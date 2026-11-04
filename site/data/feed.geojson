@@ -1,0 +1,487 @@
+{
+  "type": "FeatureCollection",
+  "contract": "tic-feed/2",
+  "program": "headwind",
+  "generated_at": "2026-11-01T12:00:00Z",
+  "licence": "US public domain (OFAC, Federal Register); CC BY-NC-SA 3.0 IGO (FAO); Headwind code MIT",
+  "attribution": "Headwind, The Intelligence Company (OFAC, Federal Register, FAO, IGC)",
+  "language_key": "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.42,
+          59.76
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:ofac:ofac-2026-10-30-shadow-fleet",
+        "program": "headwind",
+        "title": "OFAC SDN delta: Baltic & Red Sea Shadow-Fleet Crude Tanker Designations (14 entities, 3 vessels)",
+        "summary": "OFAC designated 14 entities and 3 shadow-fleet tankers (including MV BALTIC TRANSPORTER MMSI 273458910 and MT CRUDE NAVIGATOR MMSI 352981400, both tracked loitering near the Gulf of Finland subsea corridor by Wake).",
+        "kind": "assessment",
+        "tier": "warning",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "sampled",
+        "us_person_data": "none",
+        "status_class": "assessed",
+        "product_category": "warning",
+        "data_as_of": "2026-10-30T00:00:00Z",
+        "published_at": "2026-11-01T12:00:00Z",
+        "valid_until": "2026-11-02T12:00:00Z",
+        "countries": [
+          "RU",
+          "IR",
+          "PA"
+        ],
+        "pmesii_pt": [
+          "economic",
+          "political"
+        ],
+        "ascope": [
+          "organizations",
+          "capabilities"
+        ],
+        "ie_aspect": [
+          "informational",
+          "physical"
+        ],
+        "ncf": [
+          "transport_by_vessel",
+          "maintain_supply_chains",
+          "store_fuel_maintain_reserves"
+        ],
+        "requirement_ids": [
+          "HW-PIR-1",
+          "HW-EEI-1"
+        ],
+        "method_version": "headwind-1.0",
+        "coverage_fraction": 0.9,
+        "precision_class": "country",
+        "measures": {
+          "entities_added": 14,
+          "vessels_added": 3
+        },
+        "visual": {
+          "type": "table",
+          "url": "https://headwind.theintelligence.company/#ofac-2026-10-30-shadow-fleet"
+        },
+        "sources": [
+          {
+            "id": "ofac-sdn",
+            "publisher": "US Department of the Treasury (OFAC)",
+            "title": "Specially Designated Nationals (SDN) & Consolidated Sanctions List",
+            "url": "https://ofac.treasury.gov/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists",
+            "licence": "US public domain",
+            "grade": "A1",
+            "independence_group": "us-treasury-ofac",
+            "source_type": "official or market data",
+            "descriptor": "Official OFAC SDN entity and vessel (IMO/MMSI) sanctions designations.",
+            "accessed_at": "2026-11-01T12:00:00Z"
+          }
+        ],
+        "change_from_prior": "new",
+        "change_reason": "New OFAC SDN batch adding 14 entities and 3 shadow-fleet vessels.",
+        "warning_problem_id": "HW-WP-1",
+        "indicator_id": "HW-IND-1",
+        "hypothesis_id": "HW-H-1A",
+        "direction": "supports",
+        "indicator_state": "present",
+        "probability": 0.85,
+        "likelihood_term": "very_likely",
+        "confidence": "moderate",
+        "confidence_basis": {
+          "rubric": "tic-confidence-1.0",
+          "factors": {
+            "independent_lines": 2,
+            "contradicted": false,
+            "coverage_fraction": 0.9,
+            "grades": [
+              "A1",
+              "A2"
+            ],
+            "alternatives_rejected": 1,
+            "method_scored": false,
+            "assumptions": "holds",
+            "ease_of_faking": "low",
+            "horizon_days": 0.0
+          },
+          "caps": [
+            "expertise"
+          ],
+          "raise_by": [
+            "a further independent line of evidence (have 2, High needs 3)",
+            "a scored Verdict record for this method version"
+          ]
+        },
+        "alternatives": [
+          {
+            "hypothesis": "Targeted enforcement campaign to force shadow-fleet flag/club de-registration and port denial",
+            "tell_apart": "Subsequent AIS flag-hopping or loitering outside Indian/Chinese terminals in Wake."
+          },
+          {
+            "hypothesis": "Routine administrative maintenance of existing sanctions evasion aliases",
+            "tell_apart": "No active operational vessels or active transshipment hubs in the batch."
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0364,
+          38.8951
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:control:bis-affiliates-stay-2026-11-10",
+        "program": "headwind",
+        "title": "BIS deadline (2026-11-10): Affiliates (50% Ownership) Rule One-Year Stay Expiration",
+        "summary": "BIS Affiliates 50% rule stay expires 10 Nov 2026 (9 days away); USTR proposed extending its matching Section 301 maritime suspension to 9 Jan 2027 (FR Doc 2026-21755).",
+        "kind": "assessment",
+        "tier": "warning",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "sampled",
+        "us_person_data": "none",
+        "status_class": "assessed",
+        "product_category": "warning",
+        "data_as_of": "2025-11-12T00:00:00Z",
+        "published_at": "2026-11-01T12:00:00Z",
+        "valid_until": "2026-11-10T23:59:59Z",
+        "countries": [
+          "US",
+          "CN"
+        ],
+        "pmesii_pt": [
+          "economic",
+          "political"
+        ],
+        "ascope": [
+          "organizations"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "manufacture_equipment",
+          "maintain_supply_chains",
+          "provide_it_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-2",
+          "HW-EEI-2"
+        ],
+        "method_version": "headwind-1.0",
+        "coverage_fraction": 0.9,
+        "precision_class": "country",
+        "measures": {
+          "days_to_deadline": 9
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://www.federalregister.gov/documents/2025/11/12/2025-19846/one-year-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed-entities"
+        },
+        "sources": [
+          {
+            "id": "us-federal-register",
+            "publisher": "US Federal Register (BIS / USTR)",
+            "title": "Federal Register Documents & Public Inspection Filings",
+            "url": "https://www.federalregister.gov/api/v1/documents.json",
+            "licence": "US public domain",
+            "grade": "A1",
+            "independence_group": "us-federal-register",
+            "source_type": "official or market data",
+            "descriptor": "BIS and USTR export-control rule stays, suspensions, and effective-date notices.",
+            "accessed_at": "2026-11-01T12:00:00Z"
+          }
+        ],
+        "change_from_prior": "new",
+        "change_reason": "New OFAC SDN batch adding 14 entities and 3 shadow-fleet vessels.",
+        "warning_problem_id": "HW-WP-1",
+        "indicator_id": "HW-IND-2",
+        "hypothesis_id": "HW-H-1B",
+        "direction": "supports",
+        "indicator_state": "present",
+        "probability": 0.85,
+        "likelihood_term": "very_likely",
+        "confidence": "moderate",
+        "confidence_basis": {
+          "rubric": "tic-confidence-1.0",
+          "factors": {
+            "independent_lines": 2,
+            "contradicted": false,
+            "coverage_fraction": 0.9,
+            "grades": [
+              "A1",
+              "A2"
+            ],
+            "alternatives_rejected": 1,
+            "method_scored": false,
+            "assumptions": "holds",
+            "ease_of_faking": "low",
+            "horizon_days": 0.0
+          },
+          "caps": [
+            "expertise"
+          ],
+          "raise_by": [
+            "a further independent line of evidence (have 2, High needs 3)",
+            "a scored Verdict record for this method version"
+          ]
+        },
+        "alternatives": [
+          {
+            "hypothesis": "Synchronized BIS/USTR administrative stay extending the US-China trade truce",
+            "tell_apart": "Public Inspection filing of a stay document on or before the deadline date."
+          },
+          {
+            "hypothesis": "Automatic rule reimposition on the deadline date",
+            "tell_apart": "Absence of a BIS stay filing on Federal Register Public Inspection."
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0398,
+          38.9005
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:control:ustr-maritime-section-301-2026-21755",
+        "program": "headwind",
+        "title": "USTR deadline (2027-01-09): Further Suspension of Section 301 Action: China Maritime & Logistics",
+        "summary": "USTR notice proposing extension of Section 301 port-fee suspension through 9 Jan 2027.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "sampled",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-10-26T00:00:00Z",
+        "published_at": "2026-11-01T12:00:00Z",
+        "valid_until": "2027-01-09T23:59:59Z",
+        "countries": [
+          "US",
+          "CN"
+        ],
+        "pmesii_pt": [
+          "economic",
+          "political"
+        ],
+        "ascope": [
+          "organizations"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "manufacture_equipment",
+          "maintain_supply_chains",
+          "provide_it_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-2",
+          "HW-EEI-2"
+        ],
+        "method_version": "headwind-1.0",
+        "coverage_fraction": 0.9,
+        "precision_class": "country",
+        "measures": {
+          "days_to_deadline": 69
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://www.federalregister.gov/documents/2026/10/26/2026-21755/request-for-comments-on-further-suspension-of-section-301-action-chinas-targeting-of-the-maritime"
+        },
+        "sources": [
+          {
+            "id": "us-federal-register",
+            "publisher": "US Federal Register (BIS / USTR)",
+            "title": "Federal Register Documents & Public Inspection Filings",
+            "url": "https://www.federalregister.gov/api/v1/documents.json",
+            "licence": "US public domain",
+            "grade": "A1",
+            "independence_group": "us-federal-register",
+            "source_type": "official or market data",
+            "descriptor": "BIS and USTR export-control rule stays, suspensions, and effective-date notices.",
+            "accessed_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:commodity:igc-goi:2026-10",
+        "program": "headwind",
+        "title": "IGC Grains and Oilseeds Index (GOI) (2026-10): 231.4 (-4.30% vs prior)",
+        "summary": "IGC Grains and Oilseeds Index fell -4.30% in October (wheat -5.4%, maize -6.9%), pointing to a lower October FAO Food Price Index print on 6 Nov.",
+        "kind": "observation",
+        "tier": "anomaly",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-01T12:00:00Z",
+        "published_at": "2026-11-01T12:00:00Z",
+        "valid_until": "2026-11-02T12:00:00Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products",
+          "maintain_supply_chains"
+        ],
+        "requirement_ids": [
+          "HW-PIR-3"
+        ],
+        "method_version": "headwind-1.0",
+        "coverage_fraction": 0.95,
+        "precision_class": "none",
+        "measures": {
+          "index_value": 231.4,
+          "mom_pct": -4.3
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx"
+        },
+        "sources": [
+          {
+            "id": "fao-ffpi",
+            "publisher": "FAO",
+            "title": "FAO Food Price Index (FFPI)",
+            "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+            "licence": "CC BY-NC-SA 3.0 IGO",
+            "grade": "A1",
+            "independence_group": "fao",
+            "source_type": "official or market data",
+            "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
+            "accessed_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "igc-goi",
+            "publisher": "International Grains Council",
+            "title": "Grains and Oilseeds Index (GOI)",
+            "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx",
+            "licence": "IGC public market terms",
+            "grade": "A2",
+            "independence_group": "igc",
+            "source_type": "official or market data",
+            "descriptor": "Daily export price index for wheat, maize, soybeans, rice, and barley.",
+            "accessed_at": "2026-11-01T12:00:00Z"
+          }
+        ],
+        "baseline_ref": "prior-month-benchmark-value",
+        "indicator_id": "HW-IND-3",
+        "hypothesis_id": "HW-H-1B",
+        "direction": "supports",
+        "indicator_state": "present"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:commodity:fao-ffpi:2026-09",
+        "program": "headwind",
+        "title": "FAO Food Price Index (FFPI) (2026-09): 136.0 (+1.49% vs prior)",
+        "summary": "September 2026 FAO Food Price Index printed at 136.0 (+1.49%); October release scheduled for 6 Nov 2026.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-01T12:00:00Z",
+        "published_at": "2026-11-01T12:00:00Z",
+        "valid_until": "2026-11-02T12:00:00Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products",
+          "maintain_supply_chains"
+        ],
+        "requirement_ids": [
+          "HW-PIR-3"
+        ],
+        "method_version": "headwind-1.0",
+        "coverage_fraction": 0.95,
+        "precision_class": "none",
+        "measures": {
+          "index_value": 136.0,
+          "mom_pct": 1.49
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/"
+        },
+        "sources": [
+          {
+            "id": "fao-ffpi",
+            "publisher": "FAO",
+            "title": "FAO Food Price Index (FFPI)",
+            "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+            "licence": "CC BY-NC-SA 3.0 IGO",
+            "grade": "A1",
+            "independence_group": "fao",
+            "source_type": "official or market data",
+            "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
+            "accessed_at": "2026-11-01T12:00:00Z"
+          },
+          {
+            "id": "igc-goi",
+            "publisher": "International Grains Council",
+            "title": "Grains and Oilseeds Index (GOI)",
+            "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx",
+            "licence": "IGC public market terms",
+            "grade": "A2",
+            "independence_group": "igc",
+            "source_type": "official or market data",
+            "descriptor": "Daily export price index for wheat, maize, soybeans, rice, and barley.",
+            "accessed_at": "2026-11-01T12:00:00Z"
+          }
+        ]
+      }
+    }
+  ]
+}

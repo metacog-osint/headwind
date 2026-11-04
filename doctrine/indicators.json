@@ -1,0 +1,72 @@
+{
+  "program": "headwind",
+  "version": "1.0",
+  "indicators": [
+    {
+      "id": "HW-IND-1",
+      "text": "OFAC SDN delta batch designates >=3 shadow-fleet crude/product tankers (with IMO/MMSI) or a third-country dual-use procurement network.",
+      "series": "ofac_sdn_deltas",
+      "rule": "designated_vessels >= 3 or dual_use_network == true",
+      "gentry": {
+        "predictive": true,
+        "diagnostic": true,
+        "unambiguous": true,
+        "collectable": true
+      }
+    },
+    {
+      "id": "HW-IND-2",
+      "text": "BIS or USTR places a rule stay, suspension extension, or Entity List expansion on Federal Register public inspection within 14 days of a scheduled deadline.",
+      "series": "federal_register_bis_ustr",
+      "rule": "days_to_deadline <= 14",
+      "gentry": {
+        "predictive": true,
+        "diagnostic": true,
+        "unambiguous": true,
+        "collectable": true
+      }
+    },
+    {
+      "id": "HW-IND-3",
+      "text": "IGC Grains and Oilseeds Index and MPOB palm-oil quotes move >=2% in the same direction ahead of the monthly FAO FFPI release.",
+      "series": "fao_ffpi_igc",
+      "rule": "abs(composite_lead_pct) >= 2.0",
+      "gentry": {
+        "predictive": true,
+        "diagnostic": true,
+        "unambiguous": true,
+        "collectable": true
+      }
+    }
+  ],
+  "warning_problems": [
+    {
+      "id": "HW-WP-1",
+      "title": "Sanctions enforcement surge or export-control cliff",
+      "watch_condition": "Continuous monitoring of OFAC SDN delta publications and BIS/USTR Federal Register public-inspection filings.",
+      "issue_on_change": "Issue a warning item when OFAC designates a maritime tanker fleet or dual-use procurement ring, or when an export-control stay approaches within 14 days without a filed extension.",
+      "deactivation": "Rule stay or final rule is published in the Federal Register and affected shipping/trade corridors adjust.",
+      "frozen": "2026-11-01",
+      "hypotheses": [
+        {
+          "id": "HW-H-1A",
+          "title": "Coordinated enforcement tightening against shadow-fleet energy revenue or dual-use transshipment",
+          "emerging": ["HW-IND-1"],
+          "not_emerging": ["HW-IND-2"]
+        },
+        {
+          "id": "HW-H-1B",
+          "title": "Calibrated diplomatic truce extension via synchronized BIS/USTR administrative stays",
+          "emerging": ["HW-IND-2"],
+          "not_emerging": ["HW-IND-1"]
+        },
+        {
+          "id": "HW-H-1C",
+          "title": "Administrative publication lag or technical identifier correction (artefact)",
+          "emerging": [],
+          "not_emerging": ["HW-IND-1", "HW-IND-2"]
+        }
+      ]
+    }
+  ]
+}

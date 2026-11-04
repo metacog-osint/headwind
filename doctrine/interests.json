@@ -1,0 +1,22 @@
+{
+  "program": "headwind",
+  "version": "1.0",
+  "interests": [
+    {
+      "id": "HW-INT-1",
+      "about": "Maritime chokepoint transit deficits and Baltic/Red Sea AIS vessel loitering from Wake cross-check newly designated OFAC shadow-fleet tankers.",
+      "programs": ["wake"],
+      "anywhere": true,
+      "tiers": ["anomaly", "warning"],
+      "indicator_id": "HW-IND-1"
+    },
+    {
+      "id": "HW-INT-2",
+      "about": "Scored export-control and commodity forecasts in Verdict calibrate Headwind's rule-stay and food-price probability models.",
+      "programs": ["verdict"],
+      "anywhere": true,
+      "tiers": ["routine", "warning"],
+      "indicator_id": "HW-IND-2"
+    }
+  ]
+}

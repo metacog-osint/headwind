@@ -1,0 +1,42 @@
+{
+  "program": "headwind",
+  "version": "1.0",
+  "sources": [
+    {
+      "id": "ofac-sdn",
+      "name": "US Department of the Treasury OFAC SDN & Consolidated Sanctions List",
+      "url": "https://ofac.treasury.gov/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists",
+      "licence": "US public domain",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "us-treasury-ofac"
+    },
+    {
+      "id": "us-federal-register",
+      "name": "US Federal Register API (BIS, USTR, OFAC)",
+      "url": "https://www.federalregister.gov/api/v1/documents.json",
+      "licence": "US public domain",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "us-federal-register"
+    },
+    {
+      "id": "fao-ffpi",
+      "name": "FAO World Food Situation — FAO Food Price Index",
+      "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+      "licence": "CC BY-NC-SA 3.0 IGO (FAO)",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "fao"
+    },
+    {
+      "id": "igc-goi",
+      "name": "International Grains Council — Grains and Oilseeds Index (GOI)",
+      "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx",
+      "licence": "IGC public market terms",
+      "use": "ingest",
+      "grade": "A2",
+      "independence_group": "igc"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "program": "headwind",
+  "version": "1.0",
+  "assumptions": [
+    {
+      "id": "HW-ASM-1",
+      "assumption": "Federal Register Public Inspection filings give at least 24-48 hours of advance visibility before BIS or USTR rule changes take legal effect.",
+      "status": "holds",
+      "test": "Verify every tracked RIN / docket against both regular publication and special-filing Public Inspection timestamps."
+    },
+    {
+      "id": "HW-ASM-2",
+      "assumption": "Daily IGC grain/oilseed export quotes and MPOB palm-oil prices track the directional movement of the monthly FAO Food Price Index.",
+      "status": "holds",
+      "test": "Score pre-registered monthly FAO FFPI directional forecasts in Verdict."
+    }
+  ]
+}
