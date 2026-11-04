@@ -1,0 +1,18 @@
+{
+  "program": "headwind",
+  "version": "1.0",
+  "rules": [
+    {
+      "match": { "event_type": "sanctions_delta" },
+      "ncf": ["maintain_supply_chains", "transport_by_vessel"]
+    },
+    {
+      "match": { "event_type": "export_control_rule" },
+      "ncf": ["maintain_supply_chains", "manufacture_equipment"]
+    },
+    {
+      "match": { "event_type": "commodity_benchmark" },
+      "ncf": ["provide_food_products", "provide_agricultural_products"]
+    }
+  ]
+}

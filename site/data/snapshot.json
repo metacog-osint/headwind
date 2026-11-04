@@ -1,0 +1,166 @@
+{
+  "generated_at": "2026-11-01T12:00:00Z",
+  "sanctions": [
+    {
+      "id": "ofac-2026-10-30-shadow-fleet",
+      "date": "2026-10-30",
+      "title": "Baltic & Red Sea Shadow-Fleet Crude Tanker Designations",
+      "program_tag": "RUSSIA-EO14024 / IRAN-EO13902",
+      "countries": [
+        "RU",
+        "IR",
+        "PA"
+      ],
+      "entities_added": 14,
+      "vessels_added": 3,
+      "vessels": [
+        {
+          "name": "MV BALTIC TRANSPORTER",
+          "imo": "9384710",
+          "mmsi": "273458910",
+          "flag": "RU"
+        },
+        {
+          "name": "MT CRUDE NAVIGATOR",
+          "imo": "9411208",
+          "mmsi": "352981400",
+          "flag": "PA"
+        },
+        {
+          "name": "MT HORMUZ STAR",
+          "imo": "9298104",
+          "mmsi": "577412000",
+          "flag": "IR"
+        }
+      ],
+      "dual_use_network": true,
+      "lat": 59.76,
+      "lon": 24.42,
+      "url": "https://ofac.treasury.gov/recent-actions",
+      "summary": "OFAC designated 14 entities and 3 shadow-fleet tankers (including MV BALTIC TRANSPORTER MMSI 273458910 and MT CRUDE NAVIGATOR MMSI 352981400, both tracked loitering near the Gulf of Finland subsea corridor by Wake)."
+    }
+  ],
+  "controls": [
+    {
+      "id": "bis-affiliates-stay-2026-11-10",
+      "doc_number": "2025-19846",
+      "agency": "BIS",
+      "title": "Affiliates (50% Ownership) Rule One-Year Stay Expiration",
+      "published_date": "2025-11-12",
+      "deadline_date": "2026-11-10",
+      "days_to_deadline": 9,
+      "status_note": "Active stay window",
+      "countries": [
+        "US",
+        "CN"
+      ],
+      "lat": 38.8951,
+      "lon": -77.0364,
+      "url": "https://www.federalregister.gov/documents/2025/11/12/2025-19846/one-year-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed-entities",
+      "summary": "BIS Affiliates 50% rule stay expires 10 Nov 2026 (9 days away); USTR proposed extending its matching Section 301 maritime suspension to 9 Jan 2027 (FR Doc 2026-21755)."
+    },
+    {
+      "id": "ustr-maritime-section-301-2026-21755",
+      "doc_number": "2026-21755",
+      "agency": "USTR",
+      "title": "Further Suspension of Section 301 Action: China Maritime & Logistics",
+      "published_date": "2026-10-26",
+      "deadline_date": "2027-01-09",
+      "days_to_deadline": 69,
+      "status_note": "Active stay window",
+      "countries": [
+        "US",
+        "CN"
+      ],
+      "lat": 38.9005,
+      "lon": -77.0398,
+      "url": "https://www.federalregister.gov/documents/2026/10/26/2026-21755/request-for-comments-on-further-suspension-of-section-301-action-chinas-targeting-of-the-maritime",
+      "summary": "USTR notice proposing extension of Section 301 port-fee suspension through 9 Jan 2027."
+    }
+  ],
+  "commodities": [
+    {
+      "id": "igc-goi",
+      "name": "IGC Grains and Oilseeds Index (GOI)",
+      "publisher": "International Grains Council",
+      "period": "2026-10",
+      "current_value": 231.4,
+      "prior_value": 241.8,
+      "mom_pct": -4.3,
+      "next_release_date": "2026-11-20",
+      "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx",
+      "summary": "IGC Grains and Oilseeds Index fell -4.30% in October (wheat -5.4%, maize -6.9%), pointing to a lower October FAO Food Price Index print on 6 Nov."
+    },
+    {
+      "id": "fao-ffpi",
+      "name": "FAO Food Price Index (FFPI)",
+      "publisher": "FAO",
+      "period": "2026-09",
+      "current_value": 136.0,
+      "prior_value": 134.0,
+      "mom_pct": 1.49,
+      "next_release_date": "2026-11-06",
+      "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+      "summary": "September 2026 FAO Food Price Index printed at 136.0 (+1.49%); October release scheduled for 6 Nov 2026."
+    }
+  ],
+  "events": {
+    "source": "headwind",
+    "events": [
+      {
+        "id": "2026-11-10-bis-affiliates-stay-2026-11-10",
+        "date": "2026-11-10",
+        "title": "BIS: Affiliates (50% Ownership) Rule One-Year Stay Expiration",
+        "kind": "rule_date",
+        "countries": [
+          "US",
+          "CN"
+        ],
+        "ref": "2025-19846",
+        "source": {
+          "publisher": "Federal Register (BIS)",
+          "url": "https://www.federalregister.gov/documents/2025/11/12/2025-19846/one-year-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed-entities"
+        }
+      },
+      {
+        "id": "2027-01-09-ustr-maritime-section-301-2026-21755",
+        "date": "2027-01-09",
+        "title": "USTR: Further Suspension of Section 301 Action: China Maritime & Logistics",
+        "kind": "rule_date",
+        "countries": [
+          "US",
+          "CN"
+        ],
+        "ref": "2026-21755",
+        "source": {
+          "publisher": "Federal Register (USTR)",
+          "url": "https://www.federalregister.gov/documents/2026/10/26/2026-21755/request-for-comments-on-further-suspension-of-section-301-action-chinas-targeting-of-the-maritime"
+        }
+      },
+      {
+        "id": "2026-11-20-igc-goi-release",
+        "date": "2026-11-20",
+        "title": "IGC Grains and Oilseeds Index (GOI) monthly release",
+        "kind": "data_release",
+        "countries": [],
+        "ref": "IGC-GOI",
+        "source": {
+          "publisher": "International Grains Council",
+          "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx"
+        }
+      },
+      {
+        "id": "2026-11-06-fao-ffpi-release",
+        "date": "2026-11-06",
+        "title": "FAO Food Price Index (FFPI) monthly release",
+        "kind": "data_release",
+        "countries": [],
+        "ref": "FAO-FFPI",
+        "source": {
+          "publisher": "FAO",
+          "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/"
+        }
+      }
+    ]
+  }
+}
