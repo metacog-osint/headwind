@@ -19,6 +19,22 @@ controls, prices, currency and energy, with critical minerals, trade.gov screeni
 changes, and USGS mineral import reliance. Not built: Census trade data for minerals (needs a key, which Tom
 creates). Describe Headwind publicly from what is live.
 
+## Deploy (13 Nov 2026)
+- **Live at https://headwind-2lx.pages.dev** since about 10:41 AM CST, 13 Nov (`headwind.pages.dev` was taken).
+  Cloudflare Pages project `headwind`, created with `wrangler pages project create headwind --production-branch
+  main --force` (without `--force` wrangler 4.151.3 hands the command to Workers and creates nothing). The first
+  deploy was by hand from the 10:28 AM CST build, at `3281d97`.
+- `main` and `live/first-slice` are both `3281d97`, pushed. The push started the workflow's first run
+  (43465309003): tests, all ten lanes ok on the runner, check PASS, state saved to the Actions cache, deploy
+  skipped because `CLOUDFLARE_PAGES_TOKEN` is not set. Repo variable `CLOUDFLARE_ACCOUNT_ID` is set (copied from
+  Blackout's); secret `EIA_API_KEY` is set.
+- **Custom domain: https://headwind.theintelligence.company**, active with HTTPS and HSTS since about 11:00 AM CST,
+  13 Nov (Pages API domain + Squarespace `CNAME headwind -> headwind-2lx.pages.dev`, 4 hrs; Squarespace asked Tom
+  to reauthenticate before it took the record).
+- **Not done:** the `CLOUDFLARE_PAGES_TOKEN` secret (Tom), without which the workflow collects and checks but does
+  not deploy, so the site shows the hand deploy; the hub's house bar entry, the registry row, COP's drawing entry
+  and the tic-dispatch entry (wording agreed 13 Nov; proposed as a session of its own).
+
 ## Commands
 
 ```bash
