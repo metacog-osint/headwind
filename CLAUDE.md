@@ -4,14 +4,13 @@ Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind
 energy and food prices measured against their own normal range, changes to official sanctions and US screening
 lists, export-control and sanctions rules, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No probabilities, no investment advice.
 
-**State, 13 Nov 2026: the first live slice is committed and pushed on branch `live/first-slice` (`ed4e461`).
-The sanctions and rules lanes (method `headwind-1.2`) are committed on the same branch as `472e802`, pushed
-13 Nov. The screening-list and minerals lanes and the page fixes (method `headwind-1.3`) are commit `921d8f6`.
-The energy lane's move from FRED to EIA's API, the program-to-country fixes and the licence notes are the commit
-after it (13 Nov, about 9:45 AM CST). Both were pushed 13 Nov (`14e3501` is the branch tip). Nothing is merged or deployed.** `main` is still the
-4 Nov seed snapshot (`36daed6`). Untracked and to stay that way: `GEMINI.md` and `data/`. The site address in the feed
-(`headwind.theintelligence.company`) has no DNS record, and the suite registry still lists Headwind as planned
-with seed data.
+**State, 13 Nov 2026: live at https://headwind.theintelligence.company and updating itself.** Ten lanes, method
+`headwind-1.3`. `main` and `live/first-slice` are the same commit and pushed; a push to `main` runs the workflow,
+which collects, builds, checks and deploys. The house bar lists Headwind and the suite registry lists it as live
+(see Deploy). Untracked and to stay that way: `GEMINI.md` and `data/`. Commit history before the deploy:
+`ed4e461` first live slice, `472e802` sanctions and rules (`headwind-1.2`), `921d8f6` screening and minerals
+(`headwind-1.3`), `14e3501` energy from EIA, `da87b11` vessels and house bar, `39819ab` light and dark theme,
+`3281d97` state in the Actions cache and FAO's licence.
 
 **Planned scope** (`D:\Projects\_ideas\new-programs.md`, program row and roadmap step 13): sanctions, export
 controls, prices, currency and energy, with critical minerals, trade.gov screening-list diffs and UN list deltas
@@ -24,16 +23,25 @@ creates). Describe Headwind publicly from what is live.
   Cloudflare Pages project `headwind`, created with `wrangler pages project create headwind --production-branch
   main --force` (without `--force` wrangler 4.151.3 hands the command to Workers and creates nothing). The first
   deploy was by hand from the 10:28 AM CST build, at `3281d97`.
-- `main` and `live/first-slice` are both `3281d97`, pushed. The push started the workflow's first run
-  (43465309003): tests, all ten lanes ok on the runner, check PASS, state saved to the Actions cache, deploy
-  skipped because `CLOUDFLARE_PAGES_TOKEN` is not set. Repo variable `CLOUDFLARE_ACCOUNT_ID` is set (copied from
-  Blackout's); secret `EIA_API_KEY` is set.
+- **The workflow deploys since 12:42 PM CST, 13 Nov** (run 43485220044, started by hand): tests, state restored
+  from the Actions cache, all ten lanes ok on the runner, check PASS, state saved, `wrangler pages deploy`. The
+  first run (43465309003, 10:42 AM CST) did everything but deploy, because `CLOUDFLARE_PAGES_TOKEN` was not yet
+  set; Tom set it at 12:25 PM CST. Secret `EIA_API_KEY` and repo variable `CLOUDFLARE_ACCOUNT_ID` are set.
+- **A byte-order mark broke one run.** The account ID was copied from Blackout's repo with a PowerShell pipe
+  (`gh variable get ... | gh variable set ...`), which put a BOM in front of the value; run 43482685192 failed at
+  the deploy step with "Invalid account ID". The variable was set again at 12:28 PM CST and runs pass. Set
+  variables with `--body`, not a PowerShell pipe.
+- **State carries between runs:** the list baseline on the live page is still the first CI run's (10:43 AM CST).
+  The local `data/` and the runner's cache are separate histories; the live site follows the runner's.
 - **Custom domain: https://headwind.theintelligence.company**, active with HTTPS and HSTS since about 11:00 AM CST,
   13 Nov (Pages API domain + Squarespace `CNAME headwind -> headwind-2lx.pages.dev`, 4 hrs; Squarespace asked Tom
   to reauthenticate before it took the record).
-- **Not done:** the `CLOUDFLARE_PAGES_TOKEN` secret (Tom), without which the workflow collects and checks but does
-  not deploy, so the site shows the hand deploy; the hub's house bar entry, the registry row, COP's drawing entry
-  and the tic-dispatch entry (wording agreed 13 Nov; proposed as a session of its own).
+- **Suite listing, 13 Nov (done by a separate hub session; its report, with the Headwind page checked here):** house
+  bar `tic-nav.js` v1.8 lists Headwind (`Systems · economic stress`, beta) and is on this page since `7df0baa`; the
+  hub and the other program sites carry it, PropertyCast from its 14 Nov publish; the registry row, COP's drawing
+  entry and a tic-dispatch entry are pushed and deployed. Details are in the hub's `HISTORY.md` and `HANDOFF.md`.
+- **Not done:** Tom adds `headwind` to the `tic-dispatch` token's repository access; until then the dispatcher's
+  start returns 404 and the workflow runs on its own 6-hourly cron, which GitHub fires 4-9 h late.
 
 ## Commands
 
@@ -173,9 +181,6 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   sections. Fixed then: links had no colour set (browser blue on the dark panel), date badges stretched and wrapped,
   and the rules card listed all 25 documents (now six, with the rest behind a control). Wide tables scroll sideways
   on a phone.
-- Local `main` was fast-forwarded to `14e3501` on 13 Nov (Tom's yes); `origin/main` is still the seed. The work
-  after `14e3501` (vessels, country tags, house bar, deploy draft) is commit `da87b11`, and the light and dark
-  theme and the first workflow fixes are `39819ab`; both were pushed on `live/first-slice` on 13 Nov.
 - **The house bar and Time menu were looked at on 13 Nov** (about 10:30 AM CST) at 1024 and 375 pixels wide, light
   and dark, served by `tools/serve.py` with the CSP: no console errors and no CSP violations, no sideways scroll on a
   phone, and the Time menu changes every time on the page. Two faults were fixed in `site_src/style.css`: the page
@@ -186,24 +191,18 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   try), 60 feed items, `check` PASS. Still no list change: the OFAC and UN files are byte for byte the same as on
   12 Nov, and trade.gov's file changed its bytes but none of its 6,702 entries. The change items, vessel names and
   trade.gov's entry ids are still untested against a real change.
-- **Deploy is drafted, not done.** `.github/workflows/update.yml` (13 Nov, never run) follows Blackout's: tests,
-  `restore`, `collect`, `build --publish-state`, `check`, then `wrangler pages deploy` to a Cloudflare Pages
-  project named `headwind`. `restore --from <site>` reads the last run's snapshot and list indexes back from the
-  published site's `data/state/`; `build --publish-state` puts them there (about 1.7 MB; the local build leaves
-  them out so they are not committed). **Changed 13 Nov (Tom: go with the
-  recommendation): the workflow no longer publishes state.** The list indexes hold the publishers' entry ids for
-  people, and people are counts only, so state is kept in the repository's Actions cache (`actions/cache/restore`
-  and `save` v6, key `headwind-state-<run id>`, newest entry restored). GitHub drops an entry unread for 7 days;
-  with none, a run is a first reading and says so in a warning. `restore --from` and `build --publish-state` stay
-  in the CLI, unused by the workflow; `restore` exits 1 when a site cannot be reached, and a missing file (404, or
-  a page in place of JSON) is a first reading. The repo is private, so runs use Actions minutes. `site_src/_headers` carries the CSP and CORS on `/data/*`. Still Tom's:
-  the Pages project, secrets `CLOUDFLARE_PAGES_TOKEN` and `EIA_API_KEY`, variable `CLOUDFLARE_ACCOUNT_ID`, the DNS
-  record, a `tic-dispatch` entry and its token's access to the repo. The workflow runs on a push to `main`.
-- The suite registry (`tic-doctrine/vocab/programs.json`) still describes the seed build and its licences.
-- The house bar (`tic-nav.js` v1.6) and `tic-time.js` v1.3 are on the page since 13 Nov, copied from the hub's
-  `site/shared/`. The hub's Programs list has no Headwind entry yet, so the bar cannot mark "You are here"; adding
-  it is a hub change with wording for Tom. Before that the page showed the collection time in the viewer's zone
-  with the zone named, and data dates as dates.
+- **The workflow** (`.github/workflows/update.yml`) follows Blackout's: tests, state from the Actions cache,
+  `collect`, `build`, `check`, state saved, then `wrangler pages deploy`. **It does not publish state** (Tom, 13
+  Nov: go with the recommendation): the list indexes hold the publishers' entry ids for people, and people are
+  counts only, so `data/snapshot.json` and `data/state/` are kept in the repository's Actions cache
+  (`actions/cache/restore` and `save` v6, key `headwind-state-<run id>`, newest entry restored). GitHub drops an
+  entry unread for 7 days; with none, a run is a first reading and says so in a warning. State is saved before the
+  deploy, so a failed deploy does not lose a change. `restore --from` and `build --publish-state` stay in the CLI,
+  unused by the workflow; `restore` exits 1 when a site cannot be reached, and a missing file (404, or a page in
+  place of JSON) is a first reading. The repo is private, so runs use Actions minutes (a run takes about 1 min
+  15 s). `site_src/_headers` carries the CSP and CORS on `/data/*`.
+- `tic-time.js` v1.3 is on the page since 13 Nov, copied from the hub's `site/shared/`: times show in the viewer's
+  zone with the zone named, and data dates as dates.
 - US inflation and jobs dates: bls.gov refused automated requests (403). IMF's data API also refused (403).
 - No fixed baseline beside the rolling one. No Wayback capture of sources.
 - Vintages are kept for FAO only (the last twelve months as issued, in each snapshot).
