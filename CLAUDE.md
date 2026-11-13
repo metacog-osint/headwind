@@ -158,8 +158,8 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   and the rules card listed all 25 documents (now six, with the rest behind a control). Wide tables scroll sideways
   on a phone.
 - Local `main` was fast-forwarded to `14e3501` on 13 Nov (Tom's yes); `origin/main` is still the seed. The work
-  after `14e3501` (vessels, country tags, house bar, deploy draft) is commit `da87b11` on `live/first-slice`, not
-  pushed.
+  after `14e3501` (vessels, country tags, house bar, deploy draft) is commit `da87b11`, and the light and dark
+  theme and the first workflow fixes are `39819ab`; both were pushed on `live/first-slice` on 13 Nov.
 - **The house bar and Time menu were looked at on 13 Nov** (about 10:30 AM CST) at 1024 and 375 pixels wide, light
   and dark, served by `tools/serve.py` with the CSP: no console errors and no CSP violations, no sideways scroll on a
   phone, and the Time menu changes every time on the page. Two faults were fixed in `site_src/style.css`: the page
@@ -174,12 +174,13 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   `restore`, `collect`, `build --publish-state`, `check`, then `wrangler pages deploy` to a Cloudflare Pages
   project named `headwind`. `restore --from <site>` reads the last run's snapshot and list indexes back from the
   published site's `data/state/`; `build --publish-state` puts them there (about 1.7 MB; the local build leaves
-  them out so they are not committed). Changed 13 Nov after a review against Blackout's workflow: the address
-  `restore` reads is repo variable `HEADWIND_STATE_URL` (set it to the pages.dev address after the first deploy;
-  the draft read the custom domain, which has no DNS record, so every run would have been a first reading), and
-  `restore` now exits 1 when the site cannot be reached, where a missing file (404, or a page in place of JSON)
-  is still a first reading. Open for Tom: the published state holds OFAC and UN entry ids for people (ids, types
-  and programs, no names), and the repo is private, so runs use Actions minutes. `site_src/_headers` carries the CSP and CORS on `/data/*`. Still Tom's:
+  them out so they are not committed). **Changed 13 Nov (Tom: go with the
+  recommendation): the workflow no longer publishes state.** The list indexes hold the publishers' entry ids for
+  people, and people are counts only, so state is kept in the repository's Actions cache (`actions/cache/restore`
+  and `save` v6, key `headwind-state-<run id>`, newest entry restored). GitHub drops an entry unread for 7 days;
+  with none, a run is a first reading and says so in a warning. `restore --from` and `build --publish-state` stay
+  in the CLI, unused by the workflow; `restore` exits 1 when a site cannot be reached, and a missing file (404, or
+  a page in place of JSON) is a first reading. The repo is private, so runs use Actions minutes. `site_src/_headers` carries the CSP and CORS on `/data/*`. Still Tom's:
   the Pages project, secrets `CLOUDFLARE_PAGES_TOKEN` and `EIA_API_KEY`, variable `CLOUDFLARE_ACCOUNT_ID`, the DNS
   record, a `tic-dispatch` entry and its token's access to the repo. The workflow runs on a push to `main`.
 - The suite registry (`tic-doctrine/vocab/programs.json`) still describes the seed build and its licences.
@@ -197,9 +198,9 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - WFP on HDX: CC BY-IGO, read from HDX's own metadata on 12 Nov 2026.
 - FAO: its database terms page, read 13 Nov 2026, gives CC BY 4.0 unless a dataset's own page says otherwise, with
   a set citation form and a bar on use "for or in conjunction with the promotion of a commercial enterprise". The
-  Food Price Index page, read the same day, showed no licence statement to the reader. The feed, page and
-  `sources.json` still say CC BY-NC-SA 3.0 IGO from the seed build, the stricter of the two. Tom's call which to
-  state.
+  Food Price Index page, read the same day, showed no licence statement to the reader. Since 13 Nov the feed,
+  page and `sources.json` say CC BY 4.0, as the database terms do (Tom: go with the recommendation); the seed
+  build's CC BY-NC-SA 3.0 IGO had no source. FAO's set citation form is not yet used on the page.
 - ECB: its disclaimer page, read 13 Nov 2026, allows free use with the ECB cited as the source, and says a change
   to the figures must be stated. Headwind restates the rates per US dollar; the page footer says so (13 Nov).
 - World Bank: CC BY 4.0 is the default for its own datasets (licence page read 13 Nov 2026; it does not name WDI).
@@ -211,7 +212,8 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - **UN Security Council list: the open one.** The UN's website terms of use, read 13 Nov 2026, allow copying for
   personal, non-commercial use and withhold the right to redistribute or make derivative works. The list page
   states no licence of its own. Headwind publishes only counts taken from the list and a link to it, never its
-  content. Tom's call whether that is enough, or whether to ask the UN or drop the lane, before deploy.
+  content, and since 13 Nov does not publish its index of the list either. Tom, 13 Nov: that is enough to deploy
+  (the recommendation); asking the UN is still open as a courtesy.
 - USGS Mineral Commodity Summaries data release: CC0 1.0, read from the ScienceBase record on 13 Nov 2026.
 - trade.gov Consolidated Screening List: a US government work, stated from memory. Its page, read 13 Nov 2026,
   states no terms of reuse.

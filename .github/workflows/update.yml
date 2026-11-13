@@ -4,17 +4,16 @@ name: update
 #
 # Four times a day (meant to be started by the hub's tic-dispatch Worker, because GitHub fires schedules 4-9 h
 # late; its own cron is the fallback), on every push to main, and by hand: the tests, the last run's state from
-# the published site, a live collection, the site build and feed check, then a deploy of site/ to Cloudflare Pages.
+# this repository's Actions cache, a live collection, the site build and feed check, then a deploy of site/ to
+# Cloudflare Pages.
 #
 # State: Headwind reports list changes as the difference between two of its own readings, and a failed lane keeps
-# its last good copy. Both need the run before. `restore` reads that from the published site's data/state/, and
-# `build --publish-state` puts this run's state back there. With nothing published yet, the first run is a first
-# reading: it sets the baselines and reports no list change.
-#
-# Where the state is read from is repo variable HEADWIND_STATE_URL: the address the site is really served at. Set
-# it to the project's pages.dev address after the first deploy (the custom domain works only once its DNS record
-# exists). While it is unset every run is a first reading and says so in a warning. Once it is set, a site that
-# cannot be reached stops the run: going on would start the baselines over and publish that over the real state.
+# its last good copy. Both need the run before: data/snapshot.json and the two list indexes in data/state/. They
+# are kept in the Actions cache, which is private to this repository, and not on the public site, because the
+# indexes hold the publishers' entry ids for people and Headwind publishes people as counts only (13 Nov 2026).
+# Each run saves a new cache entry and the next run restores the newest. GitHub drops an entry nobody has read
+# for 7 days; with no entry a run is a first reading, sets the baselines, reports no list change and says so in a
+# warning. State is saved after the feed check and before the deploy, so a failed deploy does not lose a change.
 #
 # Secrets: EIA_API_KEY (energy lane; without it that lane fails and the rest run), CLOUDFLARE_PAGES_TOKEN
 # (Cloudflare Pages: Edit), and the account ID as repo variable CLOUDFLARE_ACCOUNT_ID. Without the Cloudflare
@@ -42,23 +41,33 @@ jobs:
         with: { node-version: "22" }
       - name: Tests
         run: python -m unittest discover -s tests
-      - name: Last run's state from the published site (none on the first run)
-        env:
-          STATE_URL: ${{ vars.HEADWIND_STATE_URL }}
-        run: |
-          if [ -z "$STATE_URL" ]; then
-            echo "::warning::HEADWIND_STATE_URL is not set, so this run is a first reading: no list change can be reported."
-            exit 0
-          fi
-          python tools/headwind.py restore --from "$STATE_URL"
+      - name: Last run's state from the Actions cache (none on the first run)
+        id: state
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            data/snapshot.json
+            data/state
+          key: headwind-state-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: headwind-state-
+      - name: Say so when there was no state
+        if: steps.state.outputs.cache-matched-key == ''
+        run: echo "::warning::No state in the Actions cache, so this run is a first reading and can report no list change."
       - name: Live collection (a failed lane keeps its last good copy and says so on the page)
         run: python tools/headwind.py collect
         env:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
-      - name: Build site/ with this run's state
-        run: python tools/headwind.py build --publish-state
+      - name: Build site/
+        run: python tools/headwind.py build
       - name: Feed check
         run: python tools/headwind.py check
+      - name: Keep this run's state for the next run
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            data/snapshot.json
+            data/state
+          key: headwind-state-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Deploy site/ to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
