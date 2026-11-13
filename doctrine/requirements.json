@@ -14,7 +14,8 @@
       "parent": "HW-REQ-1",
       "question": "Which entities, financial facilitators, or shadow-fleet tankers (IMO/MMSI) have been added to OFAC SDN or allied sanctions lists in the past 7 days?",
       "series": [
-        "ofac_sdn_deltas"
+        "ofac_sdn_deltas",
+        "trade_gov_csl_deltas"
       ]
     },
     {

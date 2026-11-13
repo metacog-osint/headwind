@@ -1,0 +1,2 @@
+# Kept byte for byte: a test checks these against the MD5 USGS lists.
+tests/fixtures/usgs_*.csv -text

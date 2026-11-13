@@ -16,6 +16,7 @@
       <a href="data/feed.geojson">Feed</a>
       <a href="data/events.json">Calendar</a>
       <a href="data/baseline.json">Country baselines</a>
+      <a href="data/minerals.json">Minerals</a>
     </nav>
   </div>
 </header>
@@ -81,6 +82,24 @@
     </section>
   </div>
 
+  <section class="card" id="screening" aria-labelledby="sc-h">
+    <div class="card-head"><h2 id="sc-h">US export-control and screening lists</h2>
+      <p class="muted small">The Entity List and the other US Commerce, State and Treasury lists, read from
+        trade.gov's Consolidated Screening List. What changed between Headwind's own readings, as counts by the
+        address country each list gives. Counts only; the names are on the publishers' lists. An entry a publisher
+        edits can count as one removed and one added.</p></div>
+    <div id="screening-deltas"></div>
+    <div class="scroll"><table id="screening-table"></table></div>
+  </section>
+
+  <section class="card" id="minerals" aria-labelledby="mn-h">
+    <div class="card-head"><h2 id="mn-h">US import reliance for mineral commodities</h2>
+      <p class="muted small" id="minerals-note">Net import reliance is imports less exports, adjusted for stock changes, as a
+        share of US consumption. Figures are annual, from the US Geological Survey, and are copied as published.</p></div>
+    <div class="scroll tall"><table id="minerals-table"></table></div>
+    <p class="small muted" id="minerals-first"></p>
+  </section>
+
   <div class="two">
     <section class="card" aria-labelledby="cal-h">
       <div class="card-head"><h2 id="cal-h">Coming dates</h2>
@@ -99,7 +118,8 @@
   <p>Headwind, a project of The Intelligence Company. Data: European Central Bank; US Energy Information
     Administration via FRED; FAO (CC BY-NC-SA 3.0 IGO); World Food Programme via the Humanitarian Data Exchange
     (CC BY-IGO); World Bank (CC BY 4.0); Federal Reserve; US Treasury (OFAC); United Nations Security Council;
-    US Federal Register. Not investment advice.</p>
+    US International Trade Administration (Consolidated Screening List); US Federal Register;
+    US Geological Survey (Mineral Commodity Summaries, CC0). Not investment advice.</p>
 </footer>
 <script src="app.js"></script>
 </body>

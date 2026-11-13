@@ -19,7 +19,7 @@ from tic_doctrine import CONTRACT, geo  # noqa: E402
 from . import controls, food, markets, stats  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
-METHOD = "headwind-1.2"
+METHOD = "headwind-1.3"
 DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
 RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
@@ -46,6 +46,18 @@ SRC_UN = {
     "independence_group": "un-security-council",
     "source_type": "official or market data",
     "descriptor": "Individuals and entities under sanctions measures imposed by the Security Council.",
+}
+
+SRC_CSL = {
+    "id": "trade-gov-csl",
+    "publisher": "US International Trade Administration (trade.gov)",
+    "title": "Consolidated Screening List",
+    "url": "https://www.trade.gov/consolidated-screening-list",
+    "licence": "US public domain",
+    "grade": "A1",
+    "independence_group": "us-trade-gov-csl",
+    "source_type": "official or market data",
+    "descriptor": "The export-control and sanctions lists of the US Commerce, State and Treasury departments in one file.",
 }
 
 SRC_FR = {
@@ -235,6 +247,31 @@ def list_features(snapshot: dict) -> list[dict]:
             source=SRC_OFAC if s["list"] == "ofac-sdn" else SRC_UN,
             accessed=(lanes.get("sanctions") or {}).get("fetched_at")))
 
+    for s in snapshot.get("screening") or []:
+        if s["detected_at"] < cutoff:
+            continue
+        parts = []
+        for word, key in (("Added", "added"), ("Removed", "removed")):
+            if s[key]:
+                by_prog = s[key + "_by_program"]
+                prog = f"; by program, {_counts(by_prog)}" if by_prog else ""
+                parts.append(f"{word} {s[key]}: by address country, {_counts(s[key + '_by_country'])}{prog}.")
+        since = f" since Headwind's reading of {s['prior_checked_at'][:10]}" if s.get("prior_checked_at") else ""
+        feats.append(_official(
+            f"headwind:screening:{s['id']}",
+            f"{s['list_name']} ({s['publisher']}): {s['added']} added, {s['removed']} removed",
+            f"{' '.join(parts)} The list now holds {s['total']} entries. This is the difference between two of "
+            f"Headwind's readings of the Consolidated Screening List{since}, seen on {s['detected_at'][:10]}; the "
+            f"dates of the listings are in the publisher's own notices. An entry the publisher edits can count as "
+            f"one removed and one added. Counts only; names are on the official list.",
+            data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
+            pmesii=["economic", "political"], ascope=["organizations"],
+            ncf=["maintain_supply_chains", "manufacture_equipment"], requirement_ids=["HW-PIR-1"],
+            measures={"added": s["added"], "removed": s["removed"], "total": s["total"]},
+            visual={"type": "page", "url": f"{SITE}/#screening"},
+            source={**SRC_CSL, "url": s.get("url") or SRC_CSL["url"]},
+            accessed=(lanes.get("screening") or {}).get("fetched_at")))
+
     for r in controls.recent(snapshot.get("controls") or [], generated, RULE_DAYS):
         dates = []
         if r.get("effective_on"):
@@ -358,11 +395,12 @@ def build_feed(snapshot: dict) -> dict:
         "program": "headwind",
         "generated_at": generated,
         "licence": ("Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; "
-                    "FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO; OFAC list and Federal Register US "
-                    "public domain; UN Security Council list, no licence stated"),
+                    "FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
+                    "Federal Register US public domain; UN Security Council list, no licence stated"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information "
                         "Administration via FRED; FAO; World Food Programme via the Humanitarian Data Exchange; "
-                        "US Treasury (OFAC); United Nations Security Council; US Federal Register."),
+                        "US Treasury (OFAC); United Nations Security Council; US International Trade Administration; "
+                        "US Federal Register."),
         "language_key": LANGUAGE_KEY,
         "features": features,
     }

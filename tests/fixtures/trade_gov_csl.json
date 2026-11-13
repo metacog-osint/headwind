@@ -1,0 +1,840 @@
+{
+ "total": 45,
+ "offset": 0,
+ "search_performed_at": "2026-11-13T14:15:00.014865+00:00",
+ "sources_used": [
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-11-09T19:36:18+00:00",
+   "source": "Capta List (CAP) - Treasury Department",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-11-09T19:36:18+00:00",
+   "source": "Non-SDN Chinese Military-Industrial Complex Companies List (CMIC) - Treasury Department",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-04-28T12:39:28+00:00",
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-07-24T00:00:00+00:00",
+   "source": "ITAR Debarred (DTC) - State Department",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-08-21T20:19:33+00:00",
+   "source": "Entity List (EL) - Bureau of Industry and Security",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-11-09T19:36:18+00:00",
+   "source": "Foreign Sanctions Evaders (FSE) - Treasury Department",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-10-02T14:20:52+00:00",
+   "source": "Nonproliferation Sanctions (ACN) - State Department",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-11-09T19:36:18+00:00",
+   "source": "Non-SDN Menu-Based Sanctions List (NS-MBS List) - Treasury Department",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-02-20T18:34:52+00:00",
+   "source": "Military End User (MEU) List - Bureau of Industry and Security",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-11-09T19:36:18+00:00",
+   "source": "Palestinian Legislative Council List (PLC) - Treasury Department",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-11-09T19:36:15+00:00",
+   "source": "Specially Designated Nationals (SDN) - Treasury Department",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-11-09T19:36:18+00:00",
+   "source": "Sectoral Sanctions Identifications List (SSI) - Treasury Department",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-13T14:15:00.014865+00:00",
+   "source_last_updated": "2026-02-10T23:02:53+00:00",
+   "source": "Unverified List (UVL) - Bureau of Industry and Security",
+   "import_rate": "Hourly"
+  }
+ ],
+ "results": [
+  {
+   "source": "Nonproliferation Sanctions (ACN) - State Department",
+   "id": "2446250b546e45b90dd23fc576a4f02f49339d19d9b2f08f26674679",
+   "type": null,
+   "programs": [
+    "Chemical and Biological Weapons Act"
+   ],
+   "name": "",
+   "country": "TH",
+   "source_list_url": "https://www.state.gov/bureau-of-arms-control-and-nonproliferation/nonproliferation-sanctions",
+   "addresses": []
+  },
+  {
+   "source": "Nonproliferation Sanctions (ACN) - State Department",
+   "id": "81e723d009d821002fe197d6f58d319c78cf6a4281c73c7acc48aefe",
+   "type": null,
+   "programs": [
+    "Chemical and Biological Weapons Act"
+   ],
+   "name": "",
+   "country": "TH",
+   "source_list_url": "https://www.state.gov/bureau-of-arms-control-and-nonproliferation/nonproliferation-sanctions",
+   "addresses": []
+  },
+  {
+   "source": "Nonproliferation Sanctions (ACN) - State Department",
+   "id": "6b1afd880f0aa5d6de2b8ca262fb4ab3b424bb830751bfe128cb0e03",
+   "type": null,
+   "programs": [
+    "Chemical and Biological Weapons Act"
+   ],
+   "name": "",
+   "country": "TH",
+   "source_list_url": "https://www.state.gov/bureau-of-arms-control-and-nonproliferation/nonproliferation-sanctions",
+   "addresses": []
+  },
+  {
+   "source": "Nonproliferation Sanctions (ACN) - State Department",
+   "id": "706efed0d7c27bd0b3da3b829105e7d952ad3b92e4dec60b5f274397",
+   "type": null,
+   "programs": [
+    "Chemical and Biological Weapons Act"
+   ],
+   "name": "",
+   "country": "PL",
+   "source_list_url": "https://www.state.gov/bureau-of-arms-control-and-nonproliferation/nonproliferation-sanctions",
+   "addresses": []
+  },
+  {
+   "source": "Capta List (CAP) - Treasury Department",
+   "id": "15268",
+   "type": "Entity",
+   "programs": [
+    "561-Related"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "CN"
+    },
+    {
+     "country": "CN"
+    },
+    {
+     "country": "CN"
+    },
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Non-SDN Chinese Military-Industrial Complex Companies List (CMIC) - Treasury Department",
+   "id": "30882",
+   "type": "Entity",
+   "programs": [
+    "CMIC-EO13959"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Non-SDN Chinese Military-Industrial Complex Companies List (CMIC) - Treasury Department",
+   "id": "30902",
+   "type": "Entity",
+   "programs": [
+    "CMIC-EO13959"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Non-SDN Chinese Military-Industrial Complex Companies List (CMIC) - Treasury Department",
+   "id": "30923",
+   "type": "Entity",
+   "programs": [
+    "CMIC-EO13959"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Non-SDN Chinese Military-Industrial Complex Companies List (CMIC) - Treasury Department",
+   "id": "30924",
+   "type": "Entity",
+   "programs": [
+    "CMIC-EO13959"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "id": "2815dd9334befab373278b903a412b353b292cc8d09cf8d06af746db",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl",
+   "addresses": [
+    {
+     "country": "DK"
+    }
+   ]
+  },
+  {
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "id": "90729d02383bde55720b948c17f28f4c8123dc2c70f8def687d8632a",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl",
+   "addresses": [
+    {
+     "country": "US"
+    }
+   ]
+  },
+  {
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "id": "e7f70b22cb46cd6ba8611288e6aa0033039727bef65a2f533f993248",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl",
+   "addresses": [
+    {
+     "country": "JP"
+    }
+   ]
+  },
+  {
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "id": "97e042258d4cf5557cbf2ad050d1154a66e7c624987cbfca99679fa1",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl",
+   "addresses": [
+    {
+     "country": "US"
+    }
+   ]
+  },
+  {
+   "source": "ITAR Debarred (DTC) - State Department",
+   "id": "1d0250ee07264881a780d52291d13f77",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://deccs.pmddtc.state.gov/ddtc_public?id=ddtc_kb_article_page&sys_id=c22d1833dbb8d300d0a370131f9619f0",
+   "addresses": []
+  },
+  {
+   "source": "ITAR Debarred (DTC) - State Department",
+   "id": "2a8131bccec9464095a6bd964467705b",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://deccs.pmddtc.state.gov/ddtc_public?id=ddtc_kb_article_page&sys_id=c22d1833dbb8d300d0a370131f9619f0",
+   "addresses": []
+  },
+  {
+   "source": "ITAR Debarred (DTC) - State Department",
+   "id": "36b82952b4784ba293cdf07d72972bdb",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://deccs.pmddtc.state.gov/ddtc_public?id=ddtc_kb_article_page&sys_id=c22d1833dbb8d300d0a370131f9619f0",
+   "addresses": []
+  },
+  {
+   "source": "ITAR Debarred (DTC) - State Department",
+   "id": "54af02f87c8b4f8bb486dc5bafba7283",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://deccs.pmddtc.state.gov/ddtc_public?id=ddtc_kb_article_page&sys_id=c22d1833dbb8d300d0a370131f9619f0",
+   "addresses": []
+  },
+  {
+   "source": "Entity List (EL) - Bureau of Industry and Security",
+   "id": "b6e959b59898e975daaae8fae3a8da1ec522f9f888cafc0e6401a16d",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-4-744",
+   "addresses": [
+    {
+     "country": "AF"
+    },
+    {
+     "country": "AF"
+    },
+    {
+     "country": "PK"
+    },
+    {
+     "country": "PK"
+    }
+   ]
+  },
+  {
+   "source": "Entity List (EL) - Bureau of Industry and Security",
+   "id": "eff72a1632af21c557fd1bfcef5f42e96de11993cca531be6b1731e9",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-4-744",
+   "addresses": [
+    {
+     "country": "AF"
+    },
+    {
+     "country": "AF"
+    }
+   ]
+  },
+  {
+   "source": "Entity List (EL) - Bureau of Industry and Security",
+   "id": "eb22e695da3e0354126e9b7dc70fc6378bd4d6e4d08728ac48a2b7f5",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-4-744",
+   "addresses": [
+    {
+     "country": "AF"
+    },
+    {
+     "country": "AF"
+    }
+   ]
+  },
+  {
+   "source": "Entity List (EL) - Bureau of Industry and Security",
+   "id": "ec07454767e552d987cc77f8a7a0f216cfb39b34c04d2982d73fcd1e",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-4-744",
+   "addresses": [
+    {
+     "country": "AF"
+    }
+   ]
+  },
+  {
+   "source": "Non-SDN Menu-Based Sanctions List (NS-MBS List) - Treasury Department",
+   "id": "17014",
+   "type": "Entity",
+   "programs": [
+    "UKRAINE-EO13662",
+    "RUSSIA-EO14024"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    }
+   ]
+  },
+  {
+   "source": "Non-SDN Menu-Based Sanctions List (NS-MBS List) - Treasury Department",
+   "id": "17250",
+   "type": "Entity",
+   "programs": [
+    "UKRAINE-EO13662",
+    "RUSSIA-EO14024"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    }
+   ]
+  },
+  {
+   "source": "Non-SDN Menu-Based Sanctions List (NS-MBS List) - Treasury Department",
+   "id": "17254",
+   "type": "Entity",
+   "programs": [
+    "UKRAINE-EO13662",
+    "RUSSIA-EO14024"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "RU"
+    }
+   ]
+  },
+  {
+   "source": "Non-SDN Menu-Based Sanctions List (NS-MBS List) - Treasury Department",
+   "id": "27016",
+   "type": "Entity",
+   "programs": [
+    "CAATSA - RUSSIA"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "TR"
+    }
+   ]
+  },
+  {
+   "source": "Military End User (MEU) List - Bureau of Industry and Security",
+   "id": "ebb648a4c4f14a3dbb22829dcbf84c33",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-7-744",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Military End User (MEU) List - Bureau of Industry and Security",
+   "id": "8c11ca124bd84988a741d8039a78751d",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-7-744",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Military End User (MEU) List - Bureau of Industry and Security",
+   "id": "5ad31e94fdba43349a6da2fe4c494041",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-7-744",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Military End User (MEU) List - Bureau of Industry and Security",
+   "id": "9498222cc1674aef954ba6dfcd5c1140",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-7-744",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Palestinian Legislative Council List (PLC) - Treasury Department",
+   "id": "9640",
+   "type": "Individual",
+   "programs": [
+    "NS-PLC"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": []
+  },
+  {
+   "source": "Palestinian Legislative Council List (PLC) - Treasury Department",
+   "id": "9641",
+   "type": "Individual",
+   "programs": [
+    "NS-PLC"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "PS"
+    }
+   ]
+  },
+  {
+   "source": "Palestinian Legislative Council List (PLC) - Treasury Department",
+   "id": "9642",
+   "type": "Individual",
+   "programs": [
+    "NS-PLC"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "PS"
+    }
+   ]
+  },
+  {
+   "source": "Palestinian Legislative Council List (PLC) - Treasury Department",
+   "id": "9643",
+   "type": "Individual",
+   "programs": [
+    "NS-PLC"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": []
+  },
+  {
+   "source": "Specially Designated Nationals (SDN) - Treasury Department",
+   "id": "36",
+   "type": "Entity",
+   "programs": [
+    "CUBA"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/SdnList",
+   "addresses": [
+    {
+     "country": "CU"
+    }
+   ]
+  },
+  {
+   "source": "Specially Designated Nationals (SDN) - Treasury Department",
+   "id": "173",
+   "type": "Entity",
+   "programs": [
+    "CUBA"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/SdnList",
+   "addresses": [
+    {
+     "country": "GB"
+    }
+   ]
+  },
+  {
+   "source": "Specially Designated Nationals (SDN) - Treasury Department",
+   "id": "306",
+   "type": "Entity",
+   "programs": [
+    "CUBA"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/SdnList",
+   "addresses": [
+    {
+     "country": "CH"
+    },
+    {
+     "country": "ES"
+    },
+    {
+     "country": "JP"
+    },
+    {
+     "country": "PA"
+    }
+   ]
+  },
+  {
+   "source": "Specially Designated Nationals (SDN) - Treasury Department",
+   "id": "424",
+   "type": "Entity",
+   "programs": [
+    "CUBA"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/SdnList",
+   "addresses": [
+    {
+     "country": "PA"
+    }
+   ]
+  },
+  {
+   "source": "Sectoral Sanctions Identifications List (SSI) - Treasury Department",
+   "id": "17013",
+   "type": "Entity",
+   "programs": [
+    "UKRAINE-EO13662",
+    "RUSSIA-EO14024",
+    "IRAN-EO13902"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "IN"
+    },
+    {
+     "country": "CN"
+    },
+    {
+     "country": "CN"
+    },
+    {
+     "country": "IR"
+    }
+   ]
+  },
+  {
+   "source": "Sectoral Sanctions Identifications List (SSI) - Treasury Department",
+   "id": "17014",
+   "type": "Entity",
+   "programs": [
+    "UKRAINE-EO13662",
+    "RUSSIA-EO14024"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    }
+   ]
+  },
+  {
+   "source": "Sectoral Sanctions Identifications List (SSI) - Treasury Department",
+   "id": "17015",
+   "type": "Entity",
+   "programs": [
+    "RUSSIA-EO14024",
+    "UKRAINE-EO13662"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "RU"
+    },
+    {
+     "country": "RU"
+    },
+    {
+     "country": "CN"
+    },
+    {
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "source": "Sectoral Sanctions Identifications List (SSI) - Treasury Department",
+   "id": "17016",
+   "type": "Entity",
+   "programs": [
+    "UKRAINE-EO13662",
+    "RUSSIA-EO14024"
+   ],
+   "name": "",
+   "country": null,
+   "source_list_url": "https://sanctionslist.ofac.treas.gov/Home/ConsolidatedList",
+   "addresses": [
+    {
+     "country": "RU"
+    },
+    {
+     "country": "MN"
+    },
+    {
+     "country": "KZ"
+    },
+    {
+     "country": "IN"
+    },
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "source": "Unverified List (UVL) - Bureau of Industry and Security",
+   "id": "1b5979e8fd3920a1a0985bf5088dad930a6a5562d1513f9e4b015e42",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-6-744",
+   "addresses": [
+    {
+     "country": "AM"
+    }
+   ]
+  },
+  {
+   "source": "Unverified List (UVL) - Bureau of Industry and Security",
+   "id": "4c49e6c66222d35e389a4d11a6c3779dd347f9c3a892c5e58209d20b",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-6-744",
+   "addresses": [
+    {
+     "country": "AM"
+    }
+   ]
+  },
+  {
+   "source": "Unverified List (UVL) - Bureau of Industry and Security",
+   "id": "b5d89c8a93d4be46e7cbaf30dc02ba8e23442f50d535a6683671db28",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-6-744",
+   "addresses": [
+    {
+     "country": "AM"
+    },
+    {
+     "country": "AE"
+    }
+   ]
+  },
+  {
+   "source": "Unverified List (UVL) - Bureau of Industry and Security",
+   "id": "4b3d47fa432ca0a8ec55b915886ccddaa0beda882ea8fde4342d1c7f",
+   "type": null,
+   "programs": null,
+   "name": "",
+   "country": null,
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-6-744",
+   "addresses": [
+    {
+     "country": "AZ"
+    }
+   ]
+  }
+ ]
+}

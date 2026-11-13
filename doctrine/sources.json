@@ -21,6 +21,15 @@
       "independence_group": "un-security-council"
     },
     {
+      "id": "trade-gov-csl",
+      "name": "US International Trade Administration: Consolidated Screening List (JSON; BIS, State and Treasury lists)",
+      "url": "https://www.trade.gov/consolidated-screening-list",
+      "licence": "US public domain",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "us-trade-gov-csl"
+    },
+    {
       "id": "us-federal-register",
       "name": "US Federal Register API (BIS and OFAC rules and proposed rules)",
       "url": "https://www.federalregister.gov/api/v1/documents.json",
@@ -91,6 +100,15 @@
       "use": "ingest",
       "grade": "A1",
       "independence_group": "ecb"
+    },
+    {
+      "id": "usgs-mcs",
+      "name": "US Geological Survey: Mineral Commodity Summaries data release (net import reliance, major import sources)",
+      "url": "https://doi.org/10.5066/P1WKQ63T",
+      "licence": "CC0 1.0",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "usgs"
     }
   ]
 }

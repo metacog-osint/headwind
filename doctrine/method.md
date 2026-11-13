@@ -1,9 +1,9 @@
-# Headwind method (`headwind-1.2`)
+# Headwind method (`headwind-1.3`)
 
 ## Purpose
 Headwind measures economic stress: currencies, energy and food prices that move outside their own
-normal range, changes to official sanctions lists, new export-control and sanctions rules, and the
-scheduled dates on which economic decisions and figures are published.
+normal range, changes to official sanctions and US screening lists, new export-control and sanctions
+rules, US import reliance for mineral commodities, and the scheduled dates on which economic decisions and figures are published.
 It reports measurements. It states no probability and gives no investment advice.
 
 ## Live lanes (13 Nov 2026)
@@ -17,6 +17,8 @@ It reports measurements. It states no probability and gives no investment advice
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
 | Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program |
+| Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country |
+| Minerals | USGS Mineral Commodity Summaries data release (net import reliance; import shares by country) | Annual | No anomaly test; context only, in `data/minerals.json` |
 | Rules | US Federal Register API: BIS and OFAC rules and proposed rules | Federal working days | What was published in the last 60 days, and the future dates each document names |
 
 ## The anomaly rule
@@ -63,10 +65,31 @@ by sanctions program. Headwind does not republish names; the item links to the o
   not say what a rule means or whether a stay will be extended.
 - **No anomaly rule yet.** Every list and rule item is tier `routine`; a baseline needs a history of
   Headwind's own readings.
+- **Only additions and removals are seen.** An entry that stays on a list and changes its programs is
+  not reported.
+
+## Screening lists
+The same measure, applied to each list in the US International Trade Administration's Consolidated
+Screening List. One item per list that changed, with counts by the address country the list gives
+for each entry and, where the list has them, by program.
+
+- **Address country is where the list places the entry**, not a finding about who controls it. An entry
+  with addresses in three countries is counted under each.
+- **Entry ids** on the Commerce and State lists are assigned by trade.gov. If an id changes when a
+  publisher edits an entry, the edit appears as one removed and one added. This has not been observed
+  either way yet.
+- **A list that loses more than half its entries** (lists of 20 or more) fails the lane and is not
+  reported as delistings.
+
+## Minerals
+Net import reliance and import shares are copied from the US Geological Survey's Mineral Commodity
+Summaries data release as printed, including bounds such as ">75" where USGS withholds the exact
+figure. They are annual and are not feed items. Headwind adds one count: the number of commodities
+for which each country is named first among the major import sources. It is a count of USGS's own
+ordering and says nothing about substitutes, stockpiles or domestic capacity.
 
 ## Not live
-trade.gov Consolidated Screening List diffs (BIS Entity List and others), critical minerals, EU and UK
-sanctions lists, USTR notices and Federal Register public-inspection filings.
+Census trade data for minerals, the critical minerals list itself, EU and UK sanctions lists, USTR notices and Federal Register public-inspection filings.
 
 ## Verdict
 `data/question_drafts.json` holds draft questions on the next FAO release with a climatology
