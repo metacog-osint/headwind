@@ -1,6 +1,6 @@
 {
   "program": "headwind",
-  "version": "1.0",
+  "version": "1.1",
   "indicators": [
     {
       "id": "HW-IND-1",
@@ -28,12 +28,48 @@
     },
     {
       "id": "HW-IND-3",
-      "text": "IGC Grains and Oilseeds Index and MPOB palm-oil quotes move >=2% in the same direction ahead of the monthly FAO FFPI release.",
-      "series": "fao_ffpi_igc",
-      "rule": "abs(composite_lead_pct) >= 2.0",
+      "text": "An FAO food price index moves on the month by a robust z of 3.5 or more against its own 120 prior monthly changes, and by at least 2%.",
+      "series": "fao_ffpi",
+      "rule": "abs(z) >= 3.5 and abs(change_pct) >= 2.0",
       "gentry": {
-        "predictive": true,
-        "diagnostic": true,
+        "predictive": false,
+        "diagnostic": false,
+        "unambiguous": true,
+        "collectable": true
+      }
+    },
+    {
+      "id": "HW-IND-4",
+      "series": "ecb_fx_per_usd",
+      "rule": "abs(z) >= 3.5 and abs(change_pct) >= 1.0",
+      "text": "A currency moves against the US dollar over five business days by a robust z of 3.5 or more against its own 250 prior five-day changes, and by at least 1%.",
+      "gentry": {
+        "predictive": false,
+        "diagnostic": false,
+        "unambiguous": true,
+        "collectable": true
+      }
+    },
+    {
+      "id": "HW-IND-5",
+      "series": "eia_spot_energy",
+      "rule": "abs(z) >= 3.5 and abs(change_pct) >= 5.0",
+      "text": "Brent, WTI or Henry Hub moves over five trading days by a robust z of 3.5 or more against its own 250 prior five-day changes, and by at least 5%.",
+      "gentry": {
+        "predictive": false,
+        "diagnostic": false,
+        "unambiguous": true,
+        "collectable": true
+      }
+    },
+    {
+      "id": "HW-IND-6",
+      "series": "wfp_local_food",
+      "rule": "abs(z) >= 3.5 and abs(median_change_pct) >= 10.0",
+      "text": "A country's median three-month change in local market food prices sits a robust z of 3.5 or more from its own 60 prior monthly medians, and is at least 10%.",
+      "gentry": {
+        "predictive": false,
+        "diagnostic": false,
         "unambiguous": true,
         "collectable": true
       }
@@ -51,20 +87,31 @@
         {
           "id": "HW-H-1A",
           "title": "Coordinated enforcement tightening against shadow-fleet energy revenue or dual-use transshipment",
-          "emerging": ["HW-IND-1"],
-          "not_emerging": ["HW-IND-2"]
+          "emerging": [
+            "HW-IND-1"
+          ],
+          "not_emerging": [
+            "HW-IND-2"
+          ]
         },
         {
           "id": "HW-H-1B",
           "title": "Calibrated diplomatic truce extension via synchronized BIS/USTR administrative stays",
-          "emerging": ["HW-IND-2"],
-          "not_emerging": ["HW-IND-1"]
+          "emerging": [
+            "HW-IND-2"
+          ],
+          "not_emerging": [
+            "HW-IND-1"
+          ]
         },
         {
           "id": "HW-H-1C",
           "title": "Administrative publication lag or technical identifier correction (artefact)",
           "emerging": [],
-          "not_emerging": ["HW-IND-1", "HW-IND-2"]
+          "not_emerging": [
+            "HW-IND-1",
+            "HW-IND-2"
+          ]
         }
       ]
     }

@@ -1,47 +1,76 @@
 {
   "program": "headwind",
-  "version": "1.0",
+  "version": "1.1",
   "review_by": "2027-02-01",
   "requirements": [
     {
       "id": "HW-REQ-1",
       "type": "standing",
-      "question": "Where are sanctions designations, export-control rule changes, or strategic commodity shocks reshaping supply chains, maritime shipping, or dual-use technology access?"
+      "question": "Where are sanctions designations, export-control rule changes, or price and currency shocks putting economic stress on a country, a supply chain or a market?"
     },
     {
       "id": "HW-PIR-1",
       "type": "pir",
       "parent": "HW-REQ-1",
       "question": "Which entities, financial facilitators, or shadow-fleet tankers (IMO/MMSI) have been added to OFAC SDN or allied sanctions lists in the past 7 days?",
-      "series": ["ofac_sdn_deltas"]
+      "series": [
+        "ofac_sdn_deltas"
+      ]
     },
     {
       "id": "HW-PIR-2",
       "type": "pir",
       "parent": "HW-REQ-1",
       "question": "Which BIS, USTR, or OFAC Federal Register rules or stays have upcoming effective dates or public-inspection filings within 30 days?",
-      "series": ["federal_register_bis_ustr"]
+      "series": [
+        "federal_register_bis_ustr"
+      ]
     },
     {
       "id": "HW-PIR-3",
       "type": "pir",
       "parent": "HW-REQ-1",
-      "question": "Where are global food or energy benchmarks (FAO FFPI, IGC GOI) moving >=2% month-over-month or diverging across sub-indices?",
-      "series": ["fao_ffpi_igc"]
+      "question": "Is the FAO Food Price Index or one of its sub-indices moving outside its own range of monthly changes?",
+      "series": [
+        "fao_ffpi"
+      ]
     },
     {
       "id": "HW-EEI-1",
       "type": "eei",
       "parent": "HW-PIR-1",
       "question": "Do newly designated OFAC vessels match MMSI tracks or loitering anomalies observed by Wake?",
-      "series": ["ofac_sdn_deltas"]
+      "series": [
+        "ofac_sdn_deltas"
+      ]
     },
     {
       "id": "HW-EEI-2",
       "type": "eei",
       "parent": "HW-PIR-2",
       "question": "Has a staying or superseding document been placed on Federal Register public inspection ahead of an automatic rule reimposition date?",
-      "series": ["federal_register_bis_ustr"]
+      "series": [
+        "federal_register_bis_ustr"
+      ]
+    },
+    {
+      "id": "HW-PIR-4",
+      "type": "pir",
+      "parent": "HW-REQ-1",
+      "question": "Which currencies or energy benchmarks moved outside their own range of five-day changes?",
+      "series": [
+        "ecb_fx_per_usd",
+        "eia_spot_energy"
+      ]
+    },
+    {
+      "id": "HW-PIR-5",
+      "type": "pir",
+      "parent": "HW-REQ-1",
+      "question": "In which watched countries are local market food prices rising or falling outside the country's own range of three-month changes?",
+      "series": [
+        "wfp_local_food"
+      ]
     }
   ]
 }

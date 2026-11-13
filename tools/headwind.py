@@ -1,141 +1,201 @@
 """Headwind CLI: collect, build, and check.
 
-    python tools/headwind.py collect
-    python tools/headwind.py build
-    python tools/headwind.py check
+    python tools/headwind.py collect     # fetch every live lane, write data/snapshot.json
+    python tools/headwind.py build       # build site/ from data/snapshot.json
+    python tools/headwind.py check       # validate the registers and lint the feed
+
+collect never falls back to made-up data. A lane that fails keeps its last good copy (marked
+from_previous) or stays empty, and the snapshot's "lanes" block says which.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import sys
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import commodities, controls, feed, sanctions  # noqa: E402
-from tic_doctrine import contract, registers  # noqa: E402
+from headwind import baseline, commodities, controls, feed, fetch, food, markets, releases, sanctions  # noqa: E402,F401
+from tic_doctrine import contract, geo, registers  # noqa: E402
 
-SEED_SNAPSHOT = {
-    "generated_at": "2026-11-01T12:00:00Z",
-    "raw_sanctions": [
-        {
-            "id": "ofac-2026-10-30-shadow-fleet",
-            "date": "2026-10-30",
-            "title": "Baltic & Red Sea Shadow-Fleet Crude Tanker Designations",
-            "program_tag": "RUSSIA-EO14024 / IRAN-EO13902",
-            "countries": ["RU", "IR", "PA"],
-            "entities_added": 14,
-            "dual_use_network": True,
-            "lat": 59.76,
-            "lon": 24.42,
-            "vessels": [
-                {"name": "MV BALTIC TRANSPORTER", "imo": "9384710", "mmsi": "273458910", "flag": "RU"},
-                {"name": "MT CRUDE NAVIGATOR", "imo": "9411208", "mmsi": "352981400", "flag": "PA"},
-                {"name": "MT HORMUZ STAR", "imo": "9298104", "mmsi": "577412000", "flag": "IR"},
-            ],
-            "summary": (
-                "OFAC designated 14 entities and 3 shadow-fleet tankers (including MV BALTIC TRANSPORTER MMSI 273458910 "
-                "and MT CRUDE NAVIGATOR MMSI 352981400, both tracked loitering near the Gulf of Finland subsea corridor by Wake)."
-            ),
-        }
-    ],
-    "raw_controls": [
-        {
-            "id": "bis-affiliates-stay-2026-11-10",
-            "doc_number": "2025-19846",
-            "agency": "BIS",
-            "title": "Affiliates (50% Ownership) Rule One-Year Stay Expiration",
-            "published_date": "2025-11-12",
-            "deadline_date": "2026-11-10",
-            "days_to_deadline": 9,
-            "countries": ["US", "CN"],
-            "lat": 38.8951,
-            "lon": -77.0364,
-            "url": "https://www.federalregister.gov/documents/2025/11/12/2025-19846/one-year-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed-entities",
-            "summary": (
-                "BIS Affiliates 50% rule stay expires 10 Nov 2026 (9 days away); USTR proposed extending its matching "
-                "Section 301 maritime suspension to 9 Jan 2027 (FR Doc 2026-21755)."
-            ),
-        },
-        {
-            "id": "ustr-maritime-section-301-2026-21755",
-            "doc_number": "2026-21755",
-            "agency": "USTR",
-            "title": "Further Suspension of Section 301 Action: China Maritime & Logistics",
-            "published_date": "2026-10-26",
-            "deadline_date": "2027-01-09",
-            "days_to_deadline": 69,
-            "countries": ["US", "CN"],
-            "lat": 38.9005,
-            "lon": -77.0398,
-            "url": "https://www.federalregister.gov/documents/2026/10/26/2026-21755/request-for-comments-on-further-suspension-of-section-301-action-chinas-targeting-of-the-maritime",
-            "summary": "USTR notice proposing extension of Section 301 port-fee suspension through 9 Jan 2027.",
-        },
-    ],
-    "raw_commodities": [
-        {
-            "id": "igc-goi",
-            "name": "IGC Grains and Oilseeds Index (GOI)",
-            "publisher": "International Grains Council",
-            "period": "2026-10",
-            "current_value": 231.4,
-            "prior_value": 241.8,
-            "next_release_date": "2026-11-20",
-            "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx",
-            "summary": "IGC Grains and Oilseeds Index fell -4.30% in October (wheat -5.4%, maize -6.9%), pointing to a lower October FAO Food Price Index print on 6 Nov.",
-        },
-        {
-            "id": "fao-ffpi",
-            "name": "FAO Food Price Index (FFPI)",
-            "publisher": "FAO",
-            "period": "2026-09",
-            "current_value": 136.0,
-            "prior_value": 134.0,
-            "next_release_date": "2026-11-06",
-            "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
-            "summary": "September 2026 FAO Food Price Index printed at 136.0 (+1.49%); October release scheduled for 6 Nov 2026.",
-        },
-    ],
+LANE_FIELDS = {
+    "fx": ["fx"],
+    "energy": ["energy"],
+    "fao": ["fao", "fao_release_dates"],
+    "wfp": ["local_food", "local_food_missing"],
+    "baseline": ["baseline"],
+    "calendar": ["fomc_dates", "ecb_dates"],
 }
+EMPTY = {"fx": [], "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
+         "baseline": {}, "fomc_dates": [], "ecb_dates": []}
 
 
-def build_snapshot(raw: dict | None = None) -> dict:
-    raw = raw or SEED_SNAPSHOT
-    s_list = sanctions.normalize_sanctions_deltas(raw.get("raw_sanctions", []))
-    c_list = controls.normalize_control_rules(raw.get("raw_controls", []))
-    m_list = commodities.normalize_commodities(raw.get("raw_commodities", []))
-    events_doc = controls.build_verdict_events(c_list, m_list)
-    return {
-        "generated_at": raw.get("generated_at", "2026-11-01T12:00:00Z"),
-        "sanctions": s_list,
-        "controls": c_list,
-        "commodities": m_list,
-        "events": events_doc,
-    }
+def _lane_fx(raw_dir, prev, getter):
+    body, rec = fetch.fetch("ecb-eurofxref", markets.ECB_HIST_ZIP, raw_dir, "zip", getter=getter)
+    return {"fx": markets.measure_fx(markets.parse_ecb_zip(body))}, [rec]
 
 
-def collect() -> dict:
-    normalized = build_snapshot(SEED_SNAPSHOT)
-    data_dir = ROOT / "data"
+def _lane_energy(raw_dir, prev, getter):
+    start = (date.today() - timedelta(days=800)).isoformat()
+    url = markets.FRED_CSV.format(ids=",".join(markets.ENERGY_SERIES), start=start)
+    body, rec = fetch.fetch("eia-spot-fred", url, raw_dir, "csv", getter=getter)
+    return {"energy": markets.measure_energy(markets.parse_fred_csv(body.decode("utf-8")))}, [rec]
+
+
+def _lane_fao(raw_dir, prev, getter):
+    page, rec1 = fetch.fetch("fao-ffpi-page", food.FAO_PAGE, raw_dir, "html", getter=getter)
+    html = page.decode("utf-8", errors="replace")
+    body, rec2 = fetch.fetch("fao-ffpi", food.fao_csv_url(html), raw_dir, "csv", getter=getter)
+    series = food.parse_fao_csv(body.decode("utf-8-sig"))
+    return {"fao": food.measure_fao(series), "fao_release_dates": food.fao_release_dates(html)}, [rec1, rec2]
+
+
+def _lane_wfp(raw_dir, prev, getter):
+    wanted = json.loads((ROOT / "config" / "wfp_countries.json").read_text(encoding="utf-8"))["countries"]
+    body, rec = fetch.fetch("hdx-wfp-index", food.HDX_SEARCH, raw_dir, "json", getter=getter)
+    resources = food.hdx_resources(json.loads(body))
+    old = {w["country"]: w for w in (prev.get("local_food") or [])}
+    today_period = date.today().strftime("%Y-%m")
+    out, missing, recs = [], [], [rec]
+    for cc, iso3 in sorted(wanted.items()):
+        res = resources.get(iso3)
+        if not res:
+            missing.append({"country": cc, "reason": "no WFP price file on HDX"})
+            continue
+        cached = old.get(cc)
+        if cached and cached.get("hdx_last_modified") == res["last_modified"]:
+            m = {k: cached[k] for k in cached if k not in ("country", "iso3", "dataset", "hdx_last_modified")}
+            m["months_old"] = ((int(today_period[:4]) - int(m["period"][:4])) * 12
+                               + int(today_period[5:7]) - int(m["period"][5:7]))
+            m["stale"] = m["months_old"] > food.WFP_STALE_MONTHS
+            m["anomaly"] = bool(m["anomaly"] and not m["stale"])
+        else:
+            try:
+                csv_body, r = fetch.fetch(f"wfp-prices-{iso3.lower()}", res["url"], raw_dir, "csv", timeout=120,
+                                          getter=getter)
+            except Exception as exc:  # one country failing must not lose the others
+                missing.append({"country": cc, "reason": f"fetch failed: {type(exc).__name__}"})
+                continue
+            recs.append(r)
+            m = food.measure_wfp(csv_body.decode("utf-8-sig", errors="replace"), today_period)
+            if not m:
+                missing.append({"country": cc, "reason": "too few price series"})
+                continue
+        out.append({"country": cc, "iso3": iso3, "dataset": res["dataset"],
+                    "hdx_last_modified": res["last_modified"], **m})
+    return {"local_food": out, "local_food_missing": missing}, recs
+
+
+def _lane_baseline(raw_dir, prev, getter):
+    known = {c["cc"] for c in json.loads(
+        (ROOT / "doctrine" / "kit" / "geo" / "countries.json").read_text(encoding="utf-8"))["countries"]}
+    per, recs = {}, []
+    for ind in baseline.INDICATORS:
+        body, rec = fetch.fetch("worldbank-wdi", baseline.WB_URL.format(ind=ind), raw_dir, "json", timeout=45,
+                                getter=getter)
+        per[ind] = baseline.parse_wb(body, known)
+        recs.append(rec)
+    return {"baseline": baseline.merge(per)}, recs
+
+
+def _lane_calendar(raw_dir, prev, getter):
+    f, rec1 = fetch.fetch("fed-fomc-calendar", releases.FOMC_PAGE, raw_dir, "html", getter=getter)
+    e, rec2 = fetch.fetch("ecb-calendar", releases.ECB_PAGE, raw_dir, "html", getter=getter)
+    fomc = releases.fomc_dates(f.decode("utf-8", errors="replace"))
+    ecb = releases.ecb_dates(e.decode("utf-8", errors="replace"))
+    if not fomc or not ecb:
+        raise ValueError(f"calendar pages parsed to {len(fomc)} FOMC and {len(ecb)} ECB dates")
+    return {"fomc_dates": fomc, "ecb_dates": ecb}, [rec1, rec2]
+
+
+LANES = {"fx": _lane_fx, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
+         "calendar": _lane_calendar}
+
+
+def finish_snapshot(snap: dict, today: date) -> dict:
+    """Add the derived parts: Verdict events and question drafts."""
+    fao = snap.get("fao") or []
+    ffpi = next((m for m in fao if m["id"] == "ffpi"), None)
+    fao_dates = snap.get("fao_release_dates") or []
+    next_release = next((d for d in fao_dates if d >= today.isoformat()), None)
+    events = controls.build_verdict_events(snap.get("controls") or [], [])["events"]
+    events += releases.build_events(today, snap.get("fomc_dates") or [], snap.get("ecb_dates") or [], fao_dates,
+                                    food.next_period(ffpi["period"]) if ffpi else None)
+    snap["events"] = {"source": "headwind", "events": sorted(events, key=lambda e: (e["date"], e["id"]))}
+    snap["question_drafts"] = releases.question_drafts(fao, next_release)
+    return snap
+
+
+def collect(root: Path = ROOT, getter=None, only: list[str] | None = None) -> dict:
+    data_dir = root / "data"
+    raw_dir = data_dir / "raw"
+    snap_path = data_dir / "snapshot.json"
+    prev = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {}
+    now = fetch.now_utc()
+    snap = {"generated_at": now, "method_version": feed.METHOD, "sanctions": [], "controls": [], "lanes": {}}
+    for lane, fn in LANES.items():
+        fields = LANE_FIELDS[lane]
+        prev_lane = (prev.get("lanes") or {}).get(lane) or {}
+        if only and lane not in only:
+            for k in fields:
+                snap[k] = prev.get(k, EMPTY[k])
+            snap["lanes"][lane] = {**prev_lane, "from_previous": True} if prev_lane else {"status": "not run"}
+            continue
+        try:
+            result, recs = fn(raw_dir, prev, getter)
+            snap.update(result)
+            snap["lanes"][lane] = {"status": "ok", "fetched_at": now, "from_previous": False,
+                                   "fetches": [{k: r[k] for k in ("url", "sha256", "bytes")} for r in recs]}
+        except Exception as exc:
+            had = bool(prev_lane.get("fetched_at"))
+            for k in fields:
+                snap[k] = prev.get(k, EMPTY[k]) if had else EMPTY[k]
+            snap["lanes"][lane] = {"status": "failed", "error": f"{type(exc).__name__}: {exc}"[:300],
+                                   "failed_at": now, "from_previous": had,
+                                   "fetched_at": prev_lane.get("fetched_at")}
+    finish_snapshot(snap, datetime.now(timezone.utc).date())
     data_dir.mkdir(parents=True, exist_ok=True)
-    (data_dir / "snapshot.json").write_text(
-        json.dumps(normalized, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
-    )
-    return normalized
+    snap_path.write_text(json.dumps(snap, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    return snap
 
 
-def build_site(root: Path = ROOT) -> dict[str, str]:
+def build_site(root: Path = ROOT, snapshot: dict | None = None) -> dict[str, str]:
     snap_path = root / "data" / "snapshot.json"
-    snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else build_snapshot()
+    if snapshot is None:
+        if not snap_path.exists():
+            raise SystemExit("No data/snapshot.json. Run `python tools/headwind.py collect` first; "
+                             "Headwind does not build from made-up data.")
+        snapshot = json.loads(snap_path.read_text(encoding="utf-8"))
+    snap = snapshot
     feed_doc = feed.build_feed(snap)
+    names = {c: geo.name(c) for c in {w["country"] for w in snap.get("local_food") or []}
+             | {f["country"] for f in snap.get("fx") or [] if f.get("country")}
+             | {m["country"] for m in snap.get("local_food_missing") or []}}
+    page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "fx", "energy", "fao", "local_food",
+                                     "local_food_missing", "sanctions", "controls", "question_drafts")}
+    page["events"] = snap["events"]["events"]
+    page["country_names"] = names
+
+    def dump(obj) -> str:
+        return json.dumps(obj, indent=2, ensure_ascii=False) + "\n"
 
     files = {
-        "data/snapshot.json": json.dumps(snap, indent=2, ensure_ascii=False) + "\n",
-        "data/feed.geojson": json.dumps(feed_doc, indent=2, ensure_ascii=False) + "\n",
-        "data/events.json": json.dumps(snap["events"], indent=2, ensure_ascii=False) + "\n",
+        "data/snapshot.json": dump(page),
+        "data/feed.geojson": dump(feed_doc),
+        "data/events.json": dump(snap["events"]),
+        "data/baseline.json": dump({
+            "generated_at": snap["generated_at"],
+            "source": "World Bank, World Development Indicators (CC BY 4.0)",
+            "lane": (snap.get("lanes") or {}).get("baseline"),
+            "indicators": {v[0]: v[1] for v in baseline.INDICATORS.values()},
+            "countries": snap.get("baseline") or {},
+        }),
+        "data/question_drafts.json": dump({"note": "Drafts only. Nothing here is registered in Verdict.",
+                                           "drafts": snap.get("question_drafts") or []}),
     }
     src_dir = root / "site_src"
     if src_dir.exists():
@@ -157,7 +217,7 @@ def check_all(root: Path = ROOT) -> list[str]:
     regs = registers.ids(root / "doctrine")
     feed_path = root / "site" / "data" / "feed.geojson"
     if not feed_path.exists():
-        build_site(root)
+        return errs + ["site/data/feed.geojson is missing: run collect and build first"]
     feed_doc = json.loads(feed_path.read_text(encoding="utf-8"))
     for feat in feed_doc.get("features", []):
         fid = (feat.get("properties") or {}).get("id", "?")
@@ -168,20 +228,24 @@ def check_all(root: Path = ROOT) -> list[str]:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="Headwind sanctions, export controls & commodity monitor.")
+    ap = argparse.ArgumentParser(description="Headwind: economic stress, sanctions and export-control monitor.")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("collect")
+    c = sub.add_parser("collect")
+    c.add_argument("--only", nargs="*", choices=sorted(LANES), help="run only these lanes; keep the rest as they were")
     sub.add_parser("build")
     sub.add_parser("check")
     args = ap.parse_args(argv)
 
     if args.cmd == "collect":
-        snap = collect()
-        print(
-            f"Collected {len(snap['sanctions'])} OFAC batches, "
-            f"{len(snap['controls'])} export-control rules, {len(snap['commodities'])} commodity indices."
-        )
-        return 0
+        snap = collect(only=args.only)
+        for lane, st in snap["lanes"].items():
+            extra = f" ({st.get('error')})" if st.get("status") == "failed" else ""
+            print(f"  {lane:9s} {st.get('status')}{' [last good copy]' if st.get('from_previous') else ''}{extra}")
+        anomalies = sum(1 for k in ("fx", "energy", "fao", "local_food") for x in snap.get(k) or [] if x.get("anomaly"))
+        print(f"Collected {len(snap['fx'])} currencies, {len(snap['energy'])} energy series, {len(snap['fao'])} FAO "
+              f"indices, {len(snap['local_food'])} countries' local food prices, {len(snap['baseline'])} country "
+              f"baselines, {len(snap['events']['events'])} events; {anomalies} anomalies.")
+        return 0 if any(s.get("status") == "ok" for s in snap["lanes"].values()) else 1
     if args.cmd == "build":
         files = build_site(ROOT)
         print(f"Built site/ ({len(files)} files).")

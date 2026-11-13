@@ -2,57 +2,119 @@
   "source": "headwind",
   "events": [
     {
-      "id": "2026-11-10-bis-affiliates-stay-2026-11-10",
-      "date": "2026-11-10",
-      "title": "BIS: Affiliates (50% Ownership) Rule One-Year Stay Expiration",
-      "kind": "rule_date",
-      "countries": [
-        "US",
-        "CN"
-      ],
-      "ref": "2025-19846",
-      "source": {
-        "publisher": "Federal Register (BIS)",
-        "url": "https://www.federalregister.gov/documents/2025/11/12/2025-19846/one-year-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed-entities"
-      }
-    },
-    {
-      "id": "2027-01-09-ustr-maritime-section-301-2026-21755",
-      "date": "2027-01-09",
-      "title": "USTR: Further Suspension of Section 301 Action: China Maritime & Logistics",
-      "kind": "rule_date",
-      "countries": [
-        "US",
-        "CN"
-      ],
-      "ref": "2026-21755",
-      "source": {
-        "publisher": "Federal Register (USTR)",
-        "url": "https://www.federalregister.gov/documents/2026/10/26/2026-21755/request-for-comments-on-further-suspension-of-section-301-action-chinas-targeting-of-the-maritime"
-      }
-    },
-    {
-      "id": "2026-11-20-igc-goi-release",
-      "date": "2026-11-20",
-      "title": "IGC Grains and Oilseeds Index (GOI) monthly release",
+      "id": "2026-12-04-fao-ffpi-release",
+      "date": "2026-12-04",
       "kind": "data_release",
       "countries": [],
-      "ref": "IGC-GOI",
-      "source": {
-        "publisher": "International Grains Council",
-        "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx"
-      }
-    },
-    {
-      "id": "2026-11-06-fao-ffpi-release",
-      "date": "2026-11-06",
-      "title": "FAO Food Price Index (FFPI) monthly release",
-      "kind": "data_release",
-      "countries": [],
-      "ref": "FAO-FFPI",
+      "ref": "FFPI",
+      "title": "FAO Food Price Index monthly release (2026-11 data)",
       "source": {
         "publisher": "FAO",
         "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/"
+      }
+    },
+    {
+      "id": "2026-12-09-fomc-decision",
+      "date": "2026-12-09",
+      "kind": "rule_date",
+      "countries": [
+        "US"
+      ],
+      "ref": "FOMC",
+      "title": "Federal Reserve FOMC rate decision",
+      "source": {
+        "publisher": "Board of Governors of the Federal Reserve System",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      }
+    },
+    {
+      "id": "2026-12-17-ecb-decision",
+      "date": "2026-12-17",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "ECB",
+      "title": "ECB Governing Council monetary policy decision",
+      "source": {
+        "publisher": "European Central Bank",
+        "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+      }
+    },
+    {
+      "id": "2027-01-27-fomc-decision",
+      "date": "2027-01-27",
+      "kind": "rule_date",
+      "countries": [
+        "US"
+      ],
+      "ref": "FOMC",
+      "title": "Federal Reserve FOMC rate decision",
+      "source": {
+        "publisher": "Board of Governors of the Federal Reserve System",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      }
+    },
+    {
+      "id": "2027-02-04-ecb-decision",
+      "date": "2027-02-04",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "ECB",
+      "title": "ECB Governing Council monetary policy decision",
+      "source": {
+        "publisher": "European Central Bank",
+        "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+      }
+    },
+    {
+      "id": "2027-03-17-fomc-decision",
+      "date": "2027-03-17",
+      "kind": "rule_date",
+      "countries": [
+        "US"
+      ],
+      "ref": "FOMC",
+      "title": "Federal Reserve FOMC rate decision",
+      "source": {
+        "publisher": "Board of Governors of the Federal Reserve System",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      }
+    },
+    {
+      "id": "2027-03-18-ecb-decision",
+      "date": "2027-03-18",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "ECB",
+      "title": "ECB Governing Council monetary policy decision",
+      "source": {
+        "publisher": "European Central Bank",
+        "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+      }
+    },
+    {
+      "id": "2027-04-28-fomc-decision",
+      "date": "2027-04-28",
+      "kind": "rule_date",
+      "countries": [
+        "US"
+      ],
+      "ref": "FOMC",
+      "title": "Federal Reserve FOMC rate decision",
+      "source": {
+        "publisher": "Board of Governors of the Federal Reserve System",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      }
+    },
+    {
+      "id": "2027-04-29-ecb-decision",
+      "date": "2027-04-29",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "ECB",
+      "title": "ECB Governing Council monetary policy decision",
+      "source": {
+        "publisher": "European Central Bank",
+        "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
       }
     }
   ]

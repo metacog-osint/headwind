@@ -1,6 +1,6 @@
 {
   "program": "headwind",
-  "version": "1.0",
+  "version": "1.1",
   "assumptions": [
     {
       "id": "HW-ASM-1",
@@ -10,9 +10,15 @@
     },
     {
       "id": "HW-ASM-2",
-      "assumption": "Daily IGC grain/oilseed export quotes and MPOB palm-oil prices track the directional movement of the monthly FAO Food Price Index.",
+      "assumption": "An official reference exchange rate reflects what people actually pay for dollars. Where a parallel market exists, the official rate understates stress.",
       "status": "holds",
-      "test": "Score pre-registered monthly FAO FFPI directional forecasts in Verdict."
+      "test": "Compare against a parallel-rate source for any country where one is found."
+    },
+    {
+      "id": "HW-ASM-3",
+      "assumption": "The markets and commodities WFP reports for a country are steady enough from month to month that the median change is comparable over time.",
+      "status": "untested",
+      "test": "Track the count of price series per country per month; flag a month where it falls by a third."
     }
   ]
 }
