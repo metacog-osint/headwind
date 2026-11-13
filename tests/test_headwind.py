@@ -13,6 +13,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import urllib.error
 import zipfile
 from unittest import mock
 from datetime import date
@@ -156,7 +157,7 @@ class TestParsers(unittest.TestCase):
             def site(url, timeout=60):
                 rel = url.split("example.test/", 1)[1]
                 if rel not in published:
-                    raise OSError("404")
+                    raise urllib.error.HTTPError(url, 404, "Not Found", None, None)
                 return published[rel].encode("utf-8")
 
             got = headwind_cli.restore(b, "https://example.test/", getter=site)
@@ -167,6 +168,12 @@ class TestParsers(unittest.TestCase):
                              json.loads(published["data/state/snapshot.json"])["sanctions_lists"][0]["baseline_set_at"])
             nothing = headwind_cli.restore(Path(tempfile.mkdtemp()), "https://example.test/", getter=lambda u, t=60: b"<html>")
             self.assertTrue(all(v.startswith("not restored") for v in nothing.values()))
+
+            def down(url, timeout=60):                                # the site cannot be reached
+                raise TimeoutError("timed out")
+
+            unreachable = headwind_cli.restore(Path(tempfile.mkdtemp()), "https://example.test/", getter=down)
+            self.assertTrue(all(v.startswith("failed") for v in unreachable.values()), unreachable)
 
     def test_no_eia_key_fails_the_lane_plainly(self):
         with tempfile.TemporaryDirectory() as tmp, \

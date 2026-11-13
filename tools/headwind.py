@@ -13,6 +13,7 @@ import argparse
 import json
 import os
 import sys
+import urllib.error
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -273,18 +274,34 @@ STATE_FILES = {"snapshot.json": "data/state/snapshot.json",
 
 def restore(root: Path = ROOT, base_url: str = "", getter=None) -> dict[str, str]:
     """Fetch the last run's state from a published site into data/. A file already on disk is left
-    alone; a file that is missing or is not JSON is skipped, and that lane starts from a first reading."""
+    alone. A file the site does not have (a 404, or a page in place of JSON, which is how Cloudflare
+    Pages answers for a missing path) is "not restored", and that lane starts from a first reading.
+    A site that could not be reached is "failed": the state may well be there, and going on would
+    reset the list baselines and publish over them, so the caller should stop."""
     out = {}
     for local, published in STATE_FILES.items():
         dest = root / "data" / local
         if dest.exists():
             out[local] = "kept the copy on disk"
             continue
+        body = None
+        for attempt in (1, 2):
+            try:
+                body = (getter or fetch.get)(base_url.rstrip("/") + "/" + published, 120)
+                break
+            except urllib.error.HTTPError as exc:
+                if exc.code in (404, 410):
+                    out[local] = "not restored (the site has no such file)"
+                    break
+                out[local] = f"failed (HTTP {exc.code})"
+            except Exception as exc:
+                out[local] = f"failed ({type(exc).__name__})"
+        if body is None:
+            continue
         try:
-            body = (getter or fetch.get)(base_url.rstrip("/") + "/" + published, 120)
             json.loads(body)
-        except Exception as exc:
-            out[local] = f"not restored ({type(exc).__name__})"
+        except ValueError:
+            out[local] = "not restored (the site has no such file)"
             continue
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(body)
@@ -396,8 +413,13 @@ def main(argv=None) -> int:
         print(f"Built site/ ({len(files)} files).")
         return 0
     if args.cmd == "restore":
-        for name, what in restore(ROOT, args.base_url).items():
+        got = restore(ROOT, args.base_url)
+        for name, what in got.items():
             print(f"  {name}: {what}")
+        if any(v.startswith("failed") for v in got.values()):
+            print("The published site could not be read. Stopping, so this run does not start the list "
+                  "baselines over and publish that in place of the last run's state.")
+            return 1
         return 0
     if args.cmd == "check":
         errs = check_all(ROOT)
