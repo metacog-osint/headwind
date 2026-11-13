@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -45,11 +46,39 @@ def _lane_fx(raw_dir, prev, getter):
     return {"fx": markets.measure_fx(markets.parse_ecb_zip(body))}, [rec]
 
 
+def eia_key_file() -> Path:
+    return Path(os.environ.get("HEADWIND_EIA_KEY_FILE") or Path.home() / ".headwind" / "eia_api_key.txt")
+
+
+def _eia_key() -> str:
+    """The EIA API key, from EIA_API_KEY or a one-line file outside the repository. Never logged."""
+    key = (os.environ.get("EIA_API_KEY") or "").strip()
+    if not key and eia_key_file().is_file():
+        key = eia_key_file().read_text(encoding="utf-8-sig").strip()
+    if not key:
+        raise RuntimeError(f"no EIA API key: set EIA_API_KEY or put the key in {eia_key_file()}")
+    return key
+
+
 def _lane_energy(raw_dir, prev, getter):
+    key = _eia_key()
+    base = getter or fetch.get
+
+    def keyed(url, timeout=60):
+        # EIA accepts the key only in the URL. Add it here so the recorded URL stays keyless,
+        # and keep it out of any error text.
+        try:
+            return base(url + "&api_key=" + key, timeout)
+        except Exception as exc:
+            raise OSError(f"{type(exc).__name__}: {exc}".replace(key, "[key]")) from None
+
     start = (date.today() - timedelta(days=800)).isoformat()
-    url = markets.FRED_CSV.format(ids=",".join(markets.ENERGY_SERIES), start=start)
-    body, rec = fetch.fetch("eia-spot-fred", url, raw_dir, "csv", getter=getter)
-    return {"energy": markets.measure_energy(markets.parse_fred_csv(body.decode("utf-8")))}, [rec]
+    series, recs = {}, []
+    for route, ids in markets.eia_routes().items():
+        body, rec = fetch.fetch("eia-spot", markets.eia_url(route, ids, start), raw_dir, "json", getter=keyed)
+        series.update(markets.parse_eia_json(body, ids))
+        recs.append(rec)
+    return {"energy": markets.measure_energy(series)}, recs
 
 
 def _lane_fao(raw_dir, prev, getter):

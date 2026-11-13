@@ -9,7 +9,7 @@ Headwind reports measurements. It states no probability and gives no investment 
 
 ## Sources
 1. **European Central Bank** euro reference rates, restated per US dollar (about 30 currencies).
-2. **US Energy Information Administration** spot prices for Brent, WTI and Henry Hub, read through FRED.
+2. **US Energy Information Administration** spot prices for Brent, WTI and Henry Hub, from EIA's own API (needs a free EIA key).
 3. **FAO** Food Price Index and its five sub-indices.
 4. **World Food Programme** food prices by market, from the Humanitarian Data Exchange.
 5. **World Bank** World Development Indicators, as a slow baseline per country.

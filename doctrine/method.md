@@ -11,7 +11,7 @@ It reports measurements. It states no probability and gives no investment advice
 | Lane | Source | Cadence | Measure |
 |---|---|---|---|
 | Exchange rates | ECB euro reference rates, restated per US dollar | TARGET business days | 5-day change against the currency's own 250 prior 5-day changes |
-| Energy | EIA spot prices for Brent, WTI and Henry Hub, read through FRED | Trading days, a day or two late | Same, with a 5% floor |
+| Energy | EIA spot prices for Brent, WTI and Henry Hub, from EIA's own API | Trading days, a day or two late | Same, with a 5% floor |
 | Food indices | FAO Food Price Index and five sub-indices | Monthly | 1-month change against 120 prior monthly changes |
 | Local food prices | WFP prices by market, from the Humanitarian Data Exchange | Monthly, one to three months late | Median 3-month change across a country's price series, against its own 60 prior medians |
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |

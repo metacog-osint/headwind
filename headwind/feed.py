@@ -97,11 +97,11 @@ SRC_ECB = {
 }
 
 SRC_EIA = {
-    "id": "eia-spot-fred",
-    "publisher": "US Energy Information Administration, retrieved from FRED (Federal Reserve Bank of St. Louis)",
+    "id": "eia-spot",
+    "publisher": "US Energy Information Administration",
     "title": "Crude oil and natural gas daily spot prices",
-    "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
-    "licence": "US public domain (EIA); citation requested",
+    "url": "https://www.eia.gov/dnav/pet/pet_pri_spt_s1_d.htm",
+    "licence": "US public domain (EIA); EIA asks to be credited as the source",
     "grade": "A1",
     "independence_group": "us-eia",
     "source_type": "official or market data",
@@ -398,7 +398,7 @@ def build_feed(snapshot: dict) -> dict:
                     "FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
                     "Federal Register US public domain; UN Security Council list, no licence stated"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information "
-                        "Administration via FRED; FAO; World Food Programme via the Humanitarian Data Exchange; "
+                        "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; US International Trade Administration; "
                         "US Federal Register."),
         "language_key": LANGUAGE_KEY,
