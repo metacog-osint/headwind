@@ -29,9 +29,11 @@ LANE_FIELDS = {
     "wfp": ["local_food", "local_food_missing"],
     "baseline": ["baseline"],
     "calendar": ["fomc_dates", "ecb_dates"],
+    "sanctions": ["sanctions", "sanctions_lists"],
+    "controls": ["controls"],
 }
 EMPTY = {"fx": [], "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
-         "baseline": {}, "fomc_dates": [], "ecb_dates": []}
+         "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "controls": []}
 
 
 def _lane_fx(raw_dir, prev, getter):
@@ -112,8 +114,42 @@ def _lane_calendar(raw_dir, prev, getter):
     return {"fomc_dates": fomc, "ecb_dates": ecb}, [rec1, rec2]
 
 
+def _lane_sanctions(raw_dir, prev, getter):
+    """Compare each list with the index kept from the last run. The first run only sets the baseline."""
+    state_path = (Path(raw_dir).parent / "state" / "sanctions_index.json")
+    state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
+    now = fetch.now_utc()
+    b1, rec1 = fetch.fetch("ofac-sdn", sanctions.OFAC_SDN_CSV, raw_dir, "csv", timeout=180, getter=getter)
+    b2, rec2 = fetch.fetch("un-sc-consolidated", sanctions.UN_XML, raw_dir, "xml", timeout=120, getter=getter)
+    un_generated, un_index = sanctions.parse_un_xml(b2)
+    readings = {"ofac-sdn": (sanctions.parse_sdn_csv(b1.decode("utf-8", errors="replace")), None),
+                "un-consolidated": (un_index, un_generated)}
+    new_state, deltas, lists = {}, [], []
+    for list_id, (index, source_generated) in readings.items():
+        old = state.get(list_id) or {}
+        sanctions.check_size(list_id, index, old.get("index"))
+        if old.get("index"):
+            d = sanctions.delta(list_id, old["index"], index, now, old.get("checked_at"))
+            if d:
+                deltas.append(d)
+        baseline_set = old.get("baseline_set_at") or now
+        new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "index": index}
+        lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated))
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text(json.dumps(new_state, separators=(",", ":")) + "\n", encoding="utf-8", newline="\n")
+    return {"sanctions": sanctions.roll(prev.get("sanctions") or [], deltas, now), "sanctions_lists": lists}, [rec1, rec2]
+
+
+def _lane_controls(raw_dir, prev, getter):
+    body, rec = fetch.fetch("us-federal-register", controls.fr_url(date.today()), raw_dir, "json", getter=getter)
+    rules = controls.parse_fr(body)
+    if not rules:
+        raise ValueError("Federal Register returned no BIS or OFAC rules for the window")
+    return {"controls": rules}, [rec]
+
+
 LANES = {"fx": _lane_fx, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
-         "calendar": _lane_calendar}
+         "calendar": _lane_calendar, "sanctions": _lane_sanctions, "controls": _lane_controls}
 
 
 def finish_snapshot(snap: dict, today: date) -> dict:
@@ -122,7 +158,7 @@ def finish_snapshot(snap: dict, today: date) -> dict:
     ffpi = next((m for m in fao if m["id"] == "ffpi"), None)
     fao_dates = snap.get("fao_release_dates") or []
     next_release = next((d for d in fao_dates if d >= today.isoformat()), None)
-    events = controls.build_verdict_events(snap.get("controls") or [], [])["events"]
+    events = controls.build_events(snap.get("controls") or [], today)
     events += releases.build_events(today, snap.get("fomc_dates") or [], snap.get("ecb_dates") or [], fao_dates,
                                     food.next_period(ffpi["period"]) if ffpi else None)
     snap["events"] = {"source": "headwind", "events": sorted(events, key=lambda e: (e["date"], e["id"]))}
@@ -136,7 +172,7 @@ def collect(root: Path = ROOT, getter=None, only: list[str] | None = None) -> di
     snap_path = data_dir / "snapshot.json"
     prev = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {}
     now = fetch.now_utc()
-    snap = {"generated_at": now, "method_version": feed.METHOD, "sanctions": [], "controls": [], "lanes": {}}
+    snap = {"generated_at": now, "method_version": feed.METHOD, "lanes": {}}
     for lane, fn in LANES.items():
         fields = LANE_FIELDS[lane]
         prev_lane = (prev.get("lanes") or {}).get(lane) or {}
@@ -176,7 +212,7 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None) -> dict[str, str
              | {f["country"] for f in snap.get("fx") or [] if f.get("country")}
              | {m["country"] for m in snap.get("local_food_missing") or []}}
     page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "fx", "energy", "fao", "local_food",
-                                     "local_food_missing", "sanctions", "controls", "question_drafts")}
+                                     "local_food_missing", "sanctions", "sanctions_lists", "controls", "question_drafts")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
 
@@ -244,7 +280,9 @@ def main(argv=None) -> int:
         anomalies = sum(1 for k in ("fx", "energy", "fao", "local_food") for x in snap.get(k) or [] if x.get("anomaly"))
         print(f"Collected {len(snap['fx'])} currencies, {len(snap['energy'])} energy series, {len(snap['fao'])} FAO "
               f"indices, {len(snap['local_food'])} countries' local food prices, {len(snap['baseline'])} country "
-              f"baselines, {len(snap['events']['events'])} events; {anomalies} anomalies.")
+              f"baselines, {len(snap['events']['events'])} events; {anomalies} anomalies. Sanctions lists: "
+              f"{len(snap['sanctions_lists'])} read, {len(snap['sanctions'])} changes kept; "
+              f"{len(snap['controls'])} Federal Register rules.")
         return 0 if any(s.get("status") == "ok" for s in snap["lanes"].values()) else 1
     if args.cmd == "build":
         files = build_site(ROOT)

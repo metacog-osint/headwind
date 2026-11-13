@@ -1,7 +1,6 @@
 """Offline tests for Headwind. Fixtures under tests/fixtures are cut from real source files fetched 12-13 Nov 2026.
 
-The sanctions and export-control records in MADE_UP are invented, for exercising feed code that has no live
-collector yet. They must never be published.
+The two sanctions-list fixtures keep each entry's id, type and program only; names and remarks are blanked.
 """
 from __future__ import annotations
 
@@ -28,20 +27,9 @@ _spec = importlib.util.spec_from_file_location("headwind_cli", ROOT / "tools" / 
 headwind_cli = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(headwind_cli)
 
-MADE_UP = {
-    "raw_sanctions": [{
-        "id": "test-batch", "date": "2026-10-30", "title": "Test designation batch (invented)",
-        "countries": ["RU", "PA"], "entities_added": 14, "dual_use_network": True, "lat": 59.76, "lon": 24.42,
-        "vessels": [{"name": "TEST VESSEL ONE", "imo": "0000001", "mmsi": "000000001", "flag": "PA"},
-                    {"name": "TEST VESSEL TWO", "imo": "0000002", "mmsi": "000000002", "flag": "PA"}],
-        "summary": "Invented record for tests.",
-    }],
-    "raw_controls": [{
-        "id": "test-rule", "doc_number": "0000-00000", "agency": "BIS", "title": "Test rule deadline (invented)",
-        "published_date": "2026-10-01", "deadline_date": "2026-11-20", "days_to_deadline": 9,
-        "countries": ["US", "CN"], "url": "https://www.federalregister.gov/", "summary": "Invented record for tests.",
-    }],
-}
+# The real lists hold thousands of entries; the fixtures hold a few dozen.
+for _l in sanctions.LISTS.values():
+    _l["min_entries"] = 5
 
 
 def text(name: str) -> str:
@@ -58,7 +46,9 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
     table = [("fredgraph.csv", "fred.csv"), ("foodpricesindex", "fao_page.html"),
              ("food_price_indices_data.csv", "fao.csv"), ("package_search", "hdx.json"),
              ("wfp_food_prices_sdn.csv", "wfp_sdn.csv"), ("api.worldbank.org", "worldbank.json"),
-             ("fomccalendars", "fomc.html"), ("calendars/mgcgc", "ecb_calendar.html")]
+             ("fomccalendars", "fomc.html"), ("calendars/mgcgc", "ecb_calendar.html"),
+             ("ofac/downloads/sdn.csv", "ofac_sdn.csv"), ("scsanctions.un.org", "un_consolidated.xml"),
+             ("federalregister.gov", "federal_register.json")]
     for needle, name in table:
         if needle in url:
             return (FIX / name).read_bytes()
@@ -198,11 +188,70 @@ class TestFeed(unittest.TestCase):
         self.assertIsNone(eur["geometry"])
         self.assertEqual(eur["properties"]["precision_class"], "none")
 
-    def test_unbuilt_lanes_still_lint(self):
+    def test_list_changes_and_rules_are_counts_and_published_facts(self):
         snap = self.snapshot()
-        snap["sanctions"] = sanctions.normalize_sanctions_deltas(MADE_UP["raw_sanctions"])
-        snap["controls"] = controls.normalize_control_rules(MADE_UP["raw_controls"])
-        self.assertEqual(lint(feed.build_feed(snap)), [])
+        old = sanctions.parse_sdn_csv(text("ofac_sdn.csv"))
+        new = dict(old)
+        del new["36"]
+        new["99999"] = ["vessel", ["RUSSIA-EO14024"]]
+        new["99998"] = ["entity", ["IRAN-EO13902", "SDGT"]]
+        d = sanctions.delta("ofac-sdn", old, new, "2026-11-13T04:00:00Z", "2026-11-12T04:00:00Z")
+        self.assertEqual((d["added"], d["removed"], d["total"]), (2, 1, len(old) + 1))
+        self.assertEqual(d["added_by_type"], {"entity": 1, "vessel": 1})
+        self.assertEqual(d["countries"], ["CU", "IR", "RU"])       # the removed entry was under CUBA
+        self.assertIsNone(sanctions.delta("ofac-sdn", old, old, "2026-11-13T04:00:00Z", None))
+        stale = {**d, "id": "ofac-sdn:old", "detected_at": "2026-10-01T00:00:00Z"}
+        snap["sanctions"] = sanctions.roll([stale], [d], "2026-11-13T05:00:00Z")
+        self.assertEqual([x["id"] for x in snap["sanctions"]], [d["id"]])            # 30 days and it is dropped
+        snap["controls"] = controls.parse_fr(text("federal_register.json"))
+        fc = feed.build_feed(snap)
+        self.assertEqual(lint(fc), [])
+        props = {f["properties"]["id"]: f["properties"] for f in fc["features"]}
+        s = props[f"headwind:sanctions:{d['id']}"]
+        self.assertEqual((s["kind"], s["tier"], s["measures"]["vessels_added"]), ("observation", "routine", 1))
+        rules = [i for i in props if i.startswith("headwind:control:")]
+        self.assertEqual(rules, ["headwind:control:2026-22793"])   # only the last 14 days reach the feed
+        for p in props.values():
+            self.assertNotIn("probability", p)
+            self.assertNotIn("likelihood_term", p)
+
+    def test_a_cut_short_list_is_an_error_not_a_mass_delisting(self):
+        old = sanctions.parse_sdn_csv(text("ofac_sdn.csv"))
+        half = dict(list(old.items())[:10])
+        with self.assertRaises(ValueError):
+            sanctions.check_size("ofac-sdn", half, old)
+        with self.assertRaises(ValueError):
+            sanctions.check_size("ofac-sdn", {}, None)
+
+
+class TestListParsers(unittest.TestCase):
+    def test_sdn(self):
+        idx = sanctions.parse_sdn_csv(text("ofac_sdn.csv"))
+        self.assertEqual(len(idx), 36)
+        self.assertEqual(idx["36"], ["entity", ["CUBA"]])           # a blank type is an entity
+        kinds = {v[0] for v in idx.values()}
+        self.assertEqual(kinds, {"entity", "individual", "vessel", "aircraft"})
+        self.assertTrue(any(len(v[1]) > 1 for v in idx.values()))   # "[A] [B]" splits into two programs
+        self.assertEqual(sanctions.countries_for(["RUSSIA-EO14024", "SDGT", "DPRK3"]), ["KP", "RU"])
+
+    def test_un(self):
+        generated, idx = sanctions.parse_un_xml((FIX / "un_consolidated.xml").read_bytes())
+        self.assertEqual(generated[:10], "2026-11-13")
+        self.assertEqual(len(idx), 14)
+        self.assertEqual(idx["6907993"], ["individual", ["DRC"]])
+
+    def test_federal_register(self):
+        rules = controls.parse_fr(text("federal_register.json"))
+        self.assertEqual(len(rules), 5)
+        stay = next(r for r in rules if r["id"] == "2026-22793")
+        self.assertEqual((stay["agency"], stay["effective_on"], stay["named_dates"]), ("BIS", "2026-11-09", ["2027-01-10"]))
+        self.assertEqual(next(r for r in rules if r["id"] == "2026-20831")["countries"], ["VE"])
+        ev = controls.build_events(rules, date(2026, 11, 13))
+        self.assertEqual([e["id"] for e in ev], ["2026-12-03-fr-2026-19537", "2027-01-10-fr-2026-22793"])
+        self.assertTrue(all(e["kind"] == "rule_date" for e in ev))
+        self.assertIn("fields%5B%5D=dates", controls.fr_url(date(2026, 11, 13)))
+        with self.assertRaises(ValueError):                         # a truncated page is not passed off as complete
+            controls.parse_fr(json.dumps({"count": 9, "results": json.loads(text("federal_register.json"))["results"]}))
 
 
 class TestEndToEnd(unittest.TestCase):
@@ -219,6 +268,10 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual([w["country"] for w in snap["local_food"]], ["SD"])
             self.assertTrue(any(m["reason"].startswith("no WFP") for m in snap["local_food_missing"]))
             self.assertTrue((tmp / "data" / "raw" / "index.jsonl").exists())
+            self.assertEqual(snap["sanctions"], [])                 # the first run only sets the baseline
+            self.assertEqual([l["total"] for l in snap["sanctions_lists"]], [36, 14])
+            self.assertEqual(len(snap["controls"]), 5)
+            self.assertTrue((tmp / "data" / "state" / "sanctions_index.json").exists())
             files = headwind_cli.build_site(tmp)
             for name in ("data/feed.geojson", "data/events.json", "data/baseline.json", "data/question_drafts.json",
                          "index.html"):
@@ -234,6 +287,22 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual(again["lanes"]["fx"]["status"], "failed")
             self.assertTrue(again["lanes"]["fx"]["from_previous"])
             self.assertEqual(again["fx"], snap["fx"])
+            self.assertEqual(again["sanctions"], [])                # same lists, no change reported
+
+            # A list that changes between runs is reported once, as counts.
+            def changed(url, timeout=60):
+                body = fake_getter(url, timeout)
+                if "sdn.csv" in url:
+                    lines = body.decode("utf-8").splitlines()[1:]
+                    lines.append("99999,-0- ,vessel,RUSSIA-EO14024" + ",-0- " * 8)
+                    return ("\n".join(lines) + "\n").encode("utf-8")
+                return body
+            third = headwind_cli.collect(tmp, getter=changed)
+            self.assertEqual([(d["list"], d["added"], d["removed"]) for d in third["sanctions"]], [("ofac-sdn", 1, 1)])
+            fourth = headwind_cli.collect(tmp, getter=changed)
+            self.assertEqual(len(fourth["sanctions"]), 1)           # kept, not reported a second time
+            headwind_cli.build_site(tmp)
+            self.assertEqual(headwind_cli.check_all(tmp), [])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
 
@@ -245,6 +314,7 @@ class TestEndToEnd(unittest.TestCase):
             snap = headwind_cli.collect(tmp, getter=down)
             self.assertTrue(all(v["status"] == "failed" and not v["from_previous"] for v in snap["lanes"].values()))
             self.assertEqual((snap["fx"], snap["energy"], snap["fao"], snap["local_food"]), ([], [], [], []))
+            self.assertEqual((snap["sanctions"], snap["sanctions_lists"], snap["controls"]), ([], [], []))
             self.assertEqual(feed.build_feed(snap)["features"], [])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)

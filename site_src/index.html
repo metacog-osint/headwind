@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Headwind: economic stress</title>
-<meta name="description" content="Currencies, energy and food prices measured against their own normal range, with the dates of coming economic decisions. Measurements, not investment advice.">
+<meta name="description" content="Currencies, energy and food prices measured against their own normal range, changes to official sanctions lists, new export-control rules, and the dates of coming economic decisions. Measurements, not investment advice.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -65,6 +65,23 @@
   </section>
 
   <div class="two">
+    <section class="card" id="sanctions" aria-labelledby="sn-h">
+      <div class="card-head"><h2 id="sn-h">Sanctions lists</h2>
+        <p class="muted small">What changed between Headwind's own readings of each official list. Counts only; the
+          names are on the publisher's list. The date is when Headwind saw the change, not the date of the
+          designation.</p></div>
+      <div id="sanction-lists"></div>
+      <div id="sanction-deltas"></div>
+    </section>
+    <section class="card" id="rules" aria-labelledby="rl-h">
+      <div class="card-head"><h2 id="rl-h">Export-control and sanctions rules</h2>
+        <p class="muted small">Rules and proposed rules published in the US Federal Register by BIS and OFAC in the
+          last 60 days, as the agencies titled them.</p></div>
+      <div id="rules-list"></div>
+    </section>
+  </div>
+
+  <div class="two">
     <section class="card" aria-labelledby="cal-h">
       <div class="card-head"><h2 id="cal-h">Coming dates</h2>
         <p class="muted small">From the publishers' own schedules. US inflation and jobs dates are not covered yet.</p></div>
@@ -81,7 +98,8 @@
 <footer class="wrap foot small muted">
   <p>Headwind, a project of The Intelligence Company. Data: European Central Bank; US Energy Information
     Administration via FRED; FAO (CC BY-NC-SA 3.0 IGO); World Food Programme via the Humanitarian Data Exchange
-    (CC BY-IGO); World Bank (CC BY 4.0); Federal Reserve. Not investment advice.</p>
+    (CC BY-IGO); World Bank (CC BY 4.0); Federal Reserve; US Treasury (OFAC); United Nations Security Council;
+    US Federal Register. Not investment advice.</p>
 </footer>
 <script src="app.js"></script>
 </body>

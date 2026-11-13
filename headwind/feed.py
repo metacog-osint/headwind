@@ -2,8 +2,8 @@
 
 Every item from the live lanes (exchange rates, energy, FAO indices, local food prices) is a
 measurement: kind "observation", tier "routine" or "anomaly". Headwind states no probability.
-The sanctions and export-control blocks are kept for when those lanes get live collectors; a
-live snapshot carries empty lists for them.
+Sanctions-list changes and Federal Register rules are also measurements: counts of what changed on
+an official list, and what an agency published. No item carries a judgment.
 """
 from __future__ import annotations
 
@@ -14,36 +14,50 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
-from tic_doctrine import CONTRACT, confidence, geo, likelihood  # noqa: E402
+from tic_doctrine import CONTRACT, geo  # noqa: E402
 
-from . import food, markets, stats  # noqa: E402
+from . import controls, food, markets, stats  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
-METHOD = "headwind-1.1"
+METHOD = "headwind-1.2"
+DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
+RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
 
 SRC_OFAC = {
     "id": "ofac-sdn",
     "publisher": "US Department of the Treasury (OFAC)",
-    "title": "Specially Designated Nationals (SDN) & Consolidated Sanctions List",
-    "url": "https://ofac.treasury.gov/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists",
+    "title": "Specially Designated Nationals and Blocked Persons List (SDN)",
+    "url": "https://ofac.treasury.gov/recent-actions",
     "licence": "US public domain",
     "grade": "A1",
     "independence_group": "us-treasury-ofac",
     "source_type": "official or market data",
-    "descriptor": "Official OFAC SDN entity and vessel (IMO/MMSI) sanctions designations.",
+    "descriptor": "The official list of persons, entities, vessels and aircraft blocked by the US Treasury.",
+}
+
+SRC_UN = {
+    "id": "un-sc-consolidated",
+    "publisher": "United Nations Security Council",
+    "title": "United Nations Security Council Consolidated List",
+    "url": "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list",
+    "licence": "No licence stated by the UN; an official public list",
+    "grade": "A1",
+    "independence_group": "un-security-council",
+    "source_type": "official or market data",
+    "descriptor": "Individuals and entities under sanctions measures imposed by the Security Council.",
 }
 
 SRC_FR = {
     "id": "us-federal-register",
-    "publisher": "US Federal Register (BIS / USTR)",
+    "publisher": "US Federal Register (BIS, OFAC)",
     "title": "Federal Register Documents & Public Inspection Filings",
     "url": "https://www.federalregister.gov/api/v1/documents.json",
     "licence": "US public domain",
     "grade": "A1",
     "independence_group": "us-federal-register",
     "source_type": "official or market data",
-    "descriptor": "BIS and USTR export-control rule stays, suspensions, and effective-date notices.",
+    "descriptor": "Rules and proposed rules as published by the agency in the official journal.",
 }
 
 SRC_FAO = {
@@ -105,20 +119,6 @@ def _month_end(period: str) -> str:
     return f"{y:04d}-{m:02d}-{calendar.monthrange(y, m)[1]:02d}T00:00:00Z"
 
 
-def _conf(ind_lines: int, cov: float, alt_rej: int) -> dict:
-    return confidence.fields(confidence.Evidence(
-        independent_lines=max(1, ind_lines),
-        contradicted=False,
-        coverage_fraction=cov,
-        grades=["A1", "A2"],
-        alternatives_rejected=alt_rej,
-        method_scored=False,
-        assumption_status="holds",
-        ease_of_faking="low",
-        horizon_days=0.0,
-    ))
-
-
 def _z_text(z) -> str:
     return "no baseline yet" if z is None else f"z {z:+.1f}"
 
@@ -169,6 +169,94 @@ def _observation(item_id: str, title: str, summary: str, *, anomaly: bool, data_
     if geom is None:
         props["precision_class"] = "none" if not countries else "country"
     return {"type": "Feature", "geometry": geom, "properties": props}
+
+
+def _counts(d: dict, limit: int = 6) -> str:
+    items = list(d.items())
+    text = ", ".join(f"{k} {v}" for k, v in items[:limit])
+    return text + (f", and {len(items) - limit} more" if len(items) > limit else "")
+
+
+def _point(countries: list[str]):
+    if len(countries) == 1:
+        pt = geo.point(countries[0])
+        if pt:
+            return {"type": "Point", "coordinates": [pt[1], pt[0]]}
+    return None
+
+
+def _official(item_id: str, title: str, summary: str, *, data_as_of: str, generated: str, valid_until: str,
+              countries: list[str], pmesii: list[str], ascope: list[str], ncf: list[str], requirement_ids: list[str],
+              measures: dict, visual: dict, source: dict, accessed: str | None) -> dict:
+    geom = _point(countries)
+    return {"type": "Feature", "geometry": geom, "properties": {
+        "contract": CONTRACT, "id": item_id, "program": "headwind", "title": title, "summary": summary,
+        "kind": "observation", "tier": "routine", "status": "actual", "msg_type": "new", "human_review": "none",
+        "us_person_data": "none", "status_class": "reported", "product_category": "current",
+        "data_as_of": data_as_of, "published_at": generated, "valid_until": valid_until, "countries": countries,
+        "pmesii_pt": pmesii, "ascope": ascope, "ie_aspect": ["informational"], "ncf": ncf,
+        "requirement_ids": requirement_ids, "method_version": METHOD, "coverage_fraction": 1.0,
+        "precision_class": "country" if geom else "none", "measures": measures, "visual": visual,
+        "sources": [{**source, "accessed_at": accessed or generated}],
+    }}
+
+
+def list_features(snapshot: dict) -> list[dict]:
+    """Sanctions-list changes and Federal Register rules. Counts and published facts; tier routine."""
+    generated = snapshot["generated_at"]
+    valid_until = _plus_hours(generated, 48)
+    lanes = snapshot.get("lanes") or {}
+    feats = []
+
+    cutoff = _plus_hours(generated, -24 * DELTA_DAYS)
+    for s in snapshot.get("sanctions") or []:
+        if s["detected_at"] < cutoff:
+            continue
+        parts = []
+        if s["added"]:
+            parts.append(f"Added {s['added']}: by type, {_counts(s['added_by_type'])}; by program, "
+                         f"{_counts(s['added_by_program'])}.")
+        if s["removed"]:
+            parts.append(f"Removed {s['removed']}: by type, {_counts(s['removed_by_type'])}; by program, "
+                         f"{_counts(s['removed_by_program'])}.")
+        since = f" since Headwind's reading of {s['prior_checked_at'][:10]}" if s.get("prior_checked_at") else ""
+        feats.append(_official(
+            f"headwind:sanctions:{s['id']}",
+            f"{s['list_name']}: {s['added']} added, {s['removed']} removed",
+            f"{' '.join(parts)} The list now holds {s['total']} entries. This is the difference between two of "
+            f"Headwind's readings{since}, seen on {s['detected_at'][:10]}; the dates of the designations are in "
+            f"the publisher's own notices. Counts only; names are on the official list.",
+            data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
+            pmesii=["economic", "political"], ascope=["organizations"],
+            ncf=["maintain_supply_chains", "provide_funding_liquidity"], requirement_ids=["HW-PIR-1"],
+            measures={"added": s["added"], "removed": s["removed"], "total": s["total"],
+                      "vessels_added": s["added_by_type"].get("vessel", 0)},
+            visual={"type": "page", "url": f"{SITE}/#sanctions"},
+            source=SRC_OFAC if s["list"] == "ofac-sdn" else SRC_UN,
+            accessed=(lanes.get("sanctions") or {}).get("fetched_at")))
+
+    for r in controls.recent(snapshot.get("controls") or [], generated, RULE_DAYS):
+        dates = []
+        if r.get("effective_on"):
+            dates.append(f"Effective {r['effective_on']}.")
+        if r.get("comments_close_on"):
+            dates.append(f"Comments close {r['comments_close_on']}.")
+        if r.get("named_dates"):
+            dates.append(f"Later dates named in its DATES paragraph: {', '.join(r['named_dates'])}.")
+        kind = "proposed rule" if r["type"].lower().startswith("proposed") else "rule"
+        feats.append(_official(
+            f"headwind:control:{r['id']}",
+            f"{r['agency']} {kind} ({r['published_date']}): {r['title']}",
+            " ".join(x for x in [f"Action: {r['action']}" if r.get("action") else "", r.get("abstract") or "",
+                                 *dates, f"Federal Register document {r['id']}."] if x),
+            data_as_of=f"{r['published_date']}T00:00:00Z", generated=generated, valid_until=valid_until,
+            countries=r.get("countries") or [], pmesii=["economic", "political"], ascope=["organizations"],
+            ncf=["maintain_supply_chains", "manufacture_equipment"], requirement_ids=["HW-PIR-2"],
+            measures={"named_dates": len(r.get("named_dates") or [])},
+            visual={"type": "page", "url": r["url"]}, source={**SRC_FR, "url": r["url"]},
+            accessed=(lanes.get("controls") or {}).get("fetched_at")))
+    return feats
+
 
 
 def live_features(snapshot: dict) -> list[dict]:
@@ -259,138 +347,9 @@ def live_features(snapshot: dict) -> list[dict]:
 def build_feed(snapshot: dict) -> dict:
     """Build a contract-v2 GeoJSON FeatureCollection from Headwind's normalized snapshot."""
     generated = snapshot["generated_at"]
-    valid_until = _plus_hours(generated, 24)
-    sanctions = snapshot.get("sanctions", [])
-    controls = snapshot.get("controls", [])
+    features = list_features(snapshot)
 
-    features = []
-
-    # 1. OFAC SDN entity & shadow-fleet vessel designations (HW-WP-1). No live collector yet.
-    for s in sanctions:
-        is_warn = s["vessels_added"] >= 2 or s["dual_use_network"]
-        conf = _conf(2, 0.90, 1)
-        prob = 0.85
-        props = {
-            "contract": CONTRACT,
-            "id": f"headwind:ofac:{s['id']}",
-            "program": "headwind",
-            "title": f"OFAC SDN delta: {s['title']} ({s['entities_added']} entities, {s['vessels_added']} vessels)",
-            "summary": s["summary"],
-            "kind": "assessment" if is_warn else "observation",
-            "tier": "warning" if is_warn else "routine",
-            "status": "actual",
-            "msg_type": "new",
-            "human_review": "sampled",
-            "us_person_data": "none",
-            "status_class": "assessed" if is_warn else "reported",
-            "product_category": "warning" if is_warn else "current",
-            "data_as_of": f"{s['date']}T00:00:00Z",
-            "published_at": generated,
-            "valid_until": valid_until,
-            "countries": s["countries"],
-            "pmesii_pt": ["economic", "political"],
-            "ascope": ["organizations", "capabilities"],
-            "ie_aspect": ["informational", "physical"],
-            "ncf": ["transport_by_vessel", "maintain_supply_chains", "store_fuel_maintain_reserves"],
-            "requirement_ids": ["HW-PIR-1", "HW-EEI-1"],
-            "method_version": METHOD,
-            "coverage_fraction": 0.90,
-            "precision_class": "country",
-            "measures": {
-                "entities_added": s["entities_added"],
-                "vessels_added": s["vessels_added"],
-            },
-            "visual": {"type": "table", "url": f"{SITE}/#{s['id']}"},
-            "sources": [{**SRC_OFAC, "accessed_at": generated}],
-        }
-        if is_warn:
-            props.update({
-                "change_from_prior": "new",
-                "change_reason": f"New OFAC SDN batch adding {s['entities_added']} entities and {s['vessels_added']} shadow-fleet vessels.",
-                "warning_problem_id": "HW-WP-1",
-                "indicator_id": "HW-IND-1",
-                "hypothesis_id": "HW-H-1A",
-                "direction": "supports",
-                "indicator_state": "present",
-                "probability": prob,
-                "likelihood_term": likelihood.term_for(prob)["id"],
-                **conf,
-                "alternatives": [
-                    {
-                        "hypothesis": "Targeted enforcement campaign to force shadow-fleet flag/club de-registration and port denial",
-                        "tell_apart": "Subsequent AIS flag-hopping or loitering outside Indian/Chinese terminals in Wake.",
-                    },
-                    {
-                        "hypothesis": "Routine administrative maintenance of existing sanctions evasion aliases",
-                        "tell_apart": "No active operational vessels or active transshipment hubs in the batch.",
-                    },
-                ],
-            })
-        geom = {"type": "Point", "coordinates": [s["lon"], s["lat"]]}
-        features.append({"type": "Feature", "geometry": geom, "properties": props})
-
-    # 2. Export-control & tariff rule deadlines (HW-IND-2). No live collector yet.
-    for r in controls:
-        is_warn = r["days_to_deadline"] <= 14
-        conf = _conf(2, 0.90, 1)
-        prob = 0.85
-        props = {
-            "contract": CONTRACT,
-            "id": f"headwind:control:{r['id']}",
-            "program": "headwind",
-            "title": f"{r['agency']} deadline ({r['deadline_date']}): {r['title']}",
-            "summary": r["summary"],
-            "kind": "assessment" if is_warn else "observation",
-            "tier": "warning" if is_warn else "routine",
-            "status": "actual",
-            "msg_type": "new",
-            "human_review": "sampled",
-            "us_person_data": "none",
-            "status_class": "assessed" if is_warn else "reported",
-            "product_category": "warning" if is_warn else "current",
-            "data_as_of": f"{r['published_date']}T00:00:00Z",
-            "published_at": generated,
-            "valid_until": f"{r['deadline_date']}T23:59:59Z",
-            "countries": r["countries"],
-            "pmesii_pt": ["economic", "political"],
-            "ascope": ["organizations"],
-            "ie_aspect": ["informational"],
-            "ncf": ["manufacture_equipment", "maintain_supply_chains", "provide_it_products"],
-            "requirement_ids": ["HW-PIR-2", "HW-EEI-2"],
-            "method_version": METHOD,
-            "coverage_fraction": 0.90,
-            "precision_class": "country",
-            "measures": {"days_to_deadline": r["days_to_deadline"]},
-            "visual": {"type": "page", "url": r["url"]},
-            "sources": [{**SRC_FR, "accessed_at": generated}],
-        }
-        if is_warn:
-            props.update({
-                "change_from_prior": "new",
-                "change_reason": f"{r['agency']} deadline on {r['deadline_date']} is {r['days_to_deadline']} days away.",
-                "warning_problem_id": "HW-WP-1",
-                "indicator_id": "HW-IND-2",
-                "hypothesis_id": "HW-H-1B",
-                "direction": "supports",
-                "indicator_state": "present",
-                "probability": prob,
-                "likelihood_term": likelihood.term_for(prob)["id"],
-                **conf,
-                "alternatives": [
-                    {
-                        "hypothesis": "Synchronized BIS/USTR administrative stay extending the US-China trade truce",
-                        "tell_apart": "Public Inspection filing of a stay document on or before the deadline date.",
-                    },
-                    {
-                        "hypothesis": "Automatic rule reimposition on the deadline date",
-                        "tell_apart": "Absence of a BIS stay filing on Federal Register Public Inspection.",
-                    },
-                ],
-            })
-        geom = {"type": "Point", "coordinates": [r["lon"], r["lat"]]}
-        features.append({"type": "Feature", "geometry": geom, "properties": props})
-
-    # 3. Live lanes: exchange rates, energy, FAO indices, local food prices. Measurements only.
+    # Exchange rates, energy, FAO indices, local food prices. Measurements only.
     features.extend(live_features(snapshot))
 
     return {
@@ -399,9 +358,11 @@ def build_feed(snapshot: dict) -> dict:
         "program": "headwind",
         "generated_at": generated,
         "licence": ("Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; "
-                    "FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO"),
+                    "FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO; OFAC list and Federal Register US "
+                    "public domain; UN Security Council list, no licence stated"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information "
-                        "Administration via FRED; FAO; World Food Programme via the Humanitarian Data Exchange."),
+                        "Administration via FRED; FAO; World Food Programme via the Humanitarian Data Exchange; "
+                        "US Treasury (OFAC); United Nations Security Council; US Federal Register."),
         "language_key": LANGUAGE_KEY,
         "features": features,
     }
