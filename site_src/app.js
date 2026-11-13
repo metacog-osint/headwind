@@ -125,7 +125,7 @@
         ? '<details class="more"><summary>Show ' + (ruleRows.length - RULES_SHOWN) + " earlier documents</summary>" + ruleRows.slice(RULES_SHOWN).join("") + "</details>" : "")
       : '<p class="small muted">No rules collected.</p>';
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules (US Federal Register)", fx: "Exchange rates (ECB)", energy: "Energy prices (EIA via FRED)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules (US Federal Register)", fx: "Exchange rates (ECB)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {
       var l = s.lanes[k], ok = l.status === "ok";
       var note = ok ? "collected " + when(l.fetched_at) : (l.from_previous && l.fetched_at ? "failed; showing the copy from " + when(l.fetched_at) : "failed; no data");

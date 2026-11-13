@@ -39,6 +39,9 @@ PROGRAM_COUNTRY = {
     "IRAQ": "IQ", "SUDAN": "SD", "DARFUR": "SD", "SOUTH SUDAN": "SS", "SOMALIA": "SO", "YEMEN": "YE", "CAR": "CF",
     "DRCONGO": "CD", "MALI": "ML", "NICARAGUA": "NI", "ETHIOPIA": "ET", "LEBANON": "LB", "ZIMBABWE": "ZW",
     "HONG KONG": "HK", "BALKANS": None, "AFGHANISTAN": "AF", "HAITI": "HT",
+    # Tags the prefix rule misplaced or missed, found against the live list on 13 Nov 2026
+    "HRIT-SY": "SY", "CAATSA - RUSSIA": "RU", "CAATSA - IRAN": "IR", "MAGNIT": "RU", "PEESA": "RU",
+    "SSIDES": "SS", "UHRPA": "CN",
     # UN list types
     "Iran": "IR", "Iraq": "IQ", "DRC": "CD", "Libya": "LY", "Somalia": "SO", "Sudan": "SD", "Haiti": "HT",
     "Yemen": "YE", "GB": "GW", "SouthSudan": "SS", "Taliban": "AF",

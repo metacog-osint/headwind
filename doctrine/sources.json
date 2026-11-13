@@ -57,9 +57,9 @@
       "independence_group": "ecb"
     },
     {
-      "id": "eia-spot-fred",
-      "name": "US EIA daily spot prices (Brent, WTI, Henry Hub), retrieved from FRED",
-      "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+      "id": "eia-spot",
+      "name": "US EIA daily spot prices (Brent, WTI, Henry Hub), from EIA's API",
+      "url": "https://www.eia.gov/dnav/pet/pet_pri_spt_s1_d.htm",
       "licence": "US public domain (EIA); citation requested",
       "use": "ingest",
       "grade": "A1",

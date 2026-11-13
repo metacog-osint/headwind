@@ -8,11 +8,13 @@ from __future__ import annotations
 import importlib.util
 import io
 import json
+import os
 import shutil
 import sys
 import tempfile
 import unittest
 import zipfile
+from unittest import mock
 from datetime import date
 from pathlib import Path
 
@@ -28,6 +30,8 @@ from tic_doctrine import contract, registers  # noqa: E402
 _spec = importlib.util.spec_from_file_location("headwind_cli", ROOT / "tools" / "headwind.py")
 headwind_cli = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(headwind_cli)
+
+os.environ["EIA_API_KEY"] = "test-key-not-real"      # the energy lane needs a key; the fixtures stand in for EIA
 
 # The real lists hold thousands of entries; the fixtures hold a few dozen.
 for _l in sanctions.LISTS.values():
@@ -47,7 +51,8 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         with zipfile.ZipFile(buf, "w") as zf:
             zf.writestr("eurofxref-hist.csv", text("ecb.csv"))
         return buf.getvalue()
-    table = [("fredgraph.csv", "fred.csv"), ("foodpricesindex", "fao_page.html"),
+    table = [("petroleum/pri/spt", "eia_petroleum.json"), ("natural-gas/pri/fut", "eia_natural_gas.json"),
+             ("foodpricesindex", "fao_page.html"),
              ("food_price_indices_data.csv", "fao.csv"), ("package_search", "hdx.json"),
              ("wfp_food_prices_sdn.csv", "wfp_sdn.csv"), ("api.worldbank.org", "worldbank.json"),
              ("fomccalendars", "fomc.html"), ("calendars/mgcgc", "ecb_calendar.html"),
@@ -106,10 +111,45 @@ class TestParsers(unittest.TestCase):
         self.assertGreater(tr["per_usd"], 1)
         self.assertEqual(tr["baseline_n"], 250)
 
-    def test_fred(self):
-        en = markets.measure_energy(markets.parse_fred_csv(text("fred.csv")))
+    def test_eia(self):
+        series = {}
+        for name, ids in (("eia_petroleum.json", ["RBRTE", "RWTC"]), ("eia_natural_gas.json", ["RNGWHHD"])):
+            series.update(markets.parse_eia_json(text(name), ids))
+        en = markets.measure_energy(series)
         self.assertEqual({e["id"] for e in en}, {"brent", "wti", "henry-hub"})
-        self.assertTrue(all(e["price"] > 0 for e in en))
+        self.assertTrue(all(e["price"] > 0 and "route" not in e for e in en))
+        with self.assertRaises(ValueError):          # a series missing from the reply is an error
+            markets.parse_eia_json(text("eia_natural_gas.json"), ["RBRTE"])
+        with self.assertRaises(ValueError):          # so is EIA's own error reply
+            markets.parse_eia_json('{"error": "API_KEY_MISSING"}', ["RBRTE"])
+        self.assertNotIn("api_key", markets.eia_url("petroleum/pri/spt", ["RBRTE", "RWTC"], "2024-01-01"))
+
+    def test_the_eia_key_is_never_recorded(self):
+        seen = []
+
+        def getter(url, timeout=60):
+            seen.append(url)
+            return fake_getter(url, timeout)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            result, recs = headwind_cli._lane_energy(raw, {}, getter)
+            self.assertEqual(len(result["energy"]), 3)
+            self.assertTrue(all("test-key-not-real" in u for u in seen))             # sent to EIA
+            self.assertNotIn("test-key-not-real", json.dumps(recs))                  # not in the record
+            self.assertNotIn("test-key-not-real", (raw / "index.jsonl").read_text(encoding="utf-8"))
+
+            def refused(url, timeout=60):
+                raise OSError(f"403 for {url}")
+            with self.assertRaises(OSError) as ctx:
+                headwind_cli._lane_energy(raw, {}, refused)
+            self.assertNotIn("test-key-not-real", str(ctx.exception))                # not in an error
+
+    def test_no_eia_key_fails_the_lane_plainly(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.dict(os.environ, {"EIA_API_KEY": "", "HEADWIND_EIA_KEY_FILE": str(Path(tmp) / "none.txt")}):
+            with self.assertRaises(RuntimeError):
+                headwind_cli._lane_energy(Path(tmp) / "raw", {}, fake_getter)
 
     def test_fao(self):
         page = text("fao_page.html")
