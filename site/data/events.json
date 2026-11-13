@@ -2,6 +2,18 @@
   "source": "headwind",
   "events": [
     {
+      "id": "2026-12-03-fr-2026-19537",
+      "date": "2026-12-03",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "2026-19537",
+      "title": "BIS: Measures To Restrict Stockpiling of Polysilicon and Polysilicon Derivatives Under Proclamation 11052 (date named in the rule)",
+      "source": {
+        "publisher": "US Federal Register (BIS)",
+        "url": "https://www.federalregister.gov/documents/2026/09/24/2026-19537/measures-to-restrict-stockpiling-of-polysilicon-and-polysilicon-derivatives-under-proclamation-11052"
+      }
+    },
+    {
       "id": "2026-12-04-fao-ffpi-release",
       "date": "2026-12-04",
       "kind": "data_release",
@@ -37,6 +49,18 @@
       "source": {
         "publisher": "European Central Bank",
         "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+      }
+    },
+    {
+      "id": "2027-01-10-fr-2026-22793",
+      "date": "2027-01-10",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "2026-22793",
+      "title": "BIS: Extension of the Suspension of Expansion of End-User Controls for Affiliates of Certain Listed Entities (date named in the rule)",
+      "source": {
+        "publisher": "US Federal Register (BIS)",
+        "url": "https://www.federalregister.gov/documents/2026/11/09/2026-22793/extension-of-the-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed"
       }
     },
     {

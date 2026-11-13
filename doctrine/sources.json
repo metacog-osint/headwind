@@ -4,16 +4,25 @@
   "sources": [
     {
       "id": "ofac-sdn",
-      "name": "US Department of the Treasury OFAC SDN & Consolidated Sanctions List",
-      "url": "https://ofac.treasury.gov/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists",
+      "name": "US Department of the Treasury, OFAC: Specially Designated Nationals and Blocked Persons List (sdn.csv)",
+      "url": "https://ofac.treasury.gov/recent-actions",
       "licence": "US public domain",
       "use": "ingest",
       "grade": "A1",
       "independence_group": "us-treasury-ofac"
     },
     {
+      "id": "un-sc-consolidated",
+      "name": "United Nations Security Council Consolidated List (XML)",
+      "url": "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list",
+      "licence": "No licence stated by the UN; an official public list",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "un-security-council"
+    },
+    {
       "id": "us-federal-register",
-      "name": "US Federal Register API (BIS, USTR, OFAC)",
+      "name": "US Federal Register API (BIS and OFAC rules and proposed rules)",
       "url": "https://www.federalregister.gov/api/v1/documents.json",
       "licence": "US public domain",
       "use": "ingest",

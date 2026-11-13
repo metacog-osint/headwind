@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-11-13T05:26:14Z",
-  "method_version": "headwind-1.1",
+  "generated_at": "2026-11-13T05:55:01Z",
+  "method_version": "headwind-1.2",
   "lanes": {
     "fx": {
       "status": "ok",
       "fetched_at": "2026-11-13T05:26:14Z",
-      "from_previous": false,
+      "from_previous": true,
       "fetches": [
         {
           "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.zip",
@@ -17,7 +17,7 @@
     "energy": {
       "status": "ok",
       "fetched_at": "2026-11-13T05:26:14Z",
-      "from_previous": false,
+      "from_previous": true,
       "fetches": [
         {
           "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU,DCOILWTICO,DHHNGSP&cosd=2024-09-03",
@@ -29,7 +29,7 @@
     "fao": {
       "status": "ok",
       "fetched_at": "2026-11-13T05:26:14Z",
-      "from_previous": false,
+      "from_previous": true,
       "fetches": [
         {
           "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
@@ -46,7 +46,7 @@
     "wfp": {
       "status": "ok",
       "fetched_at": "2026-11-13T05:26:14Z",
-      "from_previous": false,
+      "from_previous": true,
       "fetches": [
         {
           "url": "https://data.humdata.org/api/3/action/package_search?fq=name:wfp-food-prices-for-*&rows=300",
@@ -148,7 +148,7 @@
     "baseline": {
       "status": "ok",
       "fetched_at": "2026-11-13T05:26:14Z",
-      "from_previous": false,
+      "from_previous": true,
       "fetches": [
         {
           "url": "https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json&mrnev=1&per_page=400",
@@ -185,7 +185,7 @@
     "calendar": {
       "status": "ok",
       "fetched_at": "2026-11-13T05:26:14Z",
-      "from_previous": false,
+      "from_previous": true,
       "fetches": [
         {
           "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
@@ -196,6 +196,35 @@
           "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
           "sha256": "f3df704a7af4c310bee7b1ff1fada499cbdbd7da4fa9b8c1dc1cd05b63361471",
           "bytes": 106176
+        }
+      ]
+    },
+    "sanctions": {
+      "status": "ok",
+      "fetched_at": "2026-11-13T05:55:01Z",
+      "from_previous": false,
+      "fetches": [
+        {
+          "url": "https://www.treasury.gov/ofac/downloads/sdn.csv",
+          "sha256": "7f43332dae0d1b78ce44c31692d87a3c66e4075bcd97e36d3f18585572ff55b8",
+          "bytes": 5833851
+        },
+        {
+          "url": "https://scsanctions.un.org/resources/xml/en/consolidated.xml",
+          "sha256": "1a6400f1648116615f794adcc510e8636254ffb3e7796c0a3e0337a6a8265225",
+          "bytes": 2177722
+        }
+      ]
+    },
+    "controls": {
+      "status": "ok",
+      "fetched_at": "2026-11-13T05:55:01Z",
+      "from_previous": false,
+      "fetches": [
+        {
+          "url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=industry-and-security-bureau&conditions%5Bagencies%5D%5B%5D=foreign-assets-control-office&conditions%5Btype%5D%5B%5D=RULE&conditions%5Btype%5D%5B%5D=PRORULE&conditions%5Bpublication_date%5D%5Bgte%5D=2026-09-13&per_page=200&order=newest&fields%5B%5D=document_number&fields%5B%5D=title&fields%5B%5D=type&fields%5B%5D=publication_date&fields%5B%5D=effective_on&fields%5B%5D=comments_close_on&fields%5B%5D=html_url&fields%5B%5D=agencies&fields%5B%5D=action&fields%5B%5D=abstract&fields%5B%5D=dates",
+          "sha256": "4f2a08e8d23c16b62ae713058b6de603302ae1516efd98ec189b05153b8532f9",
+          "bytes": 30320
         }
       ]
     }
@@ -1356,7 +1385,367 @@
     }
   ],
   "sanctions": [],
-  "controls": [],
+  "sanctions_lists": [
+    {
+      "id": "ofac-sdn",
+      "name": "OFAC SDN list",
+      "publisher": "US Treasury (OFAC)",
+      "url": "https://ofac.treasury.gov/recent-actions",
+      "total": 19563,
+      "by_type": {
+        "aircraft": 342,
+        "entity": 10110,
+        "individual": 7541,
+        "vessel": 1570
+      },
+      "checked_at": "2026-11-13T05:55:01Z",
+      "baseline_set_at": "2026-11-13T05:55:01Z",
+      "source_generated": null
+    },
+    {
+      "id": "un-consolidated",
+      "name": "UN Security Council consolidated list",
+      "publisher": "United Nations Security Council",
+      "url": "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list",
+      "total": 1007,
+      "by_type": {
+        "entity": 274,
+        "individual": 733
+      },
+      "checked_at": "2026-11-13T05:55:01Z",
+      "baseline_set_at": "2026-11-13T05:55:01Z",
+      "source_generated": "2026-11-13T00:00:03.669Z"
+    }
+  ],
+  "controls": [
+    {
+      "id": "2026-22793",
+      "agency": "BIS",
+      "type": "Rule",
+      "action": "Final rule; stay.",
+      "title": "Extension of the Suspension of Expansion of End-User Controls for Affiliates of Certain Listed Entities",
+      "published_date": "2026-11-09",
+      "effective_on": "2026-11-09",
+      "comments_close_on": null,
+      "named_dates": [
+        "2027-01-10"
+      ],
+      "url": "https://www.federalregister.gov/documents/2026/11/09/2026-22793/extension-of-the-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed",
+      "abstract": "The Bureau of Industry and Security (BIS) is extending the suspension of the interim final rule (IFR), \"Expansion of End-User Controls to Cover Affiliates of Certain Listed Entities.\" The suspension was set to end November 9, 2026. This final rule extends the suspension through January 10, 2027.",
+      "countries": []
+    },
+    {
+      "id": "2026-20839",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of a determination.",
+      "title": "Publication of an Iran-Related Determination",
+      "published_date": "2026-10-13",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/10/13/2026-20839/publication-of-an-iran-related-determination",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing a sector determination pursuant to a January 10, 2020 Executive Order. The determination was previously issued on OFAC's website.",
+      "countries": [
+        "IR"
+      ]
+    },
+    {
+      "id": "2026-20831",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of a web general license.",
+      "title": "Publication of Venezuela Sanctions Regulations Web General License 60",
+      "published_date": "2026-10-13",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/10/13/2026-20831/publication-of-venezuela-sanctions-regulations-web-general-license-60",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing a general license (GL) issued pursuant to the Venezuela Sanctions Regulations: GL 60, which was previously made available on OFAC's website.",
+      "countries": [
+        "VE"
+      ]
+    },
+    {
+      "id": "2026-20014",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of web general licenses.",
+      "title": "Publication of Russian Harmful Foreign Activities Sanctions Regulations Web General Licenses 131E, 131F, and 131G",
+      "published_date": "2026-09-30",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-20014/publication-of-russian-harmful-foreign-activities-sanctions-regulations-web-general-licenses-131e",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing three general licenses (GLs) issued pursuant to the Russian Harmful Foreign Activities Sanctions Regulations: GLs 131E, 131F, and 131G, each of which was previously made available on OFAC's website.",
+      "countries": [
+        "RU"
+      ]
+    },
+    {
+      "id": "2026-20012",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of a web general license.",
+      "title": "Publication of Venezuela Sanctions Regulations Web General License 5W",
+      "published_date": "2026-09-30",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-20012/publication-of-venezuela-sanctions-regulations-web-general-license-5w",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing a general license (GL) issued pursuant to the Venezuela Sanctions Regulations: GL 5W, which was previously made available on OFAC's website.",
+      "countries": [
+        "VE"
+      ]
+    },
+    {
+      "id": "2026-20011",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of a web general license.",
+      "title": "Publication of Transnational Criminal Organizations Sanctions Regulations Web General License 2",
+      "published_date": "2026-09-30",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-20011/publication-of-transnational-criminal-organizations-sanctions-regulations-web-general-license-2",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing a general license (GL) issued pursuant to the Transnational Criminal Organizations Sanctions Regulations: GL 2. This GL was previously made available on OFAC's website.",
+      "countries": []
+    },
+    {
+      "id": "2026-20010",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of web general licenses.",
+      "title": "Publication of Iran-Related Web General Licenses X and X1",
+      "published_date": "2026-09-30",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-20010/publication-of-iran-related-web-general-licenses-x-and-x1",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing two Iran-related general licenses (GLs): GL X and GL X1. These GLs were previously made available on OFAC's website. GL X was revoked and superseded by GL X1. GL X1 has expired.",
+      "countries": [
+        "IR"
+      ]
+    },
+    {
+      "id": "2026-20009",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of web general licenses.",
+      "title": "Publication of Venezuela Sanctions Regulations Web General Licenses 46D, 47B, 48C, 50C, 51C, 52B, 54B, and 61A",
+      "published_date": "2026-09-30",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-20009/publication-of-venezuela-sanctions-regulations-web-general-licenses-46d-47b-48c-50c-51c-52b-54b-and",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing eight general licenses (GLs) issued pursuant to the Venezuela Sanctions Regulations: GLs 46D, 47B, 48C, 50C, 51C, 52B, 54B, and 61A, each of which was previously made available on OFAC's website.",
+      "countries": [
+        "VE"
+      ]
+    },
+    {
+      "id": "2026-20008",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of web general licenses.",
+      "title": "Publication of Venezuela Sanctions Regulations Web General Licenses 52, 53, 54, 55, 56, 57, and 58",
+      "published_date": "2026-09-30",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-20008/publication-of-venezuela-sanctions-regulations-web-general-licenses-52-53-54-55-56-57-and-58",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing seven general licenses (GLs) issued pursuant to the Venezuela Sanctions Regulations: GLs 52, 53, 54, 55, 56, 57, and 58, each of which was previously made available on OFAC's website.",
+      "countries": [
+        "VE"
+      ]
+    },
+    {
+      "id": "2026-20007",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Final rule.",
+      "title": "Removing Duplicative Penalties Information and Reorganizing Certain Parts",
+      "published_date": "2026-09-30",
+      "effective_on": "2026-09-30",
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-20007/removing-duplicative-penalties-information-and-reorganizing-certain-parts",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is removing duplicative regulatory provisions, and adding a provision to those parts directing readers to the Sanctions Penalties Regulations where the information is located. OFAC is also moving to an expanded subpart at the beginning of each part information regarding delegations of authority, recordkeeping and reporting requirements, and the Paperwork Reduction Act within multiple parts of the Office of Foreign...",
+      "countries": []
+    },
+    {
+      "id": "2026-20006",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of web general licenses.",
+      "title": "Publication of Venezuela Sanctions Regulations Web General Licenses 46C, 47A, 48B, 50B, 51B, 52A, and 54A",
+      "published_date": "2026-09-30",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-20006/publication-of-venezuela-sanctions-regulations-web-general-licenses-46c-47a-48b-50b-51b-52a-and-54a",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing seven general licenses (GLs) issued pursuant to the Venezuela Sanctions Regulations: GLs 46C, 47A, 48B, 50B, 51B, 52A, and 54A, each of which was previously made available on OFAC's website.",
+      "countries": [
+        "VE"
+      ]
+    },
+    {
+      "id": "2026-19978",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Final rule.",
+      "title": "Iranian Transactions and Sanctions Regulations",
+      "published_date": "2026-09-30",
+      "effective_on": "2026-09-30",
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-19978/iranian-transactions-and-sanctions-regulations",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is adopting a final rule amending the Iranian Transactions and Sanctions Regulations to implement certain provisions of a January 10, 2020 Iran-related Executive order. This amendment also revises an existing definition and an existing exemption, and incorporates two exemptions from the January 10, 2020 Iran-related Executive order.",
+      "countries": [
+        "IR"
+      ]
+    },
+    {
+      "id": "2026-19977",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Final rule.",
+      "title": "Cuba Sanctions Regulations",
+      "published_date": "2026-09-30",
+      "effective_on": "2026-09-30",
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-19977/cuba-sanctions-regulations",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is adding regulations to implement a May 1, 2026 Cuba- related Executive order. OFAC intends to supplement these regulations with a more comprehensive set of regulations, which may include additional interpretive guidance and definitions, general licenses, and other regulatory provisions.",
+      "countries": [
+        "CU"
+      ]
+    },
+    {
+      "id": "2026-19973",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Final rule.",
+      "title": "Cuban Assets Control Regulations",
+      "published_date": "2026-09-30",
+      "effective_on": "2026-09-30",
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/30/2026-19973/cuban-assets-control-regulations",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is amending the Cuban Assets Control Regulations to implement portions of the President's foreign policy toward Cuba, including as directed by National Security Presidential Memorandum-5, \"Reissuance of and Amendments to National Security Presidential Memorandum 5 on Strengthening the Policy of the United States Toward Cuba\" (2025 NSPM-5), signed by the President on June 30, 2025. Among other things, this rule adds a...",
+      "countries": [
+        "CU"
+      ]
+    },
+    {
+      "id": "2026-19678",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Final rule.",
+      "title": "Sanctions Penalties Regulations",
+      "published_date": "2026-09-25",
+      "effective_on": "2026-09-25",
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/25/2026-19678/sanctions-penalties-regulations",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is adding the Sanctions Penalties Regulations. These new regulations consolidate previously existing information regarding penalties applicable to multiple sanctions programs implemented by OFAC.",
+      "countries": []
+    },
+    {
+      "id": "2026-19657",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Final rule.",
+      "title": "Terrorism List Governments Sanctions Regulations",
+      "published_date": "2026-09-25",
+      "effective_on": "2026-09-25",
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/25/2026-19657/terrorism-list-governments-sanctions-regulations",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is amending the Terrorism List Governments Sanctions Regulations to implement changes resulting from the rescission of the designation of Syria as a State Sponsor of Terrorism. Specifically, OFAC is removing and reserving a Syria-specific general license because the authorization is no longer necessary following the rescission.",
+      "countries": []
+    },
+    {
+      "id": "2026-19537",
+      "agency": "BIS",
+      "type": "Rule",
+      "action": "Temporary final rule.",
+      "title": "Measures To Restrict Stockpiling of Polysilicon and Polysilicon Derivatives Under Proclamation 11052",
+      "published_date": "2026-09-24",
+      "effective_on": "2026-09-22",
+      "comments_close_on": null,
+      "named_dates": [
+        "2026-12-03"
+      ],
+      "url": "https://www.federalregister.gov/documents/2026/09/24/2026-19537/measures-to-restrict-stockpiling-of-polysilicon-and-polysilicon-derivatives-under-proclamation-11052",
+      "abstract": "On August 6, 2026, the President issued Proclamation 11052, \"Adjusting Imports of Polysilicon and Its Derivatives Into the United States\" (Proclamation 11052), ordering the Secretary of Commerce (Secretary) to take action to restrict imports by a company if he determines the company is stockpiling polysilicon or polysilicon derivatives (Polysilicon Products) in advance of import adjustments that will be effective on December 4, 2026. The Bureau of Industry and Security (BIS), in this...",
+      "countries": []
+    },
+    {
+      "id": "2026-19424",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of web general licenses.",
+      "title": "Publication of Iran-Related Web General Licenses Y and Z",
+      "published_date": "2026-09-23",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19424/publication-of-iran-related-web-general-licenses-y-and-z",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing two Iran-related general licenses (GLs): GLs Y and Z. These GLs were previously made available on OFAC's website.",
+      "countries": [
+        "IR"
+      ]
+    },
+    {
+      "id": "2026-19423",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of a web general license.",
+      "title": "Publication of the Democratic Republic of the Congo Sanctions Regulations Web General License 2",
+      "published_date": "2026-09-23",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19423/publication-of-the-democratic-republic-of-the-congo-sanctions-regulations-web-general-license-2",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing a general license (GL) issued pursuant to the Democratic Republic of the Congo Sanctions Regulations: GL 2. This GL was previously made available on OFAC's website.",
+      "countries": [
+        "CD",
+        "CG"
+      ]
+    },
+    {
+      "id": "2026-19422",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of web general licenses.",
+      "title": "Publication of Venezuela Sanctions Regulations Web General Licenses 5X and 5Y",
+      "published_date": "2026-09-23",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19422/publication-of-venezuela-sanctions-regulations-web-general-licenses-5x-and-5y",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing two general licenses (GLs) issued pursuant to the Venezuela Sanctions Regulations: GL 5X and 5Y, each of which was previously made available on OFAC's website.",
+      "countries": [
+        "VE"
+      ]
+    },
+    {
+      "id": "2026-19421",
+      "agency": "OFAC",
+      "type": "Rule",
+      "action": "Publication of a web general license.",
+      "title": "Publication of International Criminal Court-Related Sanctions Regulations Web General License 12",
+      "published_date": "2026-09-23",
+      "effective_on": null,
+      "comments_close_on": null,
+      "named_dates": [],
+      "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19421/publication-of-international-criminal-court-related-sanctions-regulations-web-general-license-12",
+      "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing a general license (GL) issued pursuant to the International Criminal Court-Related Sanctions Regulations: GL 12. This GL was previously made available on OFAC's website.",
+      "countries": []
+    }
+  ],
   "question_drafts": [
     {
       "draft_id": "headwind-ffpi-2026-11",
@@ -1386,6 +1775,18 @@
     }
   ],
   "events": [
+    {
+      "id": "2026-12-03-fr-2026-19537",
+      "date": "2026-12-03",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "2026-19537",
+      "title": "BIS: Measures To Restrict Stockpiling of Polysilicon and Polysilicon Derivatives Under Proclamation 11052 (date named in the rule)",
+      "source": {
+        "publisher": "US Federal Register (BIS)",
+        "url": "https://www.federalregister.gov/documents/2026/09/24/2026-19537/measures-to-restrict-stockpiling-of-polysilicon-and-polysilicon-derivatives-under-proclamation-11052"
+      }
+    },
     {
       "id": "2026-12-04-fao-ffpi-release",
       "date": "2026-12-04",
@@ -1422,6 +1823,18 @@
       "source": {
         "publisher": "European Central Bank",
         "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+      }
+    },
+    {
+      "id": "2027-01-10-fr-2026-22793",
+      "date": "2027-01-10",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "2026-22793",
+      "title": "BIS: Extension of the Suspension of Expansion of End-User Controls for Affiliates of Certain Listed Entities (date named in the rule)",
+      "source": {
+        "publisher": "US Federal Register (BIS)",
+        "url": "https://www.federalregister.gov/documents/2026/11/09/2026-22793/extension-of-the-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed"
       }
     },
     {
@@ -1504,51 +1917,51 @@
     }
   ],
   "country_names": {
-    "KR": "South Korea",
-    "NO": "Norway",
-    "PK": "Pakistan",
-    "CA": "Canada",
-    "NE": "Niger",
-    "GB": "United Kingdom",
-    "CN": "China",
-    "ID": "Indonesia",
-    "CU": "Cuba",
-    "IR": "Iran",
-    "LB": "Lebanon",
-    "MY": "Malaysia",
-    "HK": "Hong Kong",
-    "MM": "Myanmar",
-    "TH": "Thailand",
-    "CH": "Switzerland",
-    "BF": "Burkina Faso",
-    "ML": "Mali",
-    "AU": "Australia",
-    "IS": "Iceland",
-    "TR": "Turkey",
-    "JP": "Japan",
-    "HU": "Hungary",
-    "RO": "Romania",
-    "PS": "Palestine",
-    "HT": "Haiti",
-    "SS": "South Sudan",
-    "VE": "Venezuela",
-    "SD": "Sudan",
-    "SO": "Somalia",
-    "YE": "Yemen",
-    "UA": "Ukraine",
-    "CZ": "Czechia",
-    "NZ": "New Zealand",
-    "SG": "Singapore",
     "SE": "Sweden",
-    "DK": "Denmark",
-    "BR": "Brazil",
-    "ET": "Ethiopia",
-    "IL": "Israel",
-    "PL": "Poland",
-    "ZA": "South Africa",
+    "RO": "Romania",
+    "HK": "Hong Kong",
+    "NE": "Niger",
+    "NZ": "New Zealand",
+    "HU": "Hungary",
+    "IS": "Iceland",
     "MX": "Mexico",
-    "PH": "Philippines",
+    "TH": "Thailand",
+    "IL": "Israel",
+    "MY": "Malaysia",
+    "GB": "United Kingdom",
+    "PS": "Palestine",
+    "MM": "Myanmar",
+    "DK": "Denmark",
+    "VE": "Venezuela",
+    "CU": "Cuba",
+    "NO": "Norway",
+    "JP": "Japan",
+    "SD": "Sudan",
+    "KR": "South Korea",
+    "YE": "Yemen",
+    "CD": "Democratic Republic of the Congo",
+    "ID": "Indonesia",
+    "SG": "Singapore",
+    "HT": "Haiti",
+    "SO": "Somalia",
+    "AU": "Australia",
+    "ET": "Ethiopia",
     "IN": "India",
-    "CD": "Democratic Republic of the Congo"
+    "TR": "Turkey",
+    "BR": "Brazil",
+    "ZA": "South Africa",
+    "CH": "Switzerland",
+    "CN": "China",
+    "ML": "Mali",
+    "PH": "Philippines",
+    "CZ": "Czechia",
+    "CA": "Canada",
+    "PL": "Poland",
+    "LB": "Lebanon",
+    "IR": "Iran",
+    "SS": "South Sudan",
+    "BF": "Burkina Faso",
+    "UA": "Ukraine",
+    "PK": "Pakistan"
   }
 }

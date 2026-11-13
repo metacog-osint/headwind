@@ -2,11 +2,75 @@
   "type": "FeatureCollection",
   "contract": "tic-feed/2",
   "program": "headwind",
-  "generated_at": "2026-11-13T05:26:14Z",
-  "licence": "Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO",
-  "attribution": "Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information Administration via FRED; FAO; World Food Programme via the Humanitarian Data Exchange.",
+  "generated_at": "2026-11-13T05:55:01Z",
+  "licence": "Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO; OFAC list and Federal Register US public domain; UN Security Council list, no licence stated",
+  "attribution": "Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information Administration via FRED; FAO; World Food Programme via the Humanitarian Data Exchange; US Treasury (OFAC); United Nations Security Council; US Federal Register.",
   "language_key": "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md",
   "features": [
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:control:2026-22793",
+        "program": "headwind",
+        "title": "BIS rule (2026-11-09): Extension of the Suspension of Expansion of End-User Controls for Affiliates of Certain Listed Entities",
+        "summary": "Action: Final rule; stay. The Bureau of Industry and Security (BIS) is extending the suspension of the interim final rule (IFR), \"Expansion of End-User Controls to Cover Affiliates of Certain Listed Entities.\" The suspension was set to end November 9, 2026. This final rule extends the suspension through January 10, 2027. Effective 2026-11-09. Later dates named in its DATES paragraph: 2027-01-10. Federal Register document 2026-22793.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-09T00:00:00Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic",
+          "political"
+        ],
+        "ascope": [
+          "organizations"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "maintain_supply_chains",
+          "manufacture_equipment"
+        ],
+        "requirement_ids": [
+          "HW-PIR-2"
+        ],
+        "method_version": "headwind-1.2",
+        "coverage_fraction": 1.0,
+        "precision_class": "none",
+        "measures": {
+          "named_dates": 1
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://www.federalregister.gov/documents/2026/11/09/2026-22793/extension-of-the-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed"
+        },
+        "sources": [
+          {
+            "id": "us-federal-register",
+            "publisher": "US Federal Register (BIS, OFAC)",
+            "title": "Federal Register Documents & Public Inspection Filings",
+            "url": "https://www.federalregister.gov/documents/2026/11/09/2026-22793/extension-of-the-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed",
+            "licence": "US public domain",
+            "grade": "A1",
+            "independence_group": "us-federal-register",
+            "source_type": "official or market data",
+            "descriptor": "Rules and proposed rules as published by the agency in the official journal.",
+            "accessed_at": "2026-11-13T05:55:01Z"
+          }
+        ]
+      }
+    },
     {
       "type": "Feature",
       "geometry": {
@@ -31,8 +95,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "AU"
         ],
@@ -52,7 +116,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -106,8 +170,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "BR"
         ],
@@ -127,7 +191,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -181,8 +245,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "CA"
         ],
@@ -202,7 +266,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -256,8 +320,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "CH"
         ],
@@ -277,7 +341,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -331,8 +395,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "CN"
         ],
@@ -352,7 +416,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -406,8 +470,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "CZ"
         ],
@@ -427,7 +491,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -481,8 +545,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "DK"
         ],
@@ -502,7 +566,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -550,8 +614,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -569,7 +633,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -623,8 +687,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "GB"
         ],
@@ -644,7 +708,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -698,8 +762,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "HK"
         ],
@@ -719,7 +783,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -773,8 +837,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "HU"
         ],
@@ -794,7 +858,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -848,8 +912,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "ID"
         ],
@@ -869,7 +933,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -923,8 +987,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "IL"
         ],
@@ -944,7 +1008,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -998,8 +1062,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "IN"
         ],
@@ -1019,7 +1083,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1073,8 +1137,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "IS"
         ],
@@ -1094,7 +1158,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1148,8 +1212,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "JP"
         ],
@@ -1169,7 +1233,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1223,8 +1287,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "KR"
         ],
@@ -1244,7 +1308,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1298,8 +1362,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "MX"
         ],
@@ -1319,7 +1383,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1373,8 +1437,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "MY"
         ],
@@ -1394,7 +1458,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1448,8 +1512,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "NO"
         ],
@@ -1469,7 +1533,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1523,8 +1587,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "NZ"
         ],
@@ -1544,7 +1608,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1598,8 +1662,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "PH"
         ],
@@ -1619,7 +1683,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1673,8 +1737,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "PL"
         ],
@@ -1694,7 +1758,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1748,8 +1812,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "RO"
         ],
@@ -1769,7 +1833,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1823,8 +1887,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "SE"
         ],
@@ -1844,7 +1908,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1898,8 +1962,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "SG"
         ],
@@ -1919,7 +1983,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -1973,8 +2037,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "TH"
         ],
@@ -1994,7 +2058,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -2048,8 +2112,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "TR"
         ],
@@ -2069,7 +2133,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -2123,8 +2187,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "ZA"
         ],
@@ -2144,7 +2208,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -2192,8 +2256,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-11T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2211,7 +2275,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -2259,8 +2323,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-11T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2278,7 +2342,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -2326,8 +2390,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-11T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2345,7 +2409,7 @@
         "requirement_ids": [
           "HW-PIR-4"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -2393,8 +2457,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2413,7 +2477,7 @@
         "requirement_ids": [
           "HW-PIR-3"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -2461,8 +2525,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2481,7 +2545,7 @@
         "requirement_ids": [
           "HW-PIR-3"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -2529,8 +2593,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2549,7 +2613,7 @@
         "requirement_ids": [
           "HW-PIR-3"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -2597,8 +2661,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2617,7 +2681,7 @@
         "requirement_ids": [
           "HW-PIR-3"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -2665,8 +2729,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2685,7 +2749,7 @@
         "requirement_ids": [
           "HW-PIR-3"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -2733,8 +2797,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2753,7 +2817,7 @@
         "requirement_ids": [
           "HW-PIR-3"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
@@ -2807,8 +2871,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "BF"
         ],
@@ -2829,7 +2893,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -2885,8 +2949,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "CD"
         ],
@@ -2907,7 +2971,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -2963,8 +3027,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "ET"
         ],
@@ -2985,7 +3049,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3041,8 +3105,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-08-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "HT"
         ],
@@ -3063,7 +3127,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3119,8 +3183,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "IR"
         ],
@@ -3141,7 +3205,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3197,8 +3261,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-08-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "LB"
         ],
@@ -3219,7 +3283,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3275,8 +3339,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-08-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "ML"
         ],
@@ -3297,7 +3361,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3353,8 +3417,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "MM"
         ],
@@ -3375,7 +3439,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3431,8 +3495,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "NE"
         ],
@@ -3453,7 +3517,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3509,8 +3573,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "PH"
         ],
@@ -3531,7 +3595,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3587,8 +3651,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "PK"
         ],
@@ -3609,7 +3673,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3665,8 +3729,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "PS"
         ],
@@ -3687,7 +3751,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3743,8 +3807,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "SD"
         ],
@@ -3765,7 +3829,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3821,8 +3885,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-08-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "SO"
         ],
@@ -3843,7 +3907,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3899,8 +3963,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "SS"
         ],
@@ -3921,7 +3985,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -3977,8 +4041,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "UA"
         ],
@@ -3999,7 +4063,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
@@ -4055,8 +4119,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T05:26:14Z",
-        "valid_until": "2026-11-15T05:26:14Z",
+        "published_at": "2026-11-13T05:55:01Z",
+        "valid_until": "2026-11-15T05:55:01Z",
         "countries": [
           "YE"
         ],
@@ -4077,7 +4141,7 @@
         "requirement_ids": [
           "HW-PIR-5"
         ],
-        "method_version": "headwind-1.1",
+        "method_version": "headwind-1.2",
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {

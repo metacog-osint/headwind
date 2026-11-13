@@ -2,7 +2,8 @@
 
 **Headwind** is The Intelligence Company's economic-stress monitor. It compares currencies, energy prices and
 food prices with their own past changes and marks a series unusual only when a move is far outside that range.
-It also collects the dates of coming economic decisions and data releases for Verdict's calendar.
+It counts what was added to or removed from official sanctions lists, lists new export-control and sanctions
+rules, and collects the dates of coming economic decisions and data releases for Verdict's calendar.
 
 Headwind reports measurements. It states no probability and gives no investment advice.
 
@@ -13,8 +14,9 @@ Headwind reports measurements. It states no probability and gives no investment 
 4. **World Food Programme** food prices by market, from the Humanitarian Data Exchange.
 5. **World Bank** World Development Indicators, as a slow baseline per country.
 6. **Federal Reserve, ECB and FAO** schedule pages, for the calendar.
-
-Sanctions (OFAC) and export-control rule dates (Federal Register) are planned lanes with no collector yet.
+7. **US Treasury (OFAC)** SDN list and the **UN Security Council** consolidated list: changes between readings,
+   as counts.
+8. **US Federal Register**: rules and proposed rules from BIS and OFAC, with the future dates they name.
 
 ## Commands
 

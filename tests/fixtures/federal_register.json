@@ -1,0 +1,165 @@
+{
+ "count": 5,
+ "results": [
+  {
+   "document_number": "2026-22793",
+   "title": "Extension of the Suspension of Expansion of End-User Controls for Affiliates of Certain Listed Entities",
+   "type": "Rule",
+   "publication_date": "2026-11-09",
+   "effective_on": "2026-11-09",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/11/09/2026-22793/extension-of-the-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "action": "Final rule; stay.",
+   "abstract": "The Bureau of Industry and Security (BIS) is extending the suspension of the interim final rule (IFR), \"Expansion of End-User Controls to Cover Affiliates of Certain Listed Entities.\" The suspension was set to end November 9, 2026. This final rule extends the suspension through January 10, 2027.",
+   "dates": "Effective November 9, 2026, the amendments to 15 CFR parts 732, 734, 736, 744, and 748 in the interim final rule published at 90 FR 47201, on September 30, 2025, and stayed on November 10, 2025, at 90 FR 50857, are further stayed until January 10, 2027."
+  },
+  {
+   "document_number": "2026-20839",
+   "title": "Publication of an Iran-Related Determination",
+   "type": "Rule",
+   "publication_date": "2026-10-13",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/10/13/2026-20839/publication-of-an-iran-related-determination",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF THE TREASURY",
+     "name": "Treasury Department",
+     "id": 497,
+     "url": "https://www.federalregister.gov/agencies/treasury-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/497",
+     "parent_id": null,
+     "slug": "treasury-department"
+    },
+    {
+     "raw_name": "Office of Foreign Assets Control",
+     "name": "Foreign Assets Control Office",
+     "id": 203,
+     "url": "https://www.federalregister.gov/agencies/foreign-assets-control-office",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/203",
+     "parent_id": 497,
+     "slug": "foreign-assets-control-office"
+    }
+   ],
+   "action": "Publication of a determination.",
+   "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing a sector determination pursuant to a January 10, 2020 Executive Order. The determination was previously issued on OFAC's website.",
+   "dates": "The determination was issued on October 1 2026. See SUPPLEMENTARY INFORMATION for additional relevant dates."
+  },
+  {
+   "document_number": "2026-20831",
+   "title": "Publication of Venezuela Sanctions Regulations Web General License 60",
+   "type": "Rule",
+   "publication_date": "2026-10-13",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/10/13/2026-20831/publication-of-venezuela-sanctions-regulations-web-general-license-60",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF THE TREASURY",
+     "name": "Treasury Department",
+     "id": 497,
+     "url": "https://www.federalregister.gov/agencies/treasury-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/497",
+     "parent_id": null,
+     "slug": "treasury-department"
+    },
+    {
+     "raw_name": "Office of Foreign Assets Control",
+     "name": "Foreign Assets Control Office",
+     "id": 203,
+     "url": "https://www.federalregister.gov/agencies/foreign-assets-control-office",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/203",
+     "parent_id": 497,
+     "slug": "foreign-assets-control-office"
+    }
+   ],
+   "action": "Publication of a web general license.",
+   "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is publishing a general license (GL) issued pursuant to the Venezuela Sanctions Regulations: GL 60, which was previously made available on OFAC's website.",
+   "dates": "GL 60 was issued on June 25, 2026. See SUPPLEMENTARY INFORMATION for additional relevant dates."
+  },
+  {
+   "document_number": "2026-19978",
+   "title": "Iranian Transactions and Sanctions Regulations",
+   "type": "Rule",
+   "publication_date": "2026-09-30",
+   "effective_on": "2026-09-30",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/09/30/2026-19978/iranian-transactions-and-sanctions-regulations",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF THE TREASURY",
+     "name": "Treasury Department",
+     "id": 497,
+     "url": "https://www.federalregister.gov/agencies/treasury-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/497",
+     "parent_id": null,
+     "slug": "treasury-department"
+    },
+    {
+     "raw_name": "Office of Foreign Assets Control",
+     "name": "Foreign Assets Control Office",
+     "id": 203,
+     "url": "https://www.federalregister.gov/agencies/foreign-assets-control-office",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/203",
+     "parent_id": 497,
+     "slug": "foreign-assets-control-office"
+    }
+   ],
+   "action": "Final rule.",
+   "abstract": "The Department of the Treasury's Office of Foreign Assets Control (OFAC) is adopting a final rule amending the Iranian Transactions and Sanctions Regulations to implement certain provisions of a January 10, 2020 Iran-related Executive order. This amendment also revises an existing definition and an existing exemption, and incorporates two exemptions from the January 10, 2020 Iran-related Executive order.",
+   "dates": "This rule is effective September 30, 2026."
+  },
+  {
+   "document_number": "2026-19537",
+   "title": "Measures To Restrict Stockpiling of Polysilicon and Polysilicon Derivatives Under Proclamation 11052",
+   "type": "Rule",
+   "publication_date": "2026-09-24",
+   "effective_on": "2026-09-22",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/09/24/2026-19537/measures-to-restrict-stockpiling-of-polysilicon-and-polysilicon-derivatives-under-proclamation-11052",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "action": "Temporary final rule.",
+   "abstract": "On August 6, 2026, the President issued Proclamation 11052, \"Adjusting Imports of Polysilicon and Its Derivatives Into the United States\" (Proclamation 11052), ordering the Secretary of Commerce (Secretary) to take action to restrict imports by a company if he determines the company is stockpiling polysilicon or polysilicon derivatives (Polysilicon Products) in advance of import adjustments that will be effective on December 4, 2026. The Bureau of Industry and Security (BIS), in this temporary final rule (TFR), announces the criteria and process it will use to monitor existing companies for evidence of stockpiling, limit a newly established importer's ability to stockpile, and subject companies that are stockpiling to an import prohibition if necessary. This TFR also establishes the process for such companies to obtain a waiver from any import prohibitions imposed pursuant to this rule, and imposes certain import limitations on new importers that register with U.S. Customs and Border Protection (CBP) on or after August 6, 2026.",
+   "dates": "This rule is effective September 22, 2026, through December 3, 2026."
+  }
+ ]
+}

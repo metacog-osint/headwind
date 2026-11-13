@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-13T05:26:14Z",
+  "generated_at": "2026-11-13T05:55:01Z",
   "source": "World Bank, World Development Indicators (CC BY 4.0)",
   "lane": {
     "status": "ok",
     "fetched_at": "2026-11-13T05:26:14Z",
-    "from_previous": false,
+    "from_previous": true,
     "fetches": [
       {
         "url": "https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json&mrnev=1&per_page=400",
