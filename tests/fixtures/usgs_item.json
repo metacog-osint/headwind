@@ -1,0 +1,126 @@
+{
+ "title": "Mineral Commodity Summaries 2026 Data Release - Mineral Industry Trends and Salient Statistics",
+ "dates": [
+  {
+   "type": "Publication",
+   "dateString": "2026-02-06",
+   "label": "Publication Date"
+  },
+  {
+   "type": "Start",
+   "dateString": "2021",
+   "label": ""
+  },
+  {
+   "type": "End",
+   "dateString": "2025",
+   "label": ""
+  }
+ ],
+ "files": [
+  {
+   "name": "MCS2026_Fig1_Minerals_in_Economy.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__71%2F83%2Fa1%2F7183a1e94d95e7a4346920a73787a3f7509550bd",
+   "checksum": {
+    "value": "0fb9b279635c256788aca80d31063f07",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Fig2_Net_Import_Reliance.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__e8%2Fea%2Fc2%2Fe8eac272416293ccbb00be9271ecd07a4d549456",
+   "checksum": {
+    "value": "ac4593283060f39d39caa2af2bcd37c9",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Fig3_Major_Import_Sources.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__ce%2F72%2Fae%2Fce72ae30205494334a5bfe2195781ae2d5747bc9",
+   "checksum": {
+    "value": "013c72116dcbc3e492f17bf5fcef965f",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Fig4_Value_by_Type.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__e2%2F89%2F24%2Fe2892445882ff11c34a185e0a0c987b08c51ade9",
+   "checksum": {
+    "value": "49148c715ec320b3361a92593088c376",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Fig10_Price_Growth_Rates.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__57%2Fd7%2F20%2F57d720358dd4fc92b788ecb0929b80e65c527d90",
+   "checksum": {
+    "value": "df763736bf5b4a4f3f845a4da6eb3f33",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Fig11_Pch_Consump_2024_2025.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__d2%2F8a%2Fdf%2Fd28adf8c27e4726013a7643feba2150b5256f519",
+   "checksum": {
+    "value": "fd401d722b627edf641e493f4e20b111",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Fig12_Pch_Consump_2021_2025.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__52%2Fff%2F48%2F52ff48de56690e565749fd82fde1f1e2c676e864",
+   "checksum": {
+    "value": "16642e849419325c28b488ee43ca4b2f",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Fig13_Scrap.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__9c%2F6a%2F0d%2F9c6a0db5f42c6f83a0131848d1914b5ee521d8ab",
+   "checksum": {
+    "value": "689d4085fe8b5fad93ff00f8b82de362",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Mineral_Industry_Trends_and_Salient_Statistics.zip",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__2f%2F1d%2Fa8%2F2f1da894db5bd03ba3edd4e74792e161547886dc",
+   "checksum": {
+    "value": "72d911359632d522702e29fc5f47eedf",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_T1_Mineral_Industry_Trends.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__21%2F94%2F98%2F219498f495f273c5098ede404b91a6c9efe837f5",
+   "checksum": {
+    "value": "b7d7893f2083a5ac7cad6cf379c8cd7c",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_T2_Mineral_Economic_Trends.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__eb%2F46%2F9c%2Feb469cbd96b9f151aa13dcbdc0e2f355712395dc",
+   "checksum": {
+    "value": "b7a8543ad460216c1f8371d46ff6a7e7",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_T3_State_Value_Rank.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__b7%2Fef%2Fa1%2Fb7efa114a2116eafd262e493a1b40dd0716400b3",
+   "checksum": {
+    "value": "6612f94d3ef24586cbbc311ec33c4b5b",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Mineral_Industry_Trends_and_Salient_Statistics.xml",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__14%2F8e%2Fbe%2F148ebe9d29837e6ba8a2503bbf96b12ed4c445ac",
+   "checksum": {
+    "value": "b2b8ca980b9ca002621eeb212925054b",
+    "type": "MD5"
+   }
+  }
+ ]
+}

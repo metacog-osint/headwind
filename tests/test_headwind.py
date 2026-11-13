@@ -1,6 +1,7 @@
 """Offline tests for Headwind. Fixtures under tests/fixtures are cut from real source files fetched 12-13 Nov 2026.
 
-The two sanctions-list fixtures keep each entry's id, type and program only; names and remarks are blanked.
+The sanctions-list and screening-list fixtures keep each entry's id, type, program and address country only;
+names and remarks are blanked.
 """
 from __future__ import annotations
 
@@ -20,7 +21,8 @@ FIX = ROOT / "tests" / "fixtures"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import baseline, controls, feed, food, markets, releases, sanctions, stats  # noqa: E402
+from headwind import (baseline, controls, feed, food, markets, minerals, releases, sanctions, screening,  # noqa: E402
+                      stats)
 from tic_doctrine import contract, registers  # noqa: E402
 
 _spec = importlib.util.spec_from_file_location("headwind_cli", ROOT / "tools" / "headwind.py")
@@ -30,6 +32,8 @@ _spec.loader.exec_module(headwind_cli)
 # The real lists hold thousands of entries; the fixtures hold a few dozen.
 for _l in sanctions.LISTS.values():
     _l["min_entries"] = 5
+screening.MIN_ENTRIES = 5
+screening.SHRINK_FLOOR = 4
 
 
 def text(name: str) -> str:
@@ -48,10 +52,16 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
              ("wfp_food_prices_sdn.csv", "wfp_sdn.csv"), ("api.worldbank.org", "worldbank.json"),
              ("fomccalendars", "fomc.html"), ("calendars/mgcgc", "ecb_calendar.html"),
              ("ofac/downloads/sdn.csv", "ofac_sdn.csv"), ("scsanctions.un.org", "un_consolidated.xml"),
-             ("federalregister.gov", "federal_register.json")]
+             ("federalregister.gov", "federal_register.json"), ("data.trade.gov", "trade_gov_csl.json")]
     for needle, name in table:
         if needle in url:
             return (FIX / name).read_bytes()
+    if "sciencebase.gov/catalog/item" in url:
+        return (FIX / "usgs_item.json").read_bytes()
+    if "sciencebase.gov/catalog/file" in url:
+        files = minerals.find_files(text("usgs_item.json"))["files"]
+        name = {f["url"]: k for k, f in files.items()}[url]
+        return (FIX / {"reliance": "usgs_net_import_reliance.csv", "sources": "usgs_major_import_sources.csv"}[name]).read_bytes()
     raise OSError(f"no fixture for {url}")
 
 
@@ -137,6 +147,37 @@ class TestParsers(unittest.TestCase):
         for e in ev:
             self.assertTrue(all(k in e for k in ("id", "date", "title", "kind", "countries", "source", "ref")))
             self.assertIn(e["kind"], ("data_release", "rule_date"))
+
+    def test_usgs_minerals(self):
+        found = minerals.find_files(text("usgs_item.json"))
+        self.assertEqual(found["published"], "2026-02-06")
+        body = (FIX / "usgs_net_import_reliance.csv").read_bytes()
+        minerals.check_md5(body, found["files"]["reliance"]["md5"], "reliance")
+        with self.assertRaises(ValueError):
+            minerals.check_md5(body + b"x", found["files"]["reliance"]["md5"], "reliance")
+        rel = minerals.parse_reliance(text("usgs_net_import_reliance.csv"))
+        self.assertEqual(len(rel), 68)
+        gallium = next(r for r in rel if r["commodity"] == "GALLIUM")
+        self.assertEqual((gallium["reliance_pct"], gallium["bound"], gallium["sources"][0], gallium["year"]),
+                         (100, None, "Canada", "2025"))
+        barite = next(r for r in rel if r["commodity"] == "BARITE")
+        self.assertEqual((barite["reliance_text"], barite["reliance_pct"], barite["bound"]), (">75", 75, ">"))
+        self.assertEqual(next(r for r in rel if r["commodity"] == "XENON")["sources"], [])     # "NA" is not a country
+        crit = minerals.parse_sources(text("usgs_major_import_sources.csv"))
+        antimony = next(m for m in crit if m["commodity"] == "Antimony")
+        self.assertEqual(antimony["shares"][0], {"source": "China", "pct": 55})
+        self.assertEqual(next(m for m in crit if m["commodity"] == "Hafnium")["shares"], [])
+        doc = minerals.build(found, rel, crit, {"China": "CN", "Republic of Korea": "KR"}.get)
+        self.assertEqual((doc["reliance_year"], doc["sources_period"], doc["with_sources"]), ("2025", "2021-24", 65))
+        self.assertEqual(len(doc["import_sources"]), 47)
+        printed = {m["commodity"]: m["reliance_text"] for m in doc["import_sources"]}
+        self.assertEqual((printed["Barite"], printed["Germanium"], printed["Antimony"], printed["Hafnium"]),
+                         (">75", ">50", "91", None))           # the bound USGS prints is kept
+        china = next(b for b in doc["by_source"] if b["source"] == "China")
+        self.assertEqual(china["country"], "CN")
+        self.assertEqual(china["named_first"], sum(1 for r in rel if r["sources"][:1] == ["China"]))
+        with self.assertRaises(ValueError):
+            minerals.parse_reliance("Source,Commodity\nMCS2026,GALLIUM\n")
 
     def test_world_bank(self):
         rows = baseline.parse_wb(text("worldbank.json"), {"TR", "SD", "US"}, this_year=2026)
@@ -240,6 +281,57 @@ class TestListParsers(unittest.TestCase):
         self.assertEqual(len(idx), 14)
         self.assertEqual(idx["6907993"], ["individual", ["DRC"]])
 
+    def test_screening_list(self):
+        lists = screening.parse((FIX / "trade_gov_csl.json").read_bytes())
+        self.assertNotIn("SDN", lists)                              # the sanctions lane reads that one from OFAC
+        self.assertEqual(len(lists["EL"]["index"]), 4)
+        self.assertEqual(lists["EL"]["name"], "Entity List")
+        self.assertEqual(lists["EL"]["publisher"], "US Bureau of Industry and Security")
+        self.assertEqual(lists["MEU"]["name"], "Military End User List")
+        self.assertEqual(lists["FSE"]["index"], {})                 # named in the file, no entries
+        kind, programs, countries = next(iter(lists["EL"]["index"].values()))
+        self.assertEqual((kind, programs), ("not stated", []))
+        self.assertTrue(countries and all(len(c) == 2 for c in countries))
+        self.assertEqual(lists["EL"]["source_last_updated"][:10], "2026-08-21")
+        cut = json.loads(text("trade_gov_csl.json"))
+        cut["total"] += 100                                         # the file says more than it holds
+        with self.assertRaises(ValueError):
+            screening.parse(json.dumps(cut))
+
+    def test_screening_changes_are_counts_by_list(self):
+        now, later = "2026-11-13T15:00:00Z", "2026-11-14T15:00:00Z"
+        lists = screening.parse((FIX / "trade_gov_csl.json").read_bytes())
+        first, statuses, state = screening.compare(lists, {}, now)
+        self.assertEqual(first, [])                                 # the first reading only sets the baseline
+        self.assertEqual(statuses[0]["total"], 4)
+        new = screening.parse((FIX / "trade_gov_csl.json").read_bytes())
+        gone = next(iter(new["EL"]["index"]))
+        del new["EL"]["index"][gone]
+        new["EL"]["index"]["new-1"] = ["not stated", [], ["CN", "HK"]]
+        new["EL"]["index"]["new-2"] = ["not stated", [], ["CN"]]
+        new["FSE"]["index"]["55555"] = ["entity", ["FSE-IR"], []]   # a list that was empty gains an entry
+        deltas, _, state2 = screening.compare(new, state, later)
+        by = {d["list"]: d for d in deltas}
+        self.assertEqual(sorted(by), ["EL", "FSE"])
+        el = by["EL"]
+        self.assertEqual((el["added"], el["removed"], el["total"]), (2, 1, 5))
+        self.assertEqual(el["added_by_country"], {"CN": 2, "HK": 1})
+        self.assertEqual(el["prior_checked_at"], now)
+        self.assertIn("CN", el["countries"])
+        self.assertEqual(by["FSE"]["added_by_country"], {"none stated": 1})
+        self.assertEqual(screening.compare(new, state2, later)[0], [])
+        emptied = screening.parse((FIX / "trade_gov_csl.json").read_bytes())
+        emptied["EL"]["index"] = {}
+        with self.assertRaises(ValueError):                         # a list that empties is a broken import
+            screening.compare(emptied, state, later)
+        snap = {"generated_at": later, "lanes": {}, "screening": deltas}
+        fc = feed.build_feed(snap)
+        self.assertEqual(lint(fc), [])
+        p = next(f["properties"] for f in fc["features"] if f["properties"]["id"].startswith("headwind:screening:el:"))
+        self.assertEqual((p["kind"], p["tier"], p["measures"]["added"]), ("observation", "routine", 2))
+        self.assertIn("by address country, CN 2, HK 1", p["summary"])
+        self.assertNotIn("probability", p)
+
     def test_federal_register(self):
         rules = controls.parse_fr(text("federal_register.json"))
         self.assertEqual(len(rules), 5)
@@ -272,9 +364,13 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual([l["total"] for l in snap["sanctions_lists"]], [36, 14])
             self.assertEqual(len(snap["controls"]), 5)
             self.assertTrue((tmp / "data" / "state" / "sanctions_index.json").exists())
+            self.assertEqual(snap["screening"], [])                 # first reading
+            self.assertEqual(len(snap["screening_lists"]), 12)
+            self.assertTrue(list((tmp / "data" / "raw" / "trade-gov-csl").glob("*.json.gz")))
+            self.assertEqual(len(snap["minerals"]["reliance"]), 68)
             files = headwind_cli.build_site(tmp)
             for name in ("data/feed.geojson", "data/events.json", "data/baseline.json", "data/question_drafts.json",
-                         "index.html"):
+                         "data/minerals.json", "index.html"):
                 self.assertIn(name, files)
             self.assertEqual(headwind_cli.check_all(tmp), [])
 
@@ -296,11 +392,18 @@ class TestEndToEnd(unittest.TestCase):
                     lines = body.decode("utf-8").splitlines()[1:]
                     lines.append("99999,-0- ,vessel,RUSSIA-EO14024" + ",-0- " * 8)
                     return ("\n".join(lines) + "\n").encode("utf-8")
+                if "data.trade.gov" in url:
+                    doc = json.loads(body)
+                    doc["results"].append({"source": "Entity List (EL) - Bureau of Industry and Security",
+                                           "id": "added-1", "addresses": [{"country": "CN"}]})
+                    doc["total"] += 1
+                    return json.dumps(doc).encode("utf-8")
                 return body
             third = headwind_cli.collect(tmp, getter=changed)
             self.assertEqual([(d["list"], d["added"], d["removed"]) for d in third["sanctions"]], [("ofac-sdn", 1, 1)])
             fourth = headwind_cli.collect(tmp, getter=changed)
             self.assertEqual(len(fourth["sanctions"]), 1)           # kept, not reported a second time
+            self.assertEqual([(d["list"], d["added"], d["removed"]) for d in fourth["screening"]], [("EL", 1, 0)])
             headwind_cli.build_site(tmp)
             self.assertEqual(headwind_cli.check_all(tmp), [])
         finally:
@@ -315,6 +418,7 @@ class TestEndToEnd(unittest.TestCase):
             self.assertTrue(all(v["status"] == "failed" and not v["from_previous"] for v in snap["lanes"].values()))
             self.assertEqual((snap["fx"], snap["energy"], snap["fao"], snap["local_food"]), ([], [], [], []))
             self.assertEqual((snap["sanctions"], snap["sanctions_lists"], snap["controls"]), ([], [], []))
+            self.assertEqual((snap["screening"], snap["screening_lists"], snap["minerals"]), ([], [], {}))
             self.assertEqual(feed.build_feed(snap)["features"], [])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)

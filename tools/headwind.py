@@ -19,7 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import baseline, commodities, controls, feed, fetch, food, markets, releases, sanctions  # noqa: E402,F401
+from headwind import (baseline, commodities, controls, feed, fetch, food, markets, minerals, releases,  # noqa: E402,F401
+                      sanctions, screening)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -30,10 +31,13 @@ LANE_FIELDS = {
     "baseline": ["baseline"],
     "calendar": ["fomc_dates", "ecb_dates"],
     "sanctions": ["sanctions", "sanctions_lists"],
+    "screening": ["screening", "screening_lists"],
     "controls": ["controls"],
+    "minerals": ["minerals"],
 }
 EMPTY = {"fx": [], "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
-         "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "controls": []}
+         "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "screening": [],
+         "screening_lists": [], "controls": [], "minerals": {}}
 
 
 def _lane_fx(raw_dir, prev, getter):
@@ -140,6 +144,18 @@ def _lane_sanctions(raw_dir, prev, getter):
     return {"sanctions": sanctions.roll(prev.get("sanctions") or [], deltas, now), "sanctions_lists": lists}, [rec1, rec2]
 
 
+def _lane_screening(raw_dir, prev, getter):
+    """trade.gov Consolidated Screening List, every list but the SDN list. The first run only sets the baseline."""
+    state_path = (Path(raw_dir).parent / "state" / "screening_index.json")
+    state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
+    now = fetch.now_utc()
+    body, rec = fetch.fetch("trade-gov-csl", screening.CSL_URL, raw_dir, "json", timeout=300, getter=getter, gz=True)
+    deltas, lists, new_state = screening.compare(screening.parse(body), state, now)
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text(json.dumps(new_state, separators=(",", ":")) + "\n", encoding="utf-8", newline="\n")
+    return {"screening": sanctions.roll(prev.get("screening") or [], deltas, now), "screening_lists": lists}, [rec]
+
+
 def _lane_controls(raw_dir, prev, getter):
     body, rec = fetch.fetch("us-federal-register", controls.fr_url(date.today()), raw_dir, "json", getter=getter)
     rules = controls.parse_fr(body)
@@ -148,8 +164,27 @@ def _lane_controls(raw_dir, prev, getter):
     return {"controls": rules}, [rec]
 
 
+def _lane_minerals(raw_dir, prev, getter):
+    """USGS Mineral Commodity Summaries: net import reliance and import sources. Annual; context, not feed items."""
+    item, rec0 = fetch.fetch("usgs-mcs-item", minerals.ITEM_URL.format(item=minerals.ITEM_ID), raw_dir, "json",
+                             getter=getter)
+    found = minerals.find_files(item)
+    bodies, recs = {}, [rec0]
+    for key, f in found["files"].items():
+        body, rec = fetch.fetch(f"usgs-mcs-{key}", f["url"], raw_dir, "csv", getter=getter)
+        minerals.check_md5(body, f["md5"], f["name"])
+        bodies[key] = body.decode("utf-8-sig")
+        recs.append(rec)
+    by_name = {c["name"]: c["cc"] for c in json.loads(
+        (ROOT / "doctrine" / "kit" / "geo" / "countries.json").read_text(encoding="utf-8"))["countries"]}
+    cc_of = lambda name: minerals.NAME_CC.get(name) or by_name.get(name)  # noqa: E731
+    return {"minerals": minerals.build(found, minerals.parse_reliance(bodies["reliance"]),
+                                       minerals.parse_sources(bodies["sources"]), cc_of)}, recs
+
+
 LANES = {"fx": _lane_fx, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
-         "calendar": _lane_calendar, "sanctions": _lane_sanctions, "controls": _lane_controls}
+         "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
+         "controls": _lane_controls, "minerals": _lane_minerals}
 
 
 def finish_snapshot(snap: dict, today: date) -> dict:
@@ -212,7 +247,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None) -> dict[str, str
              | {f["country"] for f in snap.get("fx") or [] if f.get("country")}
              | {m["country"] for m in snap.get("local_food_missing") or []}}
     page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "fx", "energy", "fao", "local_food",
-                                     "local_food_missing", "sanctions", "sanctions_lists", "controls", "question_drafts")}
+                                     "local_food_missing", "sanctions", "sanctions_lists", "screening",
+                                     "screening_lists", "controls", "minerals", "question_drafts")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
 
@@ -230,6 +266,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None) -> dict[str, str
             "indicators": {v[0]: v[1] for v in baseline.INDICATORS.values()},
             "countries": snap.get("baseline") or {},
         }),
+        "data/minerals.json": dump({"generated_at": snap["generated_at"],
+                                    "lane": (snap.get("lanes") or {}).get("minerals"), **(snap.get("minerals") or {})}),
         "data/question_drafts.json": dump({"note": "Drafts only. Nothing here is registered in Verdict.",
                                            "drafts": snap.get("question_drafts") or []}),
     }
@@ -281,8 +319,10 @@ def main(argv=None) -> int:
         print(f"Collected {len(snap['fx'])} currencies, {len(snap['energy'])} energy series, {len(snap['fao'])} FAO "
               f"indices, {len(snap['local_food'])} countries' local food prices, {len(snap['baseline'])} country "
               f"baselines, {len(snap['events']['events'])} events; {anomalies} anomalies. Sanctions lists: "
-              f"{len(snap['sanctions_lists'])} read, {len(snap['sanctions'])} changes kept; "
-              f"{len(snap['controls'])} Federal Register rules.")
+              f"{len(snap['sanctions_lists'])} read, {len(snap['sanctions'])} changes kept; screening lists: "
+              f"{len(snap['screening_lists'])} read, {len(snap['screening'])} changes kept; "
+              f"{len(snap['controls'])} Federal Register rules; "
+              f"{len((snap.get('minerals') or {}).get('reliance') or [])} mineral commodities.")
         return 0 if any(s.get("status") == "ok" for s in snap["lanes"].values()) else 1
     if args.cmd == "build":
         files = build_site(ROOT)

@@ -1,0 +1,2338 @@
+{
+  "generated_at": "2026-11-13T14:50:51Z",
+  "lane": {
+    "status": "ok",
+    "fetched_at": "2026-11-13T14:50:51Z",
+    "from_previous": false,
+    "fetches": [
+      {
+        "url": "https://www.sciencebase.gov/catalog/item/69837ec8b66b01367d7ec7d9?format=json",
+        "sha256": "06ee3663d1b40313361ba4b128854c96ba9b4b02ac04884345dad809a6275038",
+        "bytes": 20050
+      },
+      {
+        "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__e8%2Fea%2Fc2%2Fe8eac272416293ccbb00be9271ecd07a4d549456",
+        "sha256": "b13c361a68c648d54d36ac2fc521fb9b7167c06468e9d2ad301cbd60a99474f7",
+        "bytes": 7584
+      },
+      {
+        "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__ce%2F72%2Fae%2Fce72ae30205494334a5bfe2195781ae2d5747bc9",
+        "sha256": "1b3bb8b7a2b95c087ad6648c62c245a29dfcbb1dc251c293816900be9190fd8d",
+        "bytes": 7095
+      }
+    ]
+  },
+  "edition": "MCS2026",
+  "title": "Mineral Commodity Summaries 2026 Data Release - Mineral Industry Trends and Salient Statistics",
+  "published": "2026-02-06",
+  "url": "https://doi.org/10.5066/P1WKQ63T",
+  "report_url": "https://doi.org/10.3133/mcs2026",
+  "licence": "CC0 1.0 (US Geological Survey)",
+  "reliance_year": "2025",
+  "sources_period": "2021-24",
+  "reliance": [
+    {
+      "commodity": "ARSENIC, all forms",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "China",
+        "Malaysia",
+        "Morocco"
+      ]
+    },
+    {
+      "commodity": "ASBESTOS",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "Brazil"
+      ]
+    },
+    {
+      "commodity": "CESIUM",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "China",
+        "Germany"
+      ]
+    },
+    {
+      "commodity": "FLUORSPAR",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "Mexico",
+        "Vietnam",
+        "China",
+        "South Africa"
+      ]
+    },
+    {
+      "commodity": "GALLIUM",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "Canada",
+        "Japan",
+        "China",
+        "Germany"
+      ]
+    },
+    {
+      "commodity": "GRAPHITE (NATURAL)",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "China",
+        "Canada",
+        "Mozambique",
+        "Mexico"
+      ]
+    },
+    {
+      "commodity": "INDIUM",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "Republic of Korea",
+        "Japan",
+        "China",
+        "Canada"
+      ]
+    },
+    {
+      "commodity": "MANGANESE",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "Gabon",
+        "South Africa",
+        "Malaysia",
+        "Australia"
+      ]
+    },
+    {
+      "commodity": "MICA (NATURAL), sheet",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "China",
+        "Vietnam",
+        "Brazil",
+        "India"
+      ]
+    },
+    {
+      "commodity": "NIOBIUM (COLUMBIUM)",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "Brazil",
+        "Canada"
+      ]
+    },
+    {
+      "commodity": "RUBIDIUM",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "China",
+        "Germany",
+        "Russia"
+      ]
+    },
+    {
+      "commodity": "SCANDIUM",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "Japan",
+        "China"
+      ]
+    },
+    {
+      "commodity": "STRONTIUM",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "Mexico",
+        "Germany",
+        "China"
+      ]
+    },
+    {
+      "commodity": "TANTALUM",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "China",
+        "Australia",
+        "Germany",
+        "Indonesia"
+      ]
+    },
+    {
+      "commodity": "TITANIUM, sponge metal",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "Japan",
+        "Saudi Arabia",
+        "Kazakhstan"
+      ]
+    },
+    {
+      "commodity": "YTTRIUM",
+      "reliance_text": "100",
+      "reliance_pct": 100,
+      "bound": null,
+      "sources": [
+        "China",
+        "Germany",
+        "Austria"
+      ]
+    },
+    {
+      "commodity": "GEMSTONES",
+      "reliance_text": "99",
+      "reliance_pct": 99,
+      "bound": null,
+      "sources": [
+        "India",
+        "Israel",
+        "Belgium",
+        "South Africa"
+      ]
+    },
+    {
+      "commodity": "XENON",
+      "reliance_text": "98",
+      "reliance_pct": 98,
+      "bound": null,
+      "sources": []
+    },
+    {
+      "commodity": "ABRASIVES, fused aluminum oxide",
+      "reliance_text": ">95",
+      "reliance_pct": 95,
+      "bound": ">",
+      "sources": [
+        "China",
+        "Canada",
+        "Brazil",
+        "Austria"
+      ]
+    },
+    {
+      "commodity": "NEPHELINE SYENITE",
+      "reliance_text": ">95",
+      "reliance_pct": 95,
+      "bound": ">",
+      "sources": [
+        "Canada"
+      ]
+    },
+    {
+      "commodity": "KRYPTON",
+      "reliance_text": "93",
+      "reliance_pct": 93,
+      "bound": null,
+      "sources": []
+    },
+    {
+      "commodity": "BISMUTH",
+      "reliance_text": "92",
+      "reliance_pct": 92,
+      "bound": null,
+      "sources": [
+        "China",
+        "Republic of Korea",
+        "Germany"
+      ]
+    },
+    {
+      "commodity": "POTASH",
+      "reliance_text": "92",
+      "reliance_pct": 92,
+      "bound": null,
+      "sources": [
+        "Canada",
+        "Russia",
+        "Israel"
+      ]
+    },
+    {
+      "commodity": "ANTIMONY, metal and oxide",
+      "reliance_text": "91",
+      "reliance_pct": 91,
+      "bound": null,
+      "sources": [
+        "China",
+        "Belgium",
+        "Thailand",
+        "India"
+      ]
+    },
+    {
+      "commodity": "PLATINUM",
+      "reliance_text": "89",
+      "reliance_pct": 89,
+      "bound": null,
+      "sources": [
+        "South Africa",
+        "Belgium",
+        "Germany",
+        "Italy"
+      ]
+    },
+    {
+      "commodity": "TITANIUM MINERAL CONCENTRATES",
+      "reliance_text": "88",
+      "reliance_pct": 88,
+      "bound": null,
+      "sources": [
+        "South Africa",
+        "Canada",
+        "Madagascar",
+        "Mozambique"
+      ]
+    },
+    {
+      "commodity": "STONE (DIMENSION)",
+      "reliance_text": "85",
+      "reliance_pct": 85,
+      "bound": null,
+      "sources": [
+        "Brazil",
+        "Italy",
+        "China",
+        "India"
+      ]
+    },
+    {
+      "commodity": "IRON OXIDE PIGMENTS, natural and synthetic",
+      "reliance_text": "84",
+      "reliance_pct": 84,
+      "bound": null,
+      "sources": [
+        "China",
+        "Germany",
+        "Brazil",
+        "Canada"
+      ]
+    },
+    {
+      "commodity": "DIAMOND (INDUSTRIAL), stones",
+      "reliance_text": "81",
+      "reliance_pct": 81,
+      "bound": null,
+      "sources": [
+        "India",
+        "South Africa",
+        "Russia",
+        "Botswana"
+      ]
+    },
+    {
+      "commodity": "PEAT",
+      "reliance_text": "80",
+      "reliance_pct": 80,
+      "bound": null,
+      "sources": [
+        "Canada"
+      ]
+    },
+    {
+      "commodity": "CHROMIUM, all forms",
+      "reliance_text": "79",
+      "reliance_pct": 79,
+      "bound": null,
+      "sources": [
+        "South Africa",
+        "Kazakhstan",
+        "Finland",
+        "Canada"
+      ]
+    },
+    {
+      "commodity": "COBALT",
+      "reliance_text": "79",
+      "reliance_pct": 79,
+      "bound": null,
+      "sources": [
+        "Norway",
+        "Finland",
+        "Canada",
+        "Japan"
+      ]
+    },
+    {
+      "commodity": "SILVER",
+      "reliance_text": "77",
+      "reliance_pct": 77,
+      "bound": null,
+      "sources": [
+        "Mexico",
+        "Canada",
+        "Chile",
+        "Turkey"
+      ]
+    },
+    {
+      "commodity": "TIN, refined",
+      "reliance_text": "77",
+      "reliance_pct": 77,
+      "bound": null,
+      "sources": [
+        "Peru",
+        "Bolivia",
+        "Indonesia",
+        "Brazil"
+      ]
+    },
+    {
+      "commodity": "RHENIUM",
+      "reliance_text": "75",
+      "reliance_pct": 75,
+      "bound": null,
+      "sources": [
+        "Chile",
+        "Canada",
+        "Germany",
+        "Poland"
+      ]
+    },
+    {
+      "commodity": "BARITE",
+      "reliance_text": ">75",
+      "reliance_pct": 75,
+      "bound": ">",
+      "sources": [
+        "India",
+        "China",
+        "Morocco",
+        "Mexico"
+      ]
+    },
+    {
+      "commodity": "BAUXITE",
+      "reliance_text": ">75",
+      "reliance_pct": 75,
+      "bound": ">",
+      "sources": [
+        "Jamaica",
+        "Turkey",
+        "Guyana",
+        "Australia"
+      ]
+    },
+    {
+      "commodity": "MAGNESIUM METAL",
+      "reliance_text": ">75",
+      "reliance_pct": 75,
+      "bound": ">",
+      "sources": [
+        "Israel",
+        "Canada",
+        "Turkey",
+        "Czechia"
+      ]
+    },
+    {
+      "commodity": "ABRASIVES, silicon carbide",
+      "reliance_text": "74",
+      "reliance_pct": 74,
+      "bound": null,
+      "sources": [
+        "China",
+        "Brazil"
+      ]
+    },
+    {
+      "commodity": "ZINC, refined",
+      "reliance_text": "73",
+      "reliance_pct": 73,
+      "bound": null,
+      "sources": [
+        "Canada",
+        "Mexico",
+        "Peru",
+        "Republic of Korea"
+      ]
+    },
+    {
+      "commodity": "ALUMINA",
+      "reliance_text": "71",
+      "reliance_pct": 71,
+      "bound": null,
+      "sources": [
+        "Brazil",
+        "Jamaica",
+        "Australia",
+        "Canada"
+      ]
+    },
+    {
+      "commodity": "GARNET (INDUSTRIAL)",
+      "reliance_text": "71",
+      "reliance_pct": 71,
+      "bound": null,
+      "sources": [
+        "South Africa",
+        "Australia",
+        "China",
+        "India"
+      ]
+    },
+    {
+      "commodity": "RARE EARTHS, compounds and metals",
+      "reliance_text": "67",
+      "reliance_pct": 67,
+      "bound": null,
+      "sources": [
+        "China",
+        "Malaysia",
+        "Estonia",
+        "Japan"
+      ]
+    },
+    {
+      "commodity": "ALUMINUM",
+      "reliance_text": "60",
+      "reliance_pct": 60,
+      "bound": null,
+      "sources": [
+        "Canada",
+        "United Arab Emirates",
+        "Bahrain",
+        "China"
+      ]
+    },
+    {
+      "commodity": "MAGNESIUM COMPOUNDS",
+      "reliance_text": "59",
+      "reliance_pct": 59,
+      "bound": null,
+      "sources": [
+        "China",
+        "Brazil",
+        "Canada",
+        "Israel"
+      ]
+    },
+    {
+      "commodity": "COPPER, refined",
+      "reliance_text": "57",
+      "reliance_pct": 57,
+      "bound": null,
+      "sources": [
+        "Chile",
+        "Canada",
+        "Peru",
+        "Mexico"
+      ]
+    },
+    {
+      "commodity": "PALLADIUM",
+      "reliance_text": "57",
+      "reliance_pct": 57,
+      "bound": null,
+      "sources": [
+        "South Africa",
+        "Russia",
+        "Belgium",
+        "Canada"
+      ]
+    },
+    {
+      "commodity": "NEON",
+      "reliance_text": "52",
+      "reliance_pct": 52,
+      "bound": null,
+      "sources": []
+    },
+    {
+      "commodity": "GERMANIUM",
+      "reliance_text": ">50",
+      "reliance_pct": 50,
+      "bound": ">",
+      "sources": [
+        "Belgium",
+        "China",
+        "Canada",
+        "Germany"
+      ]
+    },
+    {
+      "commodity": "LITHIUM",
+      "reliance_text": ">50",
+      "reliance_pct": 50,
+      "bound": ">",
+      "sources": [
+        "Chile",
+        "Argentina"
+      ]
+    },
+    {
+      "commodity": "SELENIUM",
+      "reliance_text": ">50",
+      "reliance_pct": 50,
+      "bound": ">",
+      "sources": [
+        "Philippines",
+        "Mexico",
+        "Chile",
+        "Poland"
+      ]
+    },
+    {
+      "commodity": "SILICON, metal and ferrosilicon",
+      "reliance_text": ">50",
+      "reliance_pct": 50,
+      "bound": ">",
+      "sources": [
+        "Brazil",
+        "Canada",
+        "Russia",
+        "Malaysia"
+      ]
+    },
+    {
+      "commodity": "TUNGSTEN",
+      "reliance_text": ">50",
+      "reliance_pct": 50,
+      "bound": ">",
+      "sources": [
+        "China",
+        "Germany",
+        "Bolivia",
+        "Vietnam"
+      ]
+    },
+    {
+      "commodity": "IODINE",
+      "reliance_text": "<50",
+      "reliance_pct": 50,
+      "bound": "<",
+      "sources": [
+        "Chile",
+        "Japan"
+      ]
+    },
+    {
+      "commodity": "NICKEL",
+      "reliance_text": "41",
+      "reliance_pct": 41,
+      "bound": null,
+      "sources": [
+        "Canada",
+        "Norway",
+        "Australia",
+        "Brazil"
+      ]
+    },
+    {
+      "commodity": "VANADIUM",
+      "reliance_text": "41",
+      "reliance_pct": 41,
+      "bound": null,
+      "sources": [
+        "Canada",
+        "Brazil",
+        "South Africa",
+        "Austria"
+      ]
+    },
+    {
+      "commodity": "DIAMOND (INDUSTRIAL), bort, grit, and dust and powder",
+      "reliance_text": "35",
+      "reliance_pct": 35,
+      "bound": null,
+      "sources": [
+        "China",
+        "Republic of Korea",
+        "Ireland"
+      ]
+    },
+    {
+      "commodity": "MICA (NATURAL), scrap and flake",
+      "reliance_text": "34",
+      "reliance_pct": 34,
+      "bound": null,
+      "sources": [
+        "China",
+        "Canada",
+        "India",
+        "Finland"
+      ]
+    },
+    {
+      "commodity": "LEAD, refined",
+      "reliance_text": "33",
+      "reliance_pct": 33,
+      "bound": null,
+      "sources": [
+        "Canada",
+        "Republic of Korea",
+        "Ireland"
+      ]
+    },
+    {
+      "commodity": "SALT",
+      "reliance_text": "31",
+      "reliance_pct": 31,
+      "bound": null,
+      "sources": [
+        "Mexico",
+        "Chile",
+        "Canada",
+        "Egypt"
+      ]
+    },
+    {
+      "commodity": "TELLURIUM",
+      "reliance_text": ">25",
+      "reliance_pct": 25,
+      "bound": ">",
+      "sources": [
+        "Canada",
+        "Philippines",
+        "Japan",
+        "Germany"
+      ]
+    },
+    {
+      "commodity": "VERMICULITE",
+      "reliance_text": "25",
+      "reliance_pct": 25,
+      "bound": null,
+      "sources": [
+        "South Africa",
+        "Brazil",
+        "Zimbabwe",
+        "Uganda"
+      ]
+    },
+    {
+      "commodity": "BROMINE",
+      "reliance_text": "<25",
+      "reliance_pct": 25,
+      "bound": "<",
+      "sources": [
+        "Israel",
+        "Jordan",
+        "China"
+      ]
+    },
+    {
+      "commodity": "CADMIUM",
+      "reliance_text": "<25",
+      "reliance_pct": 25,
+      "bound": "<",
+      "sources": [
+        "China",
+        "Germany",
+        "Australia",
+        "Peru"
+      ]
+    },
+    {
+      "commodity": "ZIRCONIUM, ores and concentrates",
+      "reliance_text": "<25",
+      "reliance_pct": 25,
+      "bound": "<",
+      "sources": [
+        "South Africa",
+        "Australia",
+        "Senegal"
+      ]
+    },
+    {
+      "commodity": "PERLITE",
+      "reliance_text": "23",
+      "reliance_pct": 23,
+      "bound": null,
+      "sources": [
+        "Greece",
+        "China"
+      ]
+    },
+    {
+      "commodity": "TALC",
+      "reliance_text": "22",
+      "reliance_pct": 22,
+      "bound": null,
+      "sources": [
+        "Pakistan",
+        "Canada",
+        "China"
+      ]
+    },
+    {
+      "commodity": "CEMENT",
+      "reliance_text": "21",
+      "reliance_pct": 21,
+      "bound": null,
+      "sources": [
+        "Turkey",
+        "Canada",
+        "Vietnam",
+        "Greece"
+      ]
+    }
+  ],
+  "import_sources": [
+    {
+      "commodity": "Arsenic",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "China",
+          "pct": 45
+        },
+        {
+          "source": "Malaysia",
+          "pct": 30
+        },
+        {
+          "source": "Morocco",
+          "pct": 16
+        },
+        {
+          "source": "Other",
+          "pct": 9
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Cesium",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Fluorspar",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "Mexico",
+          "pct": 64
+        },
+        {
+          "source": "Vietnam",
+          "pct": 12
+        },
+        {
+          "source": "China",
+          "pct": 10
+        },
+        {
+          "source": "South Africa",
+          "pct": 9
+        },
+        {
+          "source": "Other",
+          "pct": 5
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Gallium",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "Canada",
+          "pct": 28
+        },
+        {
+          "source": "Japan",
+          "pct": 22
+        },
+        {
+          "source": "China",
+          "pct": 18
+        },
+        {
+          "source": "Germany",
+          "pct": 16
+        },
+        {
+          "source": "Other",
+          "pct": 16
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Graphite, natural",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "China",
+          "pct": 46
+        },
+        {
+          "source": "Canada",
+          "pct": 13
+        },
+        {
+          "source": "Mozambique",
+          "pct": 13
+        },
+        {
+          "source": "Mexico",
+          "pct": 12
+        },
+        {
+          "source": "Other",
+          "pct": 16
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Indium",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "Republic of Korea",
+          "pct": 25
+        },
+        {
+          "source": "Japan",
+          "pct": 22
+        },
+        {
+          "source": "China",
+          "pct": 12
+        },
+        {
+          "source": "Canada",
+          "pct": 11
+        },
+        {
+          "source": "Other",
+          "pct": 30
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Manganese",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "Gabon",
+          "pct": 23
+        },
+        {
+          "source": "South Africa",
+          "pct": 21
+        },
+        {
+          "source": "Malaysia",
+          "pct": 11
+        },
+        {
+          "source": "Australia",
+          "pct": 10
+        },
+        {
+          "source": "Other",
+          "pct": 35
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Niobium",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "Brazil",
+          "pct": 67
+        },
+        {
+          "source": "Canada",
+          "pct": 28
+        },
+        {
+          "source": "Other",
+          "pct": 5
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Scandium",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "Japan",
+          "pct": 89
+        },
+        {
+          "source": "China",
+          "pct": 11
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Tantalum",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "China",
+          "pct": 22
+        },
+        {
+          "source": "Australia",
+          "pct": 14
+        },
+        {
+          "source": "Germany",
+          "pct": 11
+        },
+        {
+          "source": "Indonesia",
+          "pct": 7
+        },
+        {
+          "source": "Other",
+          "pct": 46
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Yttrium",
+      "reliance_pct": 100,
+      "reliance_text": "100",
+      "shares": [
+        {
+          "source": "China",
+          "pct": 70
+        },
+        {
+          "source": "Germany",
+          "pct": 11
+        },
+        {
+          "source": "Austria",
+          "pct": 8
+        },
+        {
+          "source": "Republic of Korea",
+          "pct": 4
+        },
+        {
+          "source": "Other",
+          "pct": 7
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Bismuth",
+      "reliance_pct": 92,
+      "reliance_text": "92",
+      "shares": [
+        {
+          "source": "China",
+          "pct": 56
+        },
+        {
+          "source": "Republic of Korea",
+          "pct": 22
+        },
+        {
+          "source": "Germany",
+          "pct": 13
+        },
+        {
+          "source": "Other",
+          "pct": 9
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Potash",
+      "reliance_pct": 92,
+      "reliance_text": "92",
+      "shares": [
+        {
+          "source": "Canada",
+          "pct": 79
+        },
+        {
+          "source": "Russia",
+          "pct": 12
+        },
+        {
+          "source": "Israel",
+          "pct": 3
+        },
+        {
+          "source": "Other",
+          "pct": 6
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Antimony",
+      "reliance_pct": 91,
+      "reliance_text": "91",
+      "shares": [
+        {
+          "source": "China",
+          "pct": 55
+        },
+        {
+          "source": "Belgium",
+          "pct": 12
+        },
+        {
+          "source": "Thailand",
+          "pct": 8
+        },
+        {
+          "source": "India",
+          "pct": 6
+        },
+        {
+          "source": "Other",
+          "pct": 19
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Platinum",
+      "reliance_pct": 89,
+      "reliance_text": "89",
+      "shares": [
+        {
+          "source": "South Africa",
+          "pct": 49
+        },
+        {
+          "source": "Belgium",
+          "pct": 10
+        },
+        {
+          "source": "Germany",
+          "pct": 10
+        },
+        {
+          "source": "Italy",
+          "pct": 8
+        },
+        {
+          "source": "Other",
+          "pct": 23
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Titanium, mineral concentrates",
+      "reliance_pct": 86,
+      "reliance_text": "86",
+      "shares": [
+        {
+          "source": "South Africa",
+          "pct": 32
+        },
+        {
+          "source": "Madagascar",
+          "pct": 16
+        },
+        {
+          "source": "Canada",
+          "pct": 13
+        },
+        {
+          "source": "Australia",
+          "pct": 11
+        },
+        {
+          "source": "Other",
+          "pct": 28
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Chromium",
+      "reliance_pct": 79,
+      "reliance_text": "79",
+      "shares": [
+        {
+          "source": "South Africa",
+          "pct": 31
+        },
+        {
+          "source": "Kazakhstan",
+          "pct": 11
+        },
+        {
+          "source": "Finland",
+          "pct": 6
+        },
+        {
+          "source": "Canada",
+          "pct": 5
+        },
+        {
+          "source": "Other",
+          "pct": 47
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Cobalt",
+      "reliance_pct": 79,
+      "reliance_text": "79",
+      "shares": [
+        {
+          "source": "Norway",
+          "pct": 26
+        },
+        {
+          "source": "Finland",
+          "pct": 16
+        },
+        {
+          "source": "Canada",
+          "pct": 14
+        },
+        {
+          "source": "Japan",
+          "pct": 14
+        },
+        {
+          "source": "Other",
+          "pct": 30
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Silver",
+      "reliance_pct": 77,
+      "reliance_text": "77",
+      "shares": [
+        {
+          "source": "Mexico",
+          "pct": 47
+        },
+        {
+          "source": "Canada",
+          "pct": 18
+        },
+        {
+          "source": "Chile",
+          "pct": 5
+        },
+        {
+          "source": "Turkey",
+          "pct": 5
+        },
+        {
+          "source": "Other",
+          "pct": 25
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Tin, refined",
+      "reliance_pct": 77,
+      "reliance_text": "77",
+      "shares": [
+        {
+          "source": "Peru",
+          "pct": 31
+        },
+        {
+          "source": "Bolivia",
+          "pct": 27
+        },
+        {
+          "source": "Indonesia",
+          "pct": 15
+        },
+        {
+          "source": "Brazil",
+          "pct": 10
+        },
+        {
+          "source": "Other",
+          "pct": 17
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Barite",
+      "reliance_pct": 75,
+      "reliance_text": ">75",
+      "shares": [
+        {
+          "source": "India",
+          "pct": 39
+        },
+        {
+          "source": "China",
+          "pct": 21
+        },
+        {
+          "source": "Morocco",
+          "pct": 19
+        },
+        {
+          "source": "Mexico",
+          "pct": 14
+        },
+        {
+          "source": "Other",
+          "pct": 7
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Magnesium, metal",
+      "reliance_pct": 75,
+      "reliance_text": ">75",
+      "shares": [
+        {
+          "source": "Israel",
+          "pct": 20
+        },
+        {
+          "source": "Canada",
+          "pct": 15
+        },
+        {
+          "source": "Turkey",
+          "pct": 11
+        },
+        {
+          "source": "Czechia",
+          "pct": 9
+        },
+        {
+          "source": "Other",
+          "pct": 45
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Rhenium",
+      "reliance_pct": 75,
+      "reliance_text": "75",
+      "shares": [
+        {
+          "source": "Chile",
+          "pct": 31
+        },
+        {
+          "source": "Canada",
+          "pct": 27
+        },
+        {
+          "source": "Germany",
+          "pct": 16
+        },
+        {
+          "source": "Poland",
+          "pct": 14
+        },
+        {
+          "source": "Other",
+          "pct": 12
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Zinc, refined",
+      "reliance_pct": 73,
+      "reliance_text": "73",
+      "shares": [
+        {
+          "source": "Canada",
+          "pct": 57
+        },
+        {
+          "source": "Mexico",
+          "pct": 15
+        },
+        {
+          "source": "Peru",
+          "pct": 8
+        },
+        {
+          "source": "Republic of Korea",
+          "pct": 7
+        },
+        {
+          "source": "Other",
+          "pct": 13
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Rare Earths, compounds and metals",
+      "reliance_pct": 67,
+      "reliance_text": "67",
+      "shares": [
+        {
+          "source": "China",
+          "pct": 71
+        },
+        {
+          "source": "Malaysia",
+          "pct": 13
+        },
+        {
+          "source": "Japan",
+          "pct": 5
+        },
+        {
+          "source": "Estonia",
+          "pct": 5
+        },
+        {
+          "source": "Other",
+          "pct": 6
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Aluminum",
+      "reliance_pct": 60,
+      "reliance_text": "60",
+      "shares": [
+        {
+          "source": "Canada",
+          "pct": 56
+        },
+        {
+          "source": "United Arab Emirates",
+          "pct": 8
+        },
+        {
+          "source": "Bahrain",
+          "pct": 4
+        },
+        {
+          "source": "China",
+          "pct": 3
+        },
+        {
+          "source": "Other",
+          "pct": 29
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Magnesium, compounds",
+      "reliance_pct": 59,
+      "reliance_text": "59",
+      "shares": [
+        {
+          "source": "China",
+          "pct": 58
+        },
+        {
+          "source": "Brazil",
+          "pct": 8
+        },
+        {
+          "source": "Canada",
+          "pct": 8
+        },
+        {
+          "source": "Israel",
+          "pct": 8
+        },
+        {
+          "source": "Other",
+          "pct": 18
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Copper, refined",
+      "reliance_pct": 57,
+      "reliance_text": "57",
+      "shares": [
+        {
+          "source": "Chile",
+          "pct": 68
+        },
+        {
+          "source": "Canada",
+          "pct": 16
+        },
+        {
+          "source": "Peru",
+          "pct": 7
+        },
+        {
+          "source": "Mexico",
+          "pct": 6
+        },
+        {
+          "source": "Other",
+          "pct": 3
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Palladium",
+      "reliance_pct": 57,
+      "reliance_text": "57",
+      "shares": [
+        {
+          "source": "South Africa",
+          "pct": 37
+        },
+        {
+          "source": "Russia",
+          "pct": 36
+        },
+        {
+          "source": "Belgium",
+          "pct": 6
+        },
+        {
+          "source": "Canada",
+          "pct": 6
+        },
+        {
+          "source": "Other",
+          "pct": 15
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Germanium",
+      "reliance_pct": 50,
+      "reliance_text": ">50",
+      "shares": [
+        {
+          "source": "Belgium",
+          "pct": 41
+        },
+        {
+          "source": "China",
+          "pct": 23
+        },
+        {
+          "source": "Canada",
+          "pct": 17
+        },
+        {
+          "source": "Germany",
+          "pct": 14
+        },
+        {
+          "source": "Other",
+          "pct": 5
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Lithium",
+      "reliance_pct": 50,
+      "reliance_text": ">50",
+      "shares": [
+        {
+          "source": "Chile",
+          "pct": 54
+        },
+        {
+          "source": "Argentina",
+          "pct": 43
+        },
+        {
+          "source": "Other",
+          "pct": 3
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Silicon",
+      "reliance_pct": 50,
+      "reliance_text": ">50",
+      "shares": [
+        {
+          "source": "Brazil",
+          "pct": 25
+        },
+        {
+          "source": "Canada",
+          "pct": 20
+        },
+        {
+          "source": "Russia",
+          "pct": 18
+        },
+        {
+          "source": "Malaysia",
+          "pct": 8
+        },
+        {
+          "source": "Other",
+          "pct": 29
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Tungsten",
+      "reliance_pct": 50,
+      "reliance_text": ">50",
+      "shares": [
+        {
+          "source": "China",
+          "pct": 26
+        },
+        {
+          "source": "Germany",
+          "pct": 14
+        },
+        {
+          "source": "Bolivia",
+          "pct": 8
+        },
+        {
+          "source": "Vietnam",
+          "pct": 8
+        },
+        {
+          "source": "Other",
+          "pct": 44
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Nickel",
+      "reliance_pct": 41,
+      "reliance_text": "41",
+      "shares": [
+        {
+          "source": "Canada",
+          "pct": 44
+        },
+        {
+          "source": "Norway",
+          "pct": 11
+        },
+        {
+          "source": "Australia",
+          "pct": 8
+        },
+        {
+          "source": "Brazil",
+          "pct": 7
+        },
+        {
+          "source": "Other",
+          "pct": 30
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Vanadium",
+      "reliance_pct": 41,
+      "reliance_text": "41",
+      "shares": [
+        {
+          "source": "Canada",
+          "pct": 34
+        },
+        {
+          "source": "Brazil",
+          "pct": 13
+        },
+        {
+          "source": "South Africa",
+          "pct": 13
+        },
+        {
+          "source": "Austria",
+          "pct": 10
+        },
+        {
+          "source": "Other",
+          "pct": 30
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Lead, refined",
+      "reliance_pct": 33,
+      "reliance_text": "33",
+      "shares": [
+        {
+          "source": "Canada",
+          "pct": 31
+        },
+        {
+          "source": "Republic of Korea",
+          "pct": 16
+        },
+        {
+          "source": "Mexico",
+          "pct": 15
+        },
+        {
+          "source": "Australia",
+          "pct": 13
+        },
+        {
+          "source": "Other",
+          "pct": 25
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Tellurium",
+      "reliance_pct": 25,
+      "reliance_text": ">25",
+      "shares": [
+        {
+          "source": "Canada",
+          "pct": 64
+        },
+        {
+          "source": "Philippines",
+          "pct": 14
+        },
+        {
+          "source": "Japan",
+          "pct": 8
+        },
+        {
+          "source": "Germany",
+          "pct": 5
+        },
+        {
+          "source": "Other",
+          "pct": 9
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Zirconium, ores and concentrates",
+      "reliance_pct": 25,
+      "reliance_text": "<25",
+      "shares": [
+        {
+          "source": "South Africa",
+          "pct": 48
+        },
+        {
+          "source": "Australia",
+          "pct": 35
+        },
+        {
+          "source": "Senegal",
+          "pct": 15
+        },
+        {
+          "source": "Other",
+          "pct": 2
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Phosphate, rock",
+      "reliance_pct": 16,
+      "reliance_text": "16",
+      "shares": [
+        {
+          "source": "Peru",
+          "pct": 99
+        },
+        {
+          "source": "Other",
+          "pct": 1
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Beryllium",
+      "reliance_pct": 0,
+      "reliance_text": "0",
+      "shares": [
+        {
+          "source": "Kazakhstan",
+          "pct": 31
+        },
+        {
+          "source": "Latvia",
+          "pct": 25
+        },
+        {
+          "source": "Japan",
+          "pct": 19
+        },
+        {
+          "source": "Germany",
+          "pct": 5
+        },
+        {
+          "source": "Other",
+          "pct": 20
+        }
+      ],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Boron",
+      "reliance_pct": 0,
+      "reliance_text": "0",
+      "shares": [
+        {
+          "source": "Turkey",
+          "pct": 90
+        },
+        {
+          "source": "Bolivia",
+          "pct": 6
+        },
+        {
+          "source": "Other",
+          "pct": 4
+        }
+      ],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Hafnium",
+      "reliance_pct": null,
+      "reliance_text": null,
+      "shares": [],
+      "usgs_flag": "Y"
+    },
+    {
+      "commodity": "Iridium",
+      "reliance_pct": null,
+      "reliance_text": null,
+      "shares": [],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Metallurgical coal",
+      "reliance_pct": null,
+      "reliance_text": null,
+      "shares": [],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Rhodium",
+      "reliance_pct": null,
+      "reliance_text": null,
+      "shares": [],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Rubidium",
+      "reliance_pct": null,
+      "reliance_text": null,
+      "shares": [],
+      "usgs_flag": "N"
+    },
+    {
+      "commodity": "Uranium",
+      "reliance_pct": null,
+      "reliance_text": null,
+      "shares": [],
+      "usgs_flag": "N"
+    }
+  ],
+  "with_sources": 65,
+  "by_source": [
+    {
+      "source": "China",
+      "country": "CN",
+      "named_first": 18,
+      "named": 31,
+      "commodities_named_first": [
+        "ARSENIC, all forms",
+        "CESIUM",
+        "GRAPHITE (NATURAL)",
+        "MICA (NATURAL), sheet",
+        "RUBIDIUM",
+        "TANTALUM",
+        "YTTRIUM",
+        "ABRASIVES, fused aluminum oxide",
+        "BISMUTH",
+        "ANTIMONY, metal and oxide",
+        "IRON OXIDE PIGMENTS, natural and synthetic",
+        "ABRASIVES, silicon carbide",
+        "RARE EARTHS, compounds and metals",
+        "MAGNESIUM COMPOUNDS",
+        "TUNGSTEN",
+        "DIAMOND (INDUSTRIAL), bort, grit, and dust and powder",
+        "MICA (NATURAL), scrap and flake",
+        "CADMIUM"
+      ]
+    },
+    {
+      "source": "Canada",
+      "country": "CA",
+      "named_first": 10,
+      "named": 31,
+      "commodities_named_first": [
+        "GALLIUM",
+        "NEPHELINE SYENITE",
+        "POTASH",
+        "PEAT",
+        "ZINC, refined",
+        "ALUMINUM",
+        "NICKEL",
+        "VANADIUM",
+        "LEAD, refined",
+        "TELLURIUM"
+      ]
+    },
+    {
+      "source": "South Africa",
+      "country": "ZA",
+      "named_first": 7,
+      "named": 12,
+      "commodities_named_first": [
+        "PLATINUM",
+        "TITANIUM MINERAL CONCENTRATES",
+        "CHROMIUM, all forms",
+        "GARNET (INDUSTRIAL)",
+        "PALLADIUM",
+        "VERMICULITE",
+        "ZIRCONIUM, ores and concentrates"
+      ]
+    },
+    {
+      "source": "Brazil",
+      "country": "BR",
+      "named_first": 5,
+      "named": 14,
+      "commodities_named_first": [
+        "ASBESTOS",
+        "NIOBIUM (COLUMBIUM)",
+        "STONE (DIMENSION)",
+        "ALUMINA",
+        "SILICON, metal and ferrosilicon"
+      ]
+    },
+    {
+      "source": "Mexico",
+      "country": "MX",
+      "named_first": 4,
+      "named": 9,
+      "commodities_named_first": [
+        "FLUORSPAR",
+        "STRONTIUM",
+        "SILVER",
+        "SALT"
+      ]
+    },
+    {
+      "source": "Chile",
+      "country": "CL",
+      "named_first": 4,
+      "named": 7,
+      "commodities_named_first": [
+        "RHENIUM",
+        "COPPER, refined",
+        "LITHIUM",
+        "IODINE"
+      ]
+    },
+    {
+      "source": "India",
+      "country": "IN",
+      "named_first": 3,
+      "named": 8,
+      "commodities_named_first": [
+        "GEMSTONES",
+        "DIAMOND (INDUSTRIAL), stones",
+        "BARITE"
+      ]
+    },
+    {
+      "source": "Japan",
+      "country": "JP",
+      "named_first": 2,
+      "named": 8,
+      "commodities_named_first": [
+        "SCANDIUM",
+        "TITANIUM, sponge metal"
+      ]
+    },
+    {
+      "source": "Israel",
+      "country": "IL",
+      "named_first": 2,
+      "named": 5,
+      "commodities_named_first": [
+        "MAGNESIUM METAL",
+        "BROMINE"
+      ]
+    },
+    {
+      "source": "Belgium",
+      "country": "BE",
+      "named_first": 1,
+      "named": 5,
+      "commodities_named_first": [
+        "GERMANIUM"
+      ]
+    },
+    {
+      "source": "Republic of Korea",
+      "country": "KR",
+      "named_first": 1,
+      "named": 5,
+      "commodities_named_first": [
+        "INDIUM"
+      ]
+    },
+    {
+      "source": "Peru",
+      "country": "PE",
+      "named_first": 1,
+      "named": 4,
+      "commodities_named_first": [
+        "TIN, refined"
+      ]
+    },
+    {
+      "source": "Turkey",
+      "country": "TR",
+      "named_first": 1,
+      "named": 4,
+      "commodities_named_first": [
+        "CEMENT"
+      ]
+    },
+    {
+      "source": "Greece",
+      "country": "GR",
+      "named_first": 1,
+      "named": 2,
+      "commodities_named_first": [
+        "PERLITE"
+      ]
+    },
+    {
+      "source": "Jamaica",
+      "country": "JM",
+      "named_first": 1,
+      "named": 2,
+      "commodities_named_first": [
+        "BAUXITE"
+      ]
+    },
+    {
+      "source": "Norway",
+      "country": "NO",
+      "named_first": 1,
+      "named": 2,
+      "commodities_named_first": [
+        "COBALT"
+      ]
+    },
+    {
+      "source": "Philippines",
+      "country": "PH",
+      "named_first": 1,
+      "named": 2,
+      "commodities_named_first": [
+        "SELENIUM"
+      ]
+    },
+    {
+      "source": "Gabon",
+      "country": "GA",
+      "named_first": 1,
+      "named": 1,
+      "commodities_named_first": [
+        "MANGANESE"
+      ]
+    },
+    {
+      "source": "Pakistan",
+      "country": "PK",
+      "named_first": 1,
+      "named": 1,
+      "commodities_named_first": [
+        "TALC"
+      ]
+    },
+    {
+      "source": "Germany",
+      "country": "DE",
+      "named_first": 0,
+      "named": 14,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Australia",
+      "country": "AU",
+      "named_first": 0,
+      "named": 8,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Russia",
+      "country": "RU",
+      "named_first": 0,
+      "named": 5,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Malaysia",
+      "country": "MY",
+      "named_first": 0,
+      "named": 4,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Vietnam",
+      "country": "VN",
+      "named_first": 0,
+      "named": 4,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Austria",
+      "country": "AT",
+      "named_first": 0,
+      "named": 3,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Finland",
+      "country": "FI",
+      "named_first": 0,
+      "named": 3,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Bolivia",
+      "country": "BO",
+      "named_first": 0,
+      "named": 2,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Indonesia",
+      "country": "ID",
+      "named_first": 0,
+      "named": 2,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Ireland",
+      "country": "IE",
+      "named_first": 0,
+      "named": 2,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Italy",
+      "country": "IT",
+      "named_first": 0,
+      "named": 2,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Kazakhstan",
+      "country": "KZ",
+      "named_first": 0,
+      "named": 2,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Morocco",
+      "country": "MA",
+      "named_first": 0,
+      "named": 2,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Mozambique",
+      "country": "MZ",
+      "named_first": 0,
+      "named": 2,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Poland",
+      "country": "PL",
+      "named_first": 0,
+      "named": 2,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Argentina",
+      "country": "AR",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Bahrain",
+      "country": "BH",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Botswana",
+      "country": "BW",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Czechia",
+      "country": "CZ",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Egypt",
+      "country": "EG",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Estonia",
+      "country": "EE",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Guyana",
+      "country": "GY",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Jordan",
+      "country": "JO",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Madagascar",
+      "country": "MG",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Saudi Arabia",
+      "country": "SA",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Senegal",
+      "country": "SN",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Thailand",
+      "country": "TH",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Uganda",
+      "country": "UG",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "United Arab Emirates",
+      "country": "AE",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    },
+    {
+      "source": "Zimbabwe",
+      "country": "ZW",
+      "named_first": 0,
+      "named": 1,
+      "commodities_named_first": []
+    }
+  ]
+}

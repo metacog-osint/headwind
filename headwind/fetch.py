@@ -6,6 +6,7 @@ to data/raw/index.jsonl, so a later reader can tell which bytes a number came fr
 """
 from __future__ import annotations
 
+import gzip
 import hashlib
 import json
 import os
@@ -26,17 +27,20 @@ def get(url: str, timeout: int = 60) -> bytes:
         return resp.read()
 
 
-def fetch(source_id: str, url: str, raw_dir: Path | None, ext: str, timeout: int = 60, getter=None) -> tuple[bytes, dict]:
-    """Return (bytes, record). The record carries the URL, SHA-256, size and fetch time."""
+def fetch(source_id: str, url: str, raw_dir: Path | None, ext: str, timeout: int = 60, getter=None,
+          gz: bool = False) -> tuple[bytes, dict]:
+    """Return (bytes, record). The record carries the URL, SHA-256, size and fetch time.
+
+    gz stores the raw copy gzipped (for large files); the hash and size are of the bytes as fetched."""
     body = (getter or get)(url, timeout)
     sha = hashlib.sha256(body).hexdigest()
     rec = {"source_id": source_id, "url": url, "sha256": sha, "bytes": len(body), "fetched_at": now_utc()}
     if raw_dir is not None:
         dest = Path(raw_dir) / source_id
         dest.mkdir(parents=True, exist_ok=True)
-        f = dest / f"{sha[:12]}.{ext}"
+        f = dest / (f"{sha[:12]}.{ext}" + (".gz" if gz else ""))
         if not f.exists():
-            f.write_bytes(body)
+            f.write_bytes(gzip.compress(body, 6) if gz else body)
         with (Path(raw_dir) / "index.jsonl").open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(rec) + "\n")
     return body, rec
