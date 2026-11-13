@@ -11,7 +11,10 @@
   function zText(v) { return v === null || v === undefined ? "no baseline" : (v > 0 ? "+" : "") + Number(v).toFixed(1); }
   function rate(v) { return v === null || v === undefined ? "" : Math.round(v * 100) + "%"; }
   function flag(a) { return a ? ' <span class="badge badge-warn">unusual</span>' : ""; }
+  var T = window.TicTime;
   function when(iso) {
+    // House rule: the viewer's own zone by default, the zone always named, changed from the Time menu.
+    if (T && iso) { try { return T.format(iso, { year: true }); } catch (e) { /* fall through */ } }
     try {
       return new Date(iso).toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" });
     } catch (e) { return iso; }
@@ -80,6 +83,13 @@
       var lines = [];
       if (d.added) { lines.push("Added by program: " + counts(d.added_by_program) + ". By type: " + counts(d.added_by_type) + "."); }
       if (d.removed) { lines.push("Removed by program: " + counts(d.removed_by_program) + "."); }
+      function ships(word, vs) {
+        if (!vs || !vs.length) { return; }
+        lines.push("Vessels " + word + ": " + vs.map(function (v) {
+          return v.name + " (" + (v.imo ? "IMO " + v.imo : "no IMO number given") + (v.flag ? ", flag " + v.flag : "") + ")";
+        }).join("; ") + ".");
+      }
+      ships("added", d.vessels_added); ships("removed", d.vessels_removed);
       return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed") + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
     }).join("") || (lists.length ? '<p class="small muted">No change seen in the last 30 days of readings.</p>' : "");
 
@@ -135,6 +145,13 @@
 
   fetch("data/snapshot.json")
     .then(function (r) { return r.json(); })
-    .then(render)
+    .then(function (s) {
+      render(s);
+      if (T) {
+        var slot = document.getElementById("time-settings");
+        if (slot) { T.mountSettings(slot); }
+        T.onChange(function () { render(s); });
+      }
+    })
     .catch(function () { document.getElementById("asof").textContent = "The data could not be loaded."; });
 })();

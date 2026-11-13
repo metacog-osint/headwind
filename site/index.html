@@ -6,17 +6,21 @@
 <title>Headwind: economic stress</title>
 <meta name="description" content="Currencies, energy and food prices measured against their own normal range, changes to official sanctions lists, new export-control rules, and the dates of coming economic decisions. Measurements, not investment advice.">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="tic-time.css">
+<link rel="stylesheet" href="tic-nav.css">
+<script src="tic-time.js"></script>
+<script src="tic-nav.js" defer data-current="headwind"></script>
 </head>
 <body>
 <header class="top">
   <div class="wrap top-row">
     <div class="brand"><strong>Headwind</strong><span class="muted">The Intelligence Company</span></div>
     <nav class="top-nav">
-      <a href="https://theintelligence.company/">All programs</a>
       <a href="data/feed.geojson">Feed</a>
       <a href="data/events.json">Calendar</a>
       <a href="data/baseline.json">Country baselines</a>
       <a href="data/minerals.json">Minerals</a>
+      <span id="time-settings"></span>
     </nav>
   </div>
 </header>
@@ -68,8 +72,9 @@
   <div class="two">
     <section class="card" id="sanctions" aria-labelledby="sn-h">
       <div class="card-head"><h2 id="sn-h">Sanctions lists</h2>
-        <p class="muted small">What changed between Headwind's own readings of each official list. Counts only; the
-          names are on the publisher's list. The date is when Headwind saw the change, not the date of the
+        <p class="muted small">What changed between Headwind's own readings of each official list. People and
+          organizations are counts only; their names are on the publisher's list. Vessels are named, with their IMO
+          numbers. The date is when Headwind saw the change, not the date of the
           designation.</p></div>
       <div id="sanction-lists"></div>
       <div id="sanction-deltas"></div>
@@ -119,7 +124,8 @@
     Administration; FAO (CC BY-NC-SA 3.0 IGO); World Food Programme via the Humanitarian Data Exchange
     (CC BY-IGO); World Bank (CC BY 4.0); Federal Reserve; US Treasury (OFAC); United Nations Security Council;
     US International Trade Administration (Consolidated Screening List); US Federal Register;
-    US Geological Survey (Mineral Commodity Summaries, CC0). Not investment advice.</p>
+    US Geological Survey (Mineral Commodity Summaries, CC0). Exchange rates are the ECB's euro reference rates,
+    restated by Headwind as units of each currency per US dollar. Not investment advice.</p>
 </footer>
 <script src="app.js"></script>
 </body>

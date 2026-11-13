@@ -1,6 +1,6 @@
 36,-0- ,-0-,CUBA,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
 1241,-0- ,-0-,CUBA,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
-4249,-0- ,vessel,CUBA,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
+4249,TIFON,vessel,CUBA,-0- ,-0- ,Tug,-0- ,-0- ,Cuba,-0- ,Vessel Registration Identification IMO 7206512.
 6714,-0- ,individual,SDNTK,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
 6924,-0- ,individual,SDGT,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
 7151,-0- ,-0-,SDNTK,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
@@ -23,14 +23,14 @@
 11409,-0- ,-0-,SDNTK,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
 11631,-0- ,-0-,IRAN,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
 11841,-0- ,-0-,SDNTK,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
-15042,-0- ,vessel,IRAN,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
-15088,-0- ,vessel,IRAN,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
+15042,DIAMOND II,vessel,IRAN,-0- ,-0- ,Crude Oil Tanker,-0- ,-0- ,Iran,-0- ,Vessel Registration Identification IMO 9218478; MMSI 256865000.
+15088,SERENA,vessel,IRAN,-0- ,-0- ,Crude Oil Tanker,-0- ,-0- ,Iran,-0- ,Vessel Registration Identification IMO 9569645.
 15453,-0- ,aircraft,SDGT] [NPWMD] [IFSR,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
-19595,-0- ,vessel,DPRK3,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
-23159,-0- ,vessel,DPRK4,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
-23770,-0- ,vessel,DPRK4,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
-24508,-0- ,vessel,DPRK4,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
-25289,-0- ,vessel,IRAN] [NPWMD] [IFSR,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
+19595,RA NAM 3,vessel,DPRK3,-0- ,-0- ,-0- ,-0- ,-0- ,Democratic People's Republic of Korea,-0- ,Vessel Registration Identification IMO 9314650.
+23159,JANG GYONG,vessel,DPRK4,-0- ,-0- ,-0- ,-0- ,-0- ,Democratic People's Republic of Korea,-0- ,Vessel Registration Identification IMO 8203933.
+23770,HAO FAN 2,vessel,DPRK4,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,Vessel Registration Identification IMO 8747604.
+24508,PATRIOT,vessel,DPRK4,-0- ,-0- ,-0- ,-0- ,-0- ,Russia,-0- ,Vessel Registration Identification IMO 9003550.
+25289,SHAYAN 1,vessel,IRAN] [NPWMD] [IFSR,-0- ,-0- ,Container Ship,-0- ,-0- ,Iran,-0- ,Vessel Registration Identification IMO 9420356.
 25509,-0- ,aircraft,IRAN,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
 25546,-0- ,aircraft,IRAN,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 
 28320,-0- ,aircraft,VENEZUELA-EO13884,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- ,-0- 

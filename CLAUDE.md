@@ -8,7 +8,7 @@ lists, export-control and sanctions rules, US import reliance for minerals, plus
 The sanctions and rules lanes (method `headwind-1.2`) are committed on the same branch as `472e802`, pushed
 13 Nov. The screening-list and minerals lanes and the page fixes (method `headwind-1.3`) are commit `921d8f6`.
 The energy lane's move from FRED to EIA's API, the program-to-country fixes and the licence notes are the commit
-after it (13 Nov, about 9:45 AM CST). Those two commits are not pushed. Nothing is merged or deployed.** `main` is still the
+after it (13 Nov, about 9:45 AM CST). Both were pushed 13 Nov (`14e3501` is the branch tip). Nothing is merged or deployed.** `main` is still the
 4 Nov seed snapshot (`36daed6`). Untracked and to stay that way: `GEMINI.md` and `data/`. The site address in the feed
 (`headwind.theintelligence.company`) has no DNS record, and the suite registry still lists Headwind as planned
 with seed data.
@@ -26,7 +26,8 @@ python tools/headwind.py collect              # fetch every live lane into data/
 python tools/headwind.py collect --only fx    # one or more lanes; the rest keep their last copy
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
-python -m unittest discover -s tests          # 23 offline tests against real fixtures
+python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
+python -m unittest discover -s tests          # 24 offline tests against real fixtures
 ```
 
 `collect` never falls back to made-up data. A lane that fails keeps its last good copy (`from_previous`) or stays
@@ -65,15 +66,20 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   `entry id -> [type, programs]`, compares it with `data/state/sanctions_index.json` from the run before, and
   reports counts by type and program. The date on a change is when Headwind saw it, not the designation date.
   The first run only sets the baseline. A change stays in the snapshot 30 days and in the feed 7.
-- **Counts only, no names** (Claude's choice, 12 Nov; say if names of entities and vessels should show). The index
-  file holds ids, types and programs, never names.
+- **People and organizations are counts only. Vessels are named** (Tom, 13 Nov 2026): an OFAC vessel entry
+  carries its name, IMO number, MMSI, flag and type in the index, the snapshot (`vessels_added`,
+  `vessels_removed`), the feed summary (first 25) and the page. The owner column is not carried because it can name
+  a person, and `us_person_data` stays `none`. On 13 Nov, 1,555 of 1,570 listed vessels had an IMO number. A vessel
+  removed from an index written before 13 Nov is counted but not named. The UN list has no vessels.
 - **A list that parses short or loses over half its entries fails the lane** and is never reported as delistings.
 - **`data/state/` must be carried between scheduled runs**, like `data/snapshot.json`, or every run is a first run.
 - **Countries on a list change** come from the program name where it names one country (`PROGRAM_COUNTRY` in
   `sanctions.py`; conduct programs such as SDGT are left unplaced). Checked 13 Nov against all 72 program tags on
   the live SDN list and the 14 UN list types: `HRIT-SY` was going to Iran and `CAATSA - RUSSIA`, `CAATSA - IRAN`,
-  `MAGNIT`, `PEESA`, `SSIDES` and `UHRPA` were unplaced; all seven are fixed. Tom's call: the four `UKRAINE-EO…`
-  programs (987 entries) are placed on Russia, and `PAARSSR-EO13894` (174, the former Syria order) is unplaced.
+  `MAGNIT`, `PEESA`, `SSIDES` and `UHRPA` were unplaced; all are fixed, and each tag was then read against
+  OFAC's program tag definitions page. `SSIDES` is the 2014 Ukraine support act (Russia), not South Sudan as first
+  entered. Tom's decisions, 13 Nov: `UKRAINE-EO13661` and `-EO13662` are Russia; `UKRAINE-EO13660` and `-EO13685`
+  (Crimea) are Russia and Ukraine; `PAARSSR-EO13894` is Syria. A map value can be a tuple of two countries.
 - **Rules:** a document stays in the feed 14 days. Future dates come from its effective date, its comment
   deadline, and dates written out in its DATES paragraph (`named_dates`); each becomes a `rule_date` for Verdict.
   Countries are only those a title names. USTR notices and public-inspection filings are not read.
@@ -144,16 +150,27 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   and UK sanctions lists, USTR notices, Federal Register public inspection.
 - **A list change is only an added or removed id.** An entry that stays on a list and changes its programs or type
   is not reported, in either list lane.
-- `HW-EEI-1` and `HW-EEI-2` (vessel matches in Wake, public-inspection filings) are unmet. `HW-EEI-1` needs names
-  or vessel identifiers, which is Tom's open decision.
+- `HW-EEI-1` and `HW-EEI-2` (vessel matches in Wake, public-inspection filings) are unmet. Headwind now carries
+  the IMO numbers `HW-EEI-1` needs; the match itself is not built, and Wake is seed data only.
 - Page layout was checked on 13 Nov at 1280 and 375 pixels wide for the sanctions, rules, screening and minerals
   sections. Fixed then: links had no colour set (browser blue on the dark panel), date badges stretched and wrapped,
   and the rules card listed all 25 documents (now six, with the rest behind a control). Wide tables scroll sideways
   on a phone.
-- `live/first-slice` is not merged to `main`. That needs Tom's yes.
-- No workflow, no Pages project, no DNS, and no place in `tic-dispatch`. Each needs Tom's yes.
+- Local `main` was fast-forwarded to `14e3501` on 13 Nov (Tom's yes); `origin/main` is still the seed. The work
+  after `14e3501` (vessels, country tags, house bar, deploy draft) is on `live/first-slice`, uncommitted.
+- **The house bar and Time menu have not been seen in a browser**: the preview pane refused to load on 13 Nov.
+  Tests, build and `check` pass; look at the page before deploy.
+- **Deploy is drafted, not done.** `.github/workflows/update.yml` (13 Nov, never run) follows Blackout's: tests,
+  `restore`, `collect`, `build --publish-state`, `check`, then `wrangler pages deploy` to a Cloudflare Pages
+  project named `headwind`. `restore --from <site>` reads the last run's snapshot and list indexes back from the
+  published site's `data/state/`; `build --publish-state` puts them there (about 1.7 MB; the local build leaves
+  them out so they are not committed). `site_src/_headers` carries the CSP and CORS on `/data/*`. Still Tom's:
+  the Pages project, secrets `CLOUDFLARE_PAGES_TOKEN` and `EIA_API_KEY`, variable `CLOUDFLARE_ACCOUNT_ID`, the DNS
+  record, a `tic-dispatch` entry and its token's access to the repo. The workflow runs on a push to `main`.
 - The suite registry (`tic-doctrine/vocab/programs.json`) still describes the seed build and its licences.
-- `tic-time.js` and the house bar are not on the page; the page shows the collection time in the viewer's zone
+- The house bar (`tic-nav.js` v1.6) and `tic-time.js` v1.3 are on the page since 13 Nov, copied from the hub's
+  `site/shared/`. The hub's Programs list has no Headwind entry yet, so the bar cannot mark "You are here"; adding
+  it is a hub change with wording for Tom. Before that the page showed the collection time in the viewer's zone
   with the zone named, and data dates as dates.
 - US inflation and jobs dates: bls.gov refused automated requests (403). IMF's data API also refused (403).
 - No fixed baseline beside the rolling one. No Wayback capture of sources.
@@ -165,20 +182,27 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - WFP on HDX: CC BY-IGO, read from HDX's own metadata on 12 Nov 2026.
 - FAO: its database terms page, read 13 Nov 2026, gives CC BY 4.0 unless a dataset's own page says otherwise, with
   a set citation form and a bar on use "for or in conjunction with the promotion of a commercial enterprise". The
-  Food Price Index page itself was not read. The feed, page and `sources.json` still say CC BY-NC-SA 3.0 IGO from
-  the seed build; change them once the index page is read.
+  Food Price Index page, read the same day, showed no licence statement to the reader. The feed, page and
+  `sources.json` still say CC BY-NC-SA 3.0 IGO from the seed build, the stricter of the two. Tom's call which to
+  state.
 - ECB: its disclaimer page, read 13 Nov 2026, allows free use with the ECB cited as the source, and says a change
-  to the figures must be stated. Headwind restates the rates per US dollar, so the page has to say so.
+  to the figures must be stated. Headwind restates the rates per US dollar; the page footer says so (13 Nov).
 - World Bank: CC BY 4.0 is the default for its own datasets (licence page read 13 Nov 2026; it does not name WDI).
-- Federal Reserve: stated from memory. Check before deploy.
-- OFAC list and Federal Register: US government works, stated from memory. On 13 Nov Treasury's site-policies
-  page had no reuse statement and federalregister.gov turned the reader away to its unblock page. UN Security
-  Council list: no licence statement found (the 29 Oct source research found none either). Check before deploy.
+- Federal Reserve: its disclaimer page, read 13 Nov 2026, says website information is in the public domain unless
+  marked otherwise and asks that the Board be cited.
+- Federal Register: the National Archives' page about it, read 13 Nov 2026, says everything that appears in the
+  Federal Register may be reproduced without restriction. federalregister.gov itself turned the reader away.
+- OFAC list: a US government work, stated from memory. Treasury's site-policies page had no reuse statement.
+- **UN Security Council list: the open one.** The UN's website terms of use, read 13 Nov 2026, allow copying for
+  personal, non-commercial use and withhold the right to redistribute or make derivative works. The list page
+  states no licence of its own. Headwind publishes only counts taken from the list and a link to it, never its
+  content. Tom's call whether that is enough, or whether to ask the UN or drop the lane, before deploy.
 - USGS Mineral Commodity Summaries data release: CC0 1.0, read from the ScienceBase record on 13 Nov 2026.
 - trade.gov Consolidated Screening List: a US government work, stated from memory. Its page, read 13 Nov 2026,
   states no terms of reuse.
 - Energy: EIA's reuse page, read 13 Nov 2026, says US government publications are in the public domain and asks
-  for credit as "Source: U.S. Energy Information Administration" with a date. EIA's API terms of service were not
-  read. The lane left FRED on 13 Nov because FRED's legal page bars scraping and passing stored content on; the
+  for credit as "Source: U.S. Energy Information Administration" with a date. EIA's API terms of service, read
+  the same day, allow building a service that displays and analyses its data, ask that EIA be named as the source,
+  and bar implying its endorsement or changing content while still crediting EIA. The lane left FRED on 13 Nov because FRED's legal page bars scraping and passing stored content on; the
   snapshot's energy rows have come from EIA since 9:35 AM CST that day. Old FRED raw copies are still under
   `data/raw/eia-spot-fred/` (git-ignored).
