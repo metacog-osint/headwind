@@ -11,6 +11,11 @@ name: update
 # `build --publish-state` puts this run's state back there. With nothing published yet, the first run is a first
 # reading: it sets the baselines and reports no list change.
 #
+# Where the state is read from is repo variable HEADWIND_STATE_URL: the address the site is really served at. Set
+# it to the project's pages.dev address after the first deploy (the custom domain works only once its DNS record
+# exists). While it is unset every run is a first reading and says so in a warning. Once it is set, a site that
+# cannot be reached stops the run: going on would start the baselines over and publish that over the real state.
+#
 # Secrets: EIA_API_KEY (energy lane; without it that lane fails and the rest run), CLOUDFLARE_PAGES_TOKEN
 # (Cloudflare Pages: Edit), and the account ID as repo variable CLOUDFLARE_ACCOUNT_ID. Without the Cloudflare
 # pair everything runs except the deploy. Collected data is not committed.
@@ -38,7 +43,14 @@ jobs:
       - name: Tests
         run: python -m unittest discover -s tests
       - name: Last run's state from the published site (none on the first run)
-        run: python tools/headwind.py restore --from https://headwind.theintelligence.company
+        env:
+          STATE_URL: ${{ vars.HEADWIND_STATE_URL }}
+        run: |
+          if [ -z "$STATE_URL" ]; then
+            echo "::warning::HEADWIND_STATE_URL is not set, so this run is a first reading: no list change can be reported."
+            exit 0
+          fi
+          python tools/headwind.py restore --from "$STATE_URL"
       - name: Live collection (a failed lane keeps its last good copy and says so on the page)
         run: python tools/headwind.py collect
         env:

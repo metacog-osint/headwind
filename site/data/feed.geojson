@@ -2,7 +2,7 @@
   "type": "FeatureCollection",
   "contract": "tic-feed/2",
   "program": "headwind",
-  "generated_at": "2026-11-13T16:12:44Z",
+  "generated_at": "2026-11-13T16:28:29Z",
   "licence": "Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and Federal Register US public domain; UN Security Council list, no licence stated",
   "attribution": "Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information Administration; FAO; World Food Programme via the Humanitarian Data Exchange; US Treasury (OFAC); United Nations Security Council; US International Trade Administration; US Federal Register.",
   "language_key": "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md",
@@ -31,8 +31,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-13T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "IR"
         ],
@@ -74,7 +74,7 @@
             "independence_group": "us-federal-register",
             "source_type": "official or market data",
             "descriptor": "Rules and proposed rules as published by the agency in the official journal.",
-            "accessed_at": "2026-11-13T14:50:51Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -103,8 +103,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-13T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "RU"
         ],
@@ -146,7 +146,7 @@
             "independence_group": "us-federal-register",
             "source_type": "official or market data",
             "descriptor": "Rules and proposed rules as published by the agency in the official journal.",
-            "accessed_at": "2026-11-13T14:50:51Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -175,8 +175,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-13T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "CU"
         ],
@@ -218,7 +218,7 @@
             "independence_group": "us-federal-register",
             "source_type": "official or market data",
             "descriptor": "Rules and proposed rules as published by the agency in the official journal.",
-            "accessed_at": "2026-11-13T14:50:51Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -247,8 +247,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-13T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "IR"
         ],
@@ -290,7 +290,7 @@
             "independence_group": "us-federal-register",
             "source_type": "official or market data",
             "descriptor": "Rules and proposed rules as published by the agency in the official journal.",
-            "accessed_at": "2026-11-13T14:50:51Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -313,8 +313,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-09T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic",
@@ -354,7 +354,7 @@
             "independence_group": "us-federal-register",
             "source_type": "official or market data",
             "descriptor": "Rules and proposed rules as published by the agency in the official journal.",
-            "accessed_at": "2026-11-13T14:50:51Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -370,10 +370,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:AUD:2026-11-12",
+        "id": "headwind:fx:AUD:2026-11-13",
         "program": "headwind",
-        "title": "Australia (AUD): 2.6% weaker against the US dollar in 5 business days (z +3.0)",
-        "summary": "1.46611 AUD per US dollar on 2026-11-12, against 1.42846 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Australia (AUD): 1.3% weaker against the US dollar in 5 business days (z +1.5)",
+        "summary": "1.47376 AUD per US dollar on 2026-11-13, against 1.45544 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -382,9 +382,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "AU"
         ],
@@ -408,9 +408,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 1.466113,
-          "change_pct": 2.64,
-          "z": 3.04,
+          "per_usd": 1.47376,
+          "change_pct": 1.26,
+          "z": 1.49,
           "baseline_n": 250,
           "flag_rate": 0.004
         },
@@ -429,7 +429,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -445,10 +445,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:BRL:2026-11-12",
+        "id": "headwind:fx:BRL:2026-11-13",
         "program": "headwind",
-        "title": "Brazil (BRL): 2.8% weaker against the US dollar in 5 business days (z +2.1)",
-        "summary": "5.61691 BRL per US dollar on 2026-11-12, against 5.46641 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Brazil (BRL): 2.9% weaker against the US dollar in 5 business days (z +2.2)",
+        "summary": "5.66368 BRL per US dollar on 2026-11-13, against 5.50372 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -457,9 +457,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "BR"
         ],
@@ -483,9 +483,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 5.616912,
-          "change_pct": 2.75,
-          "z": 2.12,
+          "per_usd": 5.663681,
+          "change_pct": 2.91,
+          "z": 2.25,
           "baseline_n": 250,
           "flag_rate": 0.02
         },
@@ -504,7 +504,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -520,10 +520,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:CAD:2026-11-12",
+        "id": "headwind:fx:CAD:2026-11-13",
         "program": "headwind",
-        "title": "Canada (CAD): 2.0% weaker against the US dollar in 5 business days (z +2.6)",
-        "summary": "1.42487 CAD per US dollar on 2026-11-12, against 1.39656 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Canada (CAD): 1.4% weaker against the US dollar in 5 business days (z +1.8)",
+        "summary": "1.4258 CAD per US dollar on 2026-11-13, against 1.40663 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -532,9 +532,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "CA"
         ],
@@ -558,9 +558,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 1.424871,
-          "change_pct": 2.03,
-          "z": 2.58,
+          "per_usd": 1.425805,
+          "change_pct": 1.36,
+          "z": 1.75,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -579,7 +579,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -595,10 +595,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:CHF:2026-11-12",
+        "id": "headwind:fx:CHF:2026-11-13",
         "program": "headwind",
-        "title": "Switzerland (CHF): 1.9% weaker against the US dollar in 5 business days (z +1.8)",
-        "summary": "0.833138 CHF per US dollar on 2026-11-12, against 0.81789 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Switzerland (CHF): 2.4% weaker against the US dollar in 5 business days (z +2.3)",
+        "summary": "0.8384 CHF per US dollar on 2026-11-13, against 0.818898 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -607,9 +607,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "CH"
         ],
@@ -633,9 +633,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 0.833138,
-          "change_pct": 1.86,
-          "z": 1.77,
+          "per_usd": 0.8384,
+          "change_pct": 2.38,
+          "z": 2.34,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -654,7 +654,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -670,10 +670,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:CNY:2026-11-12",
+        "id": "headwind:fx:CNY:2026-11-13",
         "program": "headwind",
-        "title": "China (CNY): 0.0% unchanged against the US dollar in 5 business days (z +0.5)",
-        "summary": "6.66826 CNY per US dollar on 2026-11-12, against 6.66839 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "China (CNY): 0.0% weaker against the US dollar in 5 business days (z +0.5)",
+        "summary": "6.67192 CNY per US dollar on 2026-11-13, against 6.67129 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -682,9 +682,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "CN"
         ],
@@ -708,9 +708,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 6.668261,
-          "change_pct": -0.0,
-          "z": 0.5,
+          "per_usd": 6.671915,
+          "change_pct": 0.01,
+          "z": 0.52,
           "baseline_n": 250,
           "flag_rate": 0.004
         },
@@ -729,7 +729,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -745,10 +745,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:CZK:2026-11-12",
+        "id": "headwind:fx:CZK:2026-11-13",
         "program": "headwind",
-        "title": "Czechia (CZK): 1.7% weaker against the US dollar in 5 business days (z +1.7)",
-        "summary": "22.0007 CZK per US dollar on 2026-11-12, against 21.6402 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Czechia (CZK): 1.3% weaker against the US dollar in 5 business days (z +1.3)",
+        "summary": "22.0992 CZK per US dollar on 2026-11-13, against 21.8092 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -757,9 +757,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "CZ"
         ],
@@ -783,9 +783,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 22.000722,
-          "change_pct": 1.67,
-          "z": 1.66,
+          "per_usd": 22.099168,
+          "change_pct": 1.33,
+          "z": 1.31,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -804,7 +804,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -820,10 +820,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:DKK:2026-11-12",
+        "id": "headwind:fx:DKK:2026-11-13",
         "program": "headwind",
-        "title": "Denmark (DKK): 1.3% weaker against the US dollar in 5 business days (z +1.6)",
-        "summary": "6.74614 DKK per US dollar on 2026-11-12, against 6.65957 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Denmark (DKK): 1.0% weaker against the US dollar in 5 business days (z +1.2)",
+        "summary": "6.76403 DKK per US dollar on 2026-11-13, against 6.69521 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -832,9 +832,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "DK"
         ],
@@ -858,9 +858,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 6.746142,
-          "change_pct": 1.3,
-          "z": 1.55,
+          "per_usd": 6.764025,
+          "change_pct": 1.03,
+          "z": 1.21,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -879,7 +879,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -889,10 +889,10 @@
       "geometry": null,
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:EUR:2026-11-12",
+        "id": "headwind:fx:EUR:2026-11-13",
         "program": "headwind",
-        "title": "Euro area (EUR): 1.3% weaker against the US dollar in 5 business days (z +1.5)",
-        "summary": "0.902446 EUR per US dollar on 2026-11-12, against 0.890948 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Euro area (EUR): 1.0% weaker against the US dollar in 5 business days (z +1.2)",
+        "summary": "0.904814 EUR per US dollar on 2026-11-13, against 0.895656 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -901,9 +901,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -925,9 +925,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
-          "per_usd": 0.902446,
-          "change_pct": 1.29,
-          "z": 1.53,
+          "per_usd": 0.904814,
+          "change_pct": 1.02,
+          "z": 1.2,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -946,7 +946,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -962,10 +962,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:GBP:2026-11-12",
+        "id": "headwind:fx:GBP:2026-11-13",
         "program": "headwind",
-        "title": "United Kingdom (GBP): 1.5% weaker against the US dollar in 5 business days (z +2.0)",
-        "summary": "0.754399 GBP per US dollar on 2026-11-12, against 0.742988 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "United Kingdom (GBP): 1.2% weaker against the US dollar in 5 business days (z +1.6)",
+        "summary": "0.756053 GBP per US dollar on 2026-11-13, against 0.747112 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -974,9 +974,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "GB"
         ],
@@ -1000,9 +1000,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 0.754399,
-          "change_pct": 1.54,
-          "z": 2.04,
+          "per_usd": 0.756053,
+          "change_pct": 1.2,
+          "z": 1.6,
           "baseline_n": 250,
           "flag_rate": 0.004
         },
@@ -1021,7 +1021,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1037,10 +1037,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:HKD:2026-11-12",
+        "id": "headwind:fx:HKD:2026-11-13",
         "program": "headwind",
-        "title": "Hong Kong (HKD): 0.0% stronger against the US dollar in 5 business days (z -0.1)",
-        "summary": "7.84478 HKD per US dollar on 2026-11-12, against 7.84524 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Hong Kong (HKD): 0.1% weaker against the US dollar in 5 business days (z +0.3)",
+        "summary": "7.846 HKD per US dollar on 2026-11-13, against 7.83744 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1049,9 +1049,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "HK"
         ],
@@ -1075,9 +1075,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 7.844779,
-          "change_pct": -0.01,
-          "z": -0.08,
+          "per_usd": 7.846001,
+          "change_pct": 0.11,
+          "z": 0.33,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -1096,7 +1096,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1112,10 +1112,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:HUF:2026-11-12",
+        "id": "headwind:fx:HUF:2026-11-13",
         "program": "headwind",
-        "title": "Hungary (HUF): 1.8% weaker against the US dollar in 5 business days (z +1.3)",
-        "summary": "329.375 HUF per US dollar on 2026-11-12, against 323.574 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Hungary (HUF): 1.5% weaker against the US dollar in 5 business days (z +1.1)",
+        "summary": "330.8 HUF per US dollar on 2026-11-13, against 325.929 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1124,9 +1124,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "HU"
         ],
@@ -1150,9 +1150,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 329.374605,
-          "change_pct": 1.79,
-          "z": 1.32,
+          "per_usd": 330.799855,
+          "change_pct": 1.49,
+          "z": 1.11,
           "baseline_n": 250,
           "flag_rate": 0.024
         },
@@ -1171,7 +1171,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1187,10 +1187,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:IDR:2026-11-12",
+        "id": "headwind:fx:IDR:2026-11-13",
         "program": "headwind",
-        "title": "Indonesia (IDR): 1.0% weaker against the US dollar in 5 business days (z +1.4)",
-        "summary": "18252.6 IDR per US dollar on 2026-11-12, against 18069.4 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Indonesia (IDR): 0.8% weaker against the US dollar in 5 business days (z +1.0)",
+        "summary": "18244.4 IDR per US dollar on 2026-11-13, against 18100.3 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1199,9 +1199,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "ID"
         ],
@@ -1225,9 +1225,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 18252.648678,
-          "change_pct": 1.01,
-          "z": 1.36,
+          "per_usd": 18244.399204,
+          "change_pct": 0.8,
+          "z": 0.98,
           "baseline_n": 250,
           "flag_rate": 0.004
         },
@@ -1246,7 +1246,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1262,10 +1262,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:ILS:2026-11-12",
+        "id": "headwind:fx:ILS:2026-11-13",
         "program": "headwind",
-        "title": "Israel (ILS): 1.0% weaker against the US dollar in 5 business days (z +0.9)",
-        "summary": "3.20323 ILS per US dollar on 2026-11-12, against 3.1716 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Israel (ILS): 0.4% weaker against the US dollar in 5 business days (z +0.4)",
+        "summary": "3.21073 ILS per US dollar on 2026-11-13, against 3.19902 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1274,9 +1274,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "IL"
         ],
@@ -1300,9 +1300,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 3.203231,
-          "change_pct": 1.0,
-          "z": 0.94,
+          "per_usd": 3.210731,
+          "change_pct": 0.37,
+          "z": 0.39,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -1321,7 +1321,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1337,10 +1337,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:INR:2026-11-12",
+        "id": "headwind:fx:INR:2026-11-13",
         "program": "headwind",
-        "title": "India (INR): 0.5% stronger against the US dollar in 5 business days (z -0.9)",
-        "summary": "94.0455 INR per US dollar on 2026-11-12, against 94.4757 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "India (INR): 0.3% weaker against the US dollar in 5 business days (z +0.2)",
+        "summary": "94.2431 INR per US dollar on 2026-11-13, against 93.9225 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1349,9 +1349,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "IN"
         ],
@@ -1375,9 +1375,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 94.045483,
-          "change_pct": -0.46,
-          "z": -0.92,
+          "per_usd": 94.243123,
+          "change_pct": 0.34,
+          "z": 0.23,
           "baseline_n": 250,
           "flag_rate": 0.004
         },
@@ -1396,7 +1396,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1412,10 +1412,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:ISK:2026-11-12",
+        "id": "headwind:fx:ISK:2026-11-13",
         "program": "headwind",
-        "title": "Iceland (ISK): 1.1% weaker against the US dollar in 5 business days (z +1.9)",
-        "summary": "123.274 ISK per US dollar on 2026-11-12, against 121.882 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Iceland (ISK): 0.9% weaker against the US dollar in 5 business days (z +1.5)",
+        "summary": "123.598 ISK per US dollar on 2026-11-13, against 122.526 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1424,9 +1424,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "IS"
         ],
@@ -1450,9 +1450,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 123.274073,
-          "change_pct": 1.14,
-          "z": 1.92,
+          "per_usd": 123.597539,
+          "change_pct": 0.87,
+          "z": 1.47,
           "baseline_n": 250,
           "flag_rate": 0.02
         },
@@ -1471,7 +1471,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1487,10 +1487,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:JPY:2026-11-12",
+        "id": "headwind:fx:JPY:2026-11-13",
         "program": "headwind",
-        "title": "Japan (JPY): 0.8% weaker against the US dollar in 5 business days (z +0.8)",
-        "summary": "159.697 JPY per US dollar on 2026-11-12, against 158.455 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Japan (JPY): 1.1% weaker against the US dollar in 5 business days (z +1.3)",
+        "summary": "159.998 JPY per US dollar on 2026-11-13, against 158.325 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1499,9 +1499,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "JP"
         ],
@@ -1525,9 +1525,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 159.696778,
-          "change_pct": 0.78,
-          "z": 0.85,
+          "per_usd": 159.99819,
+          "change_pct": 1.06,
+          "z": 1.27,
           "baseline_n": 250,
           "flag_rate": 0.084
         },
@@ -1546,7 +1546,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1562,10 +1562,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:KRW:2026-11-12",
+        "id": "headwind:fx:KRW:2026-11-13",
         "program": "headwind",
-        "title": "South Korea (KRW): 0.8% stronger against the US dollar in 5 business days (z -0.5)",
-        "summary": "1334.1 KRW per US dollar on 2026-11-12, against 1344.69 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "South Korea (KRW): 1.6% stronger against the US dollar in 5 business days (z -1.1)",
+        "summary": "1337.13 KRW per US dollar on 2026-11-13, against 1358.73 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1574,9 +1574,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "KR"
         ],
@@ -1600,9 +1600,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 1334.10342,
-          "change_pct": -0.79,
-          "z": -0.48,
+          "per_usd": 1337.13355,
+          "change_pct": -1.59,
+          "z": -1.1,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -1621,7 +1621,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1637,10 +1637,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:MXN:2026-11-12",
+        "id": "headwind:fx:MXN:2026-11-13",
         "program": "headwind",
-        "title": "Mexico (MXN): 0.5% weaker against the US dollar in 5 business days (z +0.7)",
-        "summary": "18.6908 MXN per US dollar on 2026-11-12, against 18.5901 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Mexico (MXN): 0.6% stronger against the US dollar in 5 business days (z -0.6)",
+        "summary": "18.5931 MXN per US dollar on 2026-11-13, against 18.7038 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1649,9 +1649,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "MX"
         ],
@@ -1675,9 +1675,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 18.690822,
-          "change_pct": 0.54,
-          "z": 0.66,
+          "per_usd": 18.593105,
+          "change_pct": -0.59,
+          "z": -0.64,
           "baseline_n": 250,
           "flag_rate": 0.036
         },
@@ -1696,7 +1696,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1712,10 +1712,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:MYR:2026-11-12",
+        "id": "headwind:fx:MYR:2026-11-13",
         "program": "headwind",
-        "title": "Malaysia (MYR): 0.8% weaker against the US dollar in 5 business days (z +1.7)",
-        "summary": "4.07851 MYR per US dollar on 2026-11-12, against 4.04597 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Malaysia (MYR): 0.7% weaker against the US dollar in 5 business days (z +1.5)",
+        "summary": "4.08749 MYR per US dollar on 2026-11-13, against 4.05902 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1724,9 +1724,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "MY"
         ],
@@ -1750,9 +1750,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 4.078513,
-          "change_pct": 0.8,
-          "z": 1.69,
+          "per_usd": 4.087495,
+          "change_pct": 0.7,
+          "z": 1.51,
           "baseline_n": 250,
           "flag_rate": 0.056
         },
@@ -1771,7 +1771,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1787,10 +1787,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:NOK:2026-11-12",
+        "id": "headwind:fx:NOK:2026-11-13",
         "program": "headwind",
-        "title": "Norway (NOK): 2.5% weaker against the US dollar in 5 business days (z +2.3)",
-        "summary": "9.53253 NOK per US dollar on 2026-11-12, against 9.29838 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Norway (NOK): 1.4% weaker against the US dollar in 5 business days (z +1.4)",
+        "summary": "9.56343 NOK per US dollar on 2026-11-13, against 9.42768 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1799,9 +1799,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "NO"
         ],
@@ -1825,9 +1825,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 9.532533,
-          "change_pct": 2.52,
-          "z": 2.27,
+          "per_usd": 9.563427,
+          "change_pct": 1.44,
+          "z": 1.37,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -1846,7 +1846,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1862,10 +1862,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:NZD:2026-11-12",
+        "id": "headwind:fx:NZD:2026-11-13",
         "program": "headwind",
-        "title": "New Zealand (NZD): 1.2% weaker against the US dollar in 5 business days (z +0.9)",
-        "summary": "1.79966 NZD per US dollar on 2026-11-12, against 1.77887 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "New Zealand (NZD): 0.2% weaker against the US dollar in 5 business days (z +0.1)",
+        "summary": "1.80764 NZD per US dollar on 2026-11-13, against 1.80394 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1874,9 +1874,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "NZ"
         ],
@@ -1900,9 +1900,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 1.799657,
-          "change_pct": 1.17,
-          "z": 0.87,
+          "per_usd": 1.807637,
+          "change_pct": 0.2,
+          "z": 0.15,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -1921,7 +1921,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -1937,10 +1937,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:PHP:2026-11-12",
+        "id": "headwind:fx:PHP:2026-11-13",
         "program": "headwind",
-        "title": "Philippines (PHP): 1.2% weaker against the US dollar in 5 business days (z +1.4)",
-        "summary": "63.7271 PHP per US dollar on 2026-11-12, against 62.9954 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Philippines (PHP): 1.3% weaker against the US dollar in 5 business days (z +1.5)",
+        "summary": "63.8129 PHP per US dollar on 2026-11-13, against 63.0166 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -1949,9 +1949,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "PH"
         ],
@@ -1975,9 +1975,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 63.7271,
-          "change_pct": 1.16,
-          "z": 1.44,
+          "per_usd": 63.812885,
+          "change_pct": 1.26,
+          "z": 1.54,
           "baseline_n": 250,
           "flag_rate": 0.004
         },
@@ -1996,7 +1996,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2012,10 +2012,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:PLN:2026-11-12",
+        "id": "headwind:fx:PLN:2026-11-13",
         "program": "headwind",
-        "title": "Poland (PLN): 1.8% weaker against the US dollar in 5 business days (z +1.5)",
-        "summary": "3.9787 PLN per US dollar on 2026-11-12, against 3.91037 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Poland (PLN): 1.4% weaker against the US dollar in 5 business days (z +1.3)",
+        "summary": "3.9914 PLN per US dollar on 2026-11-13, against 3.93417 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -2024,9 +2024,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "PL"
         ],
@@ -2050,9 +2050,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 3.978702,
-          "change_pct": 1.75,
-          "z": 1.53,
+          "per_usd": 3.991404,
+          "change_pct": 1.45,
+          "z": 1.26,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -2071,7 +2071,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2087,10 +2087,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:RON:2026-11-12",
+        "id": "headwind:fx:RON:2026-11-13",
         "program": "headwind",
-        "title": "Romania (RON): 1.5% weaker against the US dollar in 5 business days (z +1.6)",
-        "summary": "4.82565 RON per US dollar on 2026-11-12, against 4.75633 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Romania (RON): 1.2% weaker against the US dollar in 5 business days (z +1.3)",
+        "summary": "4.84021 RON per US dollar on 2026-11-13, against 4.78307 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -2099,9 +2099,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "RO"
         ],
@@ -2125,9 +2125,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 4.825648,
-          "change_pct": 1.46,
-          "z": 1.57,
+          "per_usd": 4.84021,
+          "change_pct": 1.19,
+          "z": 1.27,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -2146,7 +2146,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2162,10 +2162,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:SEK:2026-11-12",
+        "id": "headwind:fx:SEK:2026-11-13",
         "program": "headwind",
-        "title": "Sweden (SEK): 2.0% weaker against the US dollar in 5 business days (z +1.6)",
-        "summary": "9.98358 SEK per US dollar on 2026-11-12, against 9.78662 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Sweden (SEK): 1.8% weaker against the US dollar in 5 business days (z +1.4)",
+        "summary": "10.0502 SEK per US dollar on 2026-11-13, against 9.8755 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -2174,9 +2174,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "SE"
         ],
@@ -2200,9 +2200,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 9.983575,
-          "change_pct": 2.01,
-          "z": 1.55,
+          "per_usd": 10.050217,
+          "change_pct": 1.77,
+          "z": 1.36,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -2221,7 +2221,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2237,10 +2237,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:SGD:2026-11-12",
+        "id": "headwind:fx:SGD:2026-11-13",
         "program": "headwind",
-        "title": "Singapore (SGD): 0.7% weaker against the US dollar in 5 business days (z +1.7)",
-        "summary": "1.2859 SGD per US dollar on 2026-11-12, against 1.27726 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Singapore (SGD): 0.5% weaker against the US dollar in 5 business days (z +1.3)",
+        "summary": "1.28809 SGD per US dollar on 2026-11-13, against 1.28159 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -2249,9 +2249,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "SG"
         ],
@@ -2275,9 +2275,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 1.285895,
-          "change_pct": 0.68,
-          "z": 1.74,
+          "per_usd": 1.288093,
+          "change_pct": 0.51,
+          "z": 1.3,
           "baseline_n": 250,
           "flag_rate": 0.008
         },
@@ -2296,7 +2296,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2312,10 +2312,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:THB:2026-11-12",
+        "id": "headwind:fx:THB:2026-11-13",
         "program": "headwind",
-        "title": "Thailand (THB): 1.1% weaker against the US dollar in 5 business days (z +1.2)",
-        "summary": "33.8146 THB per US dollar on 2026-11-12, against 33.44 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "Thailand (THB): 1.1% weaker against the US dollar in 5 business days (z +1.1)",
+        "summary": "33.9151 THB per US dollar on 2026-11-13, against 33.5504 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -2324,9 +2324,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "TH"
         ],
@@ -2350,9 +2350,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 33.814638,
-          "change_pct": 1.12,
-          "z": 1.17,
+          "per_usd": 33.915128,
+          "change_pct": 1.09,
+          "z": 1.14,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -2371,7 +2371,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2387,10 +2387,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:TRY:2026-11-12",
+        "id": "headwind:fx:TRY:2026-11-13",
         "program": "headwind",
         "title": "Turkey (TRY): 0.4% weaker against the US dollar in 5 business days (z +0.2)",
-        "summary": "50.2577 TRY per US dollar on 2026-11-12, against 50.0471 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "summary": "50.368 TRY per US dollar on 2026-11-13, against 50.1529 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -2399,9 +2399,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "TR"
         ],
@@ -2425,9 +2425,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 50.257738,
-          "change_pct": 0.42,
-          "z": 0.18,
+          "per_usd": 50.367988,
+          "change_pct": 0.43,
+          "z": 0.21,
           "baseline_n": 250,
           "flag_rate": 0.0
         },
@@ -2446,7 +2446,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2462,10 +2462,10 @@
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:fx:ZAR:2026-11-12",
+        "id": "headwind:fx:ZAR:2026-11-13",
         "program": "headwind",
-        "title": "South Africa (ZAR): 1.8% weaker against the US dollar in 5 business days (z +1.4)",
-        "summary": "16.715 ZAR per US dollar on 2026-11-12, against 16.4173 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "title": "South Africa (ZAR): 2.6% weaker against the US dollar in 5 business days (z +2.0)",
+        "summary": "16.9635 ZAR per US dollar on 2026-11-13, against 16.5382 on 2026-11-06. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -2474,9 +2474,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-12T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "data_as_of": "2026-11-13T00:00:00Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "ZA"
         ],
@@ -2500,9 +2500,9 @@
         "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "per_usd": 16.715008,
-          "change_pct": 1.81,
-          "z": 1.44,
+          "per_usd": 16.963536,
+          "change_pct": 2.57,
+          "z": 2.01,
           "baseline_n": 250,
           "flag_rate": 0.008
         },
@@ -2521,7 +2521,7 @@
             "independence_group": "ecb",
             "source_type": "official or market data",
             "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2544,8 +2544,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-11T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2588,7 +2588,7 @@
             "independence_group": "us-eia",
             "source_type": "official or market data",
             "descriptor": "Brent, WTI and Henry Hub daily spot prices as published by EIA.",
-            "accessed_at": "2026-11-13T15:34:59Z"
+            "accessed_at": "2026-11-13T16:28:29Z"
           }
         ]
       }
@@ -2611,8 +2611,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-11T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2655,7 +2655,7 @@
             "independence_group": "us-eia",
             "source_type": "official or market data",
             "descriptor": "Brent, WTI and Henry Hub daily spot prices as published by EIA.",
-            "accessed_at": "2026-11-13T15:34:59Z"
+            "accessed_at": "2026-11-13T16:28:29Z"
           }
         ]
       }
@@ -2678,8 +2678,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-11T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2722,7 +2722,7 @@
             "independence_group": "us-eia",
             "source_type": "official or market data",
             "descriptor": "Brent, WTI and Henry Hub daily spot prices as published by EIA.",
-            "accessed_at": "2026-11-13T15:34:59Z"
+            "accessed_at": "2026-11-13T16:28:29Z"
           }
         ]
       }
@@ -2745,8 +2745,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2790,7 +2790,7 @@
             "independence_group": "fao",
             "source_type": "official or market data",
             "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2813,8 +2813,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2858,7 +2858,7 @@
             "independence_group": "fao",
             "source_type": "official or market data",
             "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2881,8 +2881,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2926,7 +2926,7 @@
             "independence_group": "fao",
             "source_type": "official or market data",
             "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -2949,8 +2949,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -2994,7 +2994,7 @@
             "independence_group": "fao",
             "source_type": "official or market data",
             "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3017,8 +3017,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -3062,7 +3062,7 @@
             "independence_group": "fao",
             "source_type": "official or market data",
             "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3085,8 +3085,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -3130,7 +3130,7 @@
             "independence_group": "fao",
             "source_type": "official or market data",
             "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3159,8 +3159,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "BF"
         ],
@@ -3208,7 +3208,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3237,8 +3237,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "CD"
         ],
@@ -3286,7 +3286,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3315,8 +3315,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "ET"
         ],
@@ -3364,7 +3364,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3393,8 +3393,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-08-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "HT"
         ],
@@ -3442,7 +3442,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3471,8 +3471,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-11-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "IR"
         ],
@@ -3520,7 +3520,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3549,8 +3549,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-08-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "LB"
         ],
@@ -3598,7 +3598,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3627,8 +3627,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-08-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "ML"
         ],
@@ -3676,7 +3676,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3705,8 +3705,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "MM"
         ],
@@ -3754,7 +3754,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3783,8 +3783,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "NE"
         ],
@@ -3832,7 +3832,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3861,8 +3861,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "PH"
         ],
@@ -3910,7 +3910,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -3939,8 +3939,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "PK"
         ],
@@ -3988,7 +3988,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -4017,8 +4017,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "PS"
         ],
@@ -4066,7 +4066,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -4095,8 +4095,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "SD"
         ],
@@ -4144,7 +4144,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -4173,8 +4173,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-08-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "SO"
         ],
@@ -4222,7 +4222,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -4251,8 +4251,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "SS"
         ],
@@ -4300,7 +4300,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -4329,8 +4329,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-09-30T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "UA"
         ],
@@ -4378,7 +4378,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }
@@ -4407,8 +4407,8 @@
         "status_class": "reported",
         "product_category": "current",
         "data_as_of": "2026-10-31T00:00:00Z",
-        "published_at": "2026-11-13T16:12:44Z",
-        "valid_until": "2026-11-15T16:12:44Z",
+        "published_at": "2026-11-13T16:28:29Z",
+        "valid_until": "2026-11-15T16:28:29Z",
         "countries": [
           "YE"
         ],
@@ -4456,7 +4456,7 @@
             "independence_group": "wfp",
             "source_type": "official or market data",
             "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
-            "accessed_at": "2026-11-13T05:26:14Z"
+            "accessed_at": "2026-11-13T16:26:52Z"
           }
         ]
       }

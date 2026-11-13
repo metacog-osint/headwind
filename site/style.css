@@ -1,12 +1,37 @@
+/* Light or dark with the viewer's setting, like the house bar's panel (tic-nav.css). --ink, --line and --alarm
+   are the names tic-time.css reads for its dialog. */
 :root {
-  color-scheme: dark;
-  --bg: #0c0f14;
-  --panel: #131822;
-  --border: #242d3c;
-  --text: #e6edf3;
-  --muted: #8b949e;
-  --warn: #d29922;
-  --accent: #f0883e;
+  color-scheme: light;
+  --bg: #f6f5f1;
+  --panel: #ffffff;
+  --border: #d8d3c8;
+  --text: #14202e;
+  --muted: #555f6d;
+  --warn: #8a5a00;
+  --warn-bg: rgba(138, 90, 0, 0.12);
+  --accent: #a84d08;
+  --link: #1f4fa3;
+  --badge: #ebe8e1;
+  --ink: var(--text);
+  --line: var(--border);
+  --alarm: #b3261e;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0c0f14;
+    --panel: #131822;
+    --border: #242d3c;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --warn: #f0b72f;
+    --warn-bg: rgba(210, 153, 34, 0.2);
+    --accent: #f0883e;
+    --link: #79b8ff;
+    --badge: #1e293b;
+    --alarm: #ff8a80;
+  }
+  .tic-time-dialog .tic-time-actions .tic-time-done { color: #14110d; } /* white on the dark theme's orange reads 2.4:1 */
 }
 * { box-sizing: border-box; }
 body {
@@ -35,8 +60,8 @@ body {
 .row { padding: 10px 0; border-bottom: 1px solid var(--border); }
 .row:last-child { border-bottom: none; }
 .row-title { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
-.badge { background: #1e293b; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; }
-.badge-warn { background: rgba(210, 153, 34, 0.2); color: #f0b72f; }
+.badge { background: var(--badge); padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; }
+.badge-warn { background: var(--warn-bg); color: var(--warn); }
 .muted { color: var(--muted); }
 .small { font-size: 0.84rem; }
 .foot { padding: 24px 0; border-top: 1px solid var(--border); margin-top: 24px; }
@@ -53,8 +78,8 @@ tr:last-child td { border-bottom: none; }
 .two > *, .card { min-width: 0; }
 .top-row { flex-wrap: wrap; gap: 6px 12px; }
 .top-nav a:first-child { margin-left: 0; }
-main a { color: #79b8ff; text-decoration: none; }
+main a { color: var(--link); text-decoration: none; }
 main a:hover, main a:focus { text-decoration: underline; }
-details.more > summary { cursor: pointer; padding: 10px 0; color: #79b8ff; font-size: 0.88rem; }
+details.more > summary { cursor: pointer; padding: 10px 0; color: var(--link); font-size: 0.88rem; }
 details.more[open] > summary { border-bottom: 1px solid var(--border); }
 .row-title > span:first-child { min-width: 0; overflow-wrap: anywhere; }

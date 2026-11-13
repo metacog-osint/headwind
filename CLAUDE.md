@@ -28,6 +28,7 @@ python tools/headwind.py build                # build site/ from data/snapshot.j
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
 python -m unittest discover -s tests          # 24 offline tests against real fixtures
+python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
 `collect` never falls back to made-up data. A lane that fails keeps its last good copy (`from_previous`) or stays
@@ -157,14 +158,28 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   and the rules card listed all 25 documents (now six, with the rest behind a control). Wide tables scroll sideways
   on a phone.
 - Local `main` was fast-forwarded to `14e3501` on 13 Nov (Tom's yes); `origin/main` is still the seed. The work
-  after `14e3501` (vessels, country tags, house bar, deploy draft) is on `live/first-slice`, uncommitted.
-- **The house bar and Time menu have not been seen in a browser**: the preview pane refused to load on 13 Nov.
-  Tests, build and `check` pass; look at the page before deploy.
+  after `14e3501` (vessels, country tags, house bar, deploy draft) is commit `da87b11` on `live/first-slice`, not
+  pushed.
+- **The house bar and Time menu were looked at on 13 Nov** (about 10:30 AM CST) at 1024 and 375 pixels wide, light
+  and dark, served by `tools/serve.py` with the CSP: no console errors and no CSP violations, no sideways scroll on a
+  phone, and the Time menu changes every time on the page. Two faults were fixed in `site_src/style.css`: the page
+  was dark only while the house bar's panel follows the viewer's setting, and the Time dialog's text was dark on
+  the dark panel because `tic-time.css` reads `--ink` and `--line`, which the page did not define. The page now
+  follows the viewer's light or dark setting. The preview entry is `headwind-site` in `D:\Projects\.claude\launch.json`.
+- **Full collect 13 Nov, 10:28 AM CST:** all ten lanes current (EIA timed out once at 60 s and passed on a second
+  try), 60 feed items, `check` PASS. Still no list change: the OFAC and UN files are byte for byte the same as on
+  12 Nov, and trade.gov's file changed its bytes but none of its 6,702 entries. The change items, vessel names and
+  trade.gov's entry ids are still untested against a real change.
 - **Deploy is drafted, not done.** `.github/workflows/update.yml` (13 Nov, never run) follows Blackout's: tests,
   `restore`, `collect`, `build --publish-state`, `check`, then `wrangler pages deploy` to a Cloudflare Pages
   project named `headwind`. `restore --from <site>` reads the last run's snapshot and list indexes back from the
   published site's `data/state/`; `build --publish-state` puts them there (about 1.7 MB; the local build leaves
-  them out so they are not committed). `site_src/_headers` carries the CSP and CORS on `/data/*`. Still Tom's:
+  them out so they are not committed). Changed 13 Nov after a review against Blackout's workflow: the address
+  `restore` reads is repo variable `HEADWIND_STATE_URL` (set it to the pages.dev address after the first deploy;
+  the draft read the custom domain, which has no DNS record, so every run would have been a first reading), and
+  `restore` now exits 1 when the site cannot be reached, where a missing file (404, or a page in place of JSON)
+  is still a first reading. Open for Tom: the published state holds OFAC and UN entry ids for people (ids, types
+  and programs, no names), and the repo is private, so runs use Actions minutes. `site_src/_headers` carries the CSP and CORS on `/data/*`. Still Tom's:
   the Pages project, secrets `CLOUDFLARE_PAGES_TOKEN` and `EIA_API_KEY`, variable `CLOUDFLARE_ACCOUNT_ID`, the DNS
   record, a `tic-dispatch` entry and its token's access to the repo. The workflow runs on a push to `main`.
 - The suite registry (`tic-doctrine/vocab/programs.json`) still describes the seed build and its licences.

@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-13T16:12:44Z",
+  "generated_at": "2026-11-13T16:28:29Z",
   "source": "World Bank, World Development Indicators (CC BY 4.0)",
   "lane": {
     "status": "ok",
-    "fetched_at": "2026-11-13T05:26:14Z",
+    "fetched_at": "2026-11-13T16:26:52Z",
     "from_previous": true,
     "fetches": [
       {
