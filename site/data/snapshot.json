@@ -1,166 +1,1554 @@
 {
-  "generated_at": "2026-11-01T12:00:00Z",
-  "sanctions": [
-    {
-      "id": "ofac-2026-10-30-shadow-fleet",
-      "date": "2026-10-30",
-      "title": "Baltic & Red Sea Shadow-Fleet Crude Tanker Designations",
-      "program_tag": "RUSSIA-EO14024 / IRAN-EO13902",
-      "countries": [
-        "RU",
-        "IR",
-        "PA"
-      ],
-      "entities_added": 14,
-      "vessels_added": 3,
-      "vessels": [
+  "generated_at": "2026-11-13T05:26:14Z",
+  "method_version": "headwind-1.1",
+  "lanes": {
+    "fx": {
+      "status": "ok",
+      "fetched_at": "2026-11-13T05:26:14Z",
+      "from_previous": false,
+      "fetches": [
         {
-          "name": "MV BALTIC TRANSPORTER",
-          "imo": "9384710",
-          "mmsi": "273458910",
-          "flag": "RU"
-        },
-        {
-          "name": "MT CRUDE NAVIGATOR",
-          "imo": "9411208",
-          "mmsi": "352981400",
-          "flag": "PA"
-        },
-        {
-          "name": "MT HORMUZ STAR",
-          "imo": "9298104",
-          "mmsi": "577412000",
-          "flag": "IR"
+          "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.zip",
+          "sha256": "1388fe0047cbe5c08b009e6ccc5e1e344f08e6011f1c1bf8d4a2a7cf333d3078",
+          "bytes": 643073
         }
-      ],
-      "dual_use_network": true,
-      "lat": 59.76,
-      "lon": 24.42,
-      "url": "https://ofac.treasury.gov/recent-actions",
-      "summary": "OFAC designated 14 entities and 3 shadow-fleet tankers (including MV BALTIC TRANSPORTER MMSI 273458910 and MT CRUDE NAVIGATOR MMSI 352981400, both tracked loitering near the Gulf of Finland subsea corridor by Wake)."
+      ]
+    },
+    "energy": {
+      "status": "ok",
+      "fetched_at": "2026-11-13T05:26:14Z",
+      "from_previous": false,
+      "fetches": [
+        {
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU,DCOILWTICO,DHHNGSP&cosd=2024-09-03",
+          "sha256": "baab4e6723c478bbce21c3826caedbb7ab566c2ce5999d91ba989307dff1ea77",
+          "bytes": 223474
+        }
+      ]
+    },
+    "fao": {
+      "status": "ok",
+      "fetched_at": "2026-11-13T05:26:14Z",
+      "from_previous": false,
+      "fetches": [
+        {
+          "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+          "sha256": "de076a902db06cd4ea76f2d11d45ada1c3f2293013cdc897fc8ce8eba54ebf8b",
+          "bytes": 64332
+        },
+        {
+          "url": "https://www.fao.org/media/docs/worldfoodsituationlibraries/wfs-library/food_price_indices_data.csv?sfvrsn=523ebd2a_85&download=true",
+          "sha256": "6f26341212b1354608984f92654d52a934dfd125e7236640d7fb4545e3db00dc",
+          "bytes": 48217
+        }
+      ]
+    },
+    "wfp": {
+      "status": "ok",
+      "fetched_at": "2026-11-13T05:26:14Z",
+      "from_previous": false,
+      "fetches": [
+        {
+          "url": "https://data.humdata.org/api/3/action/package_search?fq=name:wfp-food-prices-for-*&rows=300",
+          "sha256": "6a19dd0a9d0a11de798e8e0e64d4a4407a46bdaecd45a45133528e925b2f45dc",
+          "bytes": 2837298
+        },
+        {
+          "url": "https://data.humdata.org/dataset/bfd82e1f-0296-48a8-ac28-c11e028be5ed/resource/0eca67d6-e297-4f5e-9132-7dc42891b749/download/wfp_food_prices_bfa.csv",
+          "sha256": "301f9d5d5b7a89311191ee401c777aefe7d25bd1f3e761e64a2ab5fe8f72b490",
+          "bytes": 7248204
+        },
+        {
+          "url": "https://data.humdata.org/dataset/07a6d6fb-828d-4391-afb8-78b1fc32caa3/resource/c9906fd4-9947-450a-b816-682907463f2a/download/wfp_food_prices_cod.csv",
+          "sha256": "c1d76fbed26fd58f9afff184affae5533823c2a5076e0cd2432401e7ff4abd16",
+          "bytes": 12415325
+        },
+        {
+          "url": "https://data.humdata.org/dataset/2e4f1922-e446-4b57-a98a-d0e2d5e34afa/resource/87bac18e-f3aa-4b29-8cf8-76763e823dc5/download/wfp_food_prices_eth.csv",
+          "sha256": "22df31f0f8feeb960baff7aa8addb97c349fe20568f997e12ae660780ae4fc5f",
+          "bytes": 7944760
+        },
+        {
+          "url": "https://data.humdata.org/dataset/a68fe30e-8f20-4ae0-a31c-df3130b96275/resource/eb8e9cd4-51cd-4cc7-a8c6-f0d773fb318e/download/wfp_food_prices_hti.csv",
+          "sha256": "0d9bc244357ee0c4f897088015a436a56eb4176516fb08c1baa47464f264f322",
+          "bytes": 2474629
+        },
+        {
+          "url": "https://data.humdata.org/dataset/6df76343-1bd9-488a-af3c-1e5aec3fc78c/resource/987b0f53-5b55-4ed8-868a-ea285f0f0307/download/wfp_food_prices_irn.csv",
+          "sha256": "3f54085988e73e04ab474a80ab6b0579e5b4fda7bdacd499bcf83fd95a3eb87b",
+          "bytes": 300839
+        },
+        {
+          "url": "https://data.humdata.org/dataset/db0b4fb1-ce11-458e-94e0-3342365a117a/resource/772bc34e-1327-4ada-b2eb-e72020a546f2/download/wfp_food_prices_lbn.csv",
+          "sha256": "23b2c20ef22494989c68c065117e4ccfc592d8f2b20d1a6a3c67e79c06683f20",
+          "bytes": 5186697
+        },
+        {
+          "url": "https://data.humdata.org/dataset/d73f8595-0b0b-4b64-91b3-986b1cad5ae6/resource/e7489e71-2c7b-48d4-8ae7-f378b735dcba/download/wfp_food_prices_mli.csv",
+          "sha256": "16041a18a9282080638fc86728bc3bf355c8e1bc768259742fe9382f832dd415",
+          "bytes": 16407427
+        },
+        {
+          "url": "https://data.humdata.org/dataset/4d052db4-0fb8-47b5-a56a-633fdcf0e55c/resource/4f188cc5-7f6a-4354-95d7-15bd45bb8587/download/wfp_food_prices_mmr.csv",
+          "sha256": "47033a304a507b057722425208a7fa2fe12c275acb77a4def152b83d15ca7c16",
+          "bytes": 7789050
+        },
+        {
+          "url": "https://data.humdata.org/dataset/9c2f8da3-c0a5-476d-9035-b9b59172b922/resource/87334563-5dae-4125-9bcc-e9418283a8c9/download/wfp_food_prices_ner.csv",
+          "sha256": "e7e87c5e9254a01b66140dc230ea1b06e048079c5f1741ff121e9c9031c95f87",
+          "bytes": 8172511
+        },
+        {
+          "url": "https://data.humdata.org/dataset/ea251823-8694-47b4-82d0-7d27f00e8aba/resource/9a842d72-0d7d-4922-ad0e-eb8106c1ab0e/download/wfp_food_prices_phl.csv",
+          "sha256": "855ca31537988da8fab30b2cc8e30d0933c005649713725ffdf14497ed3b9c01",
+          "bytes": 33718053
+        },
+        {
+          "url": "https://data.humdata.org/dataset/125455ff-c8a8-4f4b-9190-bf0e84559dc7/resource/8cf7a8a2-58a1-4c3f-bafe-f38af68d971b/download/wfp_food_prices_pak.csv",
+          "sha256": "0297b433b50e5642046a42e45d9c807b0510e45bef40ce7972116344c9bdef2a",
+          "bytes": 1713199
+        },
+        {
+          "url": "https://data.humdata.org/dataset/7d06b059-5831-4101-aa68-6d9123ad65b7/resource/b82509ec-d48e-41d7-b376-af51c7f66737/download/wfp_food_prices_pse.csv",
+          "sha256": "aec67141f9dbee5194a2efb3ef1dc894003007d3f05ae4f818f939dd5651faa5",
+          "bytes": 3439552
+        },
+        {
+          "url": "https://data.humdata.org/dataset/369e003b-f0af-4e48-99d7-34fc85b44635/resource/8fea18b2-615f-4af5-9bd5-85cc31a25ffd/download/wfp_food_prices_sdn.csv",
+          "sha256": "155f076dab64e834fd61aa6bf3e6b64a9354072cc40aa190fd96ddd0cad13c9d",
+          "bytes": 2944499
+        },
+        {
+          "url": "https://data.humdata.org/dataset/26727d1b-af49-4323-9215-c2ac479abb87/resource/39614bfb-0f9c-4800-8997-e68e41a38ced/download/wfp_food_prices_som.csv",
+          "sha256": "d0844aac8f4d580dbf0801d6696ad44fbb3d8def15cf80e9e448eb1aa490c3cd",
+          "bytes": 5454285
+        },
+        {
+          "url": "https://data.humdata.org/dataset/4f48c45b-1a20-4478-b62d-bf637b8d4666/resource/5a3e103d-f352-41f6-94e9-acaad13c66a5/download/wfp_food_prices_ssd.csv",
+          "sha256": "92eb21b90c78788bfc79e6a4765bb0b2a8141064f633e28ffa4f0bff8866d668",
+          "bytes": 7697132
+        },
+        {
+          "url": "https://data.humdata.org/dataset/9b95de1b-d4e9-4c81-b2bb-db35bd9620e8/resource/1730560f-8e9f-4999-bec8-72118ac0ee5f/download/wfp_food_prices_ukr.csv",
+          "sha256": "2dc57d8491ea9ee2600d7139816d741a472617355367eb9b629294094940d263",
+          "bytes": 14693408
+        },
+        {
+          "url": "https://data.humdata.org/dataset/a3800f18-0126-4911-917e-2b2a9415d909/resource/706f628f-98e4-4bf9-a077-5ef85c83aa77/download/wfp_food_prices_ven.csv",
+          "sha256": "24ca21ddecd6f0fd5003e2b1523c18f95683c0c5ebdcf880cf7a92632d5bc540",
+          "bytes": 2625274
+        },
+        {
+          "url": "https://data.humdata.org/dataset/98574e10-6866-4f13-a2b1-3c8312801af5/resource/2f0c1d18-d42d-4e43-b928-1bd1fc7f6c90/download/wfp_food_prices_yem.csv",
+          "sha256": "72fcc7b24e3427716bf731d9dd768ba8fe62e55f10c9486b6812924c840bcd4e",
+          "bytes": 8012186
+        }
+      ]
+    },
+    "baseline": {
+      "status": "ok",
+      "fetched_at": "2026-11-13T05:26:14Z",
+      "from_previous": false,
+      "fetches": [
+        {
+          "url": "https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json&mrnev=1&per_page=400",
+          "sha256": "c57acdfb017bbb35dcbb6cf9664970bda7024c360563d3653f1317d316cc414d",
+          "bytes": 53747
+        },
+        {
+          "url": "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD.ZG?format=json&mrnev=1&per_page=400",
+          "sha256": "b2d0422bd1e01bcd66d849c243fad868325b959f386247e80456cb43f66a1647",
+          "bytes": 54978
+        },
+        {
+          "url": "https://api.worldbank.org/v2/country/all/indicator/SL.UEM.TOTL.ZS?format=json&mrnev=1&per_page=400",
+          "sha256": "f4893c7f71ca792c88a8f5bf6c810d6d80d1af53062419070b08eb26aad82244",
+          "bytes": 57434
+        },
+        {
+          "url": "https://api.worldbank.org/v2/country/all/indicator/GC.DOD.TOTL.GD.ZS?format=json&mrnev=1&per_page=400",
+          "sha256": "dfa5b9daf8558eea139a381eec041421733517a7f40ff59ddd05e3272a94687d",
+          "bytes": 27451
+        },
+        {
+          "url": "https://api.worldbank.org/v2/country/all/indicator/FI.RES.TOTL.MO?format=json&mrnev=1&per_page=400",
+          "sha256": "626baa40f752d9e357646d01a7ec458e66c4ff2b38a1f95b86dcfcad8b5a5b46",
+          "bytes": 50199
+        },
+        {
+          "url": "https://api.worldbank.org/v2/country/all/indicator/BN.CAB.XOKA.GD.ZS?format=json&mrnev=1&per_page=400",
+          "sha256": "0f7e8fef8002359c0b8b7039f81c716f93ccf4c87c0efab08bc5c67ff161b10b",
+          "bytes": 44087
+        }
+      ]
+    },
+    "calendar": {
+      "status": "ok",
+      "fetched_at": "2026-11-13T05:26:14Z",
+      "from_previous": false,
+      "fetches": [
+        {
+          "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+          "sha256": "5b9b50801723f9bae1630bfb59cb54c0ba04c10c89eb21063b8a2dd83296a40d",
+          "bytes": 166065
+        },
+        {
+          "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
+          "sha256": "f3df704a7af4c310bee7b1ff1fada499cbdbd7da4fa9b8c1dc1cd05b63361471",
+          "bytes": 106176
+        }
+      ]
     }
-  ],
-  "controls": [
+  },
+  "fx": [
     {
-      "id": "bis-affiliates-stay-2026-11-10",
-      "doc_number": "2025-19846",
-      "agency": "BIS",
-      "title": "Affiliates (50% Ownership) Rule One-Year Stay Expiration",
-      "published_date": "2025-11-12",
-      "deadline_date": "2026-11-10",
-      "days_to_deadline": 9,
-      "status_note": "Active stay window",
-      "countries": [
-        "US",
-        "CN"
-      ],
-      "lat": 38.8951,
-      "lon": -77.0364,
-      "url": "https://www.federalregister.gov/documents/2025/11/12/2025-19846/one-year-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed-entities",
-      "summary": "BIS Affiliates 50% rule stay expires 10 Nov 2026 (9 days away); USTR proposed extending its matching Section 301 maritime suspension to 9 Jan 2027 (FR Doc 2026-21755)."
+      "currency": "AUD",
+      "country": "AU",
+      "per_usd": 1.466113,
+      "prior_per_usd": 1.428457,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 2.64,
+      "z": 3.04,
+      "baseline_n": 250,
+      "flag_rate": 0.004,
+      "anomaly": false,
+      "direction": "weaker"
     },
     {
-      "id": "ustr-maritime-section-301-2026-21755",
-      "doc_number": "2026-21755",
-      "agency": "USTR",
-      "title": "Further Suspension of Section 301 Action: China Maritime & Logistics",
-      "published_date": "2026-10-26",
-      "deadline_date": "2027-01-09",
-      "days_to_deadline": 69,
-      "status_note": "Active stay window",
-      "countries": [
-        "US",
-        "CN"
-      ],
-      "lat": 38.9005,
-      "lon": -77.0398,
-      "url": "https://www.federalregister.gov/documents/2026/10/26/2026-21755/request-for-comments-on-further-suspension-of-section-301-action-chinas-targeting-of-the-maritime",
-      "summary": "USTR notice proposing extension of Section 301 port-fee suspension through 9 Jan 2027."
+      "currency": "BRL",
+      "country": "BR",
+      "per_usd": 5.616912,
+      "prior_per_usd": 5.466411,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 2.75,
+      "z": 2.12,
+      "baseline_n": 250,
+      "flag_rate": 0.02,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "CAD",
+      "country": "CA",
+      "per_usd": 1.424871,
+      "prior_per_usd": 1.396561,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 2.03,
+      "z": 2.58,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "CHF",
+      "country": "CH",
+      "per_usd": 0.833138,
+      "prior_per_usd": 0.81789,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.86,
+      "z": 1.77,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "CNY",
+      "country": "CN",
+      "per_usd": 6.668261,
+      "prior_per_usd": 6.668389,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": -0.0,
+      "z": 0.5,
+      "baseline_n": 250,
+      "flag_rate": 0.004,
+      "anomaly": false,
+      "direction": "unchanged"
+    },
+    {
+      "currency": "CZK",
+      "country": "CZ",
+      "per_usd": 22.000722,
+      "prior_per_usd": 21.640235,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.67,
+      "z": 1.66,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "DKK",
+      "country": "DK",
+      "per_usd": 6.746142,
+      "prior_per_usd": 6.659569,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.3,
+      "z": 1.55,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "EUR",
+      "country": null,
+      "per_usd": 0.902446,
+      "prior_per_usd": 0.890948,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.29,
+      "z": 1.53,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "GBP",
+      "country": "GB",
+      "per_usd": 0.754399,
+      "prior_per_usd": 0.742988,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.54,
+      "z": 2.04,
+      "baseline_n": 250,
+      "flag_rate": 0.004,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "HKD",
+      "country": "HK",
+      "per_usd": 7.844779,
+      "prior_per_usd": 7.845242,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": -0.01,
+      "z": -0.08,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "stronger"
+    },
+    {
+      "currency": "HUF",
+      "country": "HU",
+      "per_usd": 329.374605,
+      "prior_per_usd": 323.574483,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.79,
+      "z": 1.32,
+      "baseline_n": 250,
+      "flag_rate": 0.024,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "IDR",
+      "country": "ID",
+      "per_usd": 18252.648678,
+      "prior_per_usd": 18069.449394,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.01,
+      "z": 1.36,
+      "baseline_n": 250,
+      "flag_rate": 0.004,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "ILS",
+      "country": "IL",
+      "per_usd": 3.203231,
+      "prior_per_usd": 3.171597,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.0,
+      "z": 0.94,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "INR",
+      "country": "IN",
+      "per_usd": 94.045483,
+      "prior_per_usd": 94.475677,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": -0.46,
+      "z": -0.92,
+      "baseline_n": 250,
+      "flag_rate": 0.004,
+      "anomaly": false,
+      "direction": "stronger"
+    },
+    {
+      "currency": "ISK",
+      "country": "IS",
+      "per_usd": 123.274073,
+      "prior_per_usd": 121.881682,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.14,
+      "z": 1.92,
+      "baseline_n": 250,
+      "flag_rate": 0.02,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "JPY",
+      "country": "JP",
+      "per_usd": 159.696778,
+      "prior_per_usd": 158.455096,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 0.78,
+      "z": 0.85,
+      "baseline_n": 250,
+      "flag_rate": 0.084,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "KRW",
+      "country": "KR",
+      "per_usd": 1334.10342,
+      "prior_per_usd": 1344.68995,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": -0.79,
+      "z": -0.48,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "stronger"
+    },
+    {
+      "currency": "MXN",
+      "country": "MX",
+      "per_usd": 18.690822,
+      "prior_per_usd": 18.590075,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 0.54,
+      "z": 0.66,
+      "baseline_n": 250,
+      "flag_rate": 0.036,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "MYR",
+      "country": "MY",
+      "per_usd": 4.078513,
+      "prior_per_usd": 4.045973,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 0.8,
+      "z": 1.69,
+      "baseline_n": 250,
+      "flag_rate": 0.056,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "NOK",
+      "country": "NO",
+      "per_usd": 9.532533,
+      "prior_per_usd": 9.298378,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 2.52,
+      "z": 2.27,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "NZD",
+      "country": "NZ",
+      "per_usd": 1.799657,
+      "prior_per_usd": 1.778867,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.17,
+      "z": 0.87,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "PHP",
+      "country": "PH",
+      "per_usd": 63.7271,
+      "prior_per_usd": 62.995367,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.16,
+      "z": 1.44,
+      "baseline_n": 250,
+      "flag_rate": 0.004,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "PLN",
+      "country": "PL",
+      "per_usd": 3.978702,
+      "prior_per_usd": 3.910371,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.75,
+      "z": 1.53,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "RON",
+      "country": "RO",
+      "per_usd": 4.825648,
+      "prior_per_usd": 4.756326,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.46,
+      "z": 1.57,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "SEK",
+      "country": "SE",
+      "per_usd": 9.983575,
+      "prior_per_usd": 9.786618,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 2.01,
+      "z": 1.55,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "SGD",
+      "country": "SG",
+      "per_usd": 1.285895,
+      "prior_per_usd": 1.277263,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 0.68,
+      "z": 1.74,
+      "baseline_n": 250,
+      "flag_rate": 0.008,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "THB",
+      "country": "TH",
+      "per_usd": 33.814638,
+      "prior_per_usd": 33.43995,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.12,
+      "z": 1.17,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "TRY",
+      "country": "TR",
+      "per_usd": 50.257738,
+      "prior_per_usd": 50.047131,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 0.42,
+      "z": 0.18,
+      "baseline_n": 250,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "direction": "weaker"
+    },
+    {
+      "currency": "ZAR",
+      "country": "ZA",
+      "per_usd": 16.715008,
+      "prior_per_usd": 16.41732,
+      "date": "2026-11-12",
+      "prior_date": "2026-11-05",
+      "change_pct": 1.81,
+      "z": 1.44,
+      "baseline_n": 250,
+      "flag_rate": 0.008,
+      "anomaly": false,
+      "direction": "weaker"
     }
   ],
-  "commodities": [
+  "energy": [
     {
-      "id": "igc-goi",
-      "name": "IGC Grains and Oilseeds Index (GOI)",
-      "publisher": "International Grains Council",
+      "id": "brent",
+      "name": "Brent crude oil spot price",
+      "unit": "US dollars per barrel",
+      "fred_id": "DCOILBRENTEU",
+      "price": 92.14,
+      "prior_price": 91.84,
+      "date": "2026-11-11",
+      "prior_date": "2026-11-04",
+      "change_pct": 0.33,
+      "z": 0.01,
+      "baseline_n": 250,
+      "flag_rate": 0.012,
+      "anomaly": false
+    },
+    {
+      "id": "wti",
+      "name": "WTI crude oil spot price",
+      "unit": "US dollars per barrel",
+      "fred_id": "DCOILWTICO",
+      "price": 89.62,
+      "prior_price": 91.73,
+      "date": "2026-11-11",
+      "prior_date": "2026-11-04",
+      "change_pct": -2.3,
+      "z": -0.41,
+      "baseline_n": 250,
+      "flag_rate": 0.008,
+      "anomaly": false
+    },
+    {
+      "id": "henry-hub",
+      "name": "Henry Hub natural gas spot price",
+      "unit": "US dollars per million Btu",
+      "fred_id": "DHHNGSP",
+      "price": 3.0,
+      "prior_price": 2.63,
+      "date": "2026-11-11",
+      "prior_date": "2026-11-04",
+      "change_pct": 14.07,
+      "z": 1.87,
+      "baseline_n": 250,
+      "flag_rate": 0.072,
+      "anomaly": false
+    }
+  ],
+  "fao": [
+    {
+      "id": "ffpi",
+      "name": "FAO Food Price Index",
       "period": "2026-10",
-      "current_value": 231.4,
-      "prior_value": 241.8,
-      "mom_pct": -4.3,
-      "next_release_date": "2026-11-20",
-      "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx",
-      "summary": "IGC Grains and Oilseeds Index fell -4.30% in October (wheat -5.4%, maize -6.9%), pointing to a lower October FAO Food Price Index print on 6 Nov."
+      "value": 133.9,
+      "prior_period": "2026-09",
+      "prior_value": 135.6,
+      "change_pct": -1.25,
+      "z": -0.82,
+      "baseline_n": 120,
+      "flag_rate": 0.017,
+      "anomaly": false,
+      "rose_share_120m": 0.525,
+      "as_issued": [
+        {
+          "period": "2025-11",
+          "value": 125.2
+        },
+        {
+          "period": "2025-12",
+          "value": 124.5
+        },
+        {
+          "period": "2026-01",
+          "value": 124.1
+        },
+        {
+          "period": "2026-02",
+          "value": 125.5
+        },
+        {
+          "period": "2026-03",
+          "value": 128.7
+        },
+        {
+          "period": "2026-04",
+          "value": 131.0
+        },
+        {
+          "period": "2026-05",
+          "value": 131.0
+        },
+        {
+          "period": "2026-06",
+          "value": 130.1
+        },
+        {
+          "period": "2026-07",
+          "value": 131.7
+        },
+        {
+          "period": "2026-08",
+          "value": 133.9
+        },
+        {
+          "period": "2026-09",
+          "value": 135.6
+        },
+        {
+          "period": "2026-10",
+          "value": 133.9
+        }
+      ]
     },
     {
-      "id": "fao-ffpi",
-      "name": "FAO Food Price Index (FFPI)",
-      "publisher": "FAO",
-      "period": "2026-09",
-      "current_value": 136.0,
-      "prior_value": 134.0,
-      "mom_pct": 1.49,
-      "next_release_date": "2026-11-06",
-      "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
-      "summary": "September 2026 FAO Food Price Index printed at 136.0 (+1.49%); October release scheduled for 6 Nov 2026."
+      "id": "cereals",
+      "name": "FAO Cereal Price Index",
+      "period": "2026-10",
+      "value": 116.8,
+      "prior_period": "2026-09",
+      "prior_value": 122.3,
+      "change_pct": -4.5,
+      "z": -1.8,
+      "baseline_n": 120,
+      "flag_rate": 0.017,
+      "anomaly": false,
+      "rose_share_120m": 0.508,
+      "as_issued": [
+        {
+          "period": "2025-11",
+          "value": 105.6
+        },
+        {
+          "period": "2025-12",
+          "value": 107.2
+        },
+        {
+          "period": "2026-01",
+          "value": 107.5
+        },
+        {
+          "period": "2026-02",
+          "value": 108.7
+        },
+        {
+          "period": "2026-03",
+          "value": 110.4
+        },
+        {
+          "period": "2026-04",
+          "value": 111.3
+        },
+        {
+          "period": "2026-05",
+          "value": 114.2
+        },
+        {
+          "period": "2026-06",
+          "value": 110.0
+        },
+        {
+          "period": "2026-07",
+          "value": 113.8
+        },
+        {
+          "period": "2026-08",
+          "value": 116.8
+        },
+        {
+          "period": "2026-09",
+          "value": 122.3
+        },
+        {
+          "period": "2026-10",
+          "value": 116.8
+        }
+      ]
+    },
+    {
+      "id": "oils",
+      "name": "FAO Vegetable Oil Price Index",
+      "period": "2026-10",
+      "value": 199.2,
+      "prior_period": "2026-09",
+      "prior_value": 198.6,
+      "change_pct": 0.3,
+      "z": 0.0,
+      "baseline_n": 120,
+      "flag_rate": 0.017,
+      "anomaly": false,
+      "rose_share_120m": 0.542,
+      "as_issued": [
+        {
+          "period": "2025-11",
+          "value": 165.0
+        },
+        {
+          "period": "2025-12",
+          "value": 165.2
+        },
+        {
+          "period": "2026-01",
+          "value": 168.6
+        },
+        {
+          "period": "2026-02",
+          "value": 174.2
+        },
+        {
+          "period": "2026-03",
+          "value": 183.1
+        },
+        {
+          "period": "2026-04",
+          "value": 193.9
+        },
+        {
+          "period": "2026-05",
+          "value": 185.0
+        },
+        {
+          "period": "2026-06",
+          "value": 192.0
+        },
+        {
+          "period": "2026-07",
+          "value": 195.7
+        },
+        {
+          "period": "2026-08",
+          "value": 196.9
+        },
+        {
+          "period": "2026-09",
+          "value": 198.6
+        },
+        {
+          "period": "2026-10",
+          "value": 199.2
+        }
+      ]
+    },
+    {
+      "id": "dairy",
+      "name": "FAO Dairy Price Index",
+      "period": "2026-10",
+      "value": 117.8,
+      "prior_period": "2026-09",
+      "prior_value": 119.1,
+      "change_pct": -1.09,
+      "z": -0.65,
+      "baseline_n": 120,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "rose_share_120m": 0.542,
+      "as_issued": [
+        {
+          "period": "2025-11",
+          "value": 136.2
+        },
+        {
+          "period": "2025-12",
+          "value": 128.2
+        },
+        {
+          "period": "2026-01",
+          "value": 120.9
+        },
+        {
+          "period": "2026-02",
+          "value": 119.4
+        },
+        {
+          "period": "2026-03",
+          "value": 121.2
+        },
+        {
+          "period": "2026-04",
+          "value": 119.7
+        },
+        {
+          "period": "2026-05",
+          "value": 119.1
+        },
+        {
+          "period": "2026-06",
+          "value": 116.9
+        },
+        {
+          "period": "2026-07",
+          "value": 116.6
+        },
+        {
+          "period": "2026-08",
+          "value": 119.2
+        },
+        {
+          "period": "2026-09",
+          "value": 119.1
+        },
+        {
+          "period": "2026-10",
+          "value": 117.8
+        }
+      ]
+    },
+    {
+      "id": "meat",
+      "name": "FAO Meat Price Index",
+      "period": "2026-10",
+      "value": 125.5,
+      "prior_period": "2026-09",
+      "prior_value": 127.1,
+      "change_pct": -1.26,
+      "z": -0.85,
+      "baseline_n": 120,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "rose_share_120m": 0.542,
+      "as_issued": [
+        {
+          "period": "2025-11",
+          "value": 125.5
+        },
+        {
+          "period": "2025-12",
+          "value": 124.8
+        },
+        {
+          "period": "2026-01",
+          "value": 124.9
+        },
+        {
+          "period": "2026-02",
+          "value": 126.5
+        },
+        {
+          "period": "2026-03",
+          "value": 128.0
+        },
+        {
+          "period": "2026-04",
+          "value": 130.4
+        },
+        {
+          "period": "2026-05",
+          "value": 131.3
+        },
+        {
+          "period": "2026-06",
+          "value": 130.5
+        },
+        {
+          "period": "2026-07",
+          "value": 129.4
+        },
+        {
+          "period": "2026-08",
+          "value": 129.0
+        },
+        {
+          "period": "2026-09",
+          "value": 127.1
+        },
+        {
+          "period": "2026-10",
+          "value": 125.5
+        }
+      ]
+    },
+    {
+      "id": "sugar",
+      "name": "FAO Sugar Price Index",
+      "period": "2026-10",
+      "value": 121.3,
+      "prior_period": "2026-09",
+      "prior_value": 113.7,
+      "change_pct": 6.68,
+      "z": 1.29,
+      "baseline_n": 120,
+      "flag_rate": 0.0,
+      "anomaly": false,
+      "rose_share_120m": 0.483,
+      "as_issued": [
+        {
+          "period": "2025-11",
+          "value": 88.6
+        },
+        {
+          "period": "2025-12",
+          "value": 90.7
+        },
+        {
+          "period": "2026-01",
+          "value": 89.8
+        },
+        {
+          "period": "2026-02",
+          "value": 86.2
+        },
+        {
+          "period": "2026-03",
+          "value": 92.8
+        },
+        {
+          "period": "2026-04",
+          "value": 88.5
+        },
+        {
+          "period": "2026-05",
+          "value": 95.1
+        },
+        {
+          "period": "2026-06",
+          "value": 90.0
+        },
+        {
+          "period": "2026-07",
+          "value": 95.0
+        },
+        {
+          "period": "2026-08",
+          "value": 107.4
+        },
+        {
+          "period": "2026-09",
+          "value": 113.7
+        },
+        {
+          "period": "2026-10",
+          "value": 121.3
+        }
+      ]
     }
   ],
-  "events": {
-    "source": "headwind",
-    "events": [
-      {
-        "id": "2026-11-10-bis-affiliates-stay-2026-11-10",
-        "date": "2026-11-10",
-        "title": "BIS: Affiliates (50% Ownership) Rule One-Year Stay Expiration",
-        "kind": "rule_date",
-        "countries": [
-          "US",
-          "CN"
-        ],
-        "ref": "2025-19846",
-        "source": {
-          "publisher": "Federal Register (BIS)",
-          "url": "https://www.federalregister.gov/documents/2025/11/12/2025-19846/one-year-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed-entities"
-        }
+  "local_food": [
+    {
+      "country": "BF",
+      "iso3": "BFA",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-burkina-faso",
+      "hdx_last_modified": "2026-11-04T01:13:28.991633",
+      "period": "2026-09",
+      "median_change_pct": 2.9,
+      "series": 380,
+      "markets": 66,
+      "share_rising": 0.66,
+      "z": 0.32,
+      "baseline_n": 60,
+      "flag_rate": 0.0,
+      "months_old": 2,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "CD",
+      "iso3": "COD",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-democratic-republic-of-the-congo",
+      "hdx_last_modified": "2026-11-04T01:15:03.164210",
+      "period": "2026-09",
+      "median_change_pct": 0.0,
+      "series": 1307,
+      "markets": 215,
+      "share_rising": 0.32,
+      "z": 0.0,
+      "baseline_n": 60,
+      "flag_rate": 0.017,
+      "months_old": 2,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "ET",
+      "iso3": "ETH",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-ethiopia",
+      "hdx_last_modified": "2026-11-02T12:53:34.644101",
+      "period": "2026-09",
+      "median_change_pct": 1.3,
+      "series": 860,
+      "markets": 129,
+      "share_rising": 0.51,
+      "z": -0.81,
+      "baseline_n": 60,
+      "flag_rate": 0.0,
+      "months_old": 2,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "HT",
+      "iso3": "HTI",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-haiti",
+      "hdx_last_modified": "2026-11-04T01:17:33.381016",
+      "period": "2026-08",
+      "median_change_pct": -4.1,
+      "series": 172,
+      "markets": 71,
+      "share_rising": 0.29,
+      "z": -1.11,
+      "baseline_n": 60,
+      "flag_rate": 0.05,
+      "months_old": 3,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "IR",
+      "iso3": "IRN",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-iran-islamic-republic-of",
+      "hdx_last_modified": "2026-11-08T08:57:40.877492",
+      "period": "2026-11",
+      "median_change_pct": 9.1,
+      "series": 37,
+      "markets": 1,
+      "share_rising": 0.57,
+      "z": 0.16,
+      "baseline_n": 60,
+      "flag_rate": 0.0,
+      "months_old": 0,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "LB",
+      "iso3": "LBN",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-lebanon",
+      "hdx_last_modified": "2026-10-18T18:44:32.030142",
+      "period": "2026-08",
+      "median_change_pct": 0.0,
+      "series": 153,
+      "markets": 27,
+      "share_rising": 0.5,
+      "z": -0.67,
+      "baseline_n": 60,
+      "flag_rate": 0.217,
+      "months_old": 3,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "ML",
+      "iso3": "MLI",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-mali",
+      "hdx_last_modified": "2026-11-04T01:31:13.089801",
+      "period": "2026-08",
+      "median_change_pct": 0.0,
+      "series": 668,
+      "markets": 137,
+      "share_rising": 0.47,
+      "z": 0.0,
+      "baseline_n": 60,
+      "flag_rate": 0.05,
+      "months_old": 3,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "MM",
+      "iso3": "MMR",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-myanmar",
+      "hdx_last_modified": "2026-11-04T01:31:31.513448",
+      "period": "2026-09",
+      "median_change_pct": 13.4,
+      "series": 505,
+      "markets": 300,
+      "share_rising": 0.67,
+      "z": 1.14,
+      "baseline_n": 60,
+      "flag_rate": 0.0,
+      "months_old": 2,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "NE",
+      "iso3": "NER",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-niger",
+      "hdx_last_modified": "2026-11-05T21:07:05.089443",
+      "period": "2026-10",
+      "median_change_pct": -2.4,
+      "series": 377,
+      "markets": 79,
+      "share_rising": 0.24,
+      "z": -0.27,
+      "baseline_n": 60,
+      "flag_rate": 0.017,
+      "months_old": 1,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "PH",
+      "iso3": "PHL",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-philippines",
+      "hdx_last_modified": "2026-11-04T01:36:21.786072",
+      "period": "2026-09",
+      "median_change_pct": 0.4,
+      "series": 2623,
+      "markets": 108,
+      "share_rising": 0.51,
+      "z": -0.05,
+      "baseline_n": 60,
+      "flag_rate": 0.0,
+      "months_old": 2,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "PK",
+      "iso3": "PAK",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-pakistan",
+      "hdx_last_modified": "2026-11-04T01:33:22.256811",
+      "period": "2026-09",
+      "median_change_pct": 1.7,
+      "series": 85,
+      "markets": 5,
+      "share_rising": 0.59,
+      "z": 0.28,
+      "baseline_n": 60,
+      "flag_rate": 0.1,
+      "months_old": 2,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "PS",
+      "iso3": "PSE",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-state-of-palestine",
+      "hdx_last_modified": "2026-11-04T01:36:32.446416",
+      "period": "2026-09",
+      "median_change_pct": -0.6,
+      "series": 66,
+      "markets": 13,
+      "share_rising": 0.36,
+      "z": -0.28,
+      "baseline_n": 60,
+      "flag_rate": 0.033,
+      "months_old": 2,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "SD",
+      "iso3": "SDN",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-sudan",
+      "hdx_last_modified": "2026-11-04T01:37:07.672130",
+      "period": "2026-09",
+      "median_change_pct": 50.1,
+      "series": 159,
+      "markets": 19,
+      "share_rising": 0.94,
+      "z": 2.36,
+      "baseline_n": 60,
+      "flag_rate": 0.0,
+      "months_old": 2,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "SO",
+      "iso3": "SOM",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-somalia",
+      "hdx_last_modified": "2026-10-19T02:02:56.839202",
+      "period": "2026-08",
+      "median_change_pct": 0.7,
+      "series": 563,
+      "markets": 47,
+      "share_rising": 0.53,
+      "z": 0.26,
+      "baseline_n": 60,
+      "flag_rate": 0.033,
+      "months_old": 3,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "SS",
+      "iso3": "SSD",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-south-sudan",
+      "hdx_last_modified": "2026-11-04T01:57:26.194923",
+      "period": "2026-10",
+      "median_change_pct": 1.1,
+      "series": 523,
+      "markets": 42,
+      "share_rising": 0.51,
+      "z": -0.6,
+      "baseline_n": 60,
+      "flag_rate": 0.033,
+      "months_old": 1,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "UA",
+      "iso3": "UKR",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-ukraine",
+      "hdx_last_modified": "2026-11-04T02:02:11.542533",
+      "period": "2026-09",
+      "median_change_pct": 3.4,
+      "series": 846,
+      "markets": 28,
+      "share_rising": 0.72,
+      "z": 0.44,
+      "baseline_n": 60,
+      "flag_rate": 0.033,
+      "months_old": 2,
+      "stale": false,
+      "anomaly": false
+    },
+    {
+      "country": "VE",
+      "iso3": "VEN",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-venezuela-bolivarian-republic-of",
+      "hdx_last_modified": "2026-11-04T02:02:17.589380",
+      "period": "2025-05",
+      "median_change_pct": 8.3,
+      "series": 957,
+      "markets": 51,
+      "share_rising": 0.71,
+      "z": 2.64,
+      "baseline_n": 26,
+      "flag_rate": 0.038,
+      "months_old": 18,
+      "stale": true,
+      "anomaly": false
+    },
+    {
+      "country": "YE",
+      "iso3": "YEM",
+      "dataset": "https://data.humdata.org/dataset/wfp-food-prices-for-yemen",
+      "hdx_last_modified": "2026-11-05T21:37:06.984827",
+      "period": "2026-10",
+      "median_change_pct": 1.9,
+      "series": 253,
+      "markets": 28,
+      "share_rising": 0.58,
+      "z": 0.65,
+      "baseline_n": 60,
+      "flag_rate": 0.133,
+      "months_old": 1,
+      "stale": false,
+      "anomaly": false
+    }
+  ],
+  "local_food_missing": [
+    {
+      "country": "CU",
+      "reason": "no WFP price file on HDX"
+    }
+  ],
+  "sanctions": [],
+  "controls": [],
+  "question_drafts": [
+    {
+      "draft_id": "headwind-ffpi-2026-11",
+      "question": "Will the FAO Food Price Index for 2026-11, as first published, be above 133.9 (the 2026-10 value as published on the day this draft was written)?",
+      "resolves_on": "2026-12-04",
+      "resolution_source": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+      "baseline": {
+        "kind": "climatology",
+        "probability": 0.525,
+        "basis": "Share of the last 120 months in which the index rose from the month before, in today's revised series."
       },
-      {
-        "id": "2027-01-09-ustr-maritime-section-301-2026-21755",
-        "date": "2027-01-09",
-        "title": "USTR: Further Suspension of Section 301 Action: China Maritime & Logistics",
-        "kind": "rule_date",
-        "countries": [
-          "US",
-          "CN"
-        ],
-        "ref": "2026-21755",
-        "source": {
-          "publisher": "Federal Register (USTR)",
-          "url": "https://www.federalregister.gov/documents/2026/10/26/2026-21755/request-for-comments-on-further-suspension-of-section-301-action-chinas-targeting-of-the-maritime"
-        }
+      "caveat": "FAO revises earlier months; the comparison value can change before the release.",
+      "status": "draft, not registered"
+    },
+    {
+      "draft_id": "headwind-cereals-2026-11",
+      "question": "Will the FAO Cereal Price Index for 2026-11, as first published, be above 116.8 (the 2026-10 value as published on the day this draft was written)?",
+      "resolves_on": "2026-12-04",
+      "resolution_source": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+      "baseline": {
+        "kind": "climatology",
+        "probability": 0.508,
+        "basis": "Share of the last 120 months in which the index rose from the month before, in today's revised series."
       },
-      {
-        "id": "2026-11-20-igc-goi-release",
-        "date": "2026-11-20",
-        "title": "IGC Grains and Oilseeds Index (GOI) monthly release",
-        "kind": "data_release",
-        "countries": [],
-        "ref": "IGC-GOI",
-        "source": {
-          "publisher": "International Grains Council",
-          "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx"
-        }
-      },
-      {
-        "id": "2026-11-06-fao-ffpi-release",
-        "date": "2026-11-06",
-        "title": "FAO Food Price Index (FFPI) monthly release",
-        "kind": "data_release",
-        "countries": [],
-        "ref": "FAO-FFPI",
-        "source": {
-          "publisher": "FAO",
-          "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/"
-        }
+      "caveat": "FAO revises earlier months; the comparison value can change before the release.",
+      "status": "draft, not registered"
+    }
+  ],
+  "events": [
+    {
+      "id": "2026-12-04-fao-ffpi-release",
+      "date": "2026-12-04",
+      "kind": "data_release",
+      "countries": [],
+      "ref": "FFPI",
+      "title": "FAO Food Price Index monthly release (2026-11 data)",
+      "source": {
+        "publisher": "FAO",
+        "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/"
       }
-    ]
+    },
+    {
+      "id": "2026-12-09-fomc-decision",
+      "date": "2026-12-09",
+      "kind": "rule_date",
+      "countries": [
+        "US"
+      ],
+      "ref": "FOMC",
+      "title": "Federal Reserve FOMC rate decision",
+      "source": {
+        "publisher": "Board of Governors of the Federal Reserve System",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      }
+    },
+    {
+      "id": "2026-12-17-ecb-decision",
+      "date": "2026-12-17",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "ECB",
+      "title": "ECB Governing Council monetary policy decision",
+      "source": {
+        "publisher": "European Central Bank",
+        "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+      }
+    },
+    {
+      "id": "2027-01-27-fomc-decision",
+      "date": "2027-01-27",
+      "kind": "rule_date",
+      "countries": [
+        "US"
+      ],
+      "ref": "FOMC",
+      "title": "Federal Reserve FOMC rate decision",
+      "source": {
+        "publisher": "Board of Governors of the Federal Reserve System",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      }
+    },
+    {
+      "id": "2027-02-04-ecb-decision",
+      "date": "2027-02-04",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "ECB",
+      "title": "ECB Governing Council monetary policy decision",
+      "source": {
+        "publisher": "European Central Bank",
+        "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+      }
+    },
+    {
+      "id": "2027-03-17-fomc-decision",
+      "date": "2027-03-17",
+      "kind": "rule_date",
+      "countries": [
+        "US"
+      ],
+      "ref": "FOMC",
+      "title": "Federal Reserve FOMC rate decision",
+      "source": {
+        "publisher": "Board of Governors of the Federal Reserve System",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      }
+    },
+    {
+      "id": "2027-03-18-ecb-decision",
+      "date": "2027-03-18",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "ECB",
+      "title": "ECB Governing Council monetary policy decision",
+      "source": {
+        "publisher": "European Central Bank",
+        "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+      }
+    },
+    {
+      "id": "2027-04-28-fomc-decision",
+      "date": "2027-04-28",
+      "kind": "rule_date",
+      "countries": [
+        "US"
+      ],
+      "ref": "FOMC",
+      "title": "Federal Reserve FOMC rate decision",
+      "source": {
+        "publisher": "Board of Governors of the Federal Reserve System",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      }
+    },
+    {
+      "id": "2027-04-29-ecb-decision",
+      "date": "2027-04-29",
+      "kind": "rule_date",
+      "countries": [],
+      "ref": "ECB",
+      "title": "ECB Governing Council monetary policy decision",
+      "source": {
+        "publisher": "European Central Bank",
+        "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html"
+      }
+    }
+  ],
+  "country_names": {
+    "KR": "South Korea",
+    "NO": "Norway",
+    "PK": "Pakistan",
+    "CA": "Canada",
+    "NE": "Niger",
+    "GB": "United Kingdom",
+    "CN": "China",
+    "ID": "Indonesia",
+    "CU": "Cuba",
+    "IR": "Iran",
+    "LB": "Lebanon",
+    "MY": "Malaysia",
+    "HK": "Hong Kong",
+    "MM": "Myanmar",
+    "TH": "Thailand",
+    "CH": "Switzerland",
+    "BF": "Burkina Faso",
+    "ML": "Mali",
+    "AU": "Australia",
+    "IS": "Iceland",
+    "TR": "Turkey",
+    "JP": "Japan",
+    "HU": "Hungary",
+    "RO": "Romania",
+    "PS": "Palestine",
+    "HT": "Haiti",
+    "SS": "South Sudan",
+    "VE": "Venezuela",
+    "SD": "Sudan",
+    "SO": "Somalia",
+    "YE": "Yemen",
+    "UA": "Ukraine",
+    "CZ": "Czechia",
+    "NZ": "New Zealand",
+    "SG": "Singapore",
+    "SE": "Sweden",
+    "DK": "Denmark",
+    "BR": "Brazil",
+    "ET": "Ethiopia",
+    "IL": "Israel",
+    "PL": "Poland",
+    "ZA": "South Africa",
+    "MX": "Mexico",
+    "PH": "Philippines",
+    "IN": "India",
+    "CD": "Democratic Republic of the Congo"
   }
 }

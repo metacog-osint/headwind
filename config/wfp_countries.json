@@ -1,0 +1,8 @@
+{
+  "note": "Countries whose WFP market prices Headwind reads, ISO alpha-2 to alpha-3. Started 12 Nov 2026 from the countries in Watchfloor's feed that day; keep it in step with Watchfloor's zones. A country WFP does not publish for is reported on the page as having no data.",
+  "countries": {
+    "BF": "BFA", "CD": "COD", "CU": "CUB", "ET": "ETH", "HT": "HTI", "IR": "IRN", "LB": "LBN", "ML": "MLI",
+    "MM": "MMR", "NE": "NER", "PH": "PHL", "PK": "PAK", "PS": "PSE", "SD": "SDN", "SO": "SOM", "SS": "SSD",
+    "UA": "UKR", "VE": "VEN", "YE": "YEM"
+  }
+}

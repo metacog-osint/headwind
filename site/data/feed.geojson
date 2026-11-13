@@ -2,9 +2,9 @@
   "type": "FeatureCollection",
   "contract": "tic-feed/2",
   "program": "headwind",
-  "generated_at": "2026-11-01T12:00:00Z",
-  "licence": "US public domain (OFAC, Federal Register); CC BY-NC-SA 3.0 IGO (FAO); Headwind code MIT",
-  "attribution": "Headwind, The Intelligence Company (OFAC, Federal Register, FAO, IGC)",
+  "generated_at": "2026-11-13T05:26:14Z",
+  "licence": "Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO",
+  "attribution": "Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information Administration via FRED; FAO; World Food Programme via the Humanitarian Data Exchange.",
   "language_key": "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md",
   "features": [
     {
@@ -12,314 +12,522 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          24.42,
-          59.76
+          134.05,
+          -24.13
         ]
       },
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:ofac:ofac-2026-10-30-shadow-fleet",
+        "id": "headwind:fx:AUD:2026-11-12",
         "program": "headwind",
-        "title": "OFAC SDN delta: Baltic & Red Sea Shadow-Fleet Crude Tanker Designations (14 entities, 3 vessels)",
-        "summary": "OFAC designated 14 entities and 3 shadow-fleet tankers (including MV BALTIC TRANSPORTER MMSI 273458910 and MT CRUDE NAVIGATOR MMSI 352981400, both tracked loitering near the Gulf of Finland subsea corridor by Wake).",
-        "kind": "assessment",
-        "tier": "warning",
-        "status": "actual",
-        "msg_type": "new",
-        "human_review": "sampled",
-        "us_person_data": "none",
-        "status_class": "assessed",
-        "product_category": "warning",
-        "data_as_of": "2026-10-30T00:00:00Z",
-        "published_at": "2026-11-01T12:00:00Z",
-        "valid_until": "2026-11-02T12:00:00Z",
-        "countries": [
-          "RU",
-          "IR",
-          "PA"
-        ],
-        "pmesii_pt": [
-          "economic",
-          "political"
-        ],
-        "ascope": [
-          "organizations",
-          "capabilities"
-        ],
-        "ie_aspect": [
-          "informational",
-          "physical"
-        ],
-        "ncf": [
-          "transport_by_vessel",
-          "maintain_supply_chains",
-          "store_fuel_maintain_reserves"
-        ],
-        "requirement_ids": [
-          "HW-PIR-1",
-          "HW-EEI-1"
-        ],
-        "method_version": "headwind-1.0",
-        "coverage_fraction": 0.9,
-        "precision_class": "country",
-        "measures": {
-          "entities_added": 14,
-          "vessels_added": 3
-        },
-        "visual": {
-          "type": "table",
-          "url": "https://headwind.theintelligence.company/#ofac-2026-10-30-shadow-fleet"
-        },
-        "sources": [
-          {
-            "id": "ofac-sdn",
-            "publisher": "US Department of the Treasury (OFAC)",
-            "title": "Specially Designated Nationals (SDN) & Consolidated Sanctions List",
-            "url": "https://ofac.treasury.gov/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists",
-            "licence": "US public domain",
-            "grade": "A1",
-            "independence_group": "us-treasury-ofac",
-            "source_type": "official or market data",
-            "descriptor": "Official OFAC SDN entity and vessel (IMO/MMSI) sanctions designations.",
-            "accessed_at": "2026-11-01T12:00:00Z"
-          }
-        ],
-        "change_from_prior": "new",
-        "change_reason": "New OFAC SDN batch adding 14 entities and 3 shadow-fleet vessels.",
-        "warning_problem_id": "HW-WP-1",
-        "indicator_id": "HW-IND-1",
-        "hypothesis_id": "HW-H-1A",
-        "direction": "supports",
-        "indicator_state": "present",
-        "probability": 0.85,
-        "likelihood_term": "very_likely",
-        "confidence": "moderate",
-        "confidence_basis": {
-          "rubric": "tic-confidence-1.0",
-          "factors": {
-            "independent_lines": 2,
-            "contradicted": false,
-            "coverage_fraction": 0.9,
-            "grades": [
-              "A1",
-              "A2"
-            ],
-            "alternatives_rejected": 1,
-            "method_scored": false,
-            "assumptions": "holds",
-            "ease_of_faking": "low",
-            "horizon_days": 0.0
-          },
-          "caps": [
-            "expertise"
-          ],
-          "raise_by": [
-            "a further independent line of evidence (have 2, High needs 3)",
-            "a scored Verdict record for this method version"
-          ]
-        },
-        "alternatives": [
-          {
-            "hypothesis": "Targeted enforcement campaign to force shadow-fleet flag/club de-registration and port denial",
-            "tell_apart": "Subsequent AIS flag-hopping or loitering outside Indian/Chinese terminals in Wake."
-          },
-          {
-            "hypothesis": "Routine administrative maintenance of existing sanctions evasion aliases",
-            "tell_apart": "No active operational vessels or active transshipment hubs in the batch."
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -77.0364,
-          38.8951
-        ]
-      },
-      "properties": {
-        "contract": "tic-feed/2",
-        "id": "headwind:control:bis-affiliates-stay-2026-11-10",
-        "program": "headwind",
-        "title": "BIS deadline (2026-11-10): Affiliates (50% Ownership) Rule One-Year Stay Expiration",
-        "summary": "BIS Affiliates 50% rule stay expires 10 Nov 2026 (9 days away); USTR proposed extending its matching Section 301 maritime suspension to 9 Jan 2027 (FR Doc 2026-21755).",
-        "kind": "assessment",
-        "tier": "warning",
-        "status": "actual",
-        "msg_type": "new",
-        "human_review": "sampled",
-        "us_person_data": "none",
-        "status_class": "assessed",
-        "product_category": "warning",
-        "data_as_of": "2025-11-12T00:00:00Z",
-        "published_at": "2026-11-01T12:00:00Z",
-        "valid_until": "2026-11-10T23:59:59Z",
-        "countries": [
-          "US",
-          "CN"
-        ],
-        "pmesii_pt": [
-          "economic",
-          "political"
-        ],
-        "ascope": [
-          "organizations"
-        ],
-        "ie_aspect": [
-          "informational"
-        ],
-        "ncf": [
-          "manufacture_equipment",
-          "maintain_supply_chains",
-          "provide_it_products"
-        ],
-        "requirement_ids": [
-          "HW-PIR-2",
-          "HW-EEI-2"
-        ],
-        "method_version": "headwind-1.0",
-        "coverage_fraction": 0.9,
-        "precision_class": "country",
-        "measures": {
-          "days_to_deadline": 9
-        },
-        "visual": {
-          "type": "page",
-          "url": "https://www.federalregister.gov/documents/2025/11/12/2025-19846/one-year-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed-entities"
-        },
-        "sources": [
-          {
-            "id": "us-federal-register",
-            "publisher": "US Federal Register (BIS / USTR)",
-            "title": "Federal Register Documents & Public Inspection Filings",
-            "url": "https://www.federalregister.gov/api/v1/documents.json",
-            "licence": "US public domain",
-            "grade": "A1",
-            "independence_group": "us-federal-register",
-            "source_type": "official or market data",
-            "descriptor": "BIS and USTR export-control rule stays, suspensions, and effective-date notices.",
-            "accessed_at": "2026-11-01T12:00:00Z"
-          }
-        ],
-        "change_from_prior": "new",
-        "change_reason": "New OFAC SDN batch adding 14 entities and 3 shadow-fleet vessels.",
-        "warning_problem_id": "HW-WP-1",
-        "indicator_id": "HW-IND-2",
-        "hypothesis_id": "HW-H-1B",
-        "direction": "supports",
-        "indicator_state": "present",
-        "probability": 0.85,
-        "likelihood_term": "very_likely",
-        "confidence": "moderate",
-        "confidence_basis": {
-          "rubric": "tic-confidence-1.0",
-          "factors": {
-            "independent_lines": 2,
-            "contradicted": false,
-            "coverage_fraction": 0.9,
-            "grades": [
-              "A1",
-              "A2"
-            ],
-            "alternatives_rejected": 1,
-            "method_scored": false,
-            "assumptions": "holds",
-            "ease_of_faking": "low",
-            "horizon_days": 0.0
-          },
-          "caps": [
-            "expertise"
-          ],
-          "raise_by": [
-            "a further independent line of evidence (have 2, High needs 3)",
-            "a scored Verdict record for this method version"
-          ]
-        },
-        "alternatives": [
-          {
-            "hypothesis": "Synchronized BIS/USTR administrative stay extending the US-China trade truce",
-            "tell_apart": "Public Inspection filing of a stay document on or before the deadline date."
-          },
-          {
-            "hypothesis": "Automatic rule reimposition on the deadline date",
-            "tell_apart": "Absence of a BIS stay filing on Federal Register Public Inspection."
-          }
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -77.0398,
-          38.9005
-        ]
-      },
-      "properties": {
-        "contract": "tic-feed/2",
-        "id": "headwind:control:ustr-maritime-section-301-2026-21755",
-        "program": "headwind",
-        "title": "USTR deadline (2027-01-09): Further Suspension of Section 301 Action: China Maritime & Logistics",
-        "summary": "USTR notice proposing extension of Section 301 port-fee suspension through 9 Jan 2027.",
+        "title": "Australia (AUD): 2.6% weaker against the US dollar in 5 business days (z +3.0)",
+        "summary": "1.46611 AUD per US dollar on 2026-11-12, against 1.42846 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
         "msg_type": "new",
-        "human_review": "sampled",
+        "human_review": "none",
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-10-26T00:00:00Z",
-        "published_at": "2026-11-01T12:00:00Z",
-        "valid_until": "2027-01-09T23:59:59Z",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
         "countries": [
-          "US",
-          "CN"
+          "AU"
         ],
         "pmesii_pt": [
-          "economic",
-          "political"
+          "economic"
         ],
         "ascope": [
-          "organizations"
+          "events"
         ],
         "ie_aspect": [
           "informational"
         ],
         "ncf": [
-          "manufacture_equipment",
-          "maintain_supply_chains",
-          "provide_it_products"
+          "provide_funding_liquidity",
+          "provide_capital_markets"
         ],
         "requirement_ids": [
-          "HW-PIR-2",
-          "HW-EEI-2"
+          "HW-PIR-4"
         ],
-        "method_version": "headwind-1.0",
-        "coverage_fraction": 0.9,
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
         "precision_class": "country",
         "measures": {
-          "days_to_deadline": 69
+          "per_usd": 1.466113,
+          "change_pct": 2.64,
+          "z": 3.04,
+          "baseline_n": 250,
+          "flag_rate": 0.004
         },
         "visual": {
           "type": "page",
-          "url": "https://www.federalregister.gov/documents/2026/10/26/2026-21755/request-for-comments-on-further-suspension-of-section-301-action-chinas-targeting-of-the-maritime"
+          "url": "https://headwind.theintelligence.company/#fx"
         },
         "sources": [
           {
-            "id": "us-federal-register",
-            "publisher": "US Federal Register (BIS / USTR)",
-            "title": "Federal Register Documents & Public Inspection Filings",
-            "url": "https://www.federalregister.gov/api/v1/documents.json",
-            "licence": "US public domain",
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
             "grade": "A1",
-            "independence_group": "us-federal-register",
+            "independence_group": "ecb",
             "source_type": "official or market data",
-            "descriptor": "BIS and USTR export-control rule stays, suspensions, and effective-date notices.",
-            "accessed_at": "2026-11-01T12:00:00Z"
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -49.559,
+          -12.099
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:BRL:2026-11-12",
+        "program": "headwind",
+        "title": "Brazil (BRL): 2.8% weaker against the US dollar in 5 business days (z +2.1)",
+        "summary": "5.61691 BRL per US dollar on 2026-11-12, against 5.46641 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "BR"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 5.616912,
+          "change_pct": 2.75,
+          "z": 2.12,
+          "baseline_n": 250,
+          "flag_rate": 0.02
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -101.911,
+          60.324
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:CAD:2026-11-12",
+        "program": "headwind",
+        "title": "Canada (CAD): 2.0% weaker against the US dollar in 5 business days (z +2.6)",
+        "summary": "1.42487 CAD per US dollar on 2026-11-12, against 1.39656 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "CA"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 1.424871,
+          "change_pct": 2.03,
+          "z": 2.58,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.464,
+          46.719
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:CHF:2026-11-12",
+        "program": "headwind",
+        "title": "Switzerland (CHF): 1.9% weaker against the US dollar in 5 business days (z +1.8)",
+        "summary": "0.833138 CHF per US dollar on 2026-11-12, against 0.81789 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "CH"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 0.833138,
+          "change_pct": 1.86,
+          "z": 1.77,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.337,
+          32.498
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:CNY:2026-11-12",
+        "program": "headwind",
+        "title": "China (CNY): 0.0% unchanged against the US dollar in 5 business days (z +0.5)",
+        "summary": "6.66826 CNY per US dollar on 2026-11-12, against 6.66839 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "CN"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 6.668261,
+          "change_pct": -0.0,
+          "z": 0.5,
+          "baseline_n": 250,
+          "flag_rate": 0.004
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.378,
+          49.882
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:CZK:2026-11-12",
+        "program": "headwind",
+        "title": "Czechia (CZK): 1.7% weaker against the US dollar in 5 business days (z +1.7)",
+        "summary": "22.0007 CZK per US dollar on 2026-11-12, against 21.6402 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "CZ"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 22.000722,
+          "change_pct": 1.67,
+          "z": 1.66,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.018,
+          55.967
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:DKK:2026-11-12",
+        "program": "headwind",
+        "title": "Denmark (DKK): 1.3% weaker against the US dollar in 5 business days (z +1.6)",
+        "summary": "6.74614 DKK per US dollar on 2026-11-12, against 6.65957 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "DK"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 6.746142,
+          "change_pct": 1.3,
+          "z": 1.55,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
           }
         ]
       }
@@ -329,21 +537,1864 @@
       "geometry": null,
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:commodity:igc-goi:2026-10",
+        "id": "headwind:fx:EUR:2026-11-12",
         "program": "headwind",
-        "title": "IGC Grains and Oilseeds Index (GOI) (2026-10): 231.4 (-4.30% vs prior)",
-        "summary": "IGC Grains and Oilseeds Index fell -4.30% in October (wheat -5.4%, maize -6.9%), pointing to a lower October FAO Food Price Index print on 6 Nov.",
+        "title": "Euro area (EUR): 1.3% weaker against the US dollar in 5 business days (z +1.5)",
+        "summary": "0.902446 EUR per US dollar on 2026-11-12, against 0.890948 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
         "kind": "observation",
-        "tier": "anomaly",
+        "tier": "routine",
         "status": "actual",
         "msg_type": "new",
         "human_review": "none",
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-01T12:00:00Z",
-        "published_at": "2026-11-01T12:00:00Z",
-        "valid_until": "2026-11-02T12:00:00Z",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "none",
+        "measures": {
+          "per_usd": 0.902446,
+          "change_pct": 1.29,
+          "z": 1.53,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.116,
+          54.403
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:GBP:2026-11-12",
+        "program": "headwind",
+        "title": "United Kingdom (GBP): 1.5% weaker against the US dollar in 5 business days (z +2.0)",
+        "summary": "0.754399 GBP per US dollar on 2026-11-12, against 0.742988 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "GB"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 0.754399,
+          "change_pct": 1.54,
+          "z": 2.04,
+          "baseline_n": 250,
+          "flag_rate": 0.004
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.098,
+          22.449
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:HKD:2026-11-12",
+        "program": "headwind",
+        "title": "Hong Kong (HKD): 0.0% stronger against the US dollar in 5 business days (z -0.1)",
+        "summary": "7.84478 HKD per US dollar on 2026-11-12, against 7.84524 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "HK"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 7.844779,
+          "change_pct": -0.01,
+          "z": -0.08,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19.448,
+          47.087
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:HUF:2026-11-12",
+        "program": "headwind",
+        "title": "Hungary (HUF): 1.8% weaker against the US dollar in 5 business days (z +1.3)",
+        "summary": "329.375 HUF per US dollar on 2026-11-12, against 323.574 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "HU"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 329.374605,
+          "change_pct": 1.79,
+          "z": 1.32,
+          "baseline_n": 250,
+          "flag_rate": 0.024
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.893,
+          -0.954
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:IDR:2026-11-12",
+        "program": "headwind",
+        "title": "Indonesia (IDR): 1.0% weaker against the US dollar in 5 business days (z +1.4)",
+        "summary": "18252.6 IDR per US dollar on 2026-11-12, against 18069.4 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "ID"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 18252.648678,
+          "change_pct": 1.01,
+          "z": 1.36,
+          "baseline_n": 250,
+          "flag_rate": 0.004
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.848,
+          30.911
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:ILS:2026-11-12",
+        "program": "headwind",
+        "title": "Israel (ILS): 1.0% weaker against the US dollar in 5 business days (z +0.9)",
+        "summary": "3.20323 ILS per US dollar on 2026-11-12, against 3.1716 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "IL"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 3.203231,
+          "change_pct": 1.0,
+          "z": 0.94,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.358,
+          22.687
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:INR:2026-11-12",
+        "program": "headwind",
+        "title": "India (INR): 0.5% stronger against the US dollar in 5 business days (z -0.9)",
+        "summary": "94.0455 INR per US dollar on 2026-11-12, against 94.4757 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "IN"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 94.045483,
+          "change_pct": -0.46,
+          "z": -0.92,
+          "baseline_n": 250,
+          "flag_rate": 0.004
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -18.674,
+          64.779
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:ISK:2026-11-12",
+        "program": "headwind",
+        "title": "Iceland (ISK): 1.1% weaker against the US dollar in 5 business days (z +1.9)",
+        "summary": "123.274 ISK per US dollar on 2026-11-12, against 121.882 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "IS"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 123.274073,
+          "change_pct": 1.14,
+          "z": 1.92,
+          "baseline_n": 250,
+          "flag_rate": 0.02
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.442,
+          36.143
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:JPY:2026-11-12",
+        "program": "headwind",
+        "title": "Japan (JPY): 0.8% weaker against the US dollar in 5 business days (z +0.8)",
+        "summary": "159.697 JPY per US dollar on 2026-11-12, against 158.455 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "JP"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 159.696778,
+          "change_pct": 0.78,
+          "z": 0.85,
+          "baseline_n": 250,
+          "flag_rate": 0.084
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          128.13,
+          36.385
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:KRW:2026-11-12",
+        "program": "headwind",
+        "title": "South Korea (KRW): 0.8% stronger against the US dollar in 5 business days (z -0.5)",
+        "summary": "1334.1 KRW per US dollar on 2026-11-12, against 1344.69 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "KR"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 1334.10342,
+          "change_pct": -0.79,
+          "z": -0.48,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -102.289,
+          23.92
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:MXN:2026-11-12",
+        "program": "headwind",
+        "title": "Mexico (MXN): 0.5% weaker against the US dollar in 5 business days (z +0.7)",
+        "summary": "18.6908 MXN per US dollar on 2026-11-12, against 18.5901 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "MX"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 18.690822,
+          "change_pct": 0.54,
+          "z": 0.66,
+          "baseline_n": 250,
+          "flag_rate": 0.036
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.837,
+          2.529
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:MYR:2026-11-12",
+        "program": "headwind",
+        "title": "Malaysia (MYR): 0.8% weaker against the US dollar in 5 business days (z +1.7)",
+        "summary": "4.07851 MYR per US dollar on 2026-11-12, against 4.04597 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "MY"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 4.078513,
+          "change_pct": 0.8,
+          "z": 1.69,
+          "baseline_n": 250,
+          "flag_rate": 0.056
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.68,
+          61.357
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:NOK:2026-11-12",
+        "program": "headwind",
+        "title": "Norway (NOK): 2.5% weaker against the US dollar in 5 business days (z +2.3)",
+        "summary": "9.53253 NOK per US dollar on 2026-11-12, against 9.29838 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "NO"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 9.532533,
+          "change_pct": 2.52,
+          "z": 2.27,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          172.787,
+          -39.759
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:NZD:2026-11-12",
+        "program": "headwind",
+        "title": "New Zealand (NZD): 1.2% weaker against the US dollar in 5 business days (z +0.9)",
+        "summary": "1.79966 NZD per US dollar on 2026-11-12, against 1.77887 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "NZ"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 1.799657,
+          "change_pct": 1.17,
+          "z": 0.87,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          122.465,
+          11.198
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:PHP:2026-11-12",
+        "program": "headwind",
+        "title": "Philippines (PHP): 1.2% weaker against the US dollar in 5 business days (z +1.4)",
+        "summary": "63.7271 PHP per US dollar on 2026-11-12, against 62.9954 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "PH"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 63.7271,
+          "change_pct": 1.16,
+          "z": 1.44,
+          "baseline_n": 250,
+          "flag_rate": 0.004
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19.49,
+          51.99
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:PLN:2026-11-12",
+        "program": "headwind",
+        "title": "Poland (PLN): 1.8% weaker against the US dollar in 5 business days (z +1.5)",
+        "summary": "3.9787 PLN per US dollar on 2026-11-12, against 3.91037 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "PL"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 3.978702,
+          "change_pct": 1.75,
+          "z": 1.53,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.973,
+          45.733
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:RON:2026-11-12",
+        "program": "headwind",
+        "title": "Romania (RON): 1.5% weaker against the US dollar in 5 business days (z +1.6)",
+        "summary": "4.82565 RON per US dollar on 2026-11-12, against 4.75633 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "RO"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 4.825648,
+          "change_pct": 1.46,
+          "z": 1.57,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19.017,
+          65.859
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:SEK:2026-11-12",
+        "program": "headwind",
+        "title": "Sweden (SEK): 2.0% weaker against the US dollar in 5 business days (z +1.6)",
+        "summary": "9.98358 SEK per US dollar on 2026-11-12, against 9.78662 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "SE"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 9.983575,
+          "change_pct": 2.01,
+          "z": 1.55,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.817,
+          1.367
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:SGD:2026-11-12",
+        "program": "headwind",
+        "title": "Singapore (SGD): 0.7% weaker against the US dollar in 5 business days (z +1.7)",
+        "summary": "1.2859 SGD per US dollar on 2026-11-12, against 1.27726 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "SG"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 1.285895,
+          "change_pct": 0.68,
+          "z": 1.74,
+          "baseline_n": 250,
+          "flag_rate": 0.008
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.073,
+          15.46
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:THB:2026-11-12",
+        "program": "headwind",
+        "title": "Thailand (THB): 1.1% weaker against the US dollar in 5 business days (z +1.2)",
+        "summary": "33.8146 THB per US dollar on 2026-11-12, against 33.44 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "TH"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 33.814638,
+          "change_pct": 1.12,
+          "z": 1.17,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.508,
+          39.345
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:TRY:2026-11-12",
+        "program": "headwind",
+        "title": "Turkey (TRY): 0.4% weaker against the US dollar in 5 business days (z +0.2)",
+        "summary": "50.2577 TRY per US dollar on 2026-11-12, against 50.0471 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "TR"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 50.257738,
+          "change_pct": 0.42,
+          "z": 0.18,
+          "baseline_n": 250,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23.666,
+          -29.709
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:fx:ZAR:2026-11-12",
+        "program": "headwind",
+        "title": "South Africa (ZAR): 1.8% weaker against the US dollar in 5 business days (z +1.4)",
+        "summary": "16.715 ZAR per US dollar on 2026-11-12, against 16.4173 on 2026-11-05. Measured against the currency's own 250 earlier 5-day changes. ECB reference rate, restated per US dollar.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-12T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "ZA"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_funding_liquidity",
+          "provide_capital_markets"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "per_usd": 16.715008,
+          "change_pct": 1.81,
+          "z": 1.44,
+          "baseline_n": 250,
+          "flag_rate": 0.008
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#fx"
+        },
+        "sources": [
+          {
+            "id": "ecb-eurofxref",
+            "publisher": "European Central Bank",
+            "title": "Euro foreign exchange reference rates",
+            "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+            "licence": "ECB statistics: free reuse with the source credited",
+            "grade": "A1",
+            "independence_group": "ecb",
+            "source_type": "official or market data",
+            "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:energy:brent:2026-11-11",
+        "program": "headwind",
+        "title": "Brent crude oil spot price: +0.3% in 5 trading days (z +0.0)",
+        "summary": "92.14 US dollars per barrel on 2026-11-11, against 91.84 on 2026-11-04. Measured against the series' own 250 earlier 5-day changes.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-11T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "store_fuel_maintain_reserves",
+          "transport_by_pipeline"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "none",
+        "measures": {
+          "price": 92.14,
+          "change_pct": 0.33,
+          "z": 0.01,
+          "baseline_n": 250,
+          "flag_rate": 0.012
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#energy"
+        },
+        "sources": [
+          {
+            "id": "eia-spot-fred",
+            "publisher": "US Energy Information Administration, retrieved from FRED (Federal Reserve Bank of St. Louis)",
+            "title": "Crude oil and natural gas daily spot prices",
+            "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+            "licence": "US public domain (EIA); citation requested",
+            "grade": "A1",
+            "independence_group": "us-eia",
+            "source_type": "official or market data",
+            "descriptor": "Brent, WTI and Henry Hub daily spot prices as published by EIA.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:energy:wti:2026-11-11",
+        "program": "headwind",
+        "title": "WTI crude oil spot price: -2.3% in 5 trading days (z -0.4)",
+        "summary": "89.62 US dollars per barrel on 2026-11-11, against 91.73 on 2026-11-04. Measured against the series' own 250 earlier 5-day changes.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-11T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "store_fuel_maintain_reserves",
+          "transport_by_pipeline"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "none",
+        "measures": {
+          "price": 89.62,
+          "change_pct": -2.3,
+          "z": -0.41,
+          "baseline_n": 250,
+          "flag_rate": 0.008
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#energy"
+        },
+        "sources": [
+          {
+            "id": "eia-spot-fred",
+            "publisher": "US Energy Information Administration, retrieved from FRED (Federal Reserve Bank of St. Louis)",
+            "title": "Crude oil and natural gas daily spot prices",
+            "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+            "licence": "US public domain (EIA); citation requested",
+            "grade": "A1",
+            "independence_group": "us-eia",
+            "source_type": "official or market data",
+            "descriptor": "Brent, WTI and Henry Hub daily spot prices as published by EIA.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:energy:henry-hub:2026-11-11",
+        "program": "headwind",
+        "title": "Henry Hub natural gas spot price: +14.1% in 5 trading days (z +1.9)",
+        "summary": "3 US dollars per million Btu on 2026-11-11, against 2.63 on 2026-11-04. Measured against the series' own 250 earlier 5-day changes.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-11T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "store_fuel_maintain_reserves",
+          "transport_by_pipeline"
+        ],
+        "requirement_ids": [
+          "HW-PIR-4"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "none",
+        "measures": {
+          "price": 3.0,
+          "change_pct": 14.07,
+          "z": 1.87,
+          "baseline_n": 250,
+          "flag_rate": 0.072
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#energy"
+        },
+        "sources": [
+          {
+            "id": "eia-spot-fred",
+            "publisher": "US Energy Information Administration, retrieved from FRED (Federal Reserve Bank of St. Louis)",
+            "title": "Crude oil and natural gas daily spot prices",
+            "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+            "licence": "US public domain (EIA); citation requested",
+            "grade": "A1",
+            "independence_group": "us-eia",
+            "source_type": "official or market data",
+            "descriptor": "Brent, WTI and Henry Hub daily spot prices as published by EIA.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:food:ffpi:2026-10",
+        "program": "headwind",
+        "title": "FAO Food Price Index (2026-10): 133.9, -1.2% on the month (z -0.8)",
+        "summary": "133.9 for 2026-10, against 135.6 for 2026-09 (2014-2016 = 100). FAO revises earlier months; these are the values as published today.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-10-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -362,16 +2413,19 @@
         "requirement_ids": [
           "HW-PIR-3"
         ],
-        "method_version": "headwind-1.0",
-        "coverage_fraction": 0.95,
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
-          "index_value": 231.4,
-          "mom_pct": -4.3
+          "index_value": 133.9,
+          "change_pct": -1.25,
+          "z": -0.82,
+          "baseline_n": 120,
+          "flag_rate": 0.017
         },
         "visual": {
           "type": "page",
-          "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx"
+          "url": "https://headwind.theintelligence.company/#food"
         },
         "sources": [
           {
@@ -384,26 +2438,9 @@
             "independence_group": "fao",
             "source_type": "official or market data",
             "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
-            "accessed_at": "2026-11-01T12:00:00Z"
-          },
-          {
-            "id": "igc-goi",
-            "publisher": "International Grains Council",
-            "title": "Grains and Oilseeds Index (GOI)",
-            "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx",
-            "licence": "IGC public market terms",
-            "grade": "A2",
-            "independence_group": "igc",
-            "source_type": "official or market data",
-            "descriptor": "Daily export price index for wheat, maize, soybeans, rice, and barley.",
-            "accessed_at": "2026-11-01T12:00:00Z"
+            "accessed_at": "2026-11-13T05:26:14Z"
           }
-        ],
-        "baseline_ref": "prior-month-benchmark-value",
-        "indicator_id": "HW-IND-3",
-        "hypothesis_id": "HW-H-1B",
-        "direction": "supports",
-        "indicator_state": "present"
+        ]
       }
     },
     {
@@ -411,10 +2448,10 @@
       "geometry": null,
       "properties": {
         "contract": "tic-feed/2",
-        "id": "headwind:commodity:fao-ffpi:2026-09",
+        "id": "headwind:food:cereals:2026-10",
         "program": "headwind",
-        "title": "FAO Food Price Index (FFPI) (2026-09): 136.0 (+1.49% vs prior)",
-        "summary": "September 2026 FAO Food Price Index printed at 136.0 (+1.49%); October release scheduled for 6 Nov 2026.",
+        "title": "FAO Cereal Price Index (2026-10): 116.8, -4.5% on the month (z -1.8)",
+        "summary": "116.8 for 2026-10, against 122.3 for 2026-09 (2014-2016 = 100). FAO revises earlier months; these are the values as published today.",
         "kind": "observation",
         "tier": "routine",
         "status": "actual",
@@ -423,9 +2460,9 @@
         "us_person_data": "none",
         "status_class": "reported",
         "product_category": "current",
-        "data_as_of": "2026-11-01T12:00:00Z",
-        "published_at": "2026-11-01T12:00:00Z",
-        "valid_until": "2026-11-02T12:00:00Z",
+        "data_as_of": "2026-10-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
         "countries": [],
         "pmesii_pt": [
           "economic"
@@ -444,16 +2481,19 @@
         "requirement_ids": [
           "HW-PIR-3"
         ],
-        "method_version": "headwind-1.0",
-        "coverage_fraction": 0.95,
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
         "precision_class": "none",
         "measures": {
-          "index_value": 136.0,
-          "mom_pct": 1.49
+          "index_value": 116.8,
+          "change_pct": -4.5,
+          "z": -1.8,
+          "baseline_n": 120,
+          "flag_rate": 0.017
         },
         "visual": {
           "type": "page",
-          "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/"
+          "url": "https://headwind.theintelligence.company/#food"
         },
         "sources": [
           {
@@ -466,19 +2506,1605 @@
             "independence_group": "fao",
             "source_type": "official or market data",
             "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
-            "accessed_at": "2026-11-01T12:00:00Z"
-          },
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:food:oils:2026-10",
+        "program": "headwind",
+        "title": "FAO Vegetable Oil Price Index (2026-10): 199.2, +0.3% on the month (z +0.0)",
+        "summary": "199.2 for 2026-10, against 198.6 for 2026-09 (2014-2016 = 100). FAO revises earlier months; these are the values as published today.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-10-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products",
+          "maintain_supply_chains"
+        ],
+        "requirement_ids": [
+          "HW-PIR-3"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "none",
+        "measures": {
+          "index_value": 199.2,
+          "change_pct": 0.3,
+          "z": 0.0,
+          "baseline_n": 120,
+          "flag_rate": 0.017
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#food"
+        },
+        "sources": [
           {
-            "id": "igc-goi",
-            "publisher": "International Grains Council",
-            "title": "Grains and Oilseeds Index (GOI)",
-            "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx",
-            "licence": "IGC public market terms",
-            "grade": "A2",
-            "independence_group": "igc",
+            "id": "fao-ffpi",
+            "publisher": "FAO",
+            "title": "FAO Food Price Index (FFPI)",
+            "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+            "licence": "CC BY-NC-SA 3.0 IGO",
+            "grade": "A1",
+            "independence_group": "fao",
             "source_type": "official or market data",
-            "descriptor": "Daily export price index for wheat, maize, soybeans, rice, and barley.",
-            "accessed_at": "2026-11-01T12:00:00Z"
+            "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:food:dairy:2026-10",
+        "program": "headwind",
+        "title": "FAO Dairy Price Index (2026-10): 117.8, -1.1% on the month (z -0.7)",
+        "summary": "117.8 for 2026-10, against 119.1 for 2026-09 (2014-2016 = 100). FAO revises earlier months; these are the values as published today.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-10-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products",
+          "maintain_supply_chains"
+        ],
+        "requirement_ids": [
+          "HW-PIR-3"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "none",
+        "measures": {
+          "index_value": 117.8,
+          "change_pct": -1.09,
+          "z": -0.65,
+          "baseline_n": 120,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#food"
+        },
+        "sources": [
+          {
+            "id": "fao-ffpi",
+            "publisher": "FAO",
+            "title": "FAO Food Price Index (FFPI)",
+            "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+            "licence": "CC BY-NC-SA 3.0 IGO",
+            "grade": "A1",
+            "independence_group": "fao",
+            "source_type": "official or market data",
+            "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:food:meat:2026-10",
+        "program": "headwind",
+        "title": "FAO Meat Price Index (2026-10): 125.5, -1.3% on the month (z -0.8)",
+        "summary": "125.5 for 2026-10, against 127.1 for 2026-09 (2014-2016 = 100). FAO revises earlier months; these are the values as published today.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-10-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products",
+          "maintain_supply_chains"
+        ],
+        "requirement_ids": [
+          "HW-PIR-3"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "none",
+        "measures": {
+          "index_value": 125.5,
+          "change_pct": -1.26,
+          "z": -0.85,
+          "baseline_n": 120,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#food"
+        },
+        "sources": [
+          {
+            "id": "fao-ffpi",
+            "publisher": "FAO",
+            "title": "FAO Food Price Index (FFPI)",
+            "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+            "licence": "CC BY-NC-SA 3.0 IGO",
+            "grade": "A1",
+            "independence_group": "fao",
+            "source_type": "official or market data",
+            "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:food:sugar:2026-10",
+        "program": "headwind",
+        "title": "FAO Sugar Price Index (2026-10): 121.3, +6.7% on the month (z +1.3)",
+        "summary": "121.3 for 2026-10, against 113.7 for 2026-09 (2014-2016 = 100). FAO revises earlier months; these are the values as published today.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-10-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products",
+          "maintain_supply_chains"
+        ],
+        "requirement_ids": [
+          "HW-PIR-3"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "none",
+        "measures": {
+          "index_value": 121.3,
+          "change_pct": 6.68,
+          "z": 1.29,
+          "baseline_n": 120,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#food"
+        },
+        "sources": [
+          {
+            "id": "fao-ffpi",
+            "publisher": "FAO",
+            "title": "FAO Food Price Index (FFPI)",
+            "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+            "licence": "CC BY-NC-SA 3.0 IGO",
+            "grade": "A1",
+            "independence_group": "fao",
+            "source_type": "official or market data",
+            "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -1.364,
+          12.673
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:BF:2026-09",
+        "program": "headwind",
+        "title": "Burkina Faso: local food prices +3% in 3 months, median of 380 price series (z +0.3)",
+        "summary": "Median 3-month change to 2026-09 across 380 market-and-commodity series in 66 markets; 66% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-09-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "BF"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 2.9,
+          "series": 380,
+          "markets": 66,
+          "share_rising": 0.66,
+          "z": 0.32,
+          "baseline_n": 60,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-burkina-faso",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23.459,
+          -1.858
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:CD:2026-09",
+        "program": "headwind",
+        "title": "Democratic Republic of the Congo: local food prices +0% in 3 months, median of 1307 price series (z +0.0)",
+        "summary": "Median 3-month change to 2026-09 across 1307 market-and-commodity series in 215 markets; 32% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-09-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "CD"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 0.0,
+          "series": 1307,
+          "markets": 215,
+          "share_rising": 0.32,
+          "z": 0.0,
+          "baseline_n": 60,
+          "flag_rate": 0.017
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-democratic-republic-of-the-congo",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          39.089,
+          8.033
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:ET:2026-09",
+        "program": "headwind",
+        "title": "Ethiopia: local food prices +1% in 3 months, median of 860 price series (z -0.8)",
+        "summary": "Median 3-month change to 2026-09 across 860 market-and-commodity series in 129 markets; 51% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-09-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "ET"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 1.3,
+          "series": 860,
+          "markets": 129,
+          "share_rising": 0.51,
+          "z": -0.81,
+          "baseline_n": 60,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-ethiopia",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.224,
+          19.264
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:HT:2026-08",
+        "program": "headwind",
+        "title": "Haiti: local food prices -4% in 3 months, median of 172 price series (z -1.1)",
+        "summary": "Median 3-month change to 2026-08 across 172 market-and-commodity series in 71 markets; 29% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-08-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "HT"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": -4.1,
+          "series": 172,
+          "markets": 71,
+          "share_rising": 0.29,
+          "z": -1.11,
+          "baseline_n": 60,
+          "flag_rate": 0.05
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-haiti",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          54.931,
+          32.166
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:IR:2026-11",
+        "program": "headwind",
+        "title": "Iran: local food prices +9% in 3 months, median of 37 price series (z +0.2)",
+        "summary": "Median 3-month change to 2026-11 across 37 market-and-commodity series in 1 markets; 57% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-11-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "IR"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 9.1,
+          "series": 37,
+          "markets": 1,
+          "share_rising": 0.57,
+          "z": 0.16,
+          "baseline_n": 60,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-iran-islamic-republic-of",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          35.993,
+          34.133
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:LB:2026-08",
+        "program": "headwind",
+        "title": "Lebanon: local food prices +0% in 3 months, median of 153 price series (z -0.7)",
+        "summary": "Median 3-month change to 2026-08 across 153 market-and-commodity series in 27 markets; 50% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-08-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "LB"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 0.0,
+          "series": 153,
+          "markets": 27,
+          "share_rising": 0.5,
+          "z": -0.67,
+          "baseline_n": 60,
+          "flag_rate": 0.217
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-lebanon",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.038,
+          18.693
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:ML:2026-08",
+        "program": "headwind",
+        "title": "Mali: local food prices +0% in 3 months, median of 668 price series (z +0.0)",
+        "summary": "Median 3-month change to 2026-08 across 668 market-and-commodity series in 137 markets; 47% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-08-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "ML"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 0.0,
+          "series": 668,
+          "markets": 137,
+          "share_rising": 0.47,
+          "z": 0.0,
+          "baseline_n": 60,
+          "flag_rate": 0.05
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-mali",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          95.804,
+          21.574
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:MM:2026-09",
+        "program": "headwind",
+        "title": "Myanmar: local food prices +13% in 3 months, median of 505 price series (z +1.1)",
+        "summary": "Median 3-month change to 2026-09 across 505 market-and-commodity series in 300 markets; 67% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-09-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "MM"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 13.4,
+          "series": 505,
+          "markets": 300,
+          "share_rising": 0.67,
+          "z": 1.14,
+          "baseline_n": 60,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-myanmar",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.504,
+          17.446
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:NE:2026-10",
+        "program": "headwind",
+        "title": "Niger: local food prices -2% in 3 months, median of 377 price series (z -0.3)",
+        "summary": "Median 3-month change to 2026-10 across 377 market-and-commodity series in 79 markets; 24% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-10-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "NE"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": -2.4,
+          "series": 377,
+          "markets": 79,
+          "share_rising": 0.24,
+          "z": -0.27,
+          "baseline_n": 60,
+          "flag_rate": 0.017
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-niger",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          122.465,
+          11.198
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:PH:2026-09",
+        "program": "headwind",
+        "title": "Philippines: local food prices +0% in 3 months, median of 2623 price series (z -0.1)",
+        "summary": "Median 3-month change to 2026-09 across 2623 market-and-commodity series in 108 markets; 51% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-09-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "PH"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 0.4,
+          "series": 2623,
+          "markets": 108,
+          "share_rising": 0.51,
+          "z": -0.05,
+          "baseline_n": 60,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-philippines",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          68.546,
+          29.328
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:PK:2026-09",
+        "program": "headwind",
+        "title": "Pakistan: local food prices +2% in 3 months, median of 85 price series (z +0.3)",
+        "summary": "Median 3-month change to 2026-09 across 85 market-and-commodity series in 5 markets; 59% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-09-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "PK"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 1.7,
+          "series": 85,
+          "markets": 5,
+          "share_rising": 0.59,
+          "z": 0.28,
+          "baseline_n": 60,
+          "flag_rate": 0.1
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-pakistan",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          35.291,
+          32.047
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:PS:2026-09",
+        "program": "headwind",
+        "title": "Palestine: local food prices -1% in 3 months, median of 66 price series (z -0.3)",
+        "summary": "Median 3-month change to 2026-09 across 66 market-and-commodity series in 13 markets; 36% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-09-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "PS"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": -0.6,
+          "series": 66,
+          "markets": 13,
+          "share_rising": 0.36,
+          "z": -0.28,
+          "baseline_n": 60,
+          "flag_rate": 0.033
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-state-of-palestine",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          29.261,
+          16.331
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:SD:2026-09",
+        "program": "headwind",
+        "title": "Sudan: local food prices +50% in 3 months, median of 159 price series (z +2.4)",
+        "summary": "Median 3-month change to 2026-09 across 159 market-and-commodity series in 19 markets; 94% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-09-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "SD"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 50.1,
+          "series": 159,
+          "markets": 19,
+          "share_rising": 0.94,
+          "z": 2.36,
+          "baseline_n": 60,
+          "flag_rate": 0.0
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-sudan",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          45.192,
+          3.569
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:SO:2026-08",
+        "program": "headwind",
+        "title": "Somalia: local food prices +1% in 3 months, median of 563 price series (z +0.3)",
+        "summary": "Median 3-month change to 2026-08 across 563 market-and-commodity series in 47 markets; 53% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-08-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "SO"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 0.7,
+          "series": 563,
+          "markets": 47,
+          "share_rising": 0.53,
+          "z": 0.26,
+          "baseline_n": 60,
+          "flag_rate": 0.033
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-somalia",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          30.39,
+          7.23
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:SS:2026-10",
+        "program": "headwind",
+        "title": "South Sudan: local food prices +1% in 3 months, median of 523 price series (z -0.6)",
+        "summary": "Median 3-month change to 2026-10 across 523 market-and-commodity series in 42 markets; 51% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-10-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "SS"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 1.1,
+          "series": 523,
+          "markets": 42,
+          "share_rising": 0.51,
+          "z": -0.6,
+          "baseline_n": 60,
+          "flag_rate": 0.033
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-south-sudan",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.141,
+          49.725
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:UA:2026-09",
+        "program": "headwind",
+        "title": "Ukraine: local food prices +3% in 3 months, median of 846 price series (z +0.4)",
+        "summary": "Median 3-month change to 2026-09 across 846 market-and-commodity series in 28 markets; 72% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-09-30T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "UA"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 3.4,
+          "series": 846,
+          "markets": 28,
+          "share_rising": 0.72,
+          "z": 0.44,
+          "baseline_n": 60,
+          "flag_rate": 0.033
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-ukraine",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          45.874,
+          15.328
+        ]
+      },
+      "properties": {
+        "contract": "tic-feed/2",
+        "id": "headwind:localfood:YE:2026-10",
+        "program": "headwind",
+        "title": "Yemen: local food prices +2% in 3 months, median of 253 price series (z +0.7)",
+        "summary": "Median 3-month change to 2026-10 across 253 market-and-commodity series in 28 markets; 58% of series rose. Nominal prices in local currency, judged against the country's own 60 earlier medians.",
+        "kind": "observation",
+        "tier": "routine",
+        "status": "actual",
+        "msg_type": "new",
+        "human_review": "none",
+        "us_person_data": "none",
+        "status_class": "reported",
+        "product_category": "current",
+        "data_as_of": "2026-10-31T00:00:00Z",
+        "published_at": "2026-11-13T05:26:14Z",
+        "valid_until": "2026-11-15T05:26:14Z",
+        "countries": [
+          "YE"
+        ],
+        "pmesii_pt": [
+          "economic"
+        ],
+        "ascope": [
+          "events",
+          "people"
+        ],
+        "ie_aspect": [
+          "informational"
+        ],
+        "ncf": [
+          "provide_food_products",
+          "provide_agricultural_products"
+        ],
+        "requirement_ids": [
+          "HW-PIR-5"
+        ],
+        "method_version": "headwind-1.1",
+        "coverage_fraction": 1.0,
+        "precision_class": "country",
+        "measures": {
+          "median_change_pct": 1.9,
+          "series": 253,
+          "markets": 28,
+          "share_rising": 0.58,
+          "z": 0.65,
+          "baseline_n": 60,
+          "flag_rate": 0.133
+        },
+        "visual": {
+          "type": "page",
+          "url": "https://headwind.theintelligence.company/#local-food"
+        },
+        "sources": [
+          {
+            "id": "wfp-food-prices-hdx",
+            "publisher": "World Food Programme, via the Humanitarian Data Exchange (OCHA)",
+            "title": "WFP food prices by market",
+            "url": "https://data.humdata.org/dataset/wfp-food-prices-for-yemen",
+            "licence": "CC BY-IGO",
+            "grade": "B2",
+            "independence_group": "wfp",
+            "source_type": "official or market data",
+            "descriptor": "Monthly retail and wholesale food prices collected by WFP and partners in local markets.",
+            "accessed_at": "2026-11-13T05:26:14Z"
           }
         ]
       }

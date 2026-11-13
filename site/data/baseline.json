@@ -1,0 +1,4521 @@
+{
+  "generated_at": "2026-11-13T05:26:14Z",
+  "source": "World Bank, World Development Indicators (CC BY 4.0)",
+  "lane": {
+    "status": "ok",
+    "fetched_at": "2026-11-13T05:26:14Z",
+    "from_previous": false,
+    "fetches": [
+      {
+        "url": "https://api.worldbank.org/v2/country/all/indicator/FP.CPI.TOTL.ZG?format=json&mrnev=1&per_page=400",
+        "sha256": "c57acdfb017bbb35dcbb6cf9664970bda7024c360563d3653f1317d316cc414d",
+        "bytes": 53747
+      },
+      {
+        "url": "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.KD.ZG?format=json&mrnev=1&per_page=400",
+        "sha256": "b2d0422bd1e01bcd66d849c243fad868325b959f386247e80456cb43f66a1647",
+        "bytes": 54978
+      },
+      {
+        "url": "https://api.worldbank.org/v2/country/all/indicator/SL.UEM.TOTL.ZS?format=json&mrnev=1&per_page=400",
+        "sha256": "f4893c7f71ca792c88a8f5bf6c810d6d80d1af53062419070b08eb26aad82244",
+        "bytes": 57434
+      },
+      {
+        "url": "https://api.worldbank.org/v2/country/all/indicator/GC.DOD.TOTL.GD.ZS?format=json&mrnev=1&per_page=400",
+        "sha256": "dfa5b9daf8558eea139a381eec041421733517a7f40ff59ddd05e3272a94687d",
+        "bytes": 27451
+      },
+      {
+        "url": "https://api.worldbank.org/v2/country/all/indicator/FI.RES.TOTL.MO?format=json&mrnev=1&per_page=400",
+        "sha256": "626baa40f752d9e357646d01a7ec458e66c4ff2b38a1f95b86dcfcad8b5a5b46",
+        "bytes": 50199
+      },
+      {
+        "url": "https://api.worldbank.org/v2/country/all/indicator/BN.CAB.XOKA.GD.ZS?format=json&mrnev=1&per_page=400",
+        "sha256": "0f7e8fef8002359c0b8b7039f81c716f93ccf4c87c0efab08bc5c67ff161b10b",
+        "bytes": 44087
+      }
+    ]
+  },
+  "indicators": {
+    "inflation_pct": "Consumer price inflation, annual %",
+    "gdp_growth_pct": "Real GDP growth, annual %",
+    "unemployment_pct": "Unemployment, % of labour force (modelled ILO estimate)",
+    "central_gov_debt_pct_gdp": "Central government debt, % of GDP",
+    "reserves_months_imports": "Total reserves in months of imports",
+    "current_account_pct_gdp": "Current account balance, % of GDP"
+  },
+  "countries": {
+    "AD": {
+      "gdp_growth_pct": {
+        "value": 3.87,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 39.98,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 19.52,
+        "year": "2025"
+      }
+    },
+    "AE": {
+      "inflation_pct": {
+        "value": 1.25,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.99,
+        "year": "2024"
+      },
+      "unemployment_pct": {
+        "value": 2.17,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.23,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 15.73,
+        "year": "2024"
+      }
+    },
+    "AF": {
+      "inflation_pct": {
+        "value": -6.6,
+        "year": "2024"
+      },
+      "gdp_growth_pct": {
+        "value": 1.87,
+        "year": "2024"
+      },
+      "unemployment_pct": {
+        "value": 13.35,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 16.63,
+        "year": "2020"
+      },
+      "current_account_pct_gdp": {
+        "value": -15.72,
+        "year": "2020"
+      }
+    },
+    "AG": {
+      "inflation_pct": {
+        "value": 1.37,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.0,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.0,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -12.03,
+        "year": "2025"
+      }
+    },
+    "AL": {
+      "inflation_pct": {
+        "value": 2.15,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.79,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 10.93,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 49.96,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 7.21,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.53,
+        "year": "2025"
+      }
+    },
+    "AM": {
+      "inflation_pct": {
+        "value": 3.31,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 7.2,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 12.87,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 47.88,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 3.32,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -8.73,
+        "year": "2025"
+      }
+    },
+    "AO": {
+      "inflation_pct": {
+        "value": 20.16,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.13,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 14.11,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.29,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 0.34,
+        "year": "2025"
+      }
+    },
+    "AR": {
+      "inflation_pct": {
+        "value": 219.88,
+        "year": "2024"
+      },
+      "gdp_growth_pct": {
+        "value": 4.37,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 7.14,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.03,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -1.14,
+        "year": "2025"
+      }
+    },
+    "AS": {
+      "gdp_growth_pct": {
+        "value": 1.74,
+        "year": "2022"
+      }
+    },
+    "AT": {
+      "inflation_pct": {
+        "value": 3.53,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.62,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.58,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.8,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.79,
+        "year": "2025"
+      }
+    },
+    "AU": {
+      "inflation_pct": {
+        "value": 2.87,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.35,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.09,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 57.88,
+        "year": "2022"
+      },
+      "reserves_months_imports": {
+        "value": 1.58,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.77,
+        "year": "2025"
+      }
+    },
+    "AW": {
+      "inflation_pct": {
+        "value": 4.26,
+        "year": "2019"
+      },
+      "gdp_growth_pct": {
+        "value": 6.81,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 5.82,
+        "year": "2023"
+      },
+      "current_account_pct_gdp": {
+        "value": 5.19,
+        "year": "2023"
+      }
+    },
+    "AZ": {
+      "inflation_pct": {
+        "value": 5.62,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.45,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.46,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.95,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 4.58,
+        "year": "2025"
+      }
+    },
+    "BA": {
+      "inflation_pct": {
+        "value": 3.98,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.13,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 11.04,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 39.74,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 6.47,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -4.05,
+        "year": "2025"
+      }
+    },
+    "BB": {
+      "inflation_pct": {
+        "value": 0.85,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.7,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.52,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 125.03,
+        "year": "2016"
+      },
+      "reserves_months_imports": {
+        "value": 1.26,
+        "year": "2017"
+      },
+      "current_account_pct_gdp": {
+        "value": -5.07,
+        "year": "2017"
+      }
+    },
+    "BD": {
+      "inflation_pct": {
+        "value": 8.77,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.49,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.78,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.91,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.04,
+        "year": "2025"
+      }
+    },
+    "BE": {
+      "inflation_pct": {
+        "value": 2.47,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.98,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.91,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.03,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.16,
+        "year": "2025"
+      }
+    },
+    "BF": {
+      "inflation_pct": {
+        "value": -0.59,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.29,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.48,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 64.18,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.97,
+        "year": "2024"
+      }
+    },
+    "BG": {
+      "inflation_pct": {
+        "value": 4.58,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.1,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.54,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 7.16,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -5.84,
+        "year": "2025"
+      }
+    },
+    "BH": {
+      "inflation_pct": {
+        "value": -0.14,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.48,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 1.1,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 111.6,
+        "year": "2020"
+      },
+      "reserves_months_imports": {
+        "value": 1.44,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 5.76,
+        "year": "2025"
+      }
+    },
+    "BI": {
+      "inflation_pct": {
+        "value": 34.13,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.24,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 0.92,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.73,
+        "year": "2023"
+      },
+      "current_account_pct_gdp": {
+        "value": -13.71,
+        "year": "2025"
+      }
+    },
+    "BJ": {
+      "inflation_pct": {
+        "value": 1.1,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 8.07,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 1.59,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -8.18,
+        "year": "2023"
+      }
+    },
+    "BM": {
+      "gdp_growth_pct": {
+        "value": 1.89,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 18.29,
+        "year": "2024"
+      }
+    },
+    "BN": {
+      "inflation_pct": {
+        "value": -0.3,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.67,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.28,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 7.91,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 18.01,
+        "year": "2025"
+      }
+    },
+    "BO": {
+      "inflation_pct": {
+        "value": 19.52,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": -1.58,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.97,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.51,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.71,
+        "year": "2025"
+      }
+    },
+    "BR": {
+      "inflation_pct": {
+        "value": 5.02,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.29,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.97,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 81.86,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 8.42,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.93,
+        "year": "2025"
+      }
+    },
+    "BS": {
+      "inflation_pct": {
+        "value": 1.11,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.38,
+        "year": "2024"
+      },
+      "unemployment_pct": {
+        "value": 9.21,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 71.46,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 3.95,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -6.65,
+        "year": "2024"
+      }
+    },
+    "BT": {
+      "inflation_pct": {
+        "value": 3.56,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 8.01,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.23,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 111.01,
+        "year": "2020"
+      },
+      "reserves_months_imports": {
+        "value": 6.61,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -19.4,
+        "year": "2024"
+      }
+    },
+    "BW": {
+      "inflation_pct": {
+        "value": 2.66,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": -0.73,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 24.48,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 19.75,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 4.71,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 2.93,
+        "year": "2025"
+      }
+    },
+    "BY": {
+      "inflation_pct": {
+        "value": 6.6,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.3,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.38,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 33.24,
+        "year": "2019"
+      },
+      "reserves_months_imports": {
+        "value": 3.03,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -1.23,
+        "year": "2025"
+      }
+    },
+    "BZ": {
+      "inflation_pct": {
+        "value": 1.06,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.75,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.86,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.49,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.77,
+        "year": "2025"
+      }
+    },
+    "CA": {
+      "inflation_pct": {
+        "value": 2.07,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.74,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.91,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 64.13,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 1.6,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.96,
+        "year": "2025"
+      }
+    },
+    "CD": {
+      "inflation_pct": {
+        "value": 2.89,
+        "year": "2016"
+      },
+      "gdp_growth_pct": {
+        "value": 5.76,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.43,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 14.94,
+        "year": "2022"
+      },
+      "reserves_months_imports": {
+        "value": 1.69,
+        "year": "2023"
+      },
+      "current_account_pct_gdp": {
+        "value": -4.33,
+        "year": "2025"
+      }
+    },
+    "CF": {
+      "inflation_pct": {
+        "value": 1.0,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.5,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.25,
+        "year": "2025"
+      }
+    },
+    "CG": {
+      "inflation_pct": {
+        "value": 2.4,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.08,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 19.88,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.6,
+        "year": "2021"
+      },
+      "current_account_pct_gdp": {
+        "value": 11.57,
+        "year": "2021"
+      }
+    },
+    "CH": {
+      "inflation_pct": {
+        "value": 0.15,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.3,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.87,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 22.28,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 13.07,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 6.25,
+        "year": "2025"
+      }
+    },
+    "CI": {
+      "inflation_pct": {
+        "value": 0.13,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.5,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.32,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -4.47,
+        "year": "2024"
+      }
+    },
+    "CL": {
+      "inflation_pct": {
+        "value": 4.21,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.46,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.97,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.22,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -1.22,
+        "year": "2025"
+      }
+    },
+    "CM": {
+      "inflation_pct": {
+        "value": 3.4,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.2,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.6,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.28,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.28,
+        "year": "2024"
+      }
+    },
+    "CN": {
+      "inflation_pct": {
+        "value": 0.06,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.96,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.62,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 11.94,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 3.77,
+        "year": "2025"
+      }
+    },
+    "CO": {
+      "inflation_pct": {
+        "value": 5.14,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.64,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.29,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 71.2,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 7.27,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.41,
+        "year": "2025"
+      }
+    },
+    "CR": {
+      "inflation_pct": {
+        "value": -0.07,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.56,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.84,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.66,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.53,
+        "year": "2025"
+      }
+    },
+    "CU": {
+      "gdp_growth_pct": {
+        "value": -1.06,
+        "year": "2024"
+      },
+      "unemployment_pct": {
+        "value": 1.75,
+        "year": "2025"
+      }
+    },
+    "CV": {
+      "inflation_pct": {
+        "value": 2.34,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.3,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 11.94,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 8.69,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 3.56,
+        "year": "2025"
+      }
+    },
+    "CW": {
+      "inflation_pct": {
+        "value": 2.62,
+        "year": "2019"
+      },
+      "gdp_growth_pct": {
+        "value": 5.03,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -19.95,
+        "year": "2023"
+      }
+    },
+    "CY": {
+      "inflation_pct": {
+        "value": 0.13,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.77,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.92,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.53,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -6.29,
+        "year": "2025"
+      }
+    },
+    "CZ": {
+      "inflation_pct": {
+        "value": 2.46,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.58,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.83,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 7.64,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 0.62,
+        "year": "2025"
+      }
+    },
+    "DE": {
+      "inflation_pct": {
+        "value": 2.17,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.24,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.71,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.11,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 4.45,
+        "year": "2025"
+      }
+    },
+    "DJ": {
+      "inflation_pct": {
+        "value": -0.31,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.5,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 26.02,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.85,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 14.69,
+        "year": "2024"
+      }
+    },
+    "DK": {
+      "inflation_pct": {
+        "value": 1.89,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.93,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.53,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.88,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 12.6,
+        "year": "2025"
+      }
+    },
+    "DM": {
+      "inflation_pct": {
+        "value": 2.53,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.05,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.87,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -37.99,
+        "year": "2025"
+      }
+    },
+    "DO": {
+      "inflation_pct": {
+        "value": 3.87,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.12,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.09,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.97,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -1.37,
+        "year": "2025"
+      }
+    },
+    "DZ": {
+      "inflation_pct": {
+        "value": 1.42,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.82,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 11.63,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 11.63,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -8.81,
+        "year": "2025"
+      }
+    },
+    "EC": {
+      "inflation_pct": {
+        "value": 0.71,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.73,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.31,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 2.84,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 5.86,
+        "year": "2025"
+      }
+    },
+    "EE": {
+      "inflation_pct": {
+        "value": 4.83,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.58,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.31,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.73,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 0.38,
+        "year": "2025"
+      }
+    },
+    "EG": {
+      "inflation_pct": {
+        "value": 14.07,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.39,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.78,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.36,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.82,
+        "year": "2025"
+      }
+    },
+    "ER": {
+      "unemployment_pct": {
+        "value": 5.98,
+        "year": "2025"
+      }
+    },
+    "ES": {
+      "inflation_pct": {
+        "value": 2.67,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.82,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 10.38,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 105.64,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 2.02,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 2.95,
+        "year": "2025"
+      }
+    },
+    "ET": {
+      "inflation_pct": {
+        "value": 13.23,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 9.77,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.32,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 31.45,
+        "year": "2019"
+      },
+      "reserves_months_imports": {
+        "value": 1.78,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.53,
+        "year": "2024"
+      }
+    },
+    "FI": {
+      "inflation_pct": {
+        "value": 0.33,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.17,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 9.46,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.64,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.59,
+        "year": "2025"
+      }
+    },
+    "FJ": {
+      "inflation_pct": {
+        "value": -1.38,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.2,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.35,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.44,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -7.78,
+        "year": "2024"
+      }
+    },
+    "FM": {
+      "inflation_pct": {
+        "value": 5.41,
+        "year": "2022"
+      },
+      "gdp_growth_pct": {
+        "value": 1.06,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 27.8,
+        "year": "2020"
+      }
+    },
+    "FO": {
+      "gdp_growth_pct": {
+        "value": 0.84,
+        "year": "2024"
+      }
+    },
+    "FR": {
+      "inflation_pct": {
+        "value": 0.94,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.84,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 7.54,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.42,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.33,
+        "year": "2025"
+      }
+    },
+    "GA": {
+      "inflation_pct": {
+        "value": 1.77,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.47,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 20.15,
+        "year": "2025"
+      }
+    },
+    "GB": {
+      "inflation_pct": {
+        "value": 3.88,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.39,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.75,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 130.74,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 1.39,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.13,
+        "year": "2025"
+      }
+    },
+    "GD": {
+      "inflation_pct": {
+        "value": 0.61,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.41,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.36,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -23.13,
+        "year": "2025"
+      }
+    },
+    "GE": {
+      "inflation_pct": {
+        "value": 3.87,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 7.46,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 12.1,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 40.1,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 3.02,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.61,
+        "year": "2025"
+      }
+    },
+    "GH": {
+      "inflation_pct": {
+        "value": 14.2,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.95,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.98,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.83,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 8.22,
+        "year": "2025"
+      }
+    },
+    "GL": {
+      "gdp_growth_pct": {
+        "value": 0.87,
+        "year": "2023"
+      }
+    },
+    "GM": {
+      "inflation_pct": {
+        "value": 11.56,
+        "year": "2024"
+      },
+      "gdp_growth_pct": {
+        "value": 5.89,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.52,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.79,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.93,
+        "year": "2025"
+      }
+    },
+    "GN": {
+      "inflation_pct": {
+        "value": 3.57,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 7.45,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.16,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.28,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -1.57,
+        "year": "2024"
+      }
+    },
+    "GQ": {
+      "inflation_pct": {
+        "value": 2.92,
+        "year": "2024"
+      },
+      "gdp_growth_pct": {
+        "value": -5.85,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.34,
+        "year": "2025"
+      }
+    },
+    "GR": {
+      "inflation_pct": {
+        "value": 2.48,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.07,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.54,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 2.04,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -5.61,
+        "year": "2025"
+      }
+    },
+    "GT": {
+      "inflation_pct": {
+        "value": 1.49,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.28,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.6,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 9.26,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 4.72,
+        "year": "2025"
+      }
+    },
+    "GU": {
+      "gdp_growth_pct": {
+        "value": 5.1,
+        "year": "2022"
+      },
+      "unemployment_pct": {
+        "value": 5.57,
+        "year": "2025"
+      }
+    },
+    "GW": {
+      "inflation_pct": {
+        "value": 0.87,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.82,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.67,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -7.36,
+        "year": "2024"
+      }
+    },
+    "GY": {
+      "inflation_pct": {
+        "value": 3.33,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 19.34,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 11.96,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.85,
+        "year": "2023"
+      },
+      "current_account_pct_gdp": {
+        "value": 13.9,
+        "year": "2023"
+      }
+    },
+    "HK": {
+      "inflation_pct": {
+        "value": 1.44,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.49,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.8,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.69,
+        "year": "2023"
+      },
+      "current_account_pct_gdp": {
+        "value": 12.25,
+        "year": "2025"
+      }
+    },
+    "HN": {
+      "inflation_pct": {
+        "value": 4.6,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.75,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.92,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.3,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 2.49,
+        "year": "2025"
+      }
+    },
+    "HR": {
+      "inflation_pct": {
+        "value": 3.69,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.4,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.0,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.79,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.19,
+        "year": "2025"
+      }
+    },
+    "HT": {
+      "inflation_pct": {
+        "value": 28.64,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": -2.71,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 14.94,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 6.77,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.6,
+        "year": "2024"
+      }
+    },
+    "HU": {
+      "inflation_pct": {
+        "value": 4.41,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.51,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.52,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 81.99,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 3.5,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.65,
+        "year": "2025"
+      }
+    },
+    "ID": {
+      "inflation_pct": {
+        "value": 1.91,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.11,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.24,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.51,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.09,
+        "year": "2025"
+      }
+    },
+    "IE": {
+      "inflation_pct": {
+        "value": 2.21,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 12.34,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.63,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.13,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 6.27,
+        "year": "2025"
+      }
+    },
+    "IL": {
+      "inflation_pct": {
+        "value": 3.04,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.93,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.49,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 14.36,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 2.02,
+        "year": "2025"
+      }
+    },
+    "IM": {
+      "gdp_growth_pct": {
+        "value": -2.04,
+        "year": "2023"
+      }
+    },
+    "IN": {
+      "inflation_pct": {
+        "value": 2.4,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 7.57,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.22,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 46.52,
+        "year": "2018"
+      },
+      "reserves_months_imports": {
+        "value": 7.85,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.51,
+        "year": "2025"
+      }
+    },
+    "IQ": {
+      "inflation_pct": {
+        "value": 0.3,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": -2.16,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 15.48,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 27.44,
+        "year": "2018"
+      },
+      "reserves_months_imports": {
+        "value": 11.6,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.94,
+        "year": "2025"
+      }
+    },
+    "IR": {
+      "inflation_pct": {
+        "value": 42.17,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": -2.83,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.3,
+        "year": "2025"
+      }
+    },
+    "IS": {
+      "inflation_pct": {
+        "value": 4.09,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.28,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.62,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 80.09,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 5.3,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.88,
+        "year": "2025"
+      }
+    },
+    "IT": {
+      "inflation_pct": {
+        "value": 1.53,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.54,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.39,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.67,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.15,
+        "year": "2025"
+      }
+    },
+    "JM": {
+      "inflation_pct": {
+        "value": 4.0,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.08,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.29,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 97.87,
+        "year": "2020"
+      },
+      "reserves_months_imports": {
+        "value": 7.1,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.48,
+        "year": "2025"
+      }
+    },
+    "JO": {
+      "inflation_pct": {
+        "value": 1.77,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.83,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 16.54,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 93.62,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 7.79,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -5.33,
+        "year": "2024"
+      }
+    },
+    "JP": {
+      "inflation_pct": {
+        "value": 3.17,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.19,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.45,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 14.01,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 4.86,
+        "year": "2025"
+      }
+    },
+    "KE": {
+      "inflation_pct": {
+        "value": 4.07,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.63,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.45,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.63,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.12,
+        "year": "2025"
+      }
+    },
+    "KG": {
+      "inflation_pct": {
+        "value": 8.21,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 11.1,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.53,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 38.72,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 3.95,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -22.64,
+        "year": "2024"
+      }
+    },
+    "KH": {
+      "inflation_pct": {
+        "value": 2.35,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.35,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 0.26,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 50.34,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 7.91,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.72,
+        "year": "2025"
+      }
+    },
+    "KI": {
+      "inflation_pct": {
+        "value": 6.51,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.22,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -15.23,
+        "year": "2025"
+      }
+    },
+    "KM": {
+      "inflation_pct": {
+        "value": 3.25,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.75,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.82,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 7.61,
+        "year": "2023"
+      },
+      "current_account_pct_gdp": {
+        "value": -1.68,
+        "year": "2023"
+      }
+    },
+    "KN": {
+      "inflation_pct": {
+        "value": 3.56,
+        "year": "2023"
+      },
+      "gdp_growth_pct": {
+        "value": 2.69,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.44,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -13.71,
+        "year": "2025"
+      }
+    },
+    "KP": {
+      "unemployment_pct": {
+        "value": 3.54,
+        "year": "2025"
+      }
+    },
+    "KR": {
+      "inflation_pct": {
+        "value": 2.12,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.01,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.68,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 47.81,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 6.46,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 6.57,
+        "year": "2025"
+      }
+    },
+    "KW": {
+      "inflation_pct": {
+        "value": 2.36,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.73,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.18,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 8.41,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 22.7,
+        "year": "2025"
+      }
+    },
+    "KY": {
+      "inflation_pct": {
+        "value": -0.63,
+        "year": "2016"
+      },
+      "gdp_growth_pct": {
+        "value": 3.76,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 0.26,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -8.84,
+        "year": "2024"
+      }
+    },
+    "KZ": {
+      "inflation_pct": {
+        "value": 11.38,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.5,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.77,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 20.89,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 7.39,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -4.07,
+        "year": "2025"
+      }
+    },
+    "LA": {
+      "inflation_pct": {
+        "value": 7.74,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.54,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 1.19,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.43,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 11.07,
+        "year": "2025"
+      }
+    },
+    "LB": {
+      "inflation_pct": {
+        "value": 14.6,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": -7.08,
+        "year": "2024"
+      },
+      "unemployment_pct": {
+        "value": 10.98,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 13.6,
+        "year": "2023"
+      },
+      "current_account_pct_gdp": {
+        "value": -28.1,
+        "year": "2023"
+      }
+    },
+    "LC": {
+      "inflation_pct": {
+        "value": 2.03,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": -0.57,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 9.45,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 2.99,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -6.26,
+        "year": "2025"
+      }
+    },
+    "LK": {
+      "inflation_pct": {
+        "value": -4.76,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.95,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.0,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 2.87,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.58,
+        "year": "2025"
+      }
+    },
+    "LR": {
+      "inflation_pct": {
+        "value": 8.32,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.02,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.88,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 2.02,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 2.51,
+        "year": "2024"
+      }
+    },
+    "LS": {
+      "inflation_pct": {
+        "value": 4.27,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.98,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 16.32,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 2.99,
+        "year": "2020"
+      },
+      "reserves_months_imports": {
+        "value": 5.53,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 0.05,
+        "year": "2025"
+      }
+    },
+    "LT": {
+      "inflation_pct": {
+        "value": 3.79,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.92,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.73,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.17,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 0.94,
+        "year": "2025"
+      }
+    },
+    "LU": {
+      "inflation_pct": {
+        "value": 2.26,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.64,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.34,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.06,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 0.58,
+        "year": "2025"
+      }
+    },
+    "LV": {
+      "inflation_pct": {
+        "value": 3.75,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.14,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.57,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 2.01,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -5.27,
+        "year": "2025"
+      }
+    },
+    "LY": {
+      "inflation_pct": {
+        "value": 1.84,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 13.37,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 18.76,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 31.57,
+        "year": "2023"
+      },
+      "current_account_pct_gdp": {
+        "value": 4.24,
+        "year": "2023"
+      }
+    },
+    "MA": {
+      "inflation_pct": {
+        "value": 0.7,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.6,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 9.0,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.93,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.5,
+        "year": "2025"
+      }
+    },
+    "MC": {
+      "gdp_growth_pct": {
+        "value": 8.51,
+        "year": "2024"
+      }
+    },
+    "MD": {
+      "inflation_pct": {
+        "value": 7.76,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.42,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 1.5,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 37.48,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 5.4,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -19.64,
+        "year": "2025"
+      }
+    },
+    "ME": {
+      "inflation_pct": {
+        "value": 3.9,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.74,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 13.57,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.95,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -20.38,
+        "year": "2025"
+      }
+    },
+    "MF": {
+      "gdp_growth_pct": {
+        "value": 4.9,
+        "year": "2021"
+      }
+    },
+    "MG": {
+      "inflation_pct": {
+        "value": 8.05,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.0,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.04,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.55,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -5.2,
+        "year": "2025"
+      }
+    },
+    "MH": {
+      "gdp_growth_pct": {
+        "value": 2.28,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 41.56,
+        "year": "2019"
+      },
+      "current_account_pct_gdp": {
+        "value": 21.87,
+        "year": "2024"
+      }
+    },
+    "MK": {
+      "inflation_pct": {
+        "value": 4.07,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.49,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 12.26,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.57,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -4.27,
+        "year": "2025"
+      }
+    },
+    "ML": {
+      "inflation_pct": {
+        "value": 3.28,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.6,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.83,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -4.33,
+        "year": "2024"
+      }
+    },
+    "MM": {
+      "inflation_pct": {
+        "value": 8.83,
+        "year": "2019"
+      },
+      "gdp_growth_pct": {
+        "value": -2.01,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.05,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.29,
+        "year": "2019"
+      },
+      "current_account_pct_gdp": {
+        "value": 0.09,
+        "year": "2019"
+      }
+    },
+    "MN": {
+      "inflation_pct": {
+        "value": 8.61,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.84,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.23,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 43.34,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 4.15,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -8.36,
+        "year": "2025"
+      }
+    },
+    "MO": {
+      "inflation_pct": {
+        "value": 0.33,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.67,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.35,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 10.06,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 39.6,
+        "year": "2025"
+      }
+    },
+    "MP": {
+      "gdp_growth_pct": {
+        "value": 16.64,
+        "year": "2022"
+      }
+    },
+    "MR": {
+      "inflation_pct": {
+        "value": 1.55,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.03,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 10.32,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.41,
+        "year": "2021"
+      },
+      "current_account_pct_gdp": {
+        "value": -9.55,
+        "year": "2024"
+      }
+    },
+    "MT": {
+      "inflation_pct": {
+        "value": 2.36,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.96,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.9,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.25,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 7.1,
+        "year": "2024"
+      }
+    },
+    "MU": {
+      "inflation_pct": {
+        "value": 3.67,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.15,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.63,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 57.13,
+        "year": "2019"
+      },
+      "reserves_months_imports": {
+        "value": 5.16,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -7.03,
+        "year": "2024"
+      }
+    },
+    "MV": {
+      "inflation_pct": {
+        "value": 4.01,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.31,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.51,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.93,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -6.15,
+        "year": "2025"
+      }
+    },
+    "MW": {
+      "inflation_pct": {
+        "value": 28.37,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.89,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.07,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 61.81,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 1.91,
+        "year": "2020"
+      },
+      "current_account_pct_gdp": {
+        "value": -13.95,
+        "year": "2025"
+      }
+    },
+    "MX": {
+      "inflation_pct": {
+        "value": 3.81,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.56,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.67,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 50.27,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 3.73,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.51,
+        "year": "2025"
+      }
+    },
+    "MY": {
+      "inflation_pct": {
+        "value": 1.38,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.17,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.76,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 64.57,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 4.28,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.61,
+        "year": "2025"
+      }
+    },
+    "MZ": {
+      "inflation_pct": {
+        "value": 4.37,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": -0.52,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.63,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 71.77,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 3.44,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -14.24,
+        "year": "2025"
+      }
+    },
+    "NA": {
+      "inflation_pct": {
+        "value": 3.51,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.73,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 19.29,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.96,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -13.41,
+        "year": "2024"
+      }
+    },
+    "NC": {
+      "inflation_pct": {
+        "value": 0.58,
+        "year": "2016"
+      },
+      "gdp_growth_pct": {
+        "value": -13.5,
+        "year": "2024"
+      },
+      "unemployment_pct": {
+        "value": 11.17,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -7.5,
+        "year": "2016"
+      }
+    },
+    "NE": {
+      "inflation_pct": {
+        "value": -4.45,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 7.01,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 0.39,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -6.09,
+        "year": "2024"
+      }
+    },
+    "NG": {
+      "inflation_pct": {
+        "value": 23.01,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.01,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.06,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 7.12,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 4.83,
+        "year": "2025"
+      }
+    },
+    "NI": {
+      "inflation_pct": {
+        "value": 2.08,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.92,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.04,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.72,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 4.15,
+        "year": "2024"
+      }
+    },
+    "NL": {
+      "inflation_pct": {
+        "value": 3.2,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.78,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.87,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.01,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 7.58,
+        "year": "2025"
+      }
+    },
+    "NO": {
+      "inflation_pct": {
+        "value": 3.04,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.09,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.64,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.36,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 14.09,
+        "year": "2025"
+      }
+    },
+    "NP": {
+      "inflation_pct": {
+        "value": 2.65,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.43,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 10.46,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 39.92,
+        "year": "2021"
+      },
+      "reserves_months_imports": {
+        "value": 15.52,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 10.67,
+        "year": "2025"
+      }
+    },
+    "NR": {
+      "gdp_growth_pct": {
+        "value": 2.14,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 5.8,
+        "year": "2024"
+      }
+    },
+    "NZ": {
+      "inflation_pct": {
+        "value": 2.84,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.46,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.08,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 51.99,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 3.91,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.54,
+        "year": "2025"
+      }
+    },
+    "OM": {
+      "inflation_pct": {
+        "value": 0.97,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.4,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.25,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.74,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -1.09,
+        "year": "2025"
+      }
+    },
+    "PA": {
+      "inflation_pct": {
+        "value": -0.19,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.35,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.36,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.74,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.19,
+        "year": "2025"
+      }
+    },
+    "PE": {
+      "inflation_pct": {
+        "value": 1.53,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.43,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.12,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 35.24,
+        "year": "2021"
+      },
+      "reserves_months_imports": {
+        "value": 10.42,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 3.58,
+        "year": "2025"
+      }
+    },
+    "PF": {
+      "gdp_growth_pct": {
+        "value": 1.13,
+        "year": "2024"
+      },
+      "unemployment_pct": {
+        "value": 11.66,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 7.49,
+        "year": "2016"
+      }
+    },
+    "PG": {
+      "inflation_pct": {
+        "value": 4.42,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.64,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.57,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 52.01,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 4.9,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 15.48,
+        "year": "2024"
+      }
+    },
+    "PH": {
+      "inflation_pct": {
+        "value": 1.66,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.4,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.23,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 7.31,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.46,
+        "year": "2025"
+      }
+    },
+    "PK": {
+      "inflation_pct": {
+        "value": 3.55,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.7,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.42,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.76,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.11,
+        "year": "2025"
+      }
+    },
+    "PL": {
+      "inflation_pct": {
+        "value": 3.81,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.57,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.98,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.86,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.95,
+        "year": "2025"
+      }
+    },
+    "PR": {
+      "gdp_growth_pct": {
+        "value": 0.32,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.99,
+        "year": "2025"
+      }
+    },
+    "PS": {
+      "inflation_pct": {
+        "value": 9.81,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.34,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 24.42,
+        "year": "2022"
+      },
+      "reserves_months_imports": {
+        "value": 2.35,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -15.82,
+        "year": "2025"
+      }
+    },
+    "PT": {
+      "inflation_pct": {
+        "value": 2.34,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.86,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.16,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.73,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.19,
+        "year": "2025"
+      }
+    },
+    "PW": {
+      "inflation_pct": {
+        "value": -0.42,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.29,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 85.2,
+        "year": "2019"
+      },
+      "current_account_pct_gdp": {
+        "value": -48.61,
+        "year": "2023"
+      }
+    },
+    "PY": {
+      "inflation_pct": {
+        "value": 4.04,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.64,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.8,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.55,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.53,
+        "year": "2025"
+      }
+    },
+    "QA": {
+      "inflation_pct": {
+        "value": 1.27,
+        "year": "2024"
+      },
+      "gdp_growth_pct": {
+        "value": 2.9,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 0.13,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 7.45,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 14.81,
+        "year": "2025"
+      }
+    },
+    "RO": {
+      "inflation_pct": {
+        "value": 7.19,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.68,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.99,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.53,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -7.9,
+        "year": "2025"
+      }
+    },
+    "RS": {
+      "inflation_pct": {
+        "value": 3.89,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.03,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 7.12,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 6.16,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -4.9,
+        "year": "2025"
+      }
+    },
+    "RU": {
+      "inflation_pct": {
+        "value": 8.72,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.0,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.13,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 17.85,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 16.78,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.52,
+        "year": "2025"
+      }
+    },
+    "RW": {
+      "inflation_pct": {
+        "value": 5.91,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 9.38,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 11.36,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.18,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -11.96,
+        "year": "2024"
+      }
+    },
+    "SA": {
+      "inflation_pct": {
+        "value": 2.04,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.5,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.04,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 15.59,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.56,
+        "year": "2025"
+      }
+    },
+    "SB": {
+      "inflation_pct": {
+        "value": 3.36,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.62,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 1.43,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 26.04,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 8.9,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -4.18,
+        "year": "2024"
+      }
+    },
+    "SC": {
+      "inflation_pct": {
+        "value": 0.3,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.8,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.67,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -5.66,
+        "year": "2025"
+      }
+    },
+    "SD": {
+      "inflation_pct": {
+        "value": 138.81,
+        "year": "2022"
+      },
+      "gdp_growth_pct": {
+        "value": 3.06,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 7.53,
+        "year": "2022"
+      },
+      "reserves_months_imports": {
+        "value": 0.19,
+        "year": "2017"
+      },
+      "current_account_pct_gdp": {
+        "value": -8.46,
+        "year": "2025"
+      }
+    },
+    "SE": {
+      "inflation_pct": {
+        "value": 0.68,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.54,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.69,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 2.16,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 6.8,
+        "year": "2025"
+      }
+    },
+    "SG": {
+      "inflation_pct": {
+        "value": 0.9,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.03,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.82,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 167.8,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 4.39,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 16.71,
+        "year": "2025"
+      }
+    },
+    "SI": {
+      "inflation_pct": {
+        "value": 2.37,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.06,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.17,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.68,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 3.55,
+        "year": "2025"
+      }
+    },
+    "SK": {
+      "inflation_pct": {
+        "value": 4.0,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.81,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.36,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.54,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.63,
+        "year": "2025"
+      }
+    },
+    "SL": {
+      "inflation_pct": {
+        "value": 7.49,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.61,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.15,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.75,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -14.12,
+        "year": "2024"
+      }
+    },
+    "SM": {
+      "inflation_pct": {
+        "value": 2.3,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 0.4,
+        "year": "2023"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 99.87,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 2.58,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 21.99,
+        "year": "2023"
+      }
+    },
+    "SN": {
+      "inflation_pct": {
+        "value": 1.46,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.68,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.73,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -19.78,
+        "year": "2023"
+      }
+    },
+    "SO": {
+      "gdp_growth_pct": {
+        "value": 2.99,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 18.95,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 12.66,
+        "year": "2024"
+      }
+    },
+    "SR": {
+      "inflation_pct": {
+        "value": 9.21,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.79,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 7.83,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.29,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -55.27,
+        "year": "2025"
+      }
+    },
+    "SS": {
+      "inflation_pct": {
+        "value": 91.44,
+        "year": "2024"
+      },
+      "unemployment_pct": {
+        "value": 12.37,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 0.17,
+        "year": "2023"
+      },
+      "current_account_pct_gdp": {
+        "value": 7.93,
+        "year": "2023"
+      }
+    },
+    "ST": {
+      "inflation_pct": {
+        "value": 11.05,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.03,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 9.13,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 2.72,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -9.33,
+        "year": "2025"
+      }
+    },
+    "SV": {
+      "inflation_pct": {
+        "value": 0.26,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.91,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.3,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 107.28,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 2.45,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.54,
+        "year": "2025"
+      }
+    },
+    "SX": {
+      "inflation_pct": {
+        "value": 2.19,
+        "year": "2017"
+      },
+      "gdp_growth_pct": {
+        "value": 3.4,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -6.92,
+        "year": "2023"
+      }
+    },
+    "SY": {
+      "inflation_pct": {
+        "value": 13.42,
+        "year": "2019"
+      },
+      "gdp_growth_pct": {
+        "value": -0.2,
+        "year": "2022"
+      },
+      "unemployment_pct": {
+        "value": 13.57,
+        "year": "2025"
+      }
+    },
+    "SZ": {
+      "inflation_pct": {
+        "value": 2.6,
+        "year": "2019"
+      },
+      "gdp_growth_pct": {
+        "value": 4.19,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 34.2,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 35.72,
+        "year": "2021"
+      },
+      "reserves_months_imports": {
+        "value": 1.91,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 2.38,
+        "year": "2025"
+      }
+    },
+    "TC": {
+      "gdp_growth_pct": {
+        "value": 5.64,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 13.14,
+        "year": "2018"
+      }
+    },
+    "TD": {
+      "inflation_pct": {
+        "value": -3.91,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.59,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 1.06,
+        "year": "2025"
+      }
+    },
+    "TG": {
+      "inflation_pct": {
+        "value": 0.43,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.31,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.0,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.28,
+        "year": "2020"
+      }
+    },
+    "TH": {
+      "inflation_pct": {
+        "value": -0.13,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.44,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 0.78,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 61.86,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 8.05,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 3.02,
+        "year": "2025"
+      }
+    },
+    "TJ": {
+      "inflation_pct": {
+        "value": 3.39,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 8.4,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 6.93,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.75,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 17.1,
+        "year": "2025"
+      }
+    },
+    "TL": {
+      "inflation_pct": {
+        "value": 0.43,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.98,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 1.59,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.76,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -36.87,
+        "year": "2025"
+      }
+    },
+    "TM": {
+      "gdp_growth_pct": {
+        "value": 6.3,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.27,
+        "year": "2025"
+      }
+    },
+    "TN": {
+      "inflation_pct": {
+        "value": 5.15,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.49,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 15.11,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.5,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -2.32,
+        "year": "2025"
+      }
+    },
+    "TO": {
+      "inflation_pct": {
+        "value": 5.59,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 2.8,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.01,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 43.08,
+        "year": "2020"
+      },
+      "reserves_months_imports": {
+        "value": 10.98,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -4.41,
+        "year": "2025"
+      }
+    },
+    "TR": {
+      "inflation_pct": {
+        "value": 34.88,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.6,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 8.52,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 25.51,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 5.13,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -1.9,
+        "year": "2025"
+      }
+    },
+    "TT": {
+      "inflation_pct": {
+        "value": 0.99,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": -0.79,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 3.33,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.5,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 4.95,
+        "year": "2025"
+      }
+    },
+    "TV": {
+      "gdp_growth_pct": {
+        "value": 1.64,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 40.03,
+        "year": "2023"
+      }
+    },
+    "TZ": {
+      "inflation_pct": {
+        "value": 3.33,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 5.85,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 1.57,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 5.39,
+        "year": "2018"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.0,
+        "year": "2024"
+      }
+    },
+    "UA": {
+      "inflation_pct": {
+        "value": 12.73,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.82,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 9.83,
+        "year": "2021"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 58.72,
+        "year": "2020"
+      },
+      "reserves_months_imports": {
+        "value": 5.79,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -13.46,
+        "year": "2025"
+      }
+    },
+    "UG": {
+      "inflation_pct": {
+        "value": 3.58,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 6.33,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 2.75,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 54.43,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 2.35,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -5.16,
+        "year": "2025"
+      }
+    },
+    "US": {
+      "inflation_pct": {
+        "value": 2.95,
+        "year": "2024"
+      },
+      "gdp_growth_pct": {
+        "value": 2.16,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.2,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 115.79,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 2.8,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.83,
+        "year": "2025"
+      }
+    },
+    "UY": {
+      "inflation_pct": {
+        "value": 4.65,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.78,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 7.52,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 65.31,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 8.63,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.48,
+        "year": "2025"
+      }
+    },
+    "UZ": {
+      "inflation_pct": {
+        "value": 8.8,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 7.7,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 4.62,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 13.59,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -3.91,
+        "year": "2025"
+      }
+    },
+    "VC": {
+      "inflation_pct": {
+        "value": 0.82,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.39,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 18.0,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 4.75,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -16.07,
+        "year": "2025"
+      }
+    },
+    "VE": {
+      "inflation_pct": {
+        "value": 254.95,
+        "year": "2016"
+      },
+      "gdp_growth_pct": {
+        "value": 1.57,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.31,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 3.65,
+        "year": "2016"
+      },
+      "current_account_pct_gdp": {
+        "value": 0.57,
+        "year": "2025"
+      }
+    },
+    "VI": {
+      "gdp_growth_pct": {
+        "value": -1.31,
+        "year": "2022"
+      },
+      "unemployment_pct": {
+        "value": 11.44,
+        "year": "2025"
+      }
+    },
+    "VN": {
+      "inflation_pct": {
+        "value": 3.31,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 8.02,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 1.52,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 2.08,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 6.44,
+        "year": "2025"
+      }
+    },
+    "VU": {
+      "inflation_pct": {
+        "value": 0.66,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.05,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.07,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 67.93,
+        "year": "2023"
+      },
+      "reserves_months_imports": {
+        "value": 12.6,
+        "year": "2022"
+      },
+      "current_account_pct_gdp": {
+        "value": -11.06,
+        "year": "2022"
+      }
+    },
+    "WS": {
+      "inflation_pct": {
+        "value": 2.21,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 4.2,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.0,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 12.37,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": 6.93,
+        "year": "2025"
+      }
+    },
+    "XK": {
+      "inflation_pct": {
+        "value": 3.86,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.59,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.82,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -8.1,
+        "year": "2025"
+      }
+    },
+    "YE": {
+      "gdp_growth_pct": {
+        "value": 0.75,
+        "year": "2018"
+      },
+      "unemployment_pct": {
+        "value": 17.32,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 1.22,
+        "year": "2016"
+      },
+      "current_account_pct_gdp": {
+        "value": -7.72,
+        "year": "2016"
+      }
+    },
+    "ZA": {
+      "inflation_pct": {
+        "value": 3.21,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 1.11,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 32.39,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 82.76,
+        "year": "2024"
+      },
+      "reserves_months_imports": {
+        "value": 6.22,
+        "year": "2025"
+      },
+      "current_account_pct_gdp": {
+        "value": -0.42,
+        "year": "2025"
+      }
+    },
+    "ZM": {
+      "inflation_pct": {
+        "value": 13.91,
+        "year": "2025"
+      },
+      "gdp_growth_pct": {
+        "value": 3.76,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 5.92,
+        "year": "2025"
+      },
+      "central_gov_debt_pct_gdp": {
+        "value": 71.41,
+        "year": "2021"
+      },
+      "reserves_months_imports": {
+        "value": 3.29,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": -5.46,
+        "year": "2025"
+      }
+    },
+    "ZW": {
+      "inflation_pct": {
+        "value": 104.71,
+        "year": "2022"
+      },
+      "gdp_growth_pct": {
+        "value": 8.11,
+        "year": "2025"
+      },
+      "unemployment_pct": {
+        "value": 9.29,
+        "year": "2025"
+      },
+      "reserves_months_imports": {
+        "value": 0.52,
+        "year": "2024"
+      },
+      "current_account_pct_gdp": {
+        "value": 1.21,
+        "year": "2024"
+      }
+    }
+  }
+}

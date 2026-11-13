@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Headwind — Sanctions Deltas, Export Controls &amp; Commodities</title>
-<meta name="description" content="OFAC SDN shadow-fleet designations, BIS/USTR Federal Register rule deadlines, and FAO/IGC commodity benchmarks.">
+<title>Headwind: economic stress</title>
+<meta name="description" content="Currencies, energy and food prices measured against their own normal range, with the dates of coming economic decisions. Measurements, not investment advice.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,49 +13,75 @@
     <div class="brand"><strong>Headwind</strong><span class="muted">The Intelligence Company</span></div>
     <nav class="top-nav">
       <a href="https://theintelligence.company/">All programs</a>
-      <a href="data/feed.geojson">Contract v2 Feed</a>
-      <a href="data/events.json">Verdict Events JSON</a>
+      <a href="data/feed.geojson">Feed</a>
+      <a href="data/events.json">Calendar</a>
+      <a href="data/baseline.json">Country baselines</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
   <section class="hero">
-    <h1>Sanctions deltas, export-control deadlines, and strategic commodities.</h1>
-    <p class="lede">Tracks OFAC SDN entity and shadow-fleet vessel designations (cross-linked by MMSI to Wake), BIS/USTR
-      Federal Register stay expirations, and global food/grain benchmarks (FAO FFPI, IGC GOI).</p>
+    <h1>Economic stress, measured against its own normal.</h1>
+    <p class="lede">Each currency, energy price and food price is compared with its own past changes. An item is marked
+      unusual only when the move is far outside that range. These are measurements, not forecasts and not investment
+      advice.</p>
+    <p class="small muted" id="asof" aria-live="polite">Loading…</p>
     <div class="tiles" id="tiles" aria-live="polite"></div>
   </section>
 
-  <section class="card" aria-labelledby="san-h">
-    <div class="card-head">
-      <h2 id="san-h">OFAC SDN &amp; Shadow-Fleet Designations</h2>
-      <p class="muted small">Recent entity and tanker (IMO/MMSI) additions.</p>
-    </div>
-    <div id="sanctions"></div>
+  <section class="card" aria-labelledby="an-h">
+    <div class="card-head"><h2 id="an-h">Outside the normal range</h2>
+      <p class="muted small">Robust z of 3.5 or more against the series' own history, and a move above the lane's floor.</p></div>
+    <div id="anomalies"></div>
   </section>
 
   <div class="two">
-    <section class="card" aria-labelledby="ctl-h">
-      <div class="card-head">
-        <h2 id="ctl-h">Export Controls &amp; Rule Deadlines (Federal Register)</h2>
-        <p class="muted small">Exported to Verdict's event calendar via <code>data/events.json</code>.</p>
-      </div>
-      <div id="controls"></div>
+    <section class="card" id="fx" aria-labelledby="fx-h">
+      <div class="card-head"><h2 id="fx-h">Currencies against the US dollar</h2>
+        <p class="muted small">Five business days. ECB reference rates, which cover about 30 currencies and not the rouble.</p></div>
+      <div class="scroll"><table id="fx-table"></table></div>
     </section>
+    <div>
+      <section class="card" id="energy" aria-labelledby="en-h">
+        <div class="card-head"><h2 id="en-h">Energy</h2>
+          <p class="muted small">Five trading days. EIA spot prices, a day or two behind.</p></div>
+        <div class="scroll"><table id="energy-table"></table></div>
+      </section>
+      <section class="card" id="food" aria-labelledby="fd-h">
+        <div class="card-head"><h2 id="fd-h">FAO food price indices</h2>
+          <p class="muted small">Change on the month; 2014–2016 = 100. FAO revises earlier months.</p></div>
+        <div class="scroll"><table id="fao-table"></table></div>
+      </section>
+    </div>
+  </div>
 
-    <section class="card" aria-labelledby="com-h">
-      <div class="card-head">
-        <h2 id="com-h">Strategic Commodity Benchmarks (FAO / IGC)</h2>
-        <p class="muted small">Monthly and daily food/grain indices.</p>
-      </div>
-      <div id="commodities"></div>
+  <section class="card" id="local-food" aria-labelledby="lf-h">
+    <div class="card-head"><h2 id="lf-h">Local food prices in watched countries</h2>
+      <p class="muted small">Median three-month change across each country's market price series. Nominal prices in local
+        currency, from WFP. Data arrives one to three months late.</p></div>
+    <div class="scroll"><table id="wfp-table"></table></div>
+    <p class="small muted" id="wfp-missing"></p>
+  </section>
+
+  <div class="two">
+    <section class="card" aria-labelledby="cal-h">
+      <div class="card-head"><h2 id="cal-h">Coming dates</h2>
+        <p class="muted small">From the publishers' own schedules. US inflation and jobs dates are not covered yet.</p></div>
+      <div id="calendar"></div>
+    </section>
+    <section class="card" aria-labelledby="src-h">
+      <div class="card-head"><h2 id="src-h">Sources and their state</h2>
+        <p class="muted small">A source that failed shows its last good copy and says so.</p></div>
+      <div id="lanes"></div>
     </section>
   </div>
 </main>
 
 <footer class="wrap foot small muted">
-  <p>Headwind (`headwind-1.0`) — A project of The Intelligence Company. Sources: US Treasury OFAC, US Federal Register (BIS/USTR), FAO, IGC.</p>
+  <p>Headwind, a project of The Intelligence Company. Data: European Central Bank; US Energy Information
+    Administration via FRED; FAO (CC BY-NC-SA 3.0 IGO); World Food Programme via the Humanitarian Data Exchange
+    (CC BY-IGO); World Bank (CC BY 4.0); Federal Reserve. Not investment advice.</p>
 </footer>
 <script src="app.js"></script>
 </body>

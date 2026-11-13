@@ -1,6 +1,6 @@
 {
   "program": "headwind",
-  "version": "1.0",
+  "version": "1.1",
   "sources": [
     {
       "id": "ofac-sdn",
@@ -30,13 +30,58 @@
       "independence_group": "fao"
     },
     {
-      "id": "igc-goi",
-      "name": "International Grains Council — Grains and Oilseeds Index (GOI)",
-      "url": "https://igc.int/en/public-site/markets/marketinfo-goi.aspx",
-      "licence": "IGC public market terms",
+      "id": "ecb-eurofxref",
+      "name": "European Central Bank euro foreign exchange reference rates",
+      "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+      "licence": "ECB statistics: free reuse with the source credited",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "ecb"
+    },
+    {
+      "id": "eia-spot-fred",
+      "name": "US EIA daily spot prices (Brent, WTI, Henry Hub), retrieved from FRED",
+      "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+      "licence": "US public domain (EIA); citation requested",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "us-eia"
+    },
+    {
+      "id": "wfp-food-prices-hdx",
+      "name": "WFP food prices by market, via the Humanitarian Data Exchange",
+      "url": "https://data.humdata.org/organization/wfp",
+      "licence": "CC BY-IGO",
+      "use": "ingest",
+      "grade": "B2",
+      "independence_group": "wfp"
+    },
+    {
+      "id": "worldbank-wdi",
+      "name": "World Bank World Development Indicators API",
+      "url": "https://api.worldbank.org/v2/",
+      "licence": "CC BY 4.0",
       "use": "ingest",
       "grade": "A2",
-      "independence_group": "igc"
+      "independence_group": "world-bank"
+    },
+    {
+      "id": "fed-fomc-calendar",
+      "name": "Federal Reserve FOMC meeting calendar",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "licence": "US public domain",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "us-federal-reserve"
+    },
+    {
+      "id": "ecb-calendar",
+      "name": "ECB Governing Council meeting calendar",
+      "url": "https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html",
+      "licence": "ECB website: free reuse with the source credited",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "ecb"
     }
   ]
 }
