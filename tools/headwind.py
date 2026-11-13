@@ -263,7 +263,36 @@ def collect(root: Path = ROOT, getter=None, only: list[str] | None = None) -> di
     return snap
 
 
-def build_site(root: Path = ROOT, snapshot: dict | None = None) -> dict[str, str]:
+# What a run needs from the run before: the working snapshot (last good copies, FAO vintages, the WFP cache
+# markers) and the two list indexes. A scheduled run has no disk of its own, so the build publishes these under
+# site/data/state/ and the next run reads them back with `restore`.
+STATE_FILES = {"snapshot.json": "data/state/snapshot.json",
+               "state/sanctions_index.json": "data/state/sanctions_index.json",
+               "state/screening_index.json": "data/state/screening_index.json"}
+
+
+def restore(root: Path = ROOT, base_url: str = "", getter=None) -> dict[str, str]:
+    """Fetch the last run's state from a published site into data/. A file already on disk is left
+    alone; a file that is missing or is not JSON is skipped, and that lane starts from a first reading."""
+    out = {}
+    for local, published in STATE_FILES.items():
+        dest = root / "data" / local
+        if dest.exists():
+            out[local] = "kept the copy on disk"
+            continue
+        try:
+            body = (getter or fetch.get)(base_url.rstrip("/") + "/" + published, 120)
+            json.loads(body)
+        except Exception as exc:
+            out[local] = f"not restored ({type(exc).__name__})"
+            continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(body)
+        out[local] = f"restored, {len(body)} bytes"
+    return out
+
+
+def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: bool = False) -> dict[str, str]:
     snap_path = root / "data" / "snapshot.json"
     if snapshot is None:
         if not snap_path.exists():
@@ -300,6 +329,11 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None) -> dict[str, str
         "data/question_drafts.json": dump({"note": "Drafts only. Nothing here is registered in Verdict.",
                                            "drafts": snap.get("question_drafts") or []}),
     }
+    if publish_state:
+        for local, published in STATE_FILES.items():
+            p = root / "data" / local
+            if p.exists():
+                files[published] = p.read_text(encoding="utf-8")
     src_dir = root / "site_src"
     if src_dir.exists():
         for p in sorted(src_dir.rglob("*")):
@@ -335,7 +369,11 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("collect")
     c.add_argument("--only", nargs="*", choices=sorted(LANES), help="run only these lanes; keep the rest as they were")
-    sub.add_parser("build")
+    b = sub.add_parser("build")
+    b.add_argument("--publish-state", action="store_true",
+                   help="also write data/state/ into site/, for a scheduled run to restore from")
+    r = sub.add_parser("restore")
+    r.add_argument("--from", dest="base_url", required=True, help="the published site to read the last state from")
     sub.add_parser("check")
     args = ap.parse_args(argv)
 
@@ -354,8 +392,12 @@ def main(argv=None) -> int:
               f"{len((snap.get('minerals') or {}).get('reliance') or [])} mineral commodities.")
         return 0 if any(s.get("status") == "ok" for s in snap["lanes"].values()) else 1
     if args.cmd == "build":
-        files = build_site(ROOT)
+        files = build_site(ROOT, publish_state=args.publish_state)
         print(f"Built site/ ({len(files)} files).")
+        return 0
+    if args.cmd == "restore":
+        for name, what in restore(ROOT, args.base_url).items():
+            print(f"  {name}: {what}")
         return 0
     if args.cmd == "check":
         errs = check_all(ROOT)

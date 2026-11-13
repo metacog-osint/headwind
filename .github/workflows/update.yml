@@ -1,0 +1,59 @@
+name: update
+# DRAFT, 13 Nov 2026: written and not yet run. It does nothing until it is on main, and it deploys nothing until
+# Tom creates the Cloudflare Pages project `headwind` and sets the secrets below.
+#
+# Four times a day (meant to be started by the hub's tic-dispatch Worker, because GitHub fires schedules 4-9 h
+# late; its own cron is the fallback), on every push to main, and by hand: the tests, the last run's state from
+# the published site, a live collection, the site build and feed check, then a deploy of site/ to Cloudflare Pages.
+#
+# State: Headwind reports list changes as the difference between two of its own readings, and a failed lane keeps
+# its last good copy. Both need the run before. `restore` reads that from the published site's data/state/, and
+# `build --publish-state` puts this run's state back there. With nothing published yet, the first run is a first
+# reading: it sets the baselines and reports no list change.
+#
+# Secrets: EIA_API_KEY (energy lane; without it that lane fails and the rest run), CLOUDFLARE_PAGES_TOKEN
+# (Cloudflare Pages: Edit), and the account ID as repo variable CLOUDFLARE_ACCOUNT_ID. Without the Cloudflare
+# pair everything runs except the deploy. Collected data is not committed.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 */6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: update
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v7
+        with: { node-version: "22" }
+      - name: Tests
+        run: python -m unittest discover -s tests
+      - name: Last run's state from the published site (none on the first run)
+        run: python tools/headwind.py restore --from https://headwind.theintelligence.company
+      - name: Live collection (a failed lane keeps its last good copy and says so on the page)
+        run: python tools/headwind.py collect
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+      - name: Build site/ with this run's state
+        run: python tools/headwind.py build --publish-state
+      - name: Feed check
+        run: python tools/headwind.py check
+      - name: Deploy site/ to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Cloudflare secrets not set; skipping deploy"; exit 0
+          fi
+          npx --yes wrangler@4.151.3 pages deploy site --project-name headwind --branch main \
+            --commit-hash "$GITHUB_SHA" --commit-message "update $GITHUB_SHA" --commit-dirty=true

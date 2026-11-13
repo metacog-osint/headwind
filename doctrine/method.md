@@ -51,7 +51,7 @@ have flagged. It says how often that series trips the rule in ordinary times.
 ## Sanctions lists and rules
 A list change is the difference between two of Headwind's own readings of an official list, matched on
 the publisher's entry id. It is reported as counts by type (individual, entity, vessel, aircraft) and
-by sanctions program. Headwind does not republish names; the item links to the official list.
+by sanctions program. Headwind does not republish the names of people or organizations; the item links to the official list. Vessels are named, with IMO number, MMSI, flag and type as the list gives them, because a vessel is not a person and the IMO number is how a vessel is matched elsewhere.
 
 - **The date is the date Headwind saw the change**, not the date of the designation. A change made
   and reversed between two readings is not seen at all.

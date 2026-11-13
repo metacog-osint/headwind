@@ -145,6 +145,29 @@ class TestParsers(unittest.TestCase):
                 headwind_cli._lane_energy(raw, {}, refused)
             self.assertNotIn("test-key-not-real", str(ctx.exception))                # not in an error
 
+    def test_a_scheduled_run_gets_its_state_back_from_the_published_site(self):
+        with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
+            a, b = Path(a), Path(b)
+            shutil.copytree(ROOT / "site_src", a / "site_src")
+            headwind_cli.collect(a, getter=fake_getter)
+            self.assertNotIn("data/state/snapshot.json", headwind_cli.build_site(a))        # only when asked
+            published = headwind_cli.build_site(a, publish_state=True)
+
+            def site(url, timeout=60):
+                rel = url.split("example.test/", 1)[1]
+                if rel not in published:
+                    raise OSError("404")
+                return published[rel].encode("utf-8")
+
+            got = headwind_cli.restore(b, "https://example.test/", getter=site)
+            self.assertTrue(all(v.startswith("restored") for v in got.values()), got)
+            again = headwind_cli.collect(b, getter=fake_getter)
+            self.assertEqual(again["sanctions"], [])                 # a second reading, not a first
+            self.assertEqual(again["sanctions_lists"][0]["baseline_set_at"],
+                             json.loads(published["data/state/snapshot.json"])["sanctions_lists"][0]["baseline_set_at"])
+            nothing = headwind_cli.restore(Path(tempfile.mkdtemp()), "https://example.test/", getter=lambda u, t=60: b"<html>")
+            self.assertTrue(all(v.startswith("not restored") for v in nothing.values()))
+
     def test_no_eia_key_fails_the_lane_plainly(self):
         with tempfile.TemporaryDirectory() as tmp, \
                 mock.patch.dict(os.environ, {"EIA_API_KEY": "", "HEADWIND_EIA_KEY_FILE": str(Path(tmp) / "none.txt")}):
@@ -274,7 +297,8 @@ class TestFeed(unittest.TestCase):
         old = sanctions.parse_sdn_csv(text("ofac_sdn.csv"))
         new = dict(old)
         del new["36"]
-        new["99999"] = ["vessel", ["RUSSIA-EO14024"]]
+        new["99999"] = ["vessel", ["RUSSIA-EO14024"], {"name": "TEST HULL", "imo": "9999993", "mmsi": None,
+                                                        "flag": "Panama", "vessel_type": "Crude Oil Tanker"}]
         new["99998"] = ["entity", ["IRAN-EO13902", "SDGT"]]
         d = sanctions.delta("ofac-sdn", old, new, "2026-11-13T04:00:00Z", "2026-11-12T04:00:00Z")
         self.assertEqual((d["added"], d["removed"], d["total"]), (2, 1, len(old) + 1))
@@ -290,6 +314,12 @@ class TestFeed(unittest.TestCase):
         props = {f["properties"]["id"]: f["properties"] for f in fc["features"]}
         s = props[f"headwind:sanctions:{d['id']}"]
         self.assertEqual((s["kind"], s["tier"], s["measures"]["vessels_added"]), ("observation", "routine", 1))
+        self.assertEqual([(v["name"], v["imo"]) for v in d["vessels_added"]], [("TEST HULL", "9999993")])
+        self.assertIn("TEST HULL (IMO 9999993, flag Panama)", s["summary"])
+        self.assertEqual(s["us_person_data"], "none")
+        legacy = {"1": ["vessel", ["CUBA"]], "2": ["entity", ["CUBA"]]}              # an index from before vessel details
+        gone = sanctions.delta("ofac-sdn", legacy, {"2": legacy["2"]}, "2026-11-13T04:00:00Z", None)
+        self.assertEqual((gone["removed_by_type"], gone["vessels_removed"]), ({"vessel": 1}, []))
         rules = [i for i in props if i.startswith("headwind:control:")]
         self.assertEqual(rules, ["headwind:control:2026-22793"])   # only the last 14 days reach the feed
         for p in props.values():
@@ -310,6 +340,10 @@ class TestListParsers(unittest.TestCase):
         idx = sanctions.parse_sdn_csv(text("ofac_sdn.csv"))
         self.assertEqual(len(idx), 36)
         self.assertEqual(idx["36"], ["entity", ["CUBA"]])           # a blank type is an entity
+        ships = {k: v[2] for k, v in idx.items() if v[0] == "vessel"}
+        self.assertEqual(ships["15042"]["imo"] and len(ships["15042"]["imo"]), 7)
+        self.assertTrue(all(s["name"] for s in ships.values()))
+        self.assertTrue(all(len(v) == 2 for v in idx.values() if v[0] != "vessel"))   # no names for anyone else
         kinds = {v[0] for v in idx.values()}
         self.assertEqual(kinds, {"entity", "individual", "vessel", "aircraft"})
         self.assertTrue(any(len(v[1]) > 1 for v in idx.values()))   # "[A] [B]" splits into two programs
@@ -430,7 +464,8 @@ class TestEndToEnd(unittest.TestCase):
                 body = fake_getter(url, timeout)
                 if "sdn.csv" in url:
                     lines = body.decode("utf-8").splitlines()[1:]
-                    lines.append("99999,-0- ,vessel,RUSSIA-EO14024" + ",-0- " * 8)
+                    lines.append("99999,TEST HULL,vessel,RUSSIA-EO14024,-0- ,-0- ,Crude Oil Tanker,-0- ,-0- ,Panama,"
+                                 "-0- ,Vessel Registration Identification IMO 9999993.")
                     return ("\n".join(lines) + "\n").encode("utf-8")
                 if "data.trade.gov" in url:
                     doc = json.loads(body)

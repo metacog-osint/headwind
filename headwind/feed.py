@@ -41,7 +41,7 @@ SRC_UN = {
     "publisher": "United Nations Security Council",
     "title": "United Nations Security Council Consolidated List",
     "url": "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list",
-    "licence": "No licence stated by the UN; an official public list",
+    "licence": "UN website terms of use (personal, non-commercial use; no redistribution). Headwind publishes counts only",
     "grade": "A1",
     "independence_group": "un-security-council",
     "source_type": "official or market data",
@@ -213,6 +213,21 @@ def _official(item_id: str, title: str, summary: str, *, data_as_of: str, genera
     }}
 
 
+VESSELS_IN_TEXT = 25
+
+
+def _vessel_text(word: str, vessels: list[dict]) -> str:
+    """Vessels as OFAC lists them: name, IMO number and flag. Vessels are not persons."""
+    if not vessels:
+        return ""
+    def one(v):
+        bits = [f"IMO {v['imo']}" if v.get("imo") else "no IMO number given", f"flag {v['flag']}" if v.get("flag") else ""]
+        return f"{v['name']} ({', '.join(b for b in bits if b)})"
+    more = len(vessels) - VESSELS_IN_TEXT
+    tail = f"; and {more} more on the page" if more > 0 else ""
+    return f" Vessels {word}: {'; '.join(one(v) for v in vessels[:VESSELS_IN_TEXT])}{tail}."
+
+
 def list_features(snapshot: dict) -> list[dict]:
     """Sanctions-list changes and Federal Register rules. Counts and published facts; tier routine."""
     generated = snapshot["generated_at"]
@@ -237,7 +252,9 @@ def list_features(snapshot: dict) -> list[dict]:
             f"{s['list_name']}: {s['added']} added, {s['removed']} removed",
             f"{' '.join(parts)} The list now holds {s['total']} entries. This is the difference between two of "
             f"Headwind's readings{since}, seen on {s['detected_at'][:10]}; the dates of the designations are in "
-            f"the publisher's own notices. Counts only; names are on the official list.",
+            f"the publisher's own notices.{_vessel_text('added', s.get('vessels_added') or [])}"
+            f"{_vessel_text('removed', s.get('vessels_removed') or [])} People and organizations are counts "
+            f"only; their names are on the official list.",
             data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
             pmesii=["economic", "political"], ascope=["organizations"],
             ncf=["maintain_supply_chains", "provide_funding_liquidity"], requirement_ids=["HW-PIR-1"],

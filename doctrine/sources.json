@@ -15,7 +15,7 @@
       "id": "un-sc-consolidated",
       "name": "United Nations Security Council Consolidated List (XML)",
       "url": "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list",
-      "licence": "No licence stated by the UN; an official public list",
+      "licence": "UN website terms of use (personal, non-commercial use; no redistribution). Headwind publishes counts only",
       "use": "ingest",
       "grade": "A1",
       "independence_group": "un-security-council"
