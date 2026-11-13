@@ -77,7 +77,7 @@ SRC_FAO = {
     "publisher": "FAO",
     "title": "FAO Food Price Index (FFPI)",
     "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
-    "licence": "CC BY-NC-SA 3.0 IGO",
+    "licence": "CC BY 4.0 (FAO database terms of use)",
     "grade": "A1",
     "independence_group": "fao",
     "source_type": "official or market data",
@@ -412,7 +412,7 @@ def build_feed(snapshot: dict) -> dict:
         "program": "headwind",
         "generated_at": generated,
         "licence": ("Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; "
-                    "FAO CC BY-NC-SA 3.0 IGO; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
+                    "FAO CC BY 4.0; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
                     "Federal Register US public domain; UN Security Council list, no licence stated"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "

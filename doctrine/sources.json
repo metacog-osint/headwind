@@ -42,7 +42,7 @@
       "id": "fao-ffpi",
       "name": "FAO World Food Situation — FAO Food Price Index",
       "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
-      "licence": "CC BY-NC-SA 3.0 IGO (FAO)",
+      "licence": "CC BY 4.0 (FAO database terms of use)",
       "use": "ingest",
       "grade": "A1",
       "independence_group": "fao"
