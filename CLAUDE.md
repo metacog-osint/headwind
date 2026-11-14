@@ -150,8 +150,16 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - **The only derived number** is a count: how many commodities name each country first among major import sources
   (China 18, Canada 10, South Africa 7 of the 65 with sources given).
 - **`Critical_Mineral` in USGS's Figure 3 table is not used.** The metadata does not define it and it is "N" for
-  arsenic, natural graphite, niobium and tantalum, which are on the 2025 list. It is kept as `usgs_flag`. Headwind does
-  not yet carry the 2025 critical minerals list itself (60 minerals, Federal Register 2025-19813, 7 Nov 2025).
+  arsenic, natural graphite, niobium and tantalum, which are on the 2025 list. It is kept as `usgs_flag`.
+- **The Final 2025 List of Critical Minerals** (60 minerals, 90 FR 50494, document 2025-19813, 7 Nov 2025) is carried
+  since 14 Nov as `CRITICAL_2025` in `minerals.py`, a constant, not fetched: a test reads the notice's own sentence
+  from `tests/fixtures/fr_critical_minerals_2025.txt` and checks the tuple. Each USGS row gets `critical`, the list
+  members it stands for, matched on its first word; "Rare earths" stands for the fourteen rare earths the list names
+  one by one; a form ("MAGNESIUM COMPOUNDS", "TITANIUM, sponge metal") is marked with its mineral. All 47 rows of
+  USGS's import-sources figure are list minerals; ruthenium is the one list mineral not in it. The reliance table
+  has 40 list-mineral rows of 68 and no row for beryllium, boron, hafnium, iridium, metallurgical coal, phosphate,
+  rhodium, ruthenium and uranium. `minerals.json` carries the list as `critical_list`. Change the constant by hand
+  when a new final list is published (at least every three years).
 - **`ITEM_ID` in `minerals.py` is the 2026 edition** and has to be changed by hand when USGS publishes the next
   Summaries (the 2026 one came out on 6 Feb 2026).
 - Each CSV is checked against the MD5 that ScienceBase lists for it. `.gitattributes` keeps the two fixture CSVs
