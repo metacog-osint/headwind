@@ -4,8 +4,12 @@ Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind
 energy and food prices measured against their own normal range, changes to official sanctions and US screening
 lists, export-control and sanctions rules, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No probabilities, no investment advice.
 
-**State, 13 Nov 2026: live at https://headwind.theintelligence.company and updating itself.** Ten lanes, method
-`headwind-1.3`. `main` and `live/first-slice` are the same commit and pushed; a push to `main` runs the workflow,
+**State, 14 Nov 2026, 3:40 PM CST: live and updating itself.** Ten lanes, method `headwind-1.3`; the sanctions lane
+reads four lists (OFAC, UN, EU, UK) since `df39196`, and the minerals lane carries the 2025 critical minerals list
+since `b528333`. `main` and `live/first-slice` are both `622f78b` and pushed (run 43642037862 deployed it; EU and UK
+baselines set on the runner at 3:18 PM CST). Hub: tic-doctrine 0.5.2 (`3bffa17`) and COP's kit sync (`4ceecd5`,
+deployed) carry Headwind's new terms and owns. Open for Tom: EU `UKR` placed on Russia and Ukraine, EU `SDNZ`
+unplaced; the stale worktree `[local path]`. A push to `main` runs the workflow,
 which collects, builds, checks and deploys. The house bar lists Headwind and the suite registry lists it as live
 (see Deploy). Untracked and to stay that way: `GEMINI.md` and `data/`. Commit history before the deploy:
 `ed4e461` first live slice, `472e802` sanctions and rules (`headwind-1.2`), `921d8f6` screening and minerals
