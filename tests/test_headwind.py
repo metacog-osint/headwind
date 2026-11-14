@@ -58,6 +58,8 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
              ("wfp_food_prices_sdn.csv", "wfp_sdn.csv"), ("api.worldbank.org", "worldbank.json"),
              ("fomccalendars", "fomc.html"), ("calendars/mgcgc", "ecb_calendar.html"),
              ("ofac/downloads/sdn.csv", "ofac_sdn.csv"), ("scsanctions.un.org", "un_consolidated.xml"),
+             ("fsd/fsf/public/files/xmlFullSanctionsList_1_1", "eu_fsf.xml"),
+             ("sanctionslist.fcdo.gov.uk", "uk_sanctions.xml"),
              ("federalregister.gov", "federal_register.json"), ("data.trade.gov", "trade_gov_csl.json")]
     for needle, name in table:
         if needle in url:
@@ -384,6 +386,36 @@ class TestListParsers(unittest.TestCase):
         self.assertEqual(len(idx), 14)
         self.assertEqual(idx["6907993"], ["individual", ["DRC"]])
 
+    def test_eu(self):
+        generated, idx = sanctions.parse_eu_xml((FIX / "eu_fsf.xml").read_bytes())
+        self.assertEqual(generated[:10], "2026-10-23")
+        self.assertEqual(len(idx), 9)
+        self.assertEqual({v[0] for v in idx.values()}, {"individual", "entity"})
+        self.assertTrue(all(len(v) == 2 for v in idx.values()))     # counts only: no names carried
+        self.assertEqual(sanctions.countries_for(["UKR", "TAQA", "IRN"], "eu-fsf"), ["IR", "RU", "UA"])
+        self.assertEqual(sanctions.countries_for(["SDN"], "eu-fsf"), ["SD"])   # the EU's Sudan code, not OFAC's list
+        self.assertEqual(sanctions.unknown_programs("eu-fsf", idx), [])
+        self.assertEqual(sanctions.unknown_programs("eu-fsf", {"1": ["entity", ["NEWX"]]}), ["NEWX"])
+
+    def test_uk(self):
+        generated, idx = sanctions.parse_uk_xml((FIX / "uk_sanctions.xml").read_bytes())
+        self.assertEqual(generated, "2026-11-12")
+        self.assertEqual(len(idx), 11)
+        ships = [v for v in idx.values() if v[0] == "vessel"]
+        self.assertEqual(len(ships), 2)
+        self.assertTrue(all(v[2]["name"] and len(v[2]["imo"]) == 7 for v in ships))   # "Primary Name" and "Primary name"
+        self.assertTrue(all("owner" not in json.dumps(v[2]).lower() for v in ships))
+        self.assertTrue(all(len(v) == 2 for v in idx.values() if v[0] != "vessel"))
+        self.assertEqual(sanctions.uk_regime("The Iran (Sanctions) (Nuclear) (EU Exit) Regulations 2019"), "Iran (Nuclear)")
+        self.assertEqual(sanctions.uk_regime("The Global Human Rights Sanctions Regulations 2020"), "Global Human Rights")
+        self.assertEqual(sanctions.unknown_programs("uk-sanctions", idx), [])
+        old = dict(idx)
+        gone = next(k for k, v in idx.items() if v[0] == "vessel")
+        del idx[gone]
+        d = sanctions.delta("uk-sanctions", old, idx, "2026-11-14T04:00:00Z", "2026-11-13T04:00:00Z")
+        self.assertEqual((d["removed"], len(d["vessels_removed"]), d["vessels_removed"][0]["list_id"]), (1, 1, gone))
+        self.assertEqual(d["countries"], sanctions.countries_for(old[gone][1], "uk-sanctions"))
+
     def test_screening_list(self):
         lists = screening.parse((FIX / "trade_gov_csl.json").read_bytes())
         self.assertNotIn("SDN", lists)                              # the sanctions lane reads that one from OFAC
@@ -464,7 +496,9 @@ class TestEndToEnd(unittest.TestCase):
             self.assertTrue(any(m["reason"].startswith("no WFP") for m in snap["local_food_missing"]))
             self.assertTrue((tmp / "data" / "raw" / "index.jsonl").exists())
             self.assertEqual(snap["sanctions"], [])                 # the first run only sets the baseline
-            self.assertEqual([l["total"] for l in snap["sanctions_lists"]], [36, 14])
+            self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
+                             [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11)])
+            self.assertTrue(list((tmp / "data" / "raw" / "eu-fsf").glob("*.xml.gz")))
             self.assertEqual(len(snap["controls"]), 5)
             self.assertTrue((tmp / "data" / "state" / "sanctions_index.json").exists())
             self.assertEqual(snap["screening"], [])                 # first reading
@@ -487,6 +521,18 @@ class TestEndToEnd(unittest.TestCase):
             self.assertTrue(again["lanes"]["fx"]["from_previous"])
             self.assertEqual(again["fx"], snap["fx"])
             self.assertEqual(again["sanctions"], [])                # same lists, no change reported
+
+            # One list that cannot be read keeps its last reading and says so; the others go on.
+            def eu_down(url, timeout=60):
+                if "webgate.ec.europa.eu" in url:
+                    raise OSError("EU server down")
+                return fake_getter(url, timeout)
+            partial = headwind_cli.collect(tmp, getter=eu_down)
+            self.assertEqual(partial["lanes"]["sanctions"]["status"], "ok")
+            eu = next(l for l in partial["sanctions_lists"] if l["id"] == "eu-fsf")
+            self.assertEqual((eu["total"], "EU server down" in eu["error"]), (9, True))
+            kept = json.loads((tmp / "data" / "state" / "sanctions_index.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(kept["eu-fsf"]["index"]), 9)       # the EU baseline survives the failed read
 
             # A list that changes between runs is reported once, as counts.
             def changed(url, timeout=60):

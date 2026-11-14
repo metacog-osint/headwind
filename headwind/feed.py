@@ -48,6 +48,32 @@ SRC_UN = {
     "descriptor": "Individuals and entities under sanctions measures imposed by the Security Council.",
 }
 
+SRC_EU = {
+    "id": "eu-fsf",
+    "publisher": "European Commission (Financial Sanctions Files)",
+    "title": "Consolidated list of persons, groups and entities subject to EU financial sanctions",
+    "url": "https://data.europa.eu/data/datasets/consolidated-list-of-persons-groups-and-entities-subject-to-eu-financial-sanctions",
+    "licence": "European Commission reuse notice (Decision 2011/833/EU), reuse with acknowledgement",
+    "grade": "A1",
+    "independence_group": "eu-commission-fsf",
+    "source_type": "official or market data",
+    "descriptor": "Persons, groups and entities under EU financial sanctions, as the Commission consolidates them.",
+}
+
+SRC_UK = {
+    "id": "uk-sanctions-list",
+    "publisher": "UK Foreign, Commonwealth and Development Office",
+    "title": "UK Sanctions List",
+    "url": "https://www.gov.uk/government/publications/the-uk-sanctions-list",
+    "licence": "Open Government Licence v3.0",
+    "grade": "A1",
+    "independence_group": "uk-fcdo-sanctions",
+    "source_type": "official or market data",
+    "descriptor": "Every person, entity and ship designated under UK sanctions regulations.",
+}
+
+LIST_SOURCE = {"ofac-sdn": SRC_OFAC, "un-consolidated": SRC_UN, "eu-fsf": SRC_EU, "uk-sanctions": SRC_UK}
+
 SRC_CSL = {
     "id": "trade-gov-csl",
     "publisher": "US International Trade Administration (trade.gov)",
@@ -217,7 +243,7 @@ VESSELS_IN_TEXT = 25
 
 
 def _vessel_text(word: str, vessels: list[dict]) -> str:
-    """Vessels as OFAC lists them: name, IMO number and flag. Vessels are not persons."""
+    """Vessels as the list gives them (OFAC, UK): name, IMO number and flag. Vessels are not persons."""
     if not vessels:
         return ""
     def one(v):
@@ -261,7 +287,7 @@ def list_features(snapshot: dict) -> list[dict]:
             measures={"added": s["added"], "removed": s["removed"], "total": s["total"],
                       "vessels_added": s["added_by_type"].get("vessel", 0)},
             visual={"type": "page", "url": f"{SITE}/#sanctions"},
-            source=SRC_OFAC if s["list"] == "ofac-sdn" else SRC_UN,
+            source=LIST_SOURCE[s["list"]],
             accessed=(lanes.get("sanctions") or {}).get("fetched_at")))
 
     for s in snapshot.get("screening") or []:
@@ -413,10 +439,12 @@ def build_feed(snapshot: dict) -> dict:
         "generated_at": generated,
         "licence": ("Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; "
                     "FAO CC BY 4.0; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
-                    "Federal Register US public domain; UN Security Council list, no licence stated"),
+                    "Federal Register US public domain; UN Security Council list, no licence stated; EU financial "
+                    "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
-                        "US Treasury (OFAC); United Nations Security Council; US International Trade Administration; "
+                        "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
+                        "and Development Office; US International Trade Administration; "
                         "US Federal Register."),
         "language_key": LANGUAGE_KEY,
         "features": features,

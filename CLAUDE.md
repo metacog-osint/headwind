@@ -14,8 +14,8 @@ which collects, builds, checks and deploys. The house bar lists Headwind and the
 
 **Planned scope** (`D:\Projects\_ideas\new-programs.md`, program row and roadmap step 13): sanctions, export
 controls, prices, currency and energy, with critical minerals, trade.gov screening-list diffs and UN list deltas
-(needs a Census key). Built so far: prices, currency, energy, OFAC and UN list changes, BIS and OFAC rules, trade.gov screening-list
-changes, and USGS mineral import reliance. Not built: Census trade data for minerals (needs a key, which Tom
+(needs a Census key). Built so far: prices, currency, energy, OFAC, UN, EU and UK list changes, BIS and OFAC rules, trade.gov screening-list
+changes, USGS mineral import reliance and the 2025 critical minerals list. Not built: Census trade data for minerals (needs a key, which Tom
 creates). Describe Headwind publicly from what is live.
 
 ## Deploy (13 Nov 2026)
@@ -68,7 +68,7 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | `wfp` | `food.py` | WFP prices by market from HDX, for the countries in `config/wfp_countries.json` | 18 of 19 countries; Cuba has no file, Venezuela's newest month is May 2025 |
 | `baseline` | `baseline.py` | World Bank WDI API, six indicators | 213 countries. The API timed out twice earlier the same evening |
 | `calendar` | `releases.py` | Federal Reserve and ECB schedule pages; FAO release dates | 9 events in the next 180 days |
-| `sanctions` | `sanctions.py` | OFAC `sdn.csv` (5.8 MB) and the UN Security Council consolidated list (XML) | 12 Nov, 11:55 PM CST: 19,563 OFAC entries (1,570 vessels) and 1,007 UN entries. First reading, so no change to report yet |
+| `sanctions` | `sanctions.py` | OFAC `sdn.csv` (5.8 MB), the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML, 26 MB) and the UK Sanctions List (XML, 22 MB) | 14 Nov, 2:57 PM CST: 19,565 OFAC (1,570 vessels), 1,007 UN, 6,269 EU, 6,440 UK (694 ships). The EU download takes 30 s to 2 min |
 | `screening` | `screening.py` | trade.gov Consolidated Screening List (one 34 MB JSON), every list but the SDN list | 13 Nov, 8:46 AM CST: 12 lists, 6,702 entries (Entity List 3,419). First reading, so no change to report yet. The download took 4 s |
 | `controls` | `controls.py` | Federal Register API: BIS and OFAC rules and proposed rules, last 60 days | 13 Nov: 25 rules; 2 future dates for Verdict (3 Dec polysilicon rule ends, 10 Jan 2027 affiliates-rule stay ends) |
 | `minerals` | `minerals.py` | USGS Mineral Commodity Summaries 2026 data release on ScienceBase (item JSON, then two CSVs) | 13 Nov: 68 commodities with net import reliance, 47 with import shares by country |
@@ -105,6 +105,19 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   OFAC's program tag definitions page. `SSIDES` is the 2014 Ukraine support act (Russia), not South Sudan as first
   entered. Tom's decisions, 13 Nov: `UKRAINE-EO13661` and `-EO13662` are Russia; `UKRAINE-EO13660` and `-EO13685`
   (Crimea) are Russia and Ukraine; `PAARSSR-EO13894` is Syria. A map value can be a tuple of two countries.
+- **EU and UK lists (added 14 Nov 2026).** EU: the Commission's Financial Sanctions Files, XML v1.1, keyed on each
+  entry's `logicalId`, grouped by programme code (34 codes); people and enterprises only, because EU vessel measures
+  sit in regulation annexes, not in this file. The EU file was last generated 23 Oct 2026 (the Commission's RSS feed
+  says the same), so it changes less often than OFAC's. UK: the FCDO's UK Sanctions List, the only UK list since
+  OFSI's Consolidated List closed on 28 Jan 2026, keyed on `UniqueID`, grouped by regime short name (`uk_regime()`,
+  31 regimes). UK ships are named like OFAC vessels (name, IMO, flag, type; owners left out); 693 of 694 have an
+  IMO number. Countries come from per-list maps, `EU_PROGRAMME_COUNTRY` and `UK_REGIME_COUNTRY`, with the conduct
+  regimes left unplaced on purpose (`EU_UNPLACED`, `UK_UNPLACED`). EU `UKR` (Ukraine's territorial integrity) is
+  placed on Russia and Ukraine, following Tom's EO 13660 decision; EU `SDNZ` is left unplaced because the file does
+  not explain it. **Both are for Tom to confirm.** A code or regime in neither map nor the unplaced set shows as
+  `unknown_programs` on the list's status: add it to a map. First readings on the runner set the baselines.
+- **Each list stands alone** (since 14 Nov): a list that cannot be read or parsed keeps its index from the run before
+  and shows the error on the page; the lane fails only when no list can be read.
 - **Rules:** a document stays in the feed 14 days. Future dates come from its effective date, its comment
   deadline, and dates written out in its DATES paragraph (`named_dates`); each becomes a `rule_date` for Verdict.
   Countries are only those a title names. USTR notices and public-inspection filings are not read.
@@ -179,8 +192,8 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - A rate decision is exported to Verdict as kind `rule_date`, the nearest kind Verdict accepts.
 
 ## Not done
-- **Planned and not built:** Census trade data for minerals (needs a key), the critical minerals list itself, EU
-  and UK sanctions lists, USTR notices, Federal Register public inspection.
+- **Planned and not built:** Census trade data for minerals (needs a key), USTR notices, Federal Register public
+  inspection.
 - **A list change is only an added or removed id.** An entry that stays on a list and changes its programs or type
   is not reported, in either list lane.
 - `HW-EEI-1` and `HW-EEI-2` (vessel matches in Wake, public-inspection filings) are unmet. Headwind now carries
@@ -242,6 +255,13 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   content, and since 13 Nov does not publish its index of the list either. Tom, 13 Nov: that is enough to deploy
   (the recommendation); asking the UN is still open as a courtesy.
 - USGS Mineral Commodity Summaries data release: CC0 1.0, read from the ScienceBase record on 13 Nov 2026.
+- Final 2025 List of Critical Minerals: a Federal Register notice, so reproducible without restriction (see Federal
+  Register above).
+- EU Financial Sanctions Files: the EU open data portal's record for the dataset, read 14 Nov 2026, gives the
+  European Commission reuse notice (Decision 2011/833/EU) for the XML and CSV files, and CC BY 4.0 for one CSV.
+  The decision allows reuse with the source acknowledged. Headwind publishes counts and a link.
+- UK Sanctions List: GOV.UK's page for it, read 14 Nov 2026, says all content is under the Open Government Licence
+  v3.0 except where otherwise stated. Headwind publishes counts, ship names and a link.
 - trade.gov Consolidated Screening List: a US government work, stated from memory. Its page, read 13 Nov 2026,
   states no terms of reuse.
 - Energy: EIA's reuse page, read 13 Nov 2026, says US government publications are in the public domain and asks

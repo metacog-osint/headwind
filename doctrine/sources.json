@@ -21,6 +21,24 @@
       "independence_group": "un-security-council"
     },
     {
+      "id": "eu-fsf",
+      "name": "European Commission: consolidated list of persons, groups and entities subject to EU financial sanctions (Financial Sanctions Files, XML v1.1)",
+      "url": "https://data.europa.eu/data/datasets/consolidated-list-of-persons-groups-and-entities-subject-to-eu-financial-sanctions",
+      "licence": "European Commission reuse notice (Decision 2011/833/EU)",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "eu-commission-fsf"
+    },
+    {
+      "id": "uk-sanctions-list",
+      "name": "UK Foreign, Commonwealth and Development Office: UK Sanctions List (XML)",
+      "url": "https://www.gov.uk/government/publications/the-uk-sanctions-list",
+      "licence": "Open Government Licence v3.0",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "uk-fcdo-sanctions"
+    },
+    {
       "id": "trade-gov-csl",
       "name": "US International Trade Administration: Consolidated Screening List (JSON; BIS, State and Treasury lists)",
       "url": "https://www.trade.gov/consolidated-screening-list",

@@ -148,20 +148,49 @@ def _lane_calendar(raw_dir, prev, getter):
     return {"fomc_dates": fomc, "ecb_dates": ecb}, [rec1, rec2]
 
 
+def _read_list(list_id, raw_dir, getter):
+    """Fetch and parse one sanctions list: (index, the publisher's generation date, fetch record)."""
+    if list_id == "ofac-sdn":
+        body, rec = fetch.fetch("ofac-sdn", sanctions.OFAC_SDN_CSV, raw_dir, "csv", timeout=180, getter=getter)
+        return sanctions.parse_sdn_csv(body.decode("utf-8", errors="replace")), None, rec
+    if list_id == "un-consolidated":
+        body, rec = fetch.fetch("un-sc-consolidated", sanctions.UN_XML, raw_dir, "xml", timeout=120, getter=getter)
+        generated, index = sanctions.parse_un_xml(body)
+        return index, generated, rec
+    if list_id == "eu-fsf":
+        body, rec = fetch.fetch("eu-fsf", sanctions.EU_XML, raw_dir, "xml", timeout=300, getter=getter, gz=True)
+        generated, index = sanctions.parse_eu_xml(body)
+        return index, generated, rec
+    if list_id == "uk-sanctions":
+        body, rec = fetch.fetch("uk-sanctions-list", sanctions.UK_XML, raw_dir, "xml", timeout=180, getter=getter, gz=True)
+        generated, index = sanctions.parse_uk_xml(body)
+        return index, generated, rec
+    raise ValueError(f"unknown list {list_id}")
+
+
 def _lane_sanctions(raw_dir, prev, getter):
-    """Compare each list with the index kept from the last run. The first run only sets the baseline."""
+    """Compare each list with the index kept from the last run. A list's first reading only sets its baseline.
+
+    Each list stands alone: a list that cannot be read or parsed keeps its index from the run before and
+    is shown with the error, and the others go on. The lane fails only when no list can be read."""
     state_path = (Path(raw_dir).parent / "state" / "sanctions_index.json")
     state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
+    prev_status = {l["id"]: l for l in (prev.get("sanctions_lists") or [])}
     now = fetch.now_utc()
-    b1, rec1 = fetch.fetch("ofac-sdn", sanctions.OFAC_SDN_CSV, raw_dir, "csv", timeout=180, getter=getter)
-    b2, rec2 = fetch.fetch("un-sc-consolidated", sanctions.UN_XML, raw_dir, "xml", timeout=120, getter=getter)
-    un_generated, un_index = sanctions.parse_un_xml(b2)
-    readings = {"ofac-sdn": (sanctions.parse_sdn_csv(b1.decode("utf-8", errors="replace")), None),
-                "un-consolidated": (un_index, un_generated)}
-    new_state, deltas, lists = {}, [], []
-    for list_id, (index, source_generated) in readings.items():
+    new_state, deltas, lists, recs, errors = {}, [], [], [], []
+    for list_id in sanctions.LISTS:
         old = state.get(list_id) or {}
-        sanctions.check_size(list_id, index, old.get("index"))
+        try:
+            index, source_generated, rec = _read_list(list_id, raw_dir, getter)
+            sanctions.check_size(list_id, index, old.get("index"))
+        except Exception as exc:  # noqa: BLE001 - one list's failure is reported on that list
+            errors.append(f"{list_id}: {exc}")
+            if old:
+                new_state[list_id] = old
+            if list_id in prev_status:
+                lists.append({**prev_status[list_id], "error": str(exc)[:300], "failed_at": now})
+            continue
+        recs.append(rec)
         if old.get("index"):
             d = sanctions.delta(list_id, old["index"], index, now, old.get("checked_at"))
             if d:
@@ -169,9 +198,13 @@ def _lane_sanctions(raw_dir, prev, getter):
         baseline_set = old.get("baseline_set_at") or now
         new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "index": index}
         lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated))
+    if not recs:
+        raise RuntimeError("no sanctions list could be read: " + "; ".join(errors))
+    for e in errors:
+        print(f"  sanctions: {e}", file=sys.stderr)
     state_path.parent.mkdir(parents=True, exist_ok=True)
     state_path.write_text(json.dumps(new_state, separators=(",", ":")) + "\n", encoding="utf-8", newline="\n")
-    return {"sanctions": sanctions.roll(prev.get("sanctions") or [], deltas, now), "sanctions_lists": lists}, [rec1, rec2]
+    return {"sanctions": sanctions.roll(prev.get("sanctions") or [], deltas, now), "sanctions_lists": lists}, recs
 
 
 def _lane_screening(raw_dir, prev, getter):

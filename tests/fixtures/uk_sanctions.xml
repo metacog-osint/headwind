@@ -1,0 +1,1043 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Designations xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <DateGenerated>12/11/2026</DateGenerated>
+  <Designation>
+    <LastUpdated>18/12/2021</LastUpdated>
+    <DateDesignated>03/10/2017</DateDesignated>
+    <UniqueID>DPR0075</UniqueID>
+    <Names>
+      <Name>
+        <Name6>Petrel 8</Name6>
+        <NameType>Primary name</NameType>
+      </Name>
+      <Name>
+        <Name6>Jal Vahini</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Jal_Vahini</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Tian Tai 36</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+    </Names>
+    <RegimeName>The Democratic People's Republic of Korea (Sanctions) (EU Exit) Regulations 2019</RegimeName>
+    <IndividualEntityShip>Ship</IndividualEntityShip>
+    <DesignationSource>UN</DesignationSource>
+    <SanctionsImposed>Prohibition of port entry</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>false</AssetFreeze>
+      <ArmsEmbargo>false</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>true</ProhibitionOfPortEntry>
+      <TravelBan>false</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>false</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>Pursuant to paragraph 6 of Security Council Resolution 2371 (2017) and paragraph 6 of Security Council Resolution 2375 (2017)</OtherInformation>
+    <UKStatementofReasons>
+</UKStatementofReasons>
+    <ShipDetails>
+      <Ship>
+        <IMONumbers>
+          <IMONumber>IMO9562233</IMONumber>
+        </IMONumbers>
+        <CurrentOwnerOperators>
+          <CurrentOwnerOperator>Global United Shipping India </CurrentOwnerOperator>
+        </CurrentOwnerOperators>
+        <CurrentBelievedFlagOfShips>
+          <CurrentBelievedFlagOfShip>Comoros</CurrentBelievedFlagOfShip>
+        </CurrentBelievedFlagOfShips>
+        <PreviousFlags>
+          <PreviousFlag>India</PreviousFlag>
+        </PreviousFlags>
+        <TypeOfShipDetails>
+          <TypeOfShip>Bulk Carrier</TypeOfShip>
+        </TypeOfShipDetails>
+        <TonnageOfShipDetails>
+          <TonnageOfShip>7078</TonnageOfShip>
+        </TonnageOfShipDetails>
+        <LengthOfShipDetails>
+          <LengthOfShip>134.5</LengthOfShip>
+        </LengthOfShipDetails>
+        <YearsBuilt>
+          <YearBuilt>2011</YearBuilt>
+        </YearsBuilt>
+      </Ship>
+    </ShipDetails>
+  </Designation>
+  <Designation>
+    <LastUpdated>31/07/2024</LastUpdated>
+    <DateDesignated>31/07/2024</DateDesignated>
+    <UniqueID>RUS2176</UniqueID>
+    <Names>
+      <Name>
+        <Name6>KOROLEV PROSPECT</Name6>
+        <NameType>Primary Name</NameType>
+      </Name>
+    </Names>
+    <RegimeName>The Russia (Sanctions) (EU Exit) Regulations 2019</RegimeName>
+    <IndividualEntityShip>Ship</IndividualEntityShip>
+    <DesignationSource>UK</DesignationSource>
+    <SanctionsImposed>Shipping sanctions: (see "Other information")</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>false</AssetFreeze>
+      <ArmsEmbargo>false</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>false</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>false</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>Shipping sanctions: a specified ship is prohibited from being provided with access to or having its master or pilot cause it to enter a port in the UK, may have its registration on the UK Ship Register terminated, and a master or pilot of a specified ship may be given a port barring direction, a detention direction, and a port entry direction or a movement direction. </OtherInformation>
+    <UKStatementofReasons>
+KOROLEV PROSPECT (IMO 9826902) is involved in activity whose object or effect is to destabilise Ukraine or undermine or threaten the territorial integrity, sovereignty or independence of Ukraine or to obtain a benefit from or support the Government of Russia. Namely, KOROLEV PROSPECT is involved in carrying oil or oil related products that originated in Russia from Russia to a third country.
+</UKStatementofReasons>
+    <ShipDetails>
+      <Ship>
+        <IMONumbers>
+          <IMONumber>IMO9826902</IMONumber>
+        </IMONumbers>
+        <CurrentOwnerOperators>
+          <CurrentOwnerOperator>Stream Ship Management FZCO</CurrentOwnerOperator>
+        </CurrentOwnerOperators>
+        <CurrentBelievedFlagOfShips>
+          <CurrentBelievedFlagOfShip>Gabon</CurrentBelievedFlagOfShip>
+        </CurrentBelievedFlagOfShips>
+        <TypeOfShipDetails>
+          <TypeOfShip>Oil Tanker</TypeOfShip>
+        </TypeOfShipDetails>
+        <YearsBuilt>
+          <YearBuilt>2019</YearBuilt>
+        </YearsBuilt>
+      </Ship>
+    </ShipDetails>
+  </Designation>
+  <Designation>
+    <LastUpdated>04/08/2026</LastUpdated>
+    <DateDesignated>29/06/2012</DateDesignated>
+    <UniqueID>AFG0001</UniqueID>
+    <OFSIGroupID>12703</OFSIGroupID>
+    <UNReferenceNumber>TAe.010</UNReferenceNumber>
+    <Names>
+      <Name>
+        <Name6>HAJI KHAIRULLAH HAJI SATTAR MONEY EXCHANGE</Name6>
+        <NameType>Primary Name</NameType>
+      </Name>
+      <Name>
+        <Name6>Haji Alim Hawala</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Haji Hakim Hawala</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Haji Khair Ullah Money Service</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Haji Khairullah and Abdul Sattar and Company</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Haji Khairullah Money Exchange</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Haji Khairullah-Haji Sattar Sarafi</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Haji Salam Hawala</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Sarafi-yi Haji Khairullah Haji Satar Haji Esmatullah</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+    </Names>
+    <NonLatinNames>
+      <NonLatinName>
+        <NameNonLatinScript>حاجی خيرالله و حاجی ستار صرافی</NameNonLatinScript>
+      </NonLatinName>
+    </NonLatinNames>
+    <RegimeName>The Afghanistan (Sanctions) (EU Exit) Regulations 2020</RegimeName>
+    <IndividualEntityShip>Entity</IndividualEntityShip>
+    <DesignationSource>UN</DesignationSource>
+    <SanctionsImposed>Asset freeze</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>true</AssetFreeze>
+      <ArmsEmbargo>false</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>false</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>false</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>Afghan Money Service Provider License Number: 044. Haji Khairullah Haji Sattar Money Exchange was used by Taliban leadership to transfer money to Taliban commanders to fund fighters and operations in Afghanistan as of 2011. Active in Kunar Province. Associated with Abdul Sattar Abdul Manan (TAi.162) and Khairullah Barakzai Khudai Nazar (TAi.163). INTERPOL-UN Security Council Special Notice web link:  https://www.interpol.int/en/How-we-work/Notices/View-UN-Notices-Individuals.</OtherInformation>
+    <UKStatementofReasons>
+</UKStatementofReasons>
+    <Addresses>
+      <Address>
+        <AddressLine1>Ansari Market, 2nd Floor</AddressLine1>
+        <AddressLine6>Nimroz Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 10</AddressLine1>
+        <AddressLine2>Suite numbers 196-197, 3rd Floor</AddressLine2>
+        <AddressLine3>Khorasan Market</AddressLine3>
+        <AddressLine5>Herat City</AddressLine5>
+        <AddressLine6>Herat Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 11</AddressLine1>
+        <AddressLine2>Sarafi Market</AddressLine2>
+        <AddressLine5>Zaranj District</AddressLine5>
+        <AddressLine6>Nimroz Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 12</AddressLine1>
+        <AddressLine2>Sarafi Market</AddressLine2>
+        <AddressLine3>Wesh</AddressLine3>
+        <AddressLine5>Spin Boldak District</AddressLine5>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 13</AddressLine1>
+        <AddressLine2>Sarafi Market</AddressLine2>
+        <AddressLine6>Farah</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 14</AddressLine1>
+        <AddressLine6>Dubai</AddressLine6>
+        <AddressCountry>United Arab Emirates</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 15</AddressLine1>
+        <AddressLine6>Zahedan</AddressLine6>
+        <AddressCountry>Iran</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 16</AddressLine1>
+        <AddressLine6>Zabul</AddressLine6>
+        <AddressCountry>Iran</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 6</AddressLine1>
+        <AddressLine2>Shop number 237</AddressLine2>
+        <AddressLine3>Shah Zada Market (also known as Sarai Shahzada)</AddressLine3>
+        <AddressLine4>Puli Khishti area</AddressLine4>
+        <AddressLine5>Police District 1</AddressLine5>
+        <AddressLine6>Kabul</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 7</AddressLine1>
+        <AddressLine2>Shop numbers 21 and 22, 2nd Floor</AddressLine2>
+        <AddressLine3>Kandahar City Sarafi Market</AddressLine3>
+        <AddressLine5>Kandahar City</AddressLine5>
+        <AddressLine6>Kandahar Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 8</AddressLine1>
+        <AddressLine2>Gereshk City</AddressLine2>
+        <AddressLine3>Nahr-e Saraj District</AddressLine3>
+        <AddressLine6>Helmand Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Branch Office 9</AddressLine1>
+        <AddressLine2>Lashkar Gah Bazaar</AddressLine2>
+        <AddressLine3>Lashkar Gah</AddressLine3>
+        <AddressLine4>Lashkar Gah District</AddressLine4>
+        <AddressLine6>Helmand Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Haji Ghulam Nabi Market, 2nd Floor</AddressLine1>
+        <AddressLine2>Lashkar Gah District</AddressLine2>
+        <AddressLine6>Helmand Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Khorasan Market</AddressLine1>
+        <AddressLine2>Shahre Naw</AddressLine2>
+        <AddressLine3>District 5</AddressLine3>
+        <AddressLine5>Herat City</AddressLine5>
+        <AddressLine6>Herat Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>New Sarafi Market, 2nd Floor</AddressLine1>
+        <AddressLine5>Kandahar City</AddressLine5>
+        <AddressLine6>Kandahar Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine1>Safi Market</AddressLine1>
+        <AddressLine5>Kandahar City</AddressLine5>
+        <AddressLine6>Kandahar Province</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+    </Addresses>
+    <PhoneNumbers>
+      <PhoneNumber>-103495</PhoneNumber>
+      <PhoneNumber>-101823</PhoneNumber>
+      <PhoneNumber>-222831</PhoneNumber>
+      <PhoneNumber>0202-104748</PhoneNumber>
+      <PhoneNumber>-59763</PhoneNumber>
+    </PhoneNumbers>
+    <EmailAddresses>
+      <EmailAddress>helmand_exchange_msp@yahoo.com</EmailAddress>
+    </EmailAddresses>
+  </Designation>
+  <Designation>
+    <LastUpdated>14/04/2026</LastUpdated>
+    <DateDesignated>25/01/2001</DateDesignated>
+    <UniqueID>AFG0006</UniqueID>
+    <OFSIGroupID>7172</OFSIGroupID>
+    <UNReferenceNumber>TAi.002</UNReferenceNumber>
+    <Names>
+      <Name>
+        <Name1>MOHAMMAD</Name1>
+        <Name2>HASSAN</Name2>
+        <Name6>AKHUND</Name6>
+        <NameType>Primary Name</NameType>
+      </Name>
+    </Names>
+    <NonLatinNames>
+      <NonLatinName>
+        <NameNonLatinScript>محمد حسن آخوند </NameNonLatinScript>
+      </NonLatinName>
+    </NonLatinNames>
+    <Titles>
+      <Title>Mullah</Title>
+      <Title>Haji</Title>
+    </Titles>
+    <RegimeName>The Afghanistan (Sanctions) (EU Exit) Regulations 2020</RegimeName>
+    <IndividualEntityShip>Individual</IndividualEntityShip>
+    <DesignationSource>UN</DesignationSource>
+    <SanctionsImposed>Asset freeze|Travel Ban</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>true</AssetFreeze>
+      <ArmsEmbargo>false</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>true</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>false</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>A close associate of Mullah Mohammed Omar (TAi.004). Member of Taliban Supreme Council as at Dec. 2009. Belongs to Baabar tribe. Review pursuant to Security Council resolution 1822 (2008) was concluded on 21 Jul. 2010. INTERPOL-UN Security Council Special Notice web link: https://www.interpol.int/en/How-we-work/ Notices/View-UN-Notices-Individuals click here</OtherInformation>
+    <UKStatementofReasons>
+</UKStatementofReasons>
+    <Addresses>
+      <Address>
+        <AddressLine6>Kabul</AddressLine6>
+        <AddressCountry>Afghanistan</AddressCountry>
+      </Address>
+    </Addresses>
+    <IndividualDetails>
+      <Individual>
+        <DOBs>
+          <DOB>dd/mm/1945</DOB>
+          <DOB>dd/mm/1946</DOB>
+          <DOB>dd/mm/1947</DOB>
+          <DOB>dd/mm/1948</DOB>
+          <DOB>dd/mm/1949</DOB>
+          <DOB>dd/mm/1950</DOB>
+          <DOB>dd/mm/1955</DOB>
+          <DOB>dd/mm/1956</DOB>
+          <DOB>dd/mm/1957</DOB>
+          <DOB>dd/mm/1958</DOB>
+        </DOBs>
+        <PassportDetails>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>P04581926</PassportNumber>
+            <PassportAdditionalInformation>Afghanistan passport number P04581926, issued on 7 August 2024, issued in Kandahar, Afghanistan (expires 7 August 2034)</PassportAdditionalInformation>
+          </Passport>
+        </PassportDetails>
+        <Nationalities>
+          <Nationality>Afghanistan</Nationality>
+        </Nationalities>
+        <Positions>
+          <Position>First Deputy, Council of Ministers under the previous Taliban regime (1996-2001)</Position>
+          <Position>Governor of Kandahar under the previous Taliban regime (1996-2001)</Position>
+          <Position>Foreign Minister under the previous Taliban regime (1996-2001)</Position>
+          <Position>Political Advisor of Mullah Mohammed Omar</Position>
+        </Positions>
+        <BirthDetails>
+          <Location>
+            <TownOfBirth>Pashmul village, Panjwai District, Kandahar Province</TownOfBirth>
+            <CountryOfBirth>Afghanistan</CountryOfBirth>
+          </Location>
+        </BirthDetails>
+      </Individual>
+    </IndividualDetails>
+  </Designation>
+  <Designation>
+    <LastUpdated>18/12/2021</LastUpdated>
+    <DateDesignated>23/09/2014</DateDesignated>
+    <UniqueID>AQD0001</UniqueID>
+    <OFSIGroupID>13131</OFSIGroupID>
+    <UNReferenceNumber>QDi.334</UNReferenceNumber>
+    <Names>
+      <Name>
+        <Name1>ABD AL-RAHMAN</Name1>
+        <Name2>BIN UMAYR</Name2>
+        <Name6>AL-NU'AYMI</Name6>
+        <NameType>Primary name</NameType>
+      </Name>
+      <Name>
+        <Name1>Abdelrahman</Name1>
+        <Name2>Imer</Name2>
+        <Name3>al Jaber</Name3>
+        <Name6>al Naimeh</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+      <Name>
+        <Name1>Abdulrahman</Name1>
+        <Name2>Omair</Name2>
+        <Name6>al Neaimi</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+      <Name>
+        <Name1>A. Rahman</Name1>
+        <Name3>Omair</Name3>
+        <Name4>J</Name4>
+        <Name6>Alnaimi</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+      <Name>
+        <Name1>A. Rahman</Name1>
+        <Name6>al-Naimi</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+      <Name>
+        <Name1>Abd</Name1>
+        <Name2>al-Rahman</Name2>
+        <Name3>bin</Name3>
+        <Name4>'Amir</Name4>
+        <Name6>al-Na'imi</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+      <Name>
+        <Name1>'Abd</Name1>
+        <Name2>al-Rahman</Name2>
+        <Name6>al-Nu'aimi</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+      <Name>
+        <Name1>'Abd</Name1>
+        <Name2>al-Rahman</Name2>
+        <Name3>bin</Name3>
+        <Name4>'Amir</Name4>
+        <Name6>al-Nu'aymi</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+      <Name>
+        <Name1>'Abdallah</Name1>
+        <Name2>Muhammad</Name2>
+        <Name6>al-Nu'aymi</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+      <Name>
+        <Name1>'Abd</Name1>
+        <Name2>al-Rahman</Name2>
+        <Name6>al-Nua'ymi</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+      <Name>
+        <Name1>'Abd</Name1>
+        <Name2>al-Rahman</Name2>
+        <Name3>bin</Name3>
+        <Name4>'Amir</Name4>
+        <Name6>al-Nu'imi</Name6>
+        <NameType>Alias</NameType>
+        <AliasStrength>Good quality a.k.a</AliasStrength>
+      </Name>
+    </Names>
+    <RegimeName>Isil (Da'esh) and Al-Qaeda (United Nations Sanctions) (EU Exit) Regulations 2019</RegimeName>
+    <IndividualEntityShip>Individual</IndividualEntityShip>
+    <DesignationSource>UN</DesignationSource>
+    <SanctionsImposed>Asset freeze|Arms embargo|Travel Ban</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>true</AssetFreeze>
+      <ArmsEmbargo>true</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>true</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>false</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>Financier and facilitator for Al-Qaida (QDe.004) and Al-Qaida in Iraq (QDe.115). INTERPOL-UN Security Council Special Notice web link: https://www.interpol.int/en/notice/search/un/5817985</OtherInformation>
+    <UKStatementofReasons>
+</UKStatementofReasons>
+    <Addresses>
+      <Address>
+        <AddressLine6>Al-Waab</AddressLine6>
+        <AddressCountry>Qatar</AddressCountry>
+      </Address>
+    </Addresses>
+    <IndividualDetails>
+      <Individual>
+        <DOBs>
+          <DOB>dd/mm/1954</DOB>
+        </DOBs>
+        <PassportDetails>
+          <Passport>
+            <PassportNumber>01461558</PassportNumber>
+            <PassportAdditionalInformation>Qatar expiring 20 Jan. 2024</PassportAdditionalInformation>
+          </Passport>
+          <Passport>
+            <PassportNumber>00868774</PassportNumber>
+            <PassportAdditionalInformation>Qatari passport number expired on 27 Apr. 2014</PassportAdditionalInformation>
+          </Passport>
+        </PassportDetails>
+        <Nationalities>
+          <Nationality>Qatar</Nationality>
+        </Nationalities>
+        <NationalIdentifierDetails>
+          <NationalIdentifier>
+            <NationalIdentifierNumber>25463400086</NationalIdentifierNumber>
+            <NationalIdentifierAdditionalInformation>Qatar identification number</NationalIdentifierAdditionalInformation>
+          </NationalIdentifier>
+          <NationalIdentifier>
+            <NationalIdentifierNumber>25463401784</NationalIdentifierNumber>
+            <NationalIdentifierAdditionalInformation>Qatar identification number number expires on 6 Dec. 2019</NationalIdentifierAdditionalInformation>
+          </NationalIdentifier>
+        </NationalIdentifierDetails>
+        <BirthDetails>
+          <Location>
+            <TownOfBirth>Doha</TownOfBirth>
+            <CountryOfBirth>Qatar</CountryOfBirth>
+          </Location>
+        </BirthDetails>
+      </Individual>
+    </IndividualDetails>
+  </Designation>
+  <Designation>
+    <LastUpdated>12/01/2022</LastUpdated>
+    <DateDesignated>23/09/2014</DateDesignated>
+    <UniqueID>AQD0002</UniqueID>
+    <OFSIGroupID>13141</OFSIGroupID>
+    <UNReferenceNumber>QDe.144</UNReferenceNumber>
+    <Names>
+      <Name>
+        <Name6>ABDALLAH AZZAM BRIGADES (AAB)</Name6>
+        <NameType>Primary name</NameType>
+      </Name>
+      <Name>
+        <Name6>AAB</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Abdullah Azzam Brigades</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Yusuf al-'Uyayri Battalions of the Abdallah Azzam Brigades</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Ziyad al-Jarrah Battalions of the Abdallah Azzam Brigades</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+    </Names>
+    <RegimeName>Isil (Da'esh) and Al-Qaeda (United Nations Sanctions) (EU Exit) Regulations 2019</RegimeName>
+    <IndividualEntityShip>Entity</IndividualEntityShip>
+    <DesignationSource>UN</DesignationSource>
+    <SanctionsImposed>Asset freeze|Arms embargo</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>true</AssetFreeze>
+      <ArmsEmbargo>true</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>false</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>false</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>An armed group that has carried out joint attacks with Al-Nusrah Front for the People of the Levant (QDe.137). Review pursuant to Security Council resolution 2368 (2017) was concluded on 4 Dec. 2019. INTERPOL-UN Security Council Special Notice web link: https://www.interpol.int/en/How-we-work/Notices/View-UN-Notices-Entities.</OtherInformation>
+    <UKStatementofReasons>
+</UKStatementofReasons>
+    <Addresses>
+      <Address>
+        <AddressCountry>Lebanon</AddressCountry>
+      </Address>
+      <Address>
+        <AddressCountry>Syria</AddressCountry>
+      </Address>
+    </Addresses>
+  </Designation>
+  <Designation>
+    <LastUpdated>09/04/2025</LastUpdated>
+    <DateDesignated>31/12/2020</DateDesignated>
+    <UniqueID>BEL0001</UniqueID>
+    <OFSIGroupID>8906</OFSIGroupID>
+    <Names>
+      <Name>
+        <Name1>Uladzimir</Name1>
+        <Name2>Uladzimiravich</Name2>
+        <Name6>Navumau</Name6>
+        <NameType>Primary name</NameType>
+      </Name>
+      <Name>
+        <Name1>Uladzimir</Name1>
+        <Name2>Uladzimiravich</Name2>
+        <Name6>Naumov</Name6>
+        <NameType>Primary name variation</NameType>
+      </Name>
+      <Name>
+        <Name1>Vladimir</Name1>
+        <Name2>Vladimirovich</Name2>
+        <Name6>Naumov</Name6>
+        <NameType>Primary name variation</NameType>
+      </Name>
+      <Name>
+        <Name1>Vladimir</Name1>
+        <Name2>Vladimirovich</Name2>
+        <Name6>Navamau</Name6>
+        <NameType>Primary Name Variation</NameType>
+      </Name>
+      <Name>
+        <Name1>Vladimir</Name1>
+        <Name2>Vladimirovich</Name2>
+        <Name6>Navumau</Name6>
+        <NameType>Primary name variation</NameType>
+      </Name>
+    </Names>
+    <RegimeName>The Republic of Belarus (Sanctions) (EU Exit) Regulations 2019</RegimeName>
+    <IndividualEntityShip>Individual</IndividualEntityShip>
+    <DesignationSource>UK</DesignationSource>
+    <SanctionsImposed>Asset freeze|Travel Ban|Director Disqualification Sanction</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>true</AssetFreeze>
+      <ArmsEmbargo>false</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>true</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>true</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>Received a residence in the Drozdy nonmenklatura district in Minsk from the Presidential Administration. The Director Disqualification Sanction was imposed on 09/04/2025.</OtherInformation>
+    <UKStatementofReasons>
+As a Minister of Interior he was responsible for the repression of peaceful demonstrations until his retirement on 6 April 2009 for health reasons. Received a residence in the Drozdy nomenklatura district in Minsk from the Presidential Administration. In October 2014, was awarded the Order “For Merit” III degree by President Lukashenka.</UKStatementofReasons>
+    <Addresses>
+      <Address>
+        <AddressLine6>Minsk</AddressLine6>
+        <AddressCountry>Belarus</AddressCountry>
+      </Address>
+    </Addresses>
+    <IndividualDetails>
+      <Individual>
+        <DOBs>
+          <DOB>07/02/1956</DOB>
+        </DOBs>
+        <Nationalities>
+          <Nationality>Belarus</Nationality>
+        </Nationalities>
+        <Positions>
+          <Position>Former Minister of the Interior of Belarus, 2000-09</Position>
+        </Positions>
+        <Genders>
+          <Gender>Male</Gender>
+        </Genders>
+        <BirthDetails>
+          <Location>
+            <TownOfBirth>Smolensk</TownOfBirth>
+            <CountryOfBirth>former USSR Currently Russia</CountryOfBirth>
+          </Location>
+        </BirthDetails>
+      </Individual>
+    </IndividualDetails>
+  </Designation>
+  <Designation>
+    <LastUpdated>09/04/2025</LastUpdated>
+    <DateDesignated>31/12/2020</DateDesignated>
+    <UniqueID>BEL0060</UniqueID>
+    <OFSIGroupID>14042</OFSIGroupID>
+    <Names>
+      <Name>
+        <Name6>140 Repair Plant</Name6>
+        <NameType>Primary name</NameType>
+      </Name>
+    </Names>
+    <RegimeName>The Republic of Belarus (Sanctions) (EU Exit) Regulations 2019</RegimeName>
+    <IndividualEntityShip>Entity</IndividualEntityShip>
+    <DesignationSource>UK</DesignationSource>
+    <SanctionsImposed>Asset freeze|Director Disqualification Sanction</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>true</AssetFreeze>
+      <ArmsEmbargo>false</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>false</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>true</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>The Director Disqualification Sanction was imposed on 09/04/2025.</OtherInformation>
+    <UKStatementofReasons>
+The 140 Repair Plant is a key part of the Belarusian State Authority for Military Industry (SAMI), which is responsible for implementing the military-technical policy of the state. The 140 Repair Plant has produced transport and armoured vehicles and equipment which are used to support the internal control activities of the Lukashenko regime. Subsequently, the 140 Repair Plant bears responsibility for providing support, equipment and technology for police and security forces of the Ministry of Internal Affairs, which have contributed to serious human rights violations and the repression of civil society following the August 9 elections. 
+
+
+</UKStatementofReasons>
+    <Addresses>
+      <Address>
+        <AddressLine1>19 L. Chalovskoy Street</AddressLine1>
+        <AddressLine5>Borisov</AddressLine5>
+        <AddressCountry>Belarus</AddressCountry>
+      </Address>
+    </Addresses>
+    <PhoneNumbers>
+      <PhoneNumber>00375(17)7762032</PhoneNumber>
+      <PhoneNumber>00375(17)7765479</PhoneNumber>
+      <PhoneNumber>00375(29)6480418</PhoneNumber>
+    </PhoneNumbers>
+    <EmailAddresses>
+      <EmailAddress>info@140zavod.org</EmailAddress>
+      <EmailAddress>www.140zavod.by</EmailAddress>
+    </EmailAddresses>
+    <EntityDetails>
+      <Entity>
+        <TypeOfEntities>
+          <TypeOfEntity>State-Owned Enterprise</TypeOfEntity>
+        </TypeOfEntities>
+      </Entity>
+    </EntityDetails>
+  </Designation>
+  <Designation>
+    <LastUpdated>03/08/2026</LastUpdated>
+    <DateDesignated>11/04/2022</DateDesignated>
+    <UniqueID>BIH0001</UniqueID>
+    <OFSIGroupID>15081</OFSIGroupID>
+    <Names>
+      <Name>
+        <Name1>Zeljka </Name1>
+        <Name6>Cvijanovic</Name6>
+        <NameType>Primary Name</NameType>
+      </Name>
+    </Names>
+    <NonLatinNames>
+      <NonLatinName>
+        <NameNonLatinScript>Жељка Цвијановић</NameNonLatinScript>
+        <NonLatinScriptType>Cyrillic</NonLatinScriptType>
+        <NonLatinScriptLanguage>Bosnian</NonLatinScriptLanguage>
+      </NonLatinName>
+    </NonLatinNames>
+    <Titles>
+      <Title>President</Title>
+    </Titles>
+    <RegimeName>The Bosnia and Herzegovina (Sanctions) (EU Exit) Regulations 2020</RegimeName>
+    <IndividualEntityShip>Individual</IndividualEntityShip>
+    <DesignationSource>UK</DesignationSource>
+    <SanctionsImposed>Asset freeze|Travel Ban|Director Disqualification Sanction</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>true</AssetFreeze>
+      <ArmsEmbargo>false</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>true</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>true</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>Previously 11th Prime Minister of Republika Srpska. She is a member of the Alliance of Independent Social Democrats party (SNSD/СНСД), also a member of the party’s Executive Board and its Main Board The Director Disqualification Sanction was imposed on 09/04/2025.</OtherInformation>
+    <UKStatementofReasons>
+Zeljka Cvijanovic, as President of Republika Srpska, is working with Milorad Dodik (also designated under the Bosnia and Herzegovina (Sanctions) (EU Exit) Regulations 2020) to undermine the territorial integrity,  international personality or constitutional order of Bosnia and Herzegovina, through enacting the unilateral transfer of state competencies from the Government of Bosnia and Herzegovina to Republika Srpska, signing into law the legislative steps to begin to degrade/destroy state institutions as well as establishing an independent tax authority, medical agency, and army in the Republika Srpska. Cvijanovic’s actions are unconstitutional and go against the central tenets of the Dayton Peace Agreement as well as undermine the state’s competences in security. 
+</UKStatementofReasons>
+    <Addresses>
+      <Address>
+        <AddressLine1>Bana Milosavljevica 4</AddressLine1>
+        <AddressLine2>Banja Luka</AddressLine2>
+        <AddressPostalCode>78000</AddressPostalCode>
+        <AddressCountry>Bosnia and Herzegovina</AddressCountry>
+      </Address>
+    </Addresses>
+    <IndividualDetails>
+      <Individual>
+        <DOBs>
+          <DOB>02/08/1967</DOB>
+        </DOBs>
+        <Nationalities>
+          <Nationality>Bosnia and Herzegovina</Nationality>
+        </Nationalities>
+        <Positions>
+          <Position>President of Republika Srpska, Bosnia and Herzegovina  </Position>
+        </Positions>
+        <Genders>
+          <Gender>Female</Gender>
+        </Genders>
+        <BirthDetails>
+          <Location>
+            <TownOfBirth>Banja Luka</TownOfBirth>
+            <CountryOfBirth>Bosnia and Herzegovina</CountryOfBirth>
+          </Location>
+        </BirthDetails>
+      </Individual>
+    </IndividualDetails>
+  </Designation>
+  <Designation>
+    <LastUpdated>09/04/2025</LastUpdated>
+    <DateDesignated>15/01/2024</DateDesignated>
+    <UniqueID>BIH0004</UniqueID>
+    <OFSIGroupID>16338</OFSIGroupID>
+    <Names>
+      <Name>
+        <Name6>Mania d.o.o.</Name6>
+        <NameType>Primary Name</NameType>
+      </Name>
+    </Names>
+    <RegimeName>The Bosnia and Herzegovina (Sanctions) (EU Exit) Regulations 2020</RegimeName>
+    <IndividualEntityShip>Entity</IndividualEntityShip>
+    <DesignationSource>UK</DesignationSource>
+    <SanctionsImposed>Asset freeze|Director Disqualification Sanction</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>true</AssetFreeze>
+      <ArmsEmbargo>false</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>false</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>true</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <OtherInformation>The Director Disqualification Sanction was imposed on 09/04/2025.</OtherInformation>
+    <UKStatementofReasons>
+Mania is an involved person within the meaning of the Bosnia and Herzegovina (Sanctions) (EU Exit) Regulations 2020 in that, by promoting the celebration of Republika Srpska (RS) Day on 9 January 2024, it is or has been involved in undermining or threatening the constitutional order of Bosnia and Herzegovina (BiH). 
+</UKStatementofReasons>
+    <Addresses>
+      <Address>
+        <AddressLine1>Vojvode Pere Krece 21</AddressLine1>
+        <AddressLine6>Banja Luka</AddressLine6>
+        <AddressPostalCode>78000</AddressPostalCode>
+        <AddressCountry>Bosnia and Herzegovina</AddressCountry>
+      </Address>
+    </Addresses>
+    <PhoneNumbers>
+      <PhoneNumber>00 387 66 581 925</PhoneNumber>
+    </PhoneNumbers>
+    <Websites>
+      <Website>https://mania.marketing/sr</Website>
+    </Websites>
+    <EmailAddresses>
+      <EmailAddress>kontakt@mania.marketing</EmailAddress>
+    </EmailAddresses>
+    <EntityDetails>
+      <Entity>
+        <TypeOfEntities>
+          <TypeOfEntity>Marketing agency</TypeOfEntity>
+        </TypeOfEntities>
+        <BusinessRegistrationNumbers>
+          <BusinessRegistrationNumber>44038924500007</BusinessRegistrationNumber>
+        </BusinessRegistrationNumbers>
+      </Entity>
+    </EntityDetails>
+  </Designation>
+  <Designation>
+    <LastUpdated>20/12/2021</LastUpdated>
+    <DateDesignated>07/03/2016</DateDesignated>
+    <UniqueID>CAF0002</UniqueID>
+    <OFSIGroupID>13345</OFSIGroupID>
+    <UNReferenceNumber>CFe.002</UNReferenceNumber>
+    <Names>
+      <Name>
+        <Name6>LORD'S RESISTANCE ARMY</Name6>
+        <NameType>Primary name</NameType>
+      </Name>
+      <Name>
+        <Name6>Lord's Resistance Movement (LRM)</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>Lord's Resistance Movement/Army (LRM/A)</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+      <Name>
+        <Name6>LRA</Name6>
+        <NameType>Alias</NameType>
+      </Name>
+    </Names>
+    <RegimeName>The Central African Republic (Sanctions) (EU Exit) Regulations 2020</RegimeName>
+    <IndividualEntityShip>Entity</IndividualEntityShip>
+    <DesignationSource>UN</DesignationSource>
+    <SanctionsImposed>Asset freeze</SanctionsImposed>
+    <SanctionsImposedIndicators>
+      <AssetFreeze>true</AssetFreeze>
+      <ArmsEmbargo>false</ArmsEmbargo>
+      <TargetedArmsEmbargo>false</TargetedArmsEmbargo>
+      <CharteringOfShips>false</CharteringOfShips>
+      <ClosureOfRepresentativeOffices>false</ClosureOfRepresentativeOffices>
+      <CrewServicingOfShipsAndAircraft>false</CrewServicingOfShipsAndAircraft>
+      <Deflag>false</Deflag>
+      <PreventionOfBusinessArrangements>false</PreventionOfBusinessArrangements>
+      <ProhibitionOfPortEntry>false</ProhibitionOfPortEntry>
+      <TravelBan>false</TravelBan>
+      <PreventionOfCharteringOfShips>false</PreventionOfCharteringOfShips>
+      <PreventionOfCharteringOfShipsAndAircraft>false</PreventionOfCharteringOfShipsAndAircraft>
+      <TechnicalAssistanceRelatedToAircraft>false</TechnicalAssistanceRelatedToAircraft>
+      <TrustServicesSanctions>false</TrustServicesSanctions>
+      <DirectorDisqualificationSanction>false</DirectorDisqualificationSanction>
+    </SanctionsImposedIndicators>
+    <UKStatementofReasons>
+Emerged in northern Uganda in the 1980s. Has engaged in the abduction, killing and mutilation of thousands of civilians in Central Africa, including hundreds in the Central African Republic. The leader is Joseph Kony (CFi.009). INTERPOL-UN Security Council Special Notice web link: https://www.interpol.int/en/notice/search/une/5932344</UKStatementofReasons>
+    <Addresses>
+      <Address>
+        <AddressLine6>Basse-Kotto</AddressLine6>
+        <AddressCountry>Central African Republic</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine6>Bas-Uolo</AddressLine6>
+        <AddressCountry>Congo (Democratic Republic)</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine6>Haute-Kotto</AddressLine6>
+        <AddressCountry>Central African Republic</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine6>Haut-Mbomou</AddressLine6>
+        <AddressCountry>Central African Republic</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine6>Haut-Uolo</AddressLine6>
+        <AddressCountry>Congo (Democratic Republic)</AddressCountry>
+      </Address>
+      <Address>
+        <AddressLine6>Kafia Kingi</AddressLine6>
+      </Address>
+      <Address>
+        <AddressLine6>Vakaga</AddressLine6>
+        <AddressCountry>Central African Republic</AddressCountry>
+      </Address>
+    </Addresses>
+  </Designation>
+</Designations>
