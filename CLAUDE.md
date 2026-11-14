@@ -189,8 +189,12 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   follows the viewer's light or dark setting. The preview entry is `headwind-site` in `D:\Projects\.claude\launch.json`.
 - **Full collect 13 Nov, 10:28 AM CST:** all ten lanes current (EIA timed out once at 60 s and passed on a second
   try), 60 feed items, `check` PASS. Still no list change: the OFAC and UN files are byte for byte the same as on
-  12 Nov, and trade.gov's file changed its bytes but none of its 6,702 entries. The change items, vessel names and
-  trade.gov's entry ids are still untested against a real change.
+  12 Nov, and trade.gov's file changed its bytes but none of its 6,702 entries.
+- **First real list change, seen locally 14 Nov, 2:26 PM CST:** OFAC SDN 19,563 to 19,565, 2 entities added
+  (SDGT 2, FTO 1, ILLICIT-DRUGS-EO14059 1), no countries (conduct programs), no vessels. It matches OFAC's 13 Nov
+  "Counter Narcotics and Counter Terrorism Designations". The live site will never report it: the runner's
+  baseline (13 Nov, 10:43 AM CST) was set after OFAC published. The change item and feed text read right; vessel
+  names and trade.gov's entry ids are still untested. `check` PASS, all ten lanes ok.
 - **The workflow** (`.github/workflows/update.yml`) follows Blackout's: tests, state from the Actions cache,
   `collect`, `build`, `check`, state saved, then `wrangler pages deploy`. **It does not publish state** (Tom, 13
   Nov: go with the recommendation): the list indexes hold the publishers' entry ids for people, and people are
