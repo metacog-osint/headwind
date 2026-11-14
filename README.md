@@ -14,8 +14,8 @@ Headwind reports measurements. It states no probability and gives no investment 
 4. **World Food Programme** food prices by market, from the Humanitarian Data Exchange.
 5. **World Bank** World Development Indicators, as a slow baseline per country.
 6. **Federal Reserve, ECB and FAO** schedule pages, for the calendar.
-7. **US Treasury (OFAC)** SDN list and the **UN Security Council** consolidated list: changes between readings,
-   as counts.
+7. **US Treasury (OFAC)** SDN list, the **UN Security Council** consolidated list, the **EU**'s financial sanctions
+   list and the **UK Sanctions List**: changes between readings, as counts. Vessels are named.
 8. **US Federal Register**: rules and proposed rules from BIS and OFAC, with the future dates they name.
 9. **trade.gov** Consolidated Screening List (every list but the SDN list): changes between readings, as counts.
 10. **US Geological Survey** Mineral Commodity Summaries: net import reliance and import sources by commodity,

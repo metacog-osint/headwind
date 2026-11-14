@@ -75,8 +75,9 @@
     var lists = s.sanctions_lists || [];
     document.getElementById("sanction-lists").innerHTML = lists.map(function (l) {
       var types = Object.keys(l.by_type || {}).map(function (k) { return k + " " + Number(l.by_type[k]).toLocaleString(); }).join(", ");
+      var note = l.error ? " Not read on the last run (" + when(l.failed_at) + "): " + l.error + ". These figures are from the reading before." : "";
       return '<div class="row"><div class="row-title"><span><a href="' + esc(l.url) + '" rel="noopener">' + esc(l.name) + '</a></span><span class="badge">' + esc(Number(l.total).toLocaleString()) + ' entries</span></div><div class="small muted">' +
-        esc(types + ". Read " + when(l.checked_at) + "; compared since " + when(l.baseline_set_at) + ".") + "</div></div>";
+        esc(types + ". Read " + when(l.checked_at) + "; compared since " + when(l.baseline_set_at) + "." + note) + "</div></div>";
     }).join("") || '<p class="small muted">No list has been read yet.</p>';
     function counts(o) { return Object.keys(o || {}).slice(0, 6).map(function (k) { return k + " " + o[k]; }).join(", "); }
     document.getElementById("sanction-deltas").innerHTML = (s.sanctions || []).map(function (d) {
@@ -117,7 +118,6 @@
         return [esc(m.commodity), esc(m.reliance_text ? m.reliance_text + "%" : "not given"),
           esc((m.shares || []).map(function (x) { return x.source + " " + x.pct + "%"; }).join(", ") || "not given")];
       }));
-      var firsts = (mn.by_source || []).filter(function (b) { return b.named_first > 1; }).slice(0, 8).map(function (b) { return b.source + " " + b.named_first; });
       var cl = mn.critical_list;
       if (cl) {
         var listed = mn.import_sources.filter(function (m) { return (m.critical || []).length; }).length;
@@ -128,6 +128,7 @@
             (cl.not_in_import_sources.length ? " Not in this table: " + cl.not_in_import_sources.join(", ") + "." : "") +
             " In the net import reliance table, " + relRows + " of " + (mn.reliance || []).length + " rows are list minerals; that table has no row for " + cl.not_in_reliance_table.join(", ") + ".");
       }
+      var firsts = (mn.by_source || []).filter(function (b) { return b.named_first > 1; }).slice(0, 8).map(function (b) { return b.source + " " + b.named_first; });
       document.getElementById("minerals-first").textContent = firsts.length ? "Named first among major import sources, out of the " + mn.with_sources + " commodities with sources given: " + firsts.join(", ") + "." : "";
     } else {
       table("minerals-table", [], []);
@@ -145,7 +146,7 @@
         ? '<details class="more"><summary>Show ' + (ruleRows.length - RULES_SHOWN) + " earlier documents</summary>" + ruleRows.slice(RULES_SHOWN).join("") + "</details>" : "")
       : '<p class="small muted">No rules collected.</p>';
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules (US Federal Register)", fx: "Exchange rates (ECB)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules (US Federal Register)", fx: "Exchange rates (ECB)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {
       var l = s.lanes[k], ok = l.status === "ok";
       var note = ok ? "collected " + when(l.fetched_at) : (l.from_previous && l.fetched_at ? "failed; showing the copy from " + when(l.fetched_at) : "failed; no data");

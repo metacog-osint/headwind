@@ -1,7 +1,8 @@
 """Sanctions lists: what was added or removed since Headwind last looked.
 
-Two official lists, both keyless: the US Treasury's SDN list (OFAC, sdn.csv) and the UN Security
-Council consolidated list (XML). Each run reduces a list to an index of entry id -> [type, groups],
+Four official lists, all keyless: the US Treasury's SDN list (OFAC, sdn.csv), the UN Security
+Council consolidated list (XML), the EU's Financial Sanctions Files (XML) and the UK Sanctions List
+(FCDO, XML). Each run reduces a list to an index of entry id -> [type, groups],
 compares it with the index kept from the run before, and reports the difference as counts by type
 and by sanctions program. Headwind publishes counts and a link to the official list. People and
 organizations are counts only. Vessels are the exception (Tom, 13 Nov 2026): a vessel is not a
@@ -23,12 +24,52 @@ OFAC_SDN_CSV = "https://www.treasury.gov/ofac/downloads/sdn.csv"
 UN_XML = "https://scsanctions.un.org/resources/xml/en/consolidated.xml"
 OFAC_RECENT = "https://ofac.treasury.gov/recent-actions"
 UN_PAGE = "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list"
+# The EU's Financial Sanctions Files: the token is the public one the Commission's own RSS feed and the
+# EU open data portal give for these files. About 26 MB; the Commission's server takes about 30 s.
+EU_XML = "https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw"
+EU_PAGE = ("https://data.europa.eu/data/datasets/"
+           "consolidated-list-of-persons-groups-and-entities-subject-to-eu-financial-sanctions")
+# The UK Sanctions List (FCDO), the only UK list since OFSI's Consolidated List closed on 28 Jan 2026.
+UK_XML = "https://sanctionslist.fcdo.gov.uk/docs/UK-Sanctions-List.xml"
+UK_PAGE = "https://www.gov.uk/government/publications/the-uk-sanctions-list"
 
 LISTS = {
     "ofac-sdn": {"name": "OFAC SDN list", "publisher": "US Treasury (OFAC)", "url": OFAC_RECENT, "min_entries": 5000},
     "un-consolidated": {"name": "UN Security Council consolidated list", "publisher": "United Nations Security Council",
                         "url": UN_PAGE, "min_entries": 300},
+    "eu-fsf": {"name": "EU financial sanctions list", "publisher": "European Commission (Financial Sanctions Files)",
+               "url": EU_PAGE, "min_entries": 3000},
+    "uk-sanctions": {"name": "UK Sanctions List", "publisher": "UK Foreign, Commonwealth and Development Office",
+                     "url": UK_PAGE, "min_entries": 3000},
 }
+
+# EU programme codes, as the Financial Sanctions Files give them, that name a country. Read against the
+# live file on 14 Nov 2026 (34 codes). "UKR" is the EU's regime on undermining Ukraine's territorial
+# integrity; like OFAC's EO 13660 it is placed on both countries. Left unplaced on purpose: TAQA and EUAQ
+# (ISIL and Al-Qaida), TERR (terrorism), HAM (Hamas and Palestinian Islamic Jihad), HR (global human
+# rights), CHEM (chemical weapons), CYB (cyber attacks), UNLI (UN listings carried before an EU act) and
+# SDNZ (code not explained in the file).
+EU_PROGRAMME_COUNTRY = {
+    "UKR": ("RU", "UA"), "RUS": "RU", "RUSDA": "RU", "BLR": "BY", "IRN": "IR", "SYR": "SY", "PRK": "KP", "AFG": "AF",
+    "MMR": "MM", "COD": "CD", "IRQ": "IQ", "VEN": "VE", "LBY": "LY", "MDA": "MD", "TUN": "TN", "SDN": "SD", "SSD": "SS",
+    "SOM": "SO", "NIC": "NI", "CAF": "CF", "HTI": "HT", "YEM": "YE", "GTM": "GT", "GIN": "GN", "MLI": "ML",
+}
+EU_UNPLACED = {"TAQA", "EUAQ", "TERR", "HAM", "HR", "CHEM", "CYB", "UNLI", "SDNZ"}
+
+# UK regimes by short name (uk_regime()), read against the live list on 14 Nov 2026 (31 regimes).
+UK_REGIME_COUNTRY = {
+    "Russia": "RU", "Syria": "SY", "Iran": "IR", "Iran (Nuclear)": "IR", "Democratic People's Republic of Korea": "KP",
+    "Republic of Belarus": "BY", "Afghanistan": "AF", "Myanmar": "MM", "Iraq": "IQ",
+    "Democratic Republic of the Congo": "CD", "Libya": "LY", "Sudan": "SD", "Venezuela": "VE",
+    "Central African Republic": "CF", "Somalia": "SO", "Yemen": "YE", "Nicaragua": "NI",
+    "Republic of Guinea-Bissau": "GW", "South Sudan": "SS", "Haiti": "HT", "Guinea": "GN",
+    "Bosnia and Herzegovina": "BA", "Mali": "ML",
+}
+UK_UNPLACED = {"Isil (Da'esh) and Al-Qaeda (United Nations Sanctions)", "Global Human Rights", "Cyber",
+               "Global Anti-Corruption", "Counter-Terrorism (International Sanctions)", "Counter-Terrorism",
+               "Global Irregular Migration and Trafficking in Persons", "Chemical Weapons"}
+
+LIST_COUNTRY = {"eu-fsf": (EU_PROGRAMME_COUNTRY, EU_UNPLACED), "uk-sanctions": (UK_REGIME_COUNTRY, UK_UNPLACED)}
 KEEP_DAYS = 30          # how long a delta stays in the snapshot
 SHRINK_LIMIT = 0.5      # a list that loses more than half its entries is a broken download, not a delisting
 
@@ -56,13 +97,93 @@ PROGRAM_COUNTRY = {
 }
 
 
-def countries_for(groups) -> list[str]:
+def countries_for(groups, list_id: str | None = None) -> list[str]:
     out = set()
     for g in groups:
-        cc = PROGRAM_COUNTRY.get(g) or PROGRAM_COUNTRY.get(re.split(r"[-\d]", g, maxsplit=1)[0].strip())
+        if list_id in LIST_COUNTRY:
+            cc = LIST_COUNTRY[list_id][0].get(g)
+        else:
+            cc = PROGRAM_COUNTRY.get(g) or PROGRAM_COUNTRY.get(re.split(r"[-\d]", g, maxsplit=1)[0].strip())
         if cc:
             out.update((cc,) if isinstance(cc, str) else cc)
     return sorted(out)
+
+
+def unknown_programs(list_id: str, index: dict) -> list[str]:
+    """Programs on an EU or UK list that are neither placed on a country nor left unplaced on purpose:
+    a new regime, to be read and added to the maps above."""
+    if list_id not in LIST_COUNTRY:
+        return []
+    placed, unplaced = LIST_COUNTRY[list_id]
+    return sorted({g for e in index.values() for g in e[1]} - set(placed) - unplaced)
+
+
+def uk_regime(name: str) -> str:
+    """'The Iran (Sanctions) (Nuclear) (EU Exit) Regulations 2019' -> 'Iran (Nuclear)'."""
+    s = re.sub(r"^The\s+", "", (name or "").strip())
+    s = re.sub(r"\s*\((?:Sanctions|EU Exit)\)", "", s)
+    s = re.sub(r"\s*(?:Sanctions\s+)?Regulations\s+\d{4}$", "", s)
+    return " ".join(s.split()) or "none stated"
+
+
+EU_NS = {"e": "http://eu.europa.ec/fpi/fsd/export"}
+EU_TYPE = {"person": "individual", "enterprise": "entity"}
+
+
+def parse_eu_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
+    """The EU Financial Sanctions Files, XML v1.1: one sanctionEntity per entry, keyed on its logicalId.
+    The EU file lists people and organizations only; vessels under EU measures are in regulation
+    annexes, not in this file."""
+    root = ET.fromstring(body)
+    index = {}
+    for e in root.findall("e:sanctionEntity", EU_NS):
+        lid = (e.get("logicalId") or "").strip()
+        if not lid:
+            continue
+        st = e.find("e:subjectType", EU_NS)
+        code = st.get("code") if st is not None else None
+        programmes = sorted({r.get("programme") for r in e.findall("e:regulation", EU_NS) if r.get("programme")})
+        index[lid] = [EU_TYPE.get(code, code or "unknown"), programmes]
+    return root.get("generationDate"), index
+
+
+def _uk_date(text: str | None) -> str | None:
+    m = re.fullmatch(r"(\d{2})/(\d{2})/(\d{4})", (text or "").strip())
+    return f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else None
+
+
+UK_TYPE = {"Individual": "individual", "Entity": "entity", "Ship": "vessel"}
+
+
+def _uk_ship(d) -> dict:
+    """The public fields of a UK ship designation: name, IMO number, flag and type. Owners and operators
+    are left out, as for OFAC: they can name a person."""
+    name = None
+    for n in d.findall("Names/Name"):
+        if (n.findtext("NameType") or "").strip().lower() == "primary name":     # the file has both cases
+            name = " ".join(filter(None, ((n.findtext(f"Name{i}") or "").strip() for i in (1, 2, 3, 4, 5, 6)))) or None
+            break
+    imo = (d.findtext("ShipDetails/Ship/IMONumbers/IMONumber") or "").strip()
+    imo = re.sub(r"^IMO\s*", "", imo)
+    return {"name": name, "imo": imo if re.fullmatch(r"\d{7}", imo) else None, "mmsi": None,
+            "flag": (d.findtext("ShipDetails/Ship/CurrentBelievedFlagOfShips/CurrentBelievedFlagOfShip") or "").strip() or None,
+            "vessel_type": (d.findtext("ShipDetails/Ship/TypeOfShipDetails/TypeOfShip") or "").strip() or None}
+
+
+def parse_uk_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
+    """The UK Sanctions List XML: one Designation per entry, keyed on its UniqueID, grouped by regime."""
+    root = ET.fromstring(body)
+    index = {}
+    for d in root.findall("Designation"):
+        uid = (d.findtext("UniqueID") or "").strip()
+        if not uid:
+            continue
+        kind = UK_TYPE.get((d.findtext("IndividualEntityShip") or "").strip(), "unknown")
+        entry = [kind, [uk_regime(d.findtext("RegimeName"))]]
+        if kind == "vessel":
+            entry.append(_uk_ship(d))
+        index[uid] = entry
+    return _uk_date(root.findtext("DateGenerated")), index
 
 
 def parse_sdn_csv(text: str) -> dict[str, list]:
@@ -136,9 +257,13 @@ def _tally(index: dict, ids) -> tuple[dict, dict]:
 
 def status(list_id: str, index: dict, checked_at: str, baseline_set_at: str, source_generated: str | None = None) -> dict:
     by_type, _ = _tally(index, index)
-    return {"id": list_id, "name": LISTS[list_id]["name"], "publisher": LISTS[list_id]["publisher"],
-            "url": LISTS[list_id]["url"], "total": len(index), "by_type": by_type, "checked_at": checked_at,
-            "baseline_set_at": baseline_set_at, "source_generated": source_generated}
+    out = {"id": list_id, "name": LISTS[list_id]["name"], "publisher": LISTS[list_id]["publisher"],
+           "url": LISTS[list_id]["url"], "total": len(index), "by_type": by_type, "checked_at": checked_at,
+           "baseline_set_at": baseline_set_at, "source_generated": source_generated}
+    unknown = unknown_programs(list_id, index)
+    if unknown:
+        out["unknown_programs"] = unknown
+    return out
 
 
 def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None) -> dict | None:
@@ -158,7 +283,7 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
         "added_by_type": a_type, "added_by_program": a_group,
         "removed_by_type": r_type, "removed_by_program": r_group,
         "vessels_added": _vessels(index, added), "vessels_removed": _vessels(prev_index, removed),
-        "countries": countries_for(list(a_group) + list(r_group)),
+        "countries": countries_for(list(a_group) + list(r_group), list_id),
     }
 
 
