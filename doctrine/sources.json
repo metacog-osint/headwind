@@ -109,6 +109,15 @@
       "use": "ingest",
       "grade": "A1",
       "independence_group": "usgs"
+    },
+    {
+      "id": "usgs-critical-list-2025",
+      "name": "US Department of the Interior (USGS): Final 2025 List of Critical Minerals, 90 FR 50494 (Federal Register 2025-19813)",
+      "url": "https://www.federalregister.gov/documents/2025/11/07/2025-19813/final-2025-list-of-critical-minerals",
+      "licence": "US public domain",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "usgs"
     }
   ]
 }

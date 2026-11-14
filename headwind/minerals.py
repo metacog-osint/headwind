@@ -32,6 +32,62 @@ MIN_COMMODITIES = 30
 # USGS country names that differ from the suite's own.
 NAME_CC = {"Republic of Korea": "KR"}
 
+# The Final 2025 List of Critical Minerals (Interior Department, US Geological Survey), 90 FR 50494,
+# Federal Register document 2025-19813, published 7 Nov 2025. Copied from the notice's own sentence
+# ("includes the following 60 minerals: ..."); a test reads that sentence from the notice's text and
+# checks it against this tuple. The list is revised at least every three years, as a new notice, so
+# this has to be changed by hand when the next final list is published.
+CRITICAL_LIST = {
+    "title": "Final 2025 List of Critical Minerals", "publisher": "US Department of the Interior (USGS)",
+    "published": "2025-11-07", "citation": "90 FR 50494", "document": "2025-19813",
+    "url": "https://www.federalregister.gov/documents/2025/11/07/2025-19813/final-2025-list-of-critical-minerals",
+    "licence": "US public domain (Federal Register)",
+}
+CRITICAL_2025 = (
+    "aluminum", "antimony", "arsenic", "barite", "beryllium", "bismuth", "boron", "cerium", "cesium", "chromium",
+    "cobalt", "copper", "dysprosium", "erbium", "europium", "fluorspar", "gadolinium", "gallium", "germanium",
+    "graphite", "hafnium", "holmium", "indium", "iridium", "lanthanum", "lead", "lithium", "lutetium", "magnesium",
+    "manganese", "metallurgical coal", "neodymium", "nickel", "niobium", "palladium", "phosphate", "platinum",
+    "potash", "praseodymium", "rhenium", "rhodium", "rubidium", "ruthenium", "samarium", "scandium", "silicon",
+    "silver", "tantalum", "tellurium", "terbium", "thulium", "tin", "titanium", "tungsten", "uranium", "vanadium",
+    "ytterbium", "yttrium", "zinc", "zirconium",
+)
+# USGS reports these list members together as one commodity, "Rare earths". Scandium and yttrium,
+# which the list also names, have their own rows.
+RARE_EARTHS = ("cerium", "dysprosium", "erbium", "europium", "gadolinium", "holmium", "lanthanum", "lutetium",
+               "neodymium", "praseodymium", "samarium", "terbium", "thulium", "ytterbium")
+
+
+def parse_list_sentence(text: str) -> list[str]:
+    """The minerals named in a list notice's sentence 'includes the following N minerals: a, b, ..., and z.'
+
+    Used by the tests to check CRITICAL_2025 against the notice, and by hand for the next notice.
+    """
+    flat = " ".join(text.split())
+    m = re.search(r"following (\d+) minerals: (.+?)\.(?:\s|$)", flat)
+    if not m:
+        raise ValueError("critical minerals notice: no 'following N minerals' sentence")
+    names = [n.strip() for n in re.split(r",\s*(?:and\s+)?", m.group(2)) if n.strip()]
+    if len(names) != int(m.group(1)):
+        raise ValueError(f"critical minerals notice: says {m.group(1)}, lists {len(names)}")
+    return names
+
+
+def critical_members(commodity: str) -> list[str]:
+    """The 2025 list members a USGS commodity row stands for: [] for none.
+
+    Matched on the commodity's first word ("COPPER, refined" -> copper, "Phosphate, rock" -> phosphate),
+    with two exceptions: "Rare earths" stands for the fourteen rare earths the list names one by one, and
+    "Metallurgical coal" is two words. A row for one form of a mineral ("MAGNESIUM COMPOUNDS", "TITANIUM,
+    sponge metal") is marked with the mineral; the list names minerals, not forms.
+    """
+    w = _words(commodity)
+    if w[:2] == ["rare", "earths"]:
+        return list(RARE_EARTHS)
+    if w[:2] == ["metallurgical", "coal"]:
+        return ["metallurgical coal"]
+    return [w[0]] if w and w[0] in CRITICAL_2025 else []
+
 
 def find_files(item_body: bytes | str) -> dict:
     """From the ScienceBase item: the two tables' download links and MD5s, and the publication date."""
@@ -151,13 +207,24 @@ def reliance_as_printed(critical: list[dict], reliance: list[dict]) -> None:
 
 def build(found: dict, reliance: list[dict], critical: list[dict], cc_of) -> dict:
     reliance_as_printed(critical, reliance)
+    for r in reliance:
+        r["critical"] = critical_members(r["commodity"])
+    for m in critical:
+        m["critical"] = critical_members(m["commodity"])
+    in_reliance = {c for r in reliance for c in r["critical"]}
+    in_sources = {c for m in critical for c in m["critical"]}
     return {
         "edition": EDITION, "title": found.get("title"), "published": found.get("published"),
         "url": DOI_URL, "report_url": REPORT_URL, "licence": "CC0 1.0 (US Geological Survey)",
         "reliance_year": reliance[0]["year"], "sources_period": reliance[0]["sources_period"],
-        "reliance": [{k: r[k] for k in ("commodity", "reliance_text", "reliance_pct", "bound", "sources")} for r in reliance],
-        "import_sources": [{k: m[k] for k in ("commodity", "reliance_pct", "reliance_text", "shares", "usgs_flag")}
-                     for m in critical],
+        "reliance": [{k: r[k] for k in ("commodity", "reliance_text", "reliance_pct", "bound", "sources", "critical")}
+                     for r in reliance],
+        "import_sources": [{k: m[k] for k in ("commodity", "reliance_pct", "reliance_text", "shares", "critical",
+                                              "usgs_flag")} for m in critical],
+        "critical_list": {**CRITICAL_LIST, "count": len(CRITICAL_2025), "minerals": list(CRITICAL_2025),
+                          "rare_earths_as_one": list(RARE_EARTHS),
+                          "not_in_reliance_table": [c for c in CRITICAL_2025 if c not in in_reliance],
+                          "not_in_import_sources": [c for c in CRITICAL_2025 if c not in in_sources]},
         "with_sources": sum(1 for r in reliance if r["sources"]),
         "by_source": first_named(reliance, cc_of),
     }

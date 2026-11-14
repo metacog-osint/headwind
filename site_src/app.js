@@ -118,6 +118,16 @@
           esc((m.shares || []).map(function (x) { return x.source + " " + x.pct + "%"; }).join(", ") || "not given")];
       }));
       var firsts = (mn.by_source || []).filter(function (b) { return b.named_first > 1; }).slice(0, 8).map(function (b) { return b.source + " " + b.named_first; });
+      var cl = mn.critical_list;
+      if (cl) {
+        var listed = mn.import_sources.filter(function (m) { return (m.critical || []).length; }).length;
+        var relRows = (mn.reliance || []).filter(function (r) { return (r.critical || []).length; }).length;
+        document.getElementById("minerals-list").innerHTML = esc((listed === mn.import_sources.length ? "Every commodity in this table is" : listed + " of these " + mn.import_sources.length + " commodities are") + " on the ") +
+          '<a href="' + esc(cl.url) + '" rel="noopener">' + esc(cl.title) + "</a>" +
+          esc(" (" + cl.count + " minerals, " + cl.citation + ", published " + day(cl.published + "T12:00:00Z") + "). USGS reports fourteen of them together as rare earths." +
+            (cl.not_in_import_sources.length ? " Not in this table: " + cl.not_in_import_sources.join(", ") + "." : "") +
+            " In the net import reliance table, " + relRows + " of " + (mn.reliance || []).length + " rows are list minerals; that table has no row for " + cl.not_in_reliance_table.join(", ") + ".");
+      }
       document.getElementById("minerals-first").textContent = firsts.length ? "Named first among major import sources, out of the " + mn.with_sources + " commodities with sources given: " + firsts.join(", ") + "." : "";
     } else {
       table("minerals-table", [], []);

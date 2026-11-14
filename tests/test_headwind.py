@@ -249,6 +249,28 @@ class TestParsers(unittest.TestCase):
         with self.assertRaises(ValueError):
             minerals.parse_reliance("Source,Commodity\nMCS2026,GALLIUM\n")
 
+    def test_critical_minerals_list(self):
+        # The tuple is the notice's own sentence, read from the Federal Register text of 7 Nov 2025.
+        self.assertEqual(tuple(minerals.parse_list_sentence(text("fr_critical_minerals_2025.txt"))),
+                         minerals.CRITICAL_2025)
+        self.assertEqual(len(minerals.CRITICAL_2025), 60)
+        with self.assertRaises(ValueError):
+            minerals.parse_list_sentence("includes the following 3 minerals: tin, and zinc.")
+        cm = minerals.critical_members
+        self.assertEqual((cm("COPPER, refined"), cm("Phosphate, rock"), cm("Metallurgical coal"), cm("GRAPHITE (NATURAL)")),
+                         (["copper"], ["phosphate"], ["metallurgical coal"], ["graphite"]))
+        self.assertEqual((cm("ALUMINA"), cm("BAUXITE"), cm("ABRASIVES, fused aluminum oxide"), cm("XENON")), ([], [], [], []))
+        self.assertEqual(len(cm("RARE EARTHS, compounds and metals")), 14)
+        found = minerals.find_files(text("usgs_item.json"))
+        doc = minerals.build(found, minerals.parse_reliance(text("usgs_net_import_reliance.csv")),
+                             minerals.parse_sources(text("usgs_major_import_sources.csv")), lambda name: None)
+        self.assertTrue(all(m["critical"] for m in doc["import_sources"]))     # USGS's figure 3 is list minerals only
+        cl = doc["critical_list"]
+        self.assertEqual((cl["count"], cl["document"], cl["not_in_import_sources"]), (60, "2025-19813", ["ruthenium"]))
+        self.assertEqual(cl["not_in_reliance_table"], ["beryllium", "boron", "hafnium", "iridium", "metallurgical coal",
+                                                       "phosphate", "rhodium", "ruthenium", "uranium"])
+        self.assertEqual(next(r for r in doc["reliance"] if r["commodity"] == "MAGNESIUM COMPOUNDS")["critical"], ["magnesium"])
+
     def test_world_bank(self):
         rows = baseline.parse_wb(text("worldbank.json"), {"TR", "SD", "US"}, this_year=2026)
         self.assertIn("TR", rows)
