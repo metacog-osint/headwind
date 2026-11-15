@@ -13,7 +13,7 @@ HW-WP-2 commit (register 1.2; anomaly items carry `HW-IND-4` to `HW-IND-6`), wit
 PASS. Still waiting from before: `d320d8e`, `0ec47f2`, `ce03e81`, `08c0caa`. `origin/main` has `0814445` (house bar
 tic-nav v1.12, another session's) that `live/first-slice` does not: merge it before pushing. **Verdict:** `main` holds
 `800efd6` and the merge `4454345` (origin/main's pre-EASA guards kept beside the Headwind sync; asked for by the
-Verdict pre-EASA session, 33 tests, `check --base origin/main` PASS), 2 ahead, 0 behind, not pushed. The method
+Verdict pre-EASA session, 33 tests, `check --base origin/main` PASS); pushed by the Verdict session on Tom's yes at about 12:10 PM CST, so `origin/main` is `4454345` and nothing of Verdict waits. Verdict `main` now has a ruleset blocking force-push and deletion, with squash and rebase merges off. The method
 bump to `headwind-1.6` covers everything in this batch, since none of it is deployed yet. Next, in order, each
 built, tested, checked and committed before the next, nothing pushed until Tom says so:
 - **Step 11, currency gap.** ECB covers only PH of the 19 watched countries. The WFP files already downloaded
