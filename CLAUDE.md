@@ -141,7 +141,7 @@ python tools/headwind.py collect --only fx    # one or more lanes; the rest keep
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
-python -m unittest discover -s tests          # 59 offline tests against real fixtures
+python -m unittest discover -s tests          # 64 offline tests against real fixtures
 python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
@@ -237,8 +237,30 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - **Rules:** a document stays in the feed 14 days. Future dates come from its effective date, its comment
   deadline, and dates written out in its DATES paragraph (`named_dates`); each becomes a `rule_date` for Verdict.
   Countries are only those a title names. USTR's notices are read since step 10 (see below).
-- **Every list and rule item is tier `routine`.** No anomaly rule exists for them yet: there is no history of
-  Headwind's own readings to measure against.
+- **Rules are tier `routine`; a list change is `anomaly` only when one of its designation batches is** (plan step
+  13, `headwind/batches.py`; see "Designation batches" below).
+
+## Designation batches (plan step 13, built 15 Nov 2026, `headwind-1.6`)
+- **A batch is the entries a list gives one designation date**: EU `designationDate` (5,698 of 6,269 entries on
+  15 Nov), UK `DateDesignated` (all 6,440), UN `LISTED_ON` (all 1,007), and trade.gov's `start_date` (Entity List
+  3,266 of 3,419; also DPL, MEU, ACN). The parsers fill an optional `dates` dict; dates are never kept in the index,
+  the state or the feed. When a change adds entries, each designation date among them is measured: its size (all
+  entries on the list with that date, now) against the list's 60 earlier designation dates, robust z on the log
+  of the size, unusual at z >= 3.5 (upward only) and at least 10 entries (`BATCH_FLOOR`). The scale never drops
+  below log 2 / 3.5, so the UN's one-entry dates give a batch of 2 a z of 3.5; the floor keeps it routine.
+- **OFAC has no dates** (and a change whose added entries carry none): the batch is what Headwind saw added
+  between two readings, against `added_history` (up to 120 earlier changes seen, kept per list in
+  `sanctions_index.json` and per screening list in `screening_index.json`). It starts empty, so OFAC shows "no
+  baseline yet" until 24 changes are kept. A rekeyed vessel is not an addition.
+- **On the delta:** `batches` (basis, date, added, size, z, baseline_n, flag_rate, anomaly) and `anomaly`. Feed: tier
+  `anomaly` with `baseline_ref`, a "Designation batches: ..." sentence, `measures.batch_size_max` and
+  `batch_z_max`; no indicator id (none in the register fits; HW-IND-1 is vessels in a dual-use network). Page:
+  "unusual" badge, a batches line, and the "Unusual now" list.
+- **Backtest on the 15 Nov files** (every date with 24 earlier): EU 2 of 401 dates flagged (2005, 2008), UK 8 of 430
+  (April and June 2021, 24 Feb 2022 and the 11 and 15 Mar 2022 Russia batches of 382 and 357), UN 1 of 225 (Sep 2014),
+  Entity List 0 of 122. The EU's 213 entries of 23 Jul 2026 are z +2.0 (large EU packages are its usual). Past
+  batches are counted from today's file, so delisted entries are missing from them.
+- Live 15 Nov: no list change on either lane since the code went in, so no batch has been measured on a real change.
 
 ## UK ships and step 6 (`headwind-1.5`, built 14 Nov 2026)
 - **FCDO names many ships by IMO number.** The primary name is `IMO 9344411 ("GALLE ENERGY")` (quotes or none;

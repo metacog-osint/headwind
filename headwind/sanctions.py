@@ -20,6 +20,8 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from datetime import datetime, timedelta
 
+from . import batches
+
 OFAC_SDN_CSV = "https://www.treasury.gov/ofac/downloads/sdn.csv"
 UN_XML = "https://scsanctions.un.org/resources/xml/en/consolidated.xml"
 OFAC_RECENT = "https://ofac.treasury.gov/recent-actions"
@@ -133,10 +135,11 @@ EU_NS = {"e": "http://eu.europa.ec/fpi/fsd/export"}
 EU_TYPE = {"person": "individual", "enterprise": "entity"}
 
 
-def parse_eu_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
+def parse_eu_xml(body: bytes, dates: dict | None = None) -> tuple[str | None, dict[str, list]]:
     """The EU Financial Sanctions Files, XML v1.1: one sanctionEntity per entry, keyed on its logicalId.
     The EU file lists people and organizations only; vessels under EU measures are in regulation
-    annexes, not in this file."""
+    annexes, not in this file. `dates`, when given, is filled with each entry's designation date (or None):
+    kept for the batch measure only, never in the index or the state."""
     root = ET.fromstring(body)
     index = {}
     for e in root.findall("e:sanctionEntity", EU_NS):
@@ -147,7 +150,14 @@ def parse_eu_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
         code = st.get("code") if st is not None else None
         programmes = sorted({r.get("programme") for r in e.findall("e:regulation", EU_NS) if r.get("programme")})
         index[lid] = [EU_TYPE.get(code, code or "unknown"), programmes]
+        if dates is not None:
+            dates[lid] = _iso_day(e.get("designationDate"))
     return root.get("generationDate"), index
+
+
+def _iso_day(text: str | None) -> str | None:
+    t = (text or "").strip()[:10]
+    return t if re.fullmatch(r"\d{4}-\d{2}-\d{2}", t) else None
 
 
 def _uk_date(text: str | None) -> str | None:
@@ -203,8 +213,9 @@ def _uk_ship(d) -> dict:
     return out
 
 
-def parse_uk_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
-    """The UK Sanctions List XML: one Designation per entry, keyed on its UniqueID, grouped by regime."""
+def parse_uk_xml(body: bytes, dates: dict | None = None) -> tuple[str | None, dict[str, list]]:
+    """The UK Sanctions List XML: one Designation per entry, keyed on its UniqueID, grouped by regime. `dates`, when
+    given, is filled with each entry's DateDesignated."""
     root = ET.fromstring(body)
     index = {}
     for d in root.findall("Designation"):
@@ -216,6 +227,8 @@ def parse_uk_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
         if kind == "vessel":
             entry.append(_uk_ship(d))
         index[uid] = entry
+        if dates is not None:
+            dates[uid] = _uk_date(d.findtext("DateDesignated"))
     return _uk_date(root.findtext("DateGenerated")), index
 
 
@@ -260,7 +273,8 @@ def _vessels(index: dict, ids) -> list[dict]:
     return sorted(out, key=lambda v: (v["name"] or "", v["imo"] or ""))
 
 
-def parse_un_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
+def parse_un_xml(body: bytes, dates: dict | None = None) -> tuple[str | None, dict[str, list]]:
+    """`dates`, when given, is filled with each entry's LISTED_ON date."""
     root = ET.fromstring(body)
     index = {}
     for section, kind in (("INDIVIDUALS", "individual"), ("ENTITIES", "entity")):
@@ -269,6 +283,8 @@ def parse_un_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
             dataid = (e.findtext("DATAID") or "").strip()
             if dataid:
                 index[dataid] = [kind, [(e.findtext("UN_LIST_TYPE") or "unknown").strip()]]
+                if dates is not None:
+                    dates[dataid] = _iso_day(e.findtext("LISTED_ON"))
     return root.get("dateGenerated"), index
 
 
@@ -353,7 +369,7 @@ def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True)
 
 
 def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None,
-          compare_vessels: bool = True) -> dict | None:
+          compare_vessels: bool = True, dates: dict | None = None, added_history: list | None = None) -> dict | None:
     """The difference between two readings of one list, or None when nothing changed.
 
     Additions and removals are ids that appear or go; a change is an id on both readings whose type or
@@ -369,6 +385,7 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
         return None
     rekeyed = sorted(({**v, "old_id": o} for o, n in pairs for v in _vessels(index, [n])),
                      key=lambda v: (v["name"] or "", v["imo"] or ""))
+    batch = batches.measure(added, dates, added_history, detected_at)
     a_type, a_group = _tally(index, added)
     r_type, r_group = _tally(prev_index, removed)
     stamp = detected_at.replace("-", "").replace(":", "")[:13]
@@ -381,6 +398,7 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
         "removed_by_type": r_type, "removed_by_program": r_group,
         "vessels_added": _vessels(index, added), "vessels_removed": _vessels(prev_index, removed),
         "rekeyed": len(pairs), "vessels_rekeyed": rekeyed,
+        "batches": batch, "anomaly": any(b["anomaly"] for b in batch),
         **ed,
         "countries": countries_for(list(a_group) + list(r_group) + list(ed["programs_gained"])
                                    + list(ed["programs_lost"]), list_id),

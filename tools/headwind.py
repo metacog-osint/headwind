@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import (baseline, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
+from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
                       markets, minerals, releases, sanctions, screening)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
@@ -178,22 +178,24 @@ def _lane_calendar(raw_dir, prev, getter):
 
 
 def _read_list(list_id, raw_dir, getter):
-    """Fetch and parse one sanctions list: (index, the publisher's generation date, fetch record)."""
+    """Fetch and parse one sanctions list: (index, the publisher's generation date, fetch record, designation dates).
+    OFAC's file has no designation dates (None)."""
+    dates: dict = {}
     if list_id == "ofac-sdn":
         body, rec = fetch.fetch("ofac-sdn", sanctions.OFAC_SDN_CSV, raw_dir, "csv", timeout=180, getter=getter)
-        return sanctions.parse_sdn_csv(body.decode("utf-8", errors="replace")), None, rec
+        return sanctions.parse_sdn_csv(body.decode("utf-8", errors="replace")), None, rec, None
     if list_id == "un-consolidated":
         body, rec = fetch.fetch("un-sc-consolidated", sanctions.UN_XML, raw_dir, "xml", timeout=120, getter=getter)
-        generated, index = sanctions.parse_un_xml(body)
-        return index, generated, rec
+        generated, index = sanctions.parse_un_xml(body, dates)
+        return index, generated, rec, dates
     if list_id == "eu-fsf":
         body, rec = fetch.fetch("eu-fsf", sanctions.EU_XML, raw_dir, "xml", timeout=300, getter=getter, gz=True)
-        generated, index = sanctions.parse_eu_xml(body)
-        return index, generated, rec
+        generated, index = sanctions.parse_eu_xml(body, dates)
+        return index, generated, rec, dates
     if list_id == "uk-sanctions":
         body, rec = fetch.fetch("uk-sanctions-list", sanctions.UK_XML, raw_dir, "xml", timeout=180, getter=getter, gz=True)
-        generated, index = sanctions.parse_uk_xml(body)
-        return index, generated, rec
+        generated, index = sanctions.parse_uk_xml(body, dates)
+        return index, generated, rec, dates
     raise ValueError(f"unknown list {list_id}")
 
 
@@ -210,7 +212,7 @@ def _lane_sanctions(raw_dir, prev, getter):
     for list_id in sanctions.LISTS:
         old = state.get(list_id) or {}
         try:
-            index, source_generated, rec = _read_list(list_id, raw_dir, getter)
+            index, source_generated, rec, dates = _read_list(list_id, raw_dir, getter)
             sanctions.check_size(list_id, index, old.get("index"))
         except Exception as exc:  # noqa: BLE001 - one list's failure is reported on that list
             errors.append(f"{list_id}: {exc}")
@@ -221,19 +223,22 @@ def _lane_sanctions(raw_dir, prev, getter):
             continue
         recs.append(rec)
         last_change = old.get("last_change_at")
+        history = old.get("added_history") or []
         form = sanctions.VESSEL_FORMAT.get(list_id, 1)
         if old.get("index"):
             same_form = old.get("vessel_format", 1) == form
             if not same_form:
                 print(f"  sanctions: {list_id}: vessel details were kept in an older form; not compared this run",
                       file=sys.stderr)
-            d = sanctions.delta(list_id, old["index"], index, now, old.get("checked_at"), compare_vessels=same_form)
+            d = sanctions.delta(list_id, old["index"], index, now, old.get("checked_at"), compare_vessels=same_form,
+                                dates=dates, added_history=history)
             if d:
                 deltas.append(d)
                 last_change = now
+                history = batches.remember(history, d["added"])
         baseline_set = old.get("baseline_set_at") or now
         new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "last_change_at": last_change,
-                              "vessel_format": form, "index": index}
+                              "vessel_format": form, "added_history": history, "index": index}
         lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated, last_change))
     if not recs:
         raise RuntimeError("no sanctions list could be read: " + "; ".join(errors))
@@ -574,7 +579,8 @@ def main(argv=None) -> int:
                 line = f"{key}: data of {h.get('data_as_of')} is {h['state']}"
                 print(f"::warning::{line}" if gh else f"  warning {line}")
         print("  health: " + ", ".join(f"{n} {s}" for s, n in health.summary(snap.get("health") or {}).items()))
-        anomalies = sum(1 for k in ("fx", "fx_official", "market_fx", "energy", "fao", "local_food")
+        anomalies = sum(1 for k in ("fx", "fx_official", "market_fx", "energy", "fao", "local_food", "sanctions",
+                                    "screening")
                         for x in snap.get(k) or [] if x.get("anomaly"))
         print(f"Collected {len(snap['fx'])} currencies, {len(snap['energy'])} energy series, {len(snap['fao'])} FAO "
               f"indices, {len(snap['local_food'])} countries' local food prices, {len(snap['baseline'])} country "

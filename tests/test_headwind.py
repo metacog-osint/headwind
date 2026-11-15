@@ -25,7 +25,7 @@ FIX = ROOT / "tests" / "fixtures"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import (baseline, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
+from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
                       sanctions, screening, stats)
 from tic_doctrine import contract, registers  # noqa: E402
 
@@ -429,6 +429,71 @@ class TestVesselCrosslist(unittest.TestCase):
             self.assertEqual(len(doc["vessels"]), snap["vessel_crosslist"]["imo_numbers"])
             page = json.loads((Path(tmp) / "site" / "data" / "snapshot.json").read_text(encoding="utf-8"))
             self.assertNotIn("vessel_table", page)
+
+
+class TestBatches(unittest.TestCase):
+    def test_dated_batches(self):
+        # 30 earlier designation dates of 3 to 6 entries, then one of 40: unusual; one of 6 is not.
+        dates = {f"old{d}-{i}": f"2026-01-{d:02d}" for d in range(1, 31) for i in range(3 + d % 4)}
+        dates.update({f"big-{i}": "2026-03-01" for i in range(40)})
+        dates.update({f"small-{i}": "2026-03-02" for i in range(6)})
+        out = {b["date"]: b for b in batches.measure([f"big-{i}" for i in range(40)] + ["small-0"], dates, None,
+                                                     "2026-03-02T12:00:00Z")}
+        self.assertEqual((out["2026-03-01"]["size"], out["2026-03-01"]["added"]), (40, 40))
+        self.assertTrue(out["2026-03-01"]["anomaly"])
+        self.assertEqual(out["2026-03-02"]["added"], 1)
+        self.assertFalse(out["2026-03-02"]["anomaly"])
+        self.assertEqual(out["2026-03-01"]["baseline_n"], 30)
+
+    def test_small_batches_are_never_unusual(self):
+        # The UN's dates are nearly all one entry: a batch of 8 has a large z but stays under the floor.
+        dates = {f"o{d}": f"2025-{1 + d // 28:02d}-{1 + d % 28:02d}" for d in range(60)}
+        dates.update({f"n{i}": "2026-07-14" for i in range(8)})
+        b = batches.measure([f"n{i}" for i in range(8)], dates, None, "2026-07-15T00:00:00Z")[0]
+        self.assertGreater(b["z"], stats.Z_ANOMALY)
+        self.assertFalse(b["anomaly"])
+
+    def test_seen_batches_need_a_history(self):
+        b = batches.measure(["a", "b"], None, [2, 1, 3], "2026-11-14T20:00:00Z")[0]
+        self.assertEqual((b["basis"], b["z"], b["baseline_n"], b["anomaly"]), ("headwind readings", None, 3, False))
+        hist = [2, 3, 1, 4, 2, 2, 3, 1, 5, 2] * 3
+        self.assertTrue(batches.seen(60, hist, "2026-11-14")["anomaly"])
+        self.assertEqual(batches.remember(hist, 0), hist[-batches.HISTORY_KEEP:])
+        self.assertEqual(len(batches.remember(list(range(1, 200)), 7)), batches.HISTORY_KEEP)
+        self.assertEqual(batches.measure([], None, hist, "2026-11-14"), [])
+
+    def test_parsers_give_designation_dates(self):
+        d_eu, d_uk, d_un = {}, {}, {}
+        _, eu = sanctions.parse_eu_xml((FIX / "eu_fsf.xml").read_bytes(), d_eu)
+        _, uk = sanctions.parse_uk_xml((FIX / "uk_sanctions.xml").read_bytes(), d_uk)
+        _, un = sanctions.parse_un_xml((FIX / "un_consolidated.xml").read_bytes(), d_un)
+        self.assertEqual((set(d_eu), set(d_uk), set(d_un)), (set(eu), set(uk), set(un)))
+        for d in (d_eu, d_uk, d_un):
+            self.assertTrue(any(d.values()))
+            self.assertTrue(all(v is None or re.fullmatch(r"\d{4}-\d{2}-\d{2}", v) for v in d.values()))
+        doc = json.loads(text("trade_gov_csl.json"))
+        el = next(e for e in doc["results"] if e["source"].startswith("Entity List"))
+        el["start_date"] = "2025-10-08"
+        lists = screening.parse(json.dumps(doc))
+        self.assertIn("2025-10-08", lists["EL"]["dates"].values())
+
+    def test_a_large_batch_makes_the_change_an_anomaly(self):
+        prev = {f"old{d}-{i}": ["entity", ["RUS"]] for d in range(1, 31) for i in range(3 + d % 4)}
+        dates = {f"old{d}-{i}": f"2026-01-{d:02d}" for d in range(1, 31) for i in range(3 + d % 4)}
+        index = dict(prev, **{f"new{i}": ["entity", ["RUS"]] for i in range(45)})
+        dates.update({f"new{i}": "2026-11-12" for i in range(45)})
+        d = sanctions.delta("uk-sanctions", prev, index, "2026-11-13T15:00:00Z", "2026-11-12T15:00:00Z", dates=dates)
+        self.assertTrue(d["anomaly"])
+        snap = {"generated_at": "2026-11-13T16:00:00Z", "lanes": {}, "sanctions": [d], "controls": []}
+        fc = feed.build_feed(snap)
+        self.assertEqual(lint(fc), [])
+        p = fc["features"][0]["properties"]
+        self.assertEqual(p["tier"], "anomaly")
+        self.assertIn("designation dates", p["baseline_ref"])
+        self.assertIn("Designation batches: 2026-11-12: 45 entries", p["summary"])
+        self.assertEqual(p["measures"]["batch_size_max"], 45)
+        self.assertNotIn("probability", p)
+        self.assertNotIn("new0", json.dumps(fc))                  # entry ids are not published
 
 
 class TestFeed(unittest.TestCase):

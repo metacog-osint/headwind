@@ -39,6 +39,7 @@
     fx.forEach(function (f) { if (f.anomaly) { an.push((names[f.country] || f.currency) + " (" + f.currency + "): " + Math.abs(f.change_pct).toFixed(1) + "% " + f.direction + " against the US dollar in 5 business days, z " + zText(f.z)); } });
     en.forEach(function (e) { if (e.anomaly) { an.push(e.name + ": " + pct(e.change_pct) + " in 5 trading days, z " + zText(e.z)); } });
     fao.forEach(function (c) { if (c.anomaly) { an.push(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z)); } });
+    (s.sanctions || []).concat(s.screening || []).forEach(function (d) { if (d.anomaly) { an.push(d.list_name + ": a designation batch larger than the list's usual (" + d.added + " added, seen " + String(d.detected_at).slice(0, 10) + ")"); } });
     fresh.forEach(function (w) { if (w.anomaly) { an.push((names[w.country] || w.country) + ": local food prices " + pct(w.median_change_pct) + " in 3 months, z " + zText(w.z)); } });
     (s.fx_official || []).forEach(function (o) { if (o.anomaly) { an.push((names[o.country] || o.country) + ": official exchange rate " + Math.abs(o.change_pct).toFixed(1) + "% " + o.direction + " against the US dollar in " + o.period + ", z " + zText(o.z)); } });
     (s.market_fx || []).forEach(function (w) { if (w.anomaly) { an.push((names[w.country] || w.country) + ": " + (w.unofficial ? "unofficial " : "") + "market exchange rate " + Math.abs(w.median_change_pct).toFixed(1) + "% " + w.direction + " against the US dollar in " + w.period + ", z " + zText(w.z)); } });
@@ -114,6 +115,16 @@
       " UK entries give no IMO number." + ((vc.from_earlier_run || []).length ? " From an earlier reading: " + vc.from_earlier_run.join(", ") + "." : "")) +
       ' <a href="data/vessels.json">Every ship, with each list\'s entry ids, name and flag</a>.</p>' : "";
     function counts(o) { return Object.keys(o || {}).slice(0, 6).map(function (k) { return k + " " + o[k]; }).join(", "); }
+    function batchLine(lines, d) {
+      var b = d.batches || [];
+      if (!b.length) { return; }
+      lines.push("Designation batches: " + b.map(function (x) {
+        var z = x.z === null || x.z === undefined ? "no baseline yet" : "z " + zText(x.z);
+        return x.basis === "designation date"
+          ? x.date + ", " + x.size + " entries with that date (" + x.added + " in this change; " + z + " against " + x.baseline_n + " earlier dates" + (x.anomaly ? ", unusual" : "") + ")"
+          : x.added + " added at once (" + z + " against " + x.baseline_n + " earlier changes Headwind saw" + (x.anomaly ? ", unusual" : "") + ")";
+      }).join("; ") + ".");
+    }
     function edited(lines, d) {
       if (!d.changed) { return; }
       var bits = ["Changed " + d.changed + " that stayed on the list"];
@@ -145,7 +156,8 @@
           }).join(", ");
         }).join("; ") + ".");
       }
-      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
+      batchLine(lines, d);
+      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
     }).join("") || (lists.length ? '<p class="small muted">No change seen in the last 30 days of readings.</p>' : "");
 
     var sl = s.screening_lists || [];
@@ -159,7 +171,8 @@
       if (d.removed) { lines.push("Removed by address country: " + counts(d.removed_by_country) + "."); }
       edited(lines, d);
       if (d.rekeyed) { lines.push(d.rekeyed + " came back under a new id with the same name and type, counted as the same entry."); }
-      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(d.publisher + ". " + lines.join(" ")) + "</div></div>";
+      batchLine(lines, d);
+      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(d.publisher + ". " + lines.join(" ")) + "</div></div>";
     }).join("") || (sl.length ? '<p class="small muted">No change seen in the last 30 days of readings. Compared since ' + esc(when(sl[0].baseline_set_at)) + ".</p>" : "");
     table("screening-table", ["List", "Publisher", "Entries", "Publisher's last update"], sl.map(function (l) {
       return ['<a href="' + esc(l.url) + '" rel="noopener">' + esc(l.name) + "</a>", esc(l.publisher), esc(Number(l.total).toLocaleString()), esc(day(l.source_last_updated))];
