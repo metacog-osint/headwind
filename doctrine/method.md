@@ -11,6 +11,8 @@ It reports measurements. It states no probability and gives no investment advice
 | Lane | Source | Cadence | Measure |
 |---|---|---|---|
 | Exchange rates | ECB euro reference rates, restated per US dollar | TARGET business days | 5-day change against the currency's own 250 prior 5-day changes |
+| Official monthly rates (since 15 Nov 2026) | World Bank Global Economic Monitor, official rate per US dollar, monthly average, for the 19 watched countries | Monthly, two to three months late | 1-month change against the country's own 60 prior monthly changes, 2% floor; older than four months is listed, not published |
+| Market exchange rates (since 15 Nov 2026) | The exchange-rate rows in WFP's price files (many marked unofficial) | Monthly, one to three months late | Median 1-month change across a country's markets, against its own 60 prior medians, 5% floor |
 | Energy | EIA spot prices for Brent, WTI and Henry Hub, from EIA's own API | Trading days, a day or two late | Same, with a 5% floor |
 | Food indices | FAO Food Price Index and five sub-indices | Monthly | 1-month change against 120 prior monthly changes |
 | Local food prices | WFP prices by market, from the Humanitarian Data Exchange | Monthly, one to three months late | Median 3-month change across a country's price series, against its own 60 prior medians |
@@ -40,7 +42,15 @@ have flagged. It says how often that series trips the rule in ordinary times.
 - **The baseline is rolling only.** A long slide becomes the new normal. A fixed baseline beside it
   is not built yet.
 - **Official exchange rates.** The ECB quotes about 30 currencies and none for the rouble. Countries
-  with a parallel market are understated or absent (assumption `HW-ASM-2`).
+  with a parallel market are understated or absent (assumption `HW-ASM-2`). Since 15 Nov 2026 the watched
+  countries also get the World Bank's official monthly average (15 of 19) and WFP's market rates (8 of 19,
+  most marked unofficial). Markets more than half again apart (Somalia's two shillings) give no single level and
+  no comparison with the official rate. An official figure can be one the market does not use: GEM gives Yemen
+  about 238 rials per US dollar while WFP's markets give about 1,556 (Aug 2026); the comparison prints the gap
+  as measured and does not say which rate is in use.
+- **WFP exchange rates are not food prices.** Before `headwind-1.6` they were counted among a country's price
+  series in the local food median; now they are read only as market rates (Sudan's 3-month food median moved
+  from 50.1% to 50.0% on the 15 Nov file).
 - **Nominal prices.** WFP prices are in local currency and not adjusted for inflation; the test
   against a country's own history is what makes them comparable.
 - **Revisions.** FAO revises earlier months. Each snapshot keeps the last twelve months as issued.
@@ -121,6 +131,9 @@ country, for the first two; HW-H-2B, stress from outside, for energy), `directio
 `indicator_state` present. It stays a measurement (tier anomaly, no probability): which hypothesis holds is
 told apart by which indicators are present together, and that reading is an analyst's. Routine items carry no
 indicator. Watched countries are those whose WFP prices Headwind reads (`config/wfp_countries.json`).
+HW-IND-4 is carried by an anomaly in any of a watched country's three currency readings: the ECB's daily rate,
+the World Bank's official monthly average or WFP's market rate. The page's "Watched countries side by side"
+table (`country_view` in the snapshot) sets them next to the local food reading; nothing combines them.
 
 ## Screening lists
 The same measure, applied to each list in the US International Trade Administration's Consolidated

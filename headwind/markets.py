@@ -9,6 +9,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 import urllib.parse
 import zipfile
 
@@ -37,6 +38,16 @@ ENERGY_SERIES = {
 }
 
 FX_HORIZON, FX_WINDOW, FX_FLOOR = 5, 250, 1.0          # 5 business days against a year; at least 1%
+
+# Official exchange rates, monthly average, for the watched countries: the World Bank's Global Economic Monitor
+# (WDI API source 15, indicator DPANUSSPB, local currency per US dollar). The ECB quotes only the Philippine peso of
+# the 19 watched countries' currencies; GEM gives 15 of them (checked 15 Nov 2026; not Cuba, the Palestinian
+# territories, Somalia or South Sudan). Monthly, so one month against five years, at least 2%.
+GEM_URL = ("https://api.worldbank.org/v2/country/{iso3}/indicator/DPANUSSPB?source=15&format=json&frequency=M"
+           "&mrv=120&per_page=5000")
+GEM_HORIZON, GEM_WINDOW, GEM_FLOOR = 1, 60, 2.0
+GEM_STALE_MONTHS = 4
+GEM_RECENT = 13                                         # months of levels kept, for the market comparison
 EN_HORIZON, EN_WINDOW, EN_FLOOR = 5, 250, 5.0          # 5 trading days against a year; at least 5%
 KEEP_ROWS = 400
 
@@ -93,6 +104,59 @@ def measure_fx(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
             "prior_per_usd": round(m["prior_value"], 6),
             **{k: m[k] for k in ("date", "prior_date", "change_pct", "z", "baseline_n", "flag_rate", "anomaly")},
             "direction": "weaker" if m["change_pct"] > 0 else "stronger" if m["change_pct"] < 0 else "unchanged",
+        })
+    return out
+
+
+def gem_url(iso3s) -> str:
+    return GEM_URL.format(iso3=";".join(sorted(iso3s)))
+
+
+def parse_gem(body: bytes | str) -> tuple[dict[str, list[tuple[str, float]]], str | None]:
+    """({ISO3: [(YYYY-MM, units per USD), ...]}, the World Bank's lastupdated date). A reply with no rows, or one
+    cut into pages, is an error."""
+    doc = json.loads(body)
+    if not isinstance(doc, list) or len(doc) < 2 or not isinstance(doc[1], list) or not isinstance(doc[0], dict):
+        raise ValueError(f"World Bank GEM reply has no data rows: {str(doc)[:120]}")
+    meta = doc[0]
+    if int(meta.get("pages") or 1) > 1:
+        raise ValueError(f"World Bank GEM reply cut into {meta.get('pages')} pages")
+    out: dict[str, list[tuple[str, float]]] = {}
+    for r in doc[1]:
+        iso3 = (r.get("country") or {}).get("id")
+        m = re.fullmatch(r"(\d{4})M(\d{2})", str(r.get("date") or ""))
+        v = r.get("value")
+        if not iso3 or not m or v is None:
+            continue
+        try:
+            v = float(v)
+        except (TypeError, ValueError):
+            continue
+        if v > 0:
+            out.setdefault(iso3, []).append((f"{m.group(1)}-{m.group(2)}", v))
+    if not out:
+        raise ValueError("World Bank GEM reply has no values")
+    for pts in out.values():
+        pts.sort()
+    return out, meta.get("lastupdated")
+
+
+def measure_gem(series: dict[str, list[tuple[str, float]]], iso3_to_cc: dict[str, str], today_period: str) -> list[dict]:
+    out = []
+    for iso3, pts in sorted(series.items()):
+        cc = iso3_to_cc.get(iso3)
+        m = stats.measure(pts, GEM_HORIZON, GEM_WINDOW, GEM_FLOOR) if cc else None
+        if not m:
+            continue
+        months_old = (int(today_period[:4]) - int(m["date"][:4])) * 12 + int(today_period[5:7]) - int(m["date"][5:7])
+        stale = months_old > GEM_STALE_MONTHS
+        out.append({
+            "country": cc, "iso3": iso3, "per_usd": round(m["value"], 6), "prior_per_usd": round(m["prior_value"], 6),
+            "period": m["date"], "prior_period": m["prior_date"],
+            **{k: m[k] for k in ("change_pct", "z", "baseline_n", "flag_rate")},
+            "direction": "weaker" if m["change_pct"] > 0 else "stronger" if m["change_pct"] < 0 else "unchanged",
+            "months_old": months_old, "stale": stale, "anomaly": bool(m["anomaly"] and not stale),
+            "recent": [[d, round(v, 6)] for d, v in pts[-GEM_RECENT:]],
         })
     return out
 

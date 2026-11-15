@@ -111,6 +111,15 @@
       "independence_group": "world-bank"
     },
     {
+      "id": "worldbank-gem",
+      "name": "World Bank Global Economic Monitor (WDI API source 15): official exchange rate, monthly average (DPANUSSPB)",
+      "url": "https://databank.worldbank.org/source/global-economic-monitor-(gem)",
+      "licence": "CC BY 4.0",
+      "use": "ingest",
+      "grade": "A2",
+      "independence_group": "world-bank"
+    },
+    {
       "id": "fed-fomc-calendar",
       "name": "Federal Reserve FOMC meeting calendar",
       "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",

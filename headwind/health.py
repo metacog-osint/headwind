@@ -28,7 +28,9 @@ WARN_SHARE = 0.8        # under this share, a warning
 # Days after its newest data date that a source is fresh, then late; past both it is stale. The ECB publishes on
 # business days (a long weekend is four days), EIA's daily spot prices arrive a few days behind, FAO and WFP are
 # monthly and dated by month (counted from the month's end).
-WINDOWS = {"ecb-eurofxref": (4, 8), "eia-spot": (7, 14), "fao-ffpi": (40, 70), "wfp-food-prices-hdx": (75, 135)}
+# GEM is monthly too; the World Bank updated it on 8 Sep 2026 with August's rates, so it runs further behind.
+WINDOWS = {"ecb-eurofxref": (4, 8), "eia-spot": (7, 14), "fao-ffpi": (40, 70), "wfp-food-prices-hdx": (75, 135),
+           "worldbank-gem": (100, 160)}
 
 # A publisher date that has not moved for this many days is noted (not a failure: an unchanged list is still a
 # reading). The UN regenerates its file every day, so two quiet days is already unusual.
@@ -36,7 +38,7 @@ QUIET_DAYS = {"un-sc-consolidated": 3, "eu-fsf": 30, "uk-sanctions-list": 30}
 # OFAC's file carries no date of its own, so its note uses the last change Headwind itself saw.
 QUIET_SEEN_DAYS = {"ofac-sdn": 21}
 
-LANE_OF = {"ecb-eurofxref": "fx", "eia-spot": "energy", "fao-ffpi": "fao", "wfp-food-prices-hdx": "wfp",
+LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", "fao-ffpi": "fao", "wfp-food-prices-hdx": "wfp",
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
            "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
@@ -67,6 +69,7 @@ def _month_end(period: str) -> date:
 # their own (a 60-day window of rules, countries WFP has published for).
 DRIFT = {
     "fx": ("ecb-eurofxref", "currencies", True),
+    "gem": ("worldbank-gem", "watched countries with an official monthly rate", False),
     "energy": ("eia-spot", "series", True),
     "fao": ("fao-ffpi", "indices", True),
     "fao_release_dates": ("fao-ffpi", "release dates on FAO's page", False),
@@ -85,6 +88,8 @@ def sizes(lane: str, result: dict) -> dict[str, int]:
     """The sizes the drift check keeps for a lane's fresh result."""
     if lane == "fx":
         return {"fx": len(result.get("fx") or [])}
+    if lane == "gem":
+        return {"gem": len(result.get("fx_official") or [])}
     if lane == "energy":
         return {"energy": len(result.get("energy") or [])}
     if lane == "fao":
@@ -187,6 +192,12 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
 
     fx = snap.get("fx") or []
     add("ecb-eurofxref", "fx", _newest(f.get("date") for f in fx), f"{len(fx)} currencies")
+    off = snap.get("fx_official") or []
+    op = [o["period"] for o in off if o.get("period")]
+    add("worldbank-gem", "gem", min(_month_end(max(op)), today) if op else None,
+        f"{len(off)} watched countries with an official monthly rate ({sum(1 for o in off if o.get('stale'))} with "
+        f"old data), {len(snap.get('fx_official_missing') or [])} without; the World Bank updated it "
+        f"{snap.get('fx_official_updated') or 'on a date not given'}")
     en = snap.get("energy") or []
     add("eia-spot", "energy", _newest(e.get("date") for e in en), f"{len(en)} series")
     fao = snap.get("fao") or []
@@ -198,7 +209,8 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
     stale = sum(1 for w in lf if w.get("stale"))
     # A month still under way (WFP publishes part-month prices) is dated today, never in the future.
     add("wfp-food-prices-hdx", "wfp", min(_month_end(max(wp)), today) if wp else None,
-        f"{len(lf)} countries ({stale} with old data), {len(snap.get('local_food_missing') or [])} without data")
+        f"{len(lf)} countries ({stale} with old data), {len(snap.get('local_food_missing') or [])} without data; "
+        f"{len(snap.get('market_fx') or [])} with market exchange rates")
     add("worldbank-wdi", "baseline", None, f"{len(snap.get('baseline') or {})} countries")
     add("release-calendars", "calendar", None,
         f"{len(snap.get('fomc_dates') or [])} FOMC and {len(snap.get('ecb_dates') or [])} ECB dates")
