@@ -81,7 +81,7 @@ python tools/headwind.py collect --only fx    # one or more lanes; the rest keep
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
-python -m unittest discover -s tests          # 41 offline tests against real fixtures
+python -m unittest discover -s tests          # 45 offline tests against real fixtures
 python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
@@ -272,6 +272,13 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   when a new final list is published (at least every three years).
 - **`ITEM_ID` in `minerals.py` is the 2026 edition** and has to be changed by hand when USGS publishes the next
   Summaries (the 2026 one came out on 6 Feb 2026).
+- **Watch for both (step 7, 14 Nov 2026).** Each run of the lane also asks ScienceBase for "Mineral Commodity Summaries
+  <edition year + 1>" (`SB_SEARCH_URL`; the 2026 search returns 3 items, the edition's own "... 2026 Data Release"
+  among them) and the Federal Register for Geological Survey or Interior notices titled with a List of Critical
+  Minerals, draft, final or correction, other than 2025-19813 and dated on or after it (`FR_LISTS_URL`; the search
+  also returns notices that only share words, such as OCS leasing). A hit is a warning on the `usgs-mcs` health
+  entry (`watch_notes`), shown on the page and as a `::warning::` on the runner; a search that fails is a warning
+  too, never a failed lane. Kept in `minerals.json` as `watch`. Checked live 14 Nov, 9:51 PM CST: nothing newer.
 - Each CSV is checked against the MD5 that ScienceBase lists for it. `.gitattributes` keeps the two fixture CSVs
   byte for byte so that test passes on any checkout.
 
