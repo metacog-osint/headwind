@@ -137,6 +137,18 @@ SRC_ECB = {
     "descriptor": "Daily reference rates for about 30 currencies against the euro, set on TARGET business days.",
 }
 
+SRC_GEM = {
+    "id": "worldbank-gem",
+    "publisher": "World Bank (Global Economic Monitor)",
+    "title": "Official exchange rate, local currency per US dollar, monthly average (DPANUSSPB)",
+    "url": "https://databank.worldbank.org/source/global-economic-monitor-(gem)",
+    "licence": "CC BY 4.0",
+    "grade": "A2",
+    "independence_group": "world-bank",
+    "source_type": "official or market data",
+    "descriptor": "Monthly average official exchange rates compiled by the World Bank from national sources.",
+}
+
 SRC_EIA = {
     "id": "eia-spot",
     "publisher": "US Energy Information Administration",
@@ -170,6 +182,11 @@ def _plus_hours(iso_utc: str, hours: int) -> str:
 def _month_end(period: str) -> str:
     y, m = int(period[:4]), int(period[5:7])
     return f"{y:04d}-{m:02d}-{calendar.monthrange(y, m)[1]:02d}T00:00:00Z"
+
+
+def _month_end_by(period: str, generated: str) -> str:
+    """The month's end, or the collection time for a month still under way: never dated in the future."""
+    return min(_month_end(period), generated)
 
 
 def _z_text(z) -> str:
@@ -534,6 +551,58 @@ def live_features(snapshot: dict) -> list[dict]:
             coverage=1.0, lane_accessed=accessed("fx"), ascope=["events"],
             hypothesis_id="HW-H-2A" if cc in WATCHED else None))
 
+    for o in snapshot.get("fx_official") or []:
+        if o.get("stale"):
+            continue        # the page lists it with its newest month
+        cc = o["country"]
+        name = geo.name(cc) or cc
+        feats.append(_observation(
+            f"headwind:fxofficial:{cc}:{o['period']}",
+            f"{name}: official exchange rate {abs(o['change_pct']):.1f}% {o['direction']} against the US dollar "
+            f"in {o['period']} ({_z_text(o['z'])})",
+            f"Monthly average official rate {o['per_usd']:g} per US dollar in {o['period']}, against "
+            f"{o['prior_per_usd']:g} in {o['prior_period']}. Measured against the country's own {o['baseline_n']} "
+            f"earlier monthly changes. World Bank Global Economic Monitor.",
+            anomaly=o["anomaly"], data_as_of=_month_end_by(o["period"], generated), generated=generated,
+            valid_until=valid_until, countries=[cc], ncf=["provide_funding_liquidity", "provide_capital_markets"],
+            requirement_ids=["HW-PIR-4"],
+            measures={"per_usd": o["per_usd"], "change_pct": o["change_pct"], "z": o["z"],
+                      "baseline_n": o["baseline_n"], "flag_rate": o.get("flag_rate")},
+            anchor="countries", source=SRC_GEM, indicator_id="HW-IND-4",
+            baseline_ref=f"rolling: the country's own {markets.GEM_WINDOW} prior monthly changes; anomaly at "
+                         f"|z| >= {stats.Z_ANOMALY:g} and a move of at least {markets.GEM_FLOOR:g}%",
+            coverage=1.0, lane_accessed=accessed("gem"), ascope=["events"],
+            hypothesis_id="HW-H-2A" if cc in WATCHED else None))
+
+    for w in snapshot.get("market_fx") or []:
+        if w.get("stale"):
+            continue
+        cc = w["country"]
+        name = geo.name(cc) or cc
+        kind = "unofficial market" if w.get("unofficial") else "market"
+        level = (f"rates from {w['per_usd_low']:g} to {w['per_usd_high']:g} per US dollar, too far apart to be one "
+                 f"market" if w.get("split") else f"median rate {w['per_usd_median']:g} per US dollar")
+        feats.append(_observation(
+            f"headwind:fxmarket:{cc}:{w['period']}",
+            f"{name}: {kind} exchange rate {abs(w['median_change_pct']):.1f}% {w['direction']} against the US dollar "
+            f"in {w['period']}, median of {w['markets']} market{'s' if w['markets'] != 1 else ''} "
+            f"({_z_text(w['z'])})",
+            f"Median one-month change to {w['period']} across {w['markets']} markets' exchange rates as WFP "
+            f"collected them ({', '.join(w.get('labels') or [])}); {level}. Judged against the country's own "
+            f"{w['baseline_n']} earlier medians.",
+            anomaly=w["anomaly"], data_as_of=_month_end_by(w["period"], generated), generated=generated,
+            valid_until=valid_until, countries=[cc], ncf=["provide_funding_liquidity", "provide_capital_markets"],
+            requirement_ids=["HW-PIR-4"],
+            measures={"median_change_pct": w["median_change_pct"], "markets": w["markets"],
+                      "per_usd_median": None if w.get("split") else w["per_usd_median"], "z": w["z"],
+                      "baseline_n": w["baseline_n"], "flag_rate": w.get("flag_rate")},
+            anchor="countries", source={**SRC_WFP, "url": w.get("dataset") or SRC_WFP["url"]},
+            indicator_id="HW-IND-4",
+            baseline_ref=f"rolling: the country's own {food.WFPFX_WINDOW} prior monthly medians; anomaly at "
+                         f"|z| >= {stats.Z_ANOMALY:g} and a median move of at least {food.WFPFX_FLOOR:g}%",
+            coverage=1.0, lane_accessed=accessed("wfp"), ascope=["events", "people"],
+            hypothesis_id="HW-H-2A" if cc in WATCHED else None))
+
     for e in snapshot.get("energy") or []:
         feats.append(_observation(
             f"headwind:energy:{e['id']}:{e['date']}",
@@ -577,8 +646,8 @@ def live_features(snapshot: dict) -> list[dict]:
             f"Median {food.WFP_HORIZON}-month change to {w['period']} across {w['series']} market-and-commodity "
             f"series in {w['markets']} markets; {round(w['share_rising'] * 100)}% of series rose. Nominal prices in "
             f"local currency, judged against the country's own {w['baseline_n']} earlier medians.",
-            anomaly=w["anomaly"], data_as_of=_month_end(w["period"]), generated=generated, valid_until=valid_until,
-            countries=[cc], ncf=["provide_food_products", "provide_agricultural_products"],
+            anomaly=w["anomaly"], data_as_of=_month_end_by(w["period"], generated), generated=generated,
+            valid_until=valid_until, countries=[cc], ncf=["provide_food_products", "provide_agricultural_products"],
             requirement_ids=["HW-PIR-5"],
             measures={"median_change_pct": w["median_change_pct"], "series": w["series"], "markets": w["markets"],
                       "share_rising": w["share_rising"], "z": w["z"], "baseline_n": w["baseline_n"], "flag_rate": w.get("flag_rate")},
@@ -589,6 +658,57 @@ def live_features(snapshot: dict) -> list[dict]:
             coverage=1.0, lane_accessed=accessed("wfp"), ascope=["events", "people"],
             hypothesis_id="HW-H-2A" if cc in WATCHED else None))
     return feats
+
+
+# The currency each watched country uses, where the ECB quotes it but under another country (the Palestinian
+# territories use the Israeli shekel). Shown in the country view only; the feed item stays Israel's.
+CURRENCY_IN_USE = {"PS": "ILS"}
+
+
+def country_view(snapshot: dict) -> list[dict]:
+    """One row per watched country: its daily rate (ECB) where there is one, its official monthly rate (World Bank
+    GEM), its market rate (WFP), the market rate against the official one for the same month, its local food
+    reading, and the HW-WP-2 indicators present. Measurements side by side; nothing is combined into a score."""
+    by_cc = {f["country"]: f for f in snapshot.get("fx") or [] if f.get("country")}
+    by_cur = {f["currency"]: f for f in snapshot.get("fx") or []}
+    off = {o["country"]: o for o in snapshot.get("fx_official") or []}
+    mkt = {w["country"]: w for w in snapshot.get("market_fx") or []}
+    lf = {w["country"]: w for w in snapshot.get("local_food") or []}
+    missing = {m["country"]: m["reason"] for m in snapshot.get("local_food_missing") or []}
+    out = []
+    for cc in sorted(WATCHED):
+        daily = by_cc.get(cc) or by_cur.get(CURRENCY_IN_USE.get(cc, ""))
+        o, w, f = off.get(cc), mkt.get(cc), lf.get(cc)
+        row = {"country": cc, "name": geo.name(cc) or cc}
+        row["daily"] = None if not daily else {
+            "currency": daily["currency"], "per_usd": daily["per_usd"], "change_pct": daily["change_pct"],
+            "z": daily["z"], "anomaly": daily["anomaly"], "date": daily["date"],
+            "note": None if daily.get("country") == cc else f"{daily['currency']}, the currency in use"}
+        row["official"] = None if not o else {k: o[k] for k in ("per_usd", "change_pct", "z", "anomaly", "period",
+                                                                "stale")}
+        row["market"] = None if not w else {k: w.get(k) for k in ("per_usd_median", "per_usd_low", "per_usd_high",
+                                                                  "split", "unofficial", "median_change_pct", "z",
+                                                                  "anomaly", "period", "stale", "markets")}
+        gap = None
+        if o and w and not w.get("split"):
+            # The newest month both give (WFP's and the World Bank's months seldom end together).
+            official, market = dict(o.get("recent") or []), dict(w.get("recent") or [])
+            both = sorted(set(official) & set(market))
+            if both and official[both[-1]] > 0:
+                gap = {"period": both[-1], "pct": round((market[both[-1]] / official[both[-1]] - 1.0) * 100.0, 1)}
+        row["market_vs_official"] = gap
+        row["local_food"] = None if not f else {k: f[k] for k in ("median_change_pct", "z", "anomaly", "period",
+                                                                  "stale")}
+        if not f and cc in missing:
+            row["local_food_missing"] = missing[cc]
+        present = []
+        if any(x and x.get("anomaly") and not x.get("stale") for x in (by_cc.get(cc), o, w)):
+            present.append("HW-IND-4")
+        if f and f.get("anomaly"):
+            present.append("HW-IND-6")
+        row["indicators_present"] = present
+        out.append(row)
+    return out
 
 
 def build_feed(snapshot: dict) -> dict:
@@ -604,12 +724,13 @@ def build_feed(snapshot: dict) -> dict:
         "contract": CONTRACT,
         "program": "headwind",
         "generated_at": generated,
-        "licence": ("Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; "
+        "licence": ("Headwind code MIT; ECB reference rates free to reuse with credit; World Bank Global Economic "
+                    "Monitor CC BY 4.0; EIA data US public domain; "
                     "FAO CC BY 4.0; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
                     "Federal Register and its public inspection US public domain; UN Security Council list, no "
                     "licence stated; EU financial "
                     "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0"),
-        "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information "
+        "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; World Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
                         "and Development Office; US International Trade Administration; "

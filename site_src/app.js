@@ -40,6 +40,8 @@
     en.forEach(function (e) { if (e.anomaly) { an.push(e.name + ": " + pct(e.change_pct) + " in 5 trading days, z " + zText(e.z)); } });
     fao.forEach(function (c) { if (c.anomaly) { an.push(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z)); } });
     fresh.forEach(function (w) { if (w.anomaly) { an.push((names[w.country] || w.country) + ": local food prices " + pct(w.median_change_pct) + " in 3 months, z " + zText(w.z)); } });
+    (s.fx_official || []).forEach(function (o) { if (o.anomaly) { an.push((names[o.country] || o.country) + ": official exchange rate " + Math.abs(o.change_pct).toFixed(1) + "% " + o.direction + " against the US dollar in " + o.period + ", z " + zText(o.z)); } });
+    (s.market_fx || []).forEach(function (w) { if (w.anomaly) { an.push((names[w.country] || w.country) + ": " + (w.unofficial ? "unofficial " : "") + "market exchange rate " + Math.abs(w.median_change_pct).toFixed(1) + "% " + w.direction + " against the US dollar in " + w.period + ", z " + zText(w.z)); } });
     document.getElementById("anomalies").innerHTML = an.length
       ? an.map(function (t) { return '<div class="row">' + esc(t) + "</div>"; }).join("")
       : '<p class="small muted">Nothing is outside its normal range in this collection.</p>';
@@ -64,6 +66,26 @@
         return [esc(names[w.country] || w.country) + flag(w.anomaly), esc(pct(w.median_change_pct)), esc(zText(w.z)),
           esc(Math.round(w.share_rising * 100) + "%"), esc(w.series), esc(w.markets), esc(w.period)];
       }));
+    function num(v) { return v === null || v === undefined ? "" : Number(v).toLocaleString(undefined, { maximumSignificantDigits: 6 }); }
+    function cell(x, level, change, period, extra) {
+      if (!x) { return '<span class="muted">none</span>'; }
+      var bits = [change, x.z === null || x.z === undefined ? "" : "z " + zText(x.z)].filter(function (b) { return b; });
+      return esc(level + (bits.length ? " (" + bits.join(", ") + ")" : "")) + flag(x.anomaly && !x.stale) +
+        '<br><span class="small muted">' + esc(period + (x.stale ? ", old data" : "") + (extra ? "; " + extra : "")) + "</span>";
+    }
+    table("country-table", ["Country", "Daily rate (ECB)", "Official, monthly (World Bank)", "Market, monthly (WFP)", "Market against official", "Local food, 3 months"],
+      (s.country_view || []).map(function (r) {
+        var d = r.daily, o = r.official, m = r.market, f = r.local_food, g = r.market_vs_official;
+        return [esc(r.name) + ((r.indicators_present || []).length ? ' <span class="badge badge-warn">' + esc(r.indicators_present.join(", ")) + "</span>" : ""),
+          cell(d, d ? d.currency + " " + num(d.per_usd) : "", d ? pct(d.change_pct) + " in 5 days" : "", d ? d.date : "", d && d.note),
+          cell(o, o ? num(o.per_usd) : "", o ? pct(o.change_pct) + " on the month" : "", o ? o.period : ""),
+          cell(m, m ? (m.split ? num(m.per_usd_low) + " to " + num(m.per_usd_high) : num(m.per_usd_median)) : "", m ? pct(m.median_change_pct) + " on the month" : "", m ? m.period : "",
+            m ? m.markets + " market" + (m.markets === 1 ? "" : "s") + (m.unofficial ? ", unofficial" : "") + (m.split ? ", too far apart to be one market" : "") : ""),
+          g ? esc(pct(g.pct)) + '<br><span class="small muted">' + esc(g.period) + "</span>" : '<span class="muted">none</span>',
+          f ? cell(f, pct(f.median_change_pct), "", f.period) : '<span class="muted">' + esc(r.local_food_missing || "none") + "</span>"];
+      }));
+    document.getElementById("country-note").textContent = "No official monthly rate: " + ((s.fx_official_missing || []).map(function (m) { return names[m.country] || m.country; }).join(", ") || "none") +
+      ". A badge names the HW-WP-2 indicators present (HW-IND-4 a currency, HW-IND-6 local food). The World Bank last updated its monthly rates " + (s.fx_official_updated || "on a date it does not give") + ".";
     var gone = lf.filter(function (w) { return w.stale; }).map(function (w) { return (names[w.country] || w.country) + " (newest month " + w.period + ")"; })
       .concat((s.local_food_missing || []).map(function (m) { return (names[m.country] || m.country) + " (" + m.reason + ")"; }));
     document.getElementById("wfp-missing").textContent = gone.length ? "No recent data: " + gone.join("; ") + "." : "";
@@ -203,7 +225,7 @@
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, counted only because their titles can name people and companies: notices, ' + esc(countedText) + ".</p>" : "");
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {

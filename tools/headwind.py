@@ -27,9 +27,10 @@ from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
     "fx": ["fx"],
+    "gem": ["fx_official", "fx_official_missing", "fx_official_updated"],
     "energy": ["energy"],
     "fao": ["fao", "fao_release_dates"],
-    "wfp": ["local_food", "local_food_missing"],
+    "wfp": ["local_food", "local_food_missing", "market_fx"],
     "baseline": ["baseline"],
     "calendar": ["fomc_dates", "ecb_dates"],
     "sanctions": ["sanctions", "sanctions_lists", "vessel_crosslist", "vessel_table"],
@@ -38,7 +39,8 @@ LANE_FIELDS = {
     "inspection": ["inspection", "inspection_issues"],
     "minerals": ["minerals"],
 }
-EMPTY = {"fx": [], "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
+EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
+         "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
          "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
          "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
          "minerals": {}}
@@ -47,6 +49,23 @@ EMPTY = {"fx": [], "energy": [], "fao": [], "fao_release_dates": [], "local_food
 def _lane_fx(raw_dir, prev, getter):
     body, rec = fetch.fetch("ecb-eurofxref", markets.ECB_HIST_ZIP, raw_dir, "zip", getter=getter)
     return {"fx": markets.measure_fx(markets.parse_ecb_zip(body))}, [rec]
+
+
+def _watched() -> dict[str, str]:
+    return json.loads((ROOT / "config" / "wfp_countries.json").read_text(encoding="utf-8"))["countries"]
+
+
+def _lane_gem(raw_dir, prev, getter):
+    """Official monthly exchange rates for the watched countries (World Bank Global Economic Monitor)."""
+    wanted = _watched()
+    body, rec = fetch.fetch("worldbank-gem", markets.gem_url(wanted.values()), raw_dir, "json", timeout=60,
+                            getter=getter)
+    series, updated = markets.parse_gem(body)
+    rows = markets.measure_gem(series, {v: k for k, v in wanted.items()}, date.today().strftime("%Y-%m"))
+    have = {r["country"] for r in rows}
+    missing = [{"country": cc, "reason": "no official monthly rate in the World Bank's Global Economic Monitor"}
+               for cc in sorted(wanted) if cc not in have]
+    return {"fx_official": rows, "fx_official_missing": missing, "fx_official_updated": updated}, [rec]
 
 
 def eia_key_file() -> Path:
@@ -93,7 +112,7 @@ def _lane_fao(raw_dir, prev, getter):
 
 
 def _lane_wfp(raw_dir, prev, getter):
-    wanted = json.loads((ROOT / "config" / "wfp_countries.json").read_text(encoding="utf-8"))["countries"]
+    wanted = _watched()
     body, rec = fetch.fetch("hdx-wfp-index", food.HDX_SEARCH, raw_dir, "json", getter=getter)
     resources = food.hdx_resources(json.loads(body))
     old = {w["country"]: w for w in (prev.get("local_food") or [])}
@@ -105,12 +124,16 @@ def _lane_wfp(raw_dir, prev, getter):
             missing.append({"country": cc, "reason": "no WFP price file on HDX"})
             continue
         cached = old.get(cc)
-        if cached and cached.get("hdx_last_modified") == res["last_modified"]:
+        # A record kept from before headwind-1.6 has no market_fx: read the file again once.
+        if cached and cached.get("hdx_last_modified") == res["last_modified"] and "market_fx" in cached:
             m = {k: cached[k] for k in cached if k not in ("country", "iso3", "dataset", "hdx_last_modified")}
-            m["months_old"] = ((int(today_period[:4]) - int(m["period"][:4])) * 12
-                               + int(today_period[5:7]) - int(m["period"][5:7]))
-            m["stale"] = m["months_old"] > food.WFP_STALE_MONTHS
-            m["anomaly"] = bool(m["anomaly"] and not m["stale"])
+            for part in (m, m.get("market_fx")):
+                if not part:
+                    continue
+                part["months_old"] = ((int(today_period[:4]) - int(part["period"][:4])) * 12
+                                      + int(today_period[5:7]) - int(part["period"][5:7]))
+                part["stale"] = part["months_old"] > food.WFP_STALE_MONTHS
+                part["anomaly"] = bool(part["anomaly"] and not part["stale"])
         else:
             try:
                 csv_body, r = fetch.fetch(f"wfp-prices-{iso3.lower()}", res["url"], raw_dir, "csv", timeout=120,
@@ -119,13 +142,17 @@ def _lane_wfp(raw_dir, prev, getter):
                 missing.append({"country": cc, "reason": f"fetch failed: {type(exc).__name__}"})
                 continue
             recs.append(r)
-            m = food.measure_wfp(csv_body.decode("utf-8-sig", errors="replace"), today_period)
+            csv_text = csv_body.decode("utf-8-sig", errors="replace")
+            m = food.measure_wfp(csv_text, today_period)
             if not m:
                 missing.append({"country": cc, "reason": "too few price series"})
                 continue
+            m["market_fx"] = food.measure_wfp_fx(csv_text, today_period)
         out.append({"country": cc, "iso3": iso3, "dataset": res["dataset"],
                     "hdx_last_modified": res["last_modified"], **m})
-    return {"local_food": out, "local_food_missing": missing}, recs
+    market = [{"country": w["country"], "iso3": w["iso3"], "dataset": w["dataset"], **w["market_fx"]}
+              for w in out if w.get("market_fx")]
+    return {"local_food": out, "local_food_missing": missing, "market_fx": market}, recs
 
 
 def _lane_baseline(raw_dir, prev, getter):
@@ -326,7 +353,7 @@ def _minerals_watch(raw_dir, getter, recs) -> dict:
     return watch
 
 
-LANES = {"fx": _lane_fx, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
+LANES = {"fx": _lane_fx, "gem": _lane_gem, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
          "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
          "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals}
 
@@ -343,6 +370,7 @@ def finish_snapshot(snap: dict, today: date) -> dict:
                                     food.next_period(ffpi["period"]) if ffpi else None)
     snap["events"] = {"source": "headwind", "events": sorted(events, key=lambda e: (e["date"], e["id"]))}
     snap["question_drafts"] = releases.question_drafts(fao, next_release)
+    snap["country_view"] = feed.country_view(snap)
     return snap
 
 
@@ -448,7 +476,10 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
     names = {c: geo.name(c) for c in {w["country"] for w in snap.get("local_food") or []}
              | {f["country"] for f in snap.get("fx") or [] if f.get("country")}
              | {m["country"] for m in snap.get("local_food_missing") or []}}
-    page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "health", "fx", "energy", "fao",
+    names.update({c: geo.name(c) for c in feed.WATCHED})
+    page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "health", "fx", "fx_official",
+                                     "fx_official_missing", "fx_official_updated", "market_fx", "country_view",
+                                     "energy", "fao",
                                      "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
                                      "screening_lists", "controls", "inspection", "inspection_issues", "minerals",
                                      "question_drafts", "vessel_crosslist")}
@@ -543,7 +574,8 @@ def main(argv=None) -> int:
                 line = f"{key}: data of {h.get('data_as_of')} is {h['state']}"
                 print(f"::warning::{line}" if gh else f"  warning {line}")
         print("  health: " + ", ".join(f"{n} {s}" for s, n in health.summary(snap.get("health") or {}).items()))
-        anomalies = sum(1 for k in ("fx", "energy", "fao", "local_food") for x in snap.get(k) or [] if x.get("anomaly"))
+        anomalies = sum(1 for k in ("fx", "fx_official", "market_fx", "energy", "fao", "local_food")
+                        for x in snap.get(k) or [] if x.get("anomaly"))
         print(f"Collected {len(snap['fx'])} currencies, {len(snap['energy'])} energy series, {len(snap['fao'])} FAO "
               f"indices, {len(snap['local_food'])} countries' local food prices, {len(snap['baseline'])} country "
               f"baselines, {len(snap['events']['events'])} events; {anomalies} anomalies. Sanctions lists: "

@@ -141,7 +141,7 @@ python tools/headwind.py collect --only fx    # one or more lanes; the rest keep
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
-python -m unittest discover -s tests          # 56 offline tests against real fixtures
+python -m unittest discover -s tests          # 59 offline tests against real fixtures
 python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
@@ -153,6 +153,7 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | Lane | Module | Source (all keyless) | Checked live 12 Nov |
 |---|---|---|---|
 | `fx` | `markets.py` | ECB reference rates, history zip; restated per US dollar | 29 currencies |
+| `gem` | `markets.py` | World Bank Global Economic Monitor (WDI API source 15, `DPANUSSPB`), official rate per US dollar, monthly average, the 19 watched countries in one request | 15 Nov: 16 countries with a rate (5 with old data: IR Jan 2026, MM Mar 2024, SD Oct 2024, SO Jun 2018, VE Nov 2025), CU, PS, SS none; World Bank updated 8 Sep 2026, newest month Aug 2026 |
 | `energy` | `markets.py` | EIA's own API v2 (Brent `RBRTE`, WTI `RWTC`, Henry Hub `RNGWHHD`). **Needs a free EIA key** | 13 Nov, 9:35 AM CST: 3 series to 11 Nov (Brent 92.14, WTI 89.62, Henry Hub 3.00), the same prices FRED gave |
 | `fao` | `food.py` | FAO Food Price Index CSV; the link is read from FAO's page because it changes | 6 indices |
 | `wfp` | `food.py` | WFP prices by market from HDX, for the countries in `config/wfp_countries.json` | 18 of 19 countries; Cuba has no file, Venezuela's newest month is May 2025 |
@@ -170,6 +171,30 @@ on 12 Nov, so Headwind has still not seen a real list change. The trade.gov file
 Outputs in `site/data/`: `feed.geojson` (60 items on 13 Nov), `events.json` (Verdict's `sync_calendar` format),
 `baseline.json` and `minerals.json` (not in the feed), `question_drafts.json` (drafts only), `snapshot.json` (what
 the page reads).
+
+## Currencies of watched countries (plan step 11, built 15 Nov 2026, `headwind-1.6`)
+- **Three readings per country.** ECB daily (PH; PS shows the shekel in the country view only, its feed item
+  stays Israel's), World Bank GEM official monthly average (`gem` lane, `fx_official`), WFP market rates
+  (`food.measure_wfp_fx`, in the `wfp` lane, `market_fx`; nested as `market_fx` in each `local_food` record for the
+  HDX cache). GEM: 1 month against 60, 2% floor, more than four months old is stale (listed, not in the feed).
+  WFP market: median one-month change across markets, from one market up, 5% floor; `split` when the highest
+  market rate is over 1.5 times the lowest (Somalia: 11,000 to 50,000, Somaliland's and Somalia's shillings), and
+  then no level and no comparison. `unofficial` when WFP labels any series so.
+- **Exchange-rate rows left WFP's food median** (`food.is_fx_row`). Small moves on 15 Nov: SD 50.1 to 50.0, SO
+  0.7 to 0.6, SS 1.1 to 0.0, YE 1.9 to 2.1, CD's series 1,307 to 1,249. Covered by the `headwind-1.6` bump.
+- **Feed items** `headwind:fxofficial:<cc>:<month>` (source `worldbank-gem`, new in `sources.json`) and
+  `headwind:fxmarket:<cc>:<month>` (WFP's dataset); both `HW-IND-4` and `HW-H-2A` when anomalous, anchor
+  `#countries`. Month ends never date an item after the collection (`feed._month_end_by`, now used for local food
+  too).
+- **Country view** (`feed.country_view`, snapshot `country_view`, page section `#countries`): per watched country
+  the daily, official and market rates, market against official (the newest month both give, from each record's
+  `recent` 13 months), local food, and `indicators_present`. Nothing is combined into a score.
+- **Live 15 Nov, 12:40 PM CST:** one anomaly, Sudan's unofficial market rate (Khartoum, WFP) 23.3% weaker in Oct
+  2026, z +5.1, so Sudan carries `HW-IND-4`. Market against official: CD +0.8%, LB +0.1%, YE +555.1% (GEM's Yemen
+  figure is about 238 per dollar and flat; WFP's markets, Aden's side, about 1,556; which rate GEM reports is not
+  verified). Health: `worldbank-gem` fresh (window 100/160 days after the month's end).
+- **Not covered:** Cuba (no WFP file, no GEM rate); BF, ML, NE use the CFA franc, pegged to the euro, which GEM
+  gives; the peg is not derived from the ECB's euro rate.
 
 ## The measure (`stats.py`, `doctrine/method.md`)
 One rule for every series: the latest change against the series' own earlier changes, as a robust z (median and
@@ -411,7 +436,8 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   stress from outside (energy shock reaching local food, currency holding), HW-H-2C artefact. `HW-IND-4` and
   `HW-IND-5` are now marked diagnostic (they tell 2A from 2B); `HW-IND-6` is not (expected under both). Written
   from the indicators Headwind has, not checked against current events; the wording is Tom's to change. Until
-  step 11, ECB rates cover only PH of the 19 watched countries, so `HW-IND-4` can appear for PH only.
+  step 11, ECB rates covered only PH of the 19 watched countries; since step 11 the World Bank's official monthly
+  rates and WFP's market rates carry `HW-IND-4` too (see "Currencies of watched countries").
 - **No judgments in the feed.** The seed build's sanctions and rule blocks carried a fixed 0.85 probability and
   invented test records (`MADE_UP`); both are removed. `commodities.py` (the old IGC lane) is unused.
 - A rate decision is exported to Verdict as kind `rule_date`, the nearest kind Verdict accepts.
@@ -461,6 +487,8 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 
 ## Licences (unverified unless marked)
 - WFP on HDX: CC BY-IGO, read from HDX's own metadata on 12 Nov 2026.
+- World Bank Global Economic Monitor: CC BY 4.0 as the World Bank's default for its datasets (see World Bank
+  below); GEM's own licence line was not read separately (unverified).
 - FAO: its database terms page, read 13 Nov 2026, gives CC BY 4.0 unless a dataset's own page says otherwise, with
   a set citation form and a bar on use "for or in conjunction with the promotion of a commercial enterprise". The
   Food Price Index page, read the same day, showed no licence statement to the reader. Since 13 Nov the feed,

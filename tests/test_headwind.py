@@ -71,6 +71,8 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         return (FIX / ("fr_ustr_notices.json" if "fields%5B%5D=abstract" in url else "fr_register_ustr.json")).read_bytes()
     if "federalregister.gov/api/v1/documents.json" in url and "fields%5B%5D=abstract" not in url:
         return (FIX / "fr_register_rules.json").read_bytes()
+    if "api.worldbank.org" in url and "source=15" in url:
+        return (FIX / "worldbank_gem.json").read_bytes()
     table = [("petroleum/pri/spt", "eia_petroleum.json"), ("natural-gas/pri/fut", "eia_natural_gas.json"),
              ("foodpricesindex", "fao_page.html"),
              ("food_price_indices_data.csv", "fao.csv"), ("package_search", "hdx.json"),
@@ -218,11 +220,45 @@ class TestParsers(unittest.TestCase):
         self.assertIn("SDN", res)
         m = food.measure_wfp(text("wfp_sdn.csv"), "2026-11")
         self.assertEqual(m["period"], "2026-09")
-        self.assertAlmostEqual(m["median_change_pct"], 50.1, places=1)
+        self.assertAlmostEqual(m["median_change_pct"], 50.0, places=1)    # 50.1 with the exchange rate in
         self.assertGreaterEqual(m["series"], food.WFP_MIN_SERIES)
         self.assertFalse(m["stale"])
         self.assertTrue(food.measure_wfp(text("wfp_sdn.csv"), "2027-06")["stale"])
         self.assertIsNone(food.measure_wfp("date,price\n", "2026-11"))
+
+    def test_wfp_market_exchange_rate(self):
+        # Sudan's file has Khartoum's unofficial rate; it is read on its own and kept out of the food median.
+        fx = food.measure_wfp_fx(text("wfp_sdn.csv"), "2026-11")
+        self.assertTrue(fx["unofficial"])
+        self.assertEqual(fx["recent"][-1], [fx["period"], fx["per_usd_median"]])
+        self.assertEqual(fx["labels"], ["Exchange rate (unofficial)"])
+        self.assertGreaterEqual(fx["markets"], 1)
+        self.assertGreater(fx["per_usd_median"], 1000)              # Sudanese pounds per US dollar
+        self.assertEqual(fx["direction"], "weaker" if fx["median_change_pct"] > 0 else fx["direction"])
+        self.assertIsNone(food.measure_wfp_fx("date,commodity,price\n2026-01-15,Sorghum,10\n", "2026-11"))
+        rows = ["date,market,commodity,unit,pricetype,currency,price"]
+        for i in range(30):
+            y, m = 2024 + i // 12, i % 12 + 1
+            rows.append(f"{y}-{m:02d}-15,Aden,Exchange rate (unofficial),USD/LCU,Retail,YER,{1500 + i}")
+            rows.append(f"{y}-{m:02d}-15,Sanaa,Exchange rate (unofficial),USD/LCU,Retail,YER,{530 + i}")
+        split = food.measure_wfp_fx("\n".join(rows) + "\n", "2026-07")
+        self.assertTrue(split["split"])                             # two rials: no single level
+
+    def test_world_bank_gem(self):
+        series, updated = markets.parse_gem(text("worldbank_gem.json"))
+        self.assertEqual(updated, "2026-09-08")
+        self.assertEqual(sorted(series), ["COD", "LBN", "PHL", "SDN", "YEM"])   # Somalia has no values
+        rows = markets.measure_gem(series, {"COD": "CD", "LBN": "LB", "PHL": "PH", "SDN": "SD", "YEM": "YE"}, "2026-11")
+        by = {r["country"]: r for r in rows}
+        self.assertEqual(by["PH"]["period"], "2026-08")
+        self.assertAlmostEqual(by["PH"]["per_usd"], 61.3728875, places=4)
+        self.assertTrue(by["SD"]["stale"])                          # newest month October 2024
+        self.assertFalse(by["SD"]["anomaly"])
+        self.assertEqual(len(by["PH"]["recent"]), markets.GEM_RECENT)
+        with self.assertRaises(ValueError):
+            markets.parse_gem(b'[{"message": [{"id": "120", "value": "Invalid value"}]}]')
+        with self.assertRaises(ValueError):
+            markets.parse_gem(b'[{"page": 1, "pages": 2}, []]')
 
     def test_calendars(self):
         fomc = releases.fomc_dates(text("fomc.html"))
@@ -436,6 +472,40 @@ class TestFeed(unittest.TestCase):
         eur = next(f for f in fc["features"] if f["properties"]["id"].startswith("headwind:fx:EUR"))
         self.assertIsNone(eur["geometry"])
         self.assertEqual(eur["properties"]["precision_class"], "none")
+
+    def test_official_and_market_rates_and_the_country_view(self):
+        snap = self.snapshot()
+        snap["fx_official"] = [{"country": "YE", "iso3": "YEM", "per_usd": 1600.0, "prior_per_usd": 1500.0,
+                                "period": "2026-10", "prior_period": "2026-09", "change_pct": 6.7, "z": 5.1,
+                                "baseline_n": 60, "flag_rate": 0.02, "direction": "weaker", "months_old": 1,
+                                "stale": False, "anomaly": True, "recent": [["2026-09", 1500.0], ["2026-10", 1600.0]]},
+                               {"country": "SD", "iso3": "SDN", "per_usd": 600.0, "prior_per_usd": 600.0,
+                                "period": "2024-10", "prior_period": "2024-09", "change_pct": 0.0, "z": 0.0,
+                                "baseline_n": 60, "flag_rate": 0.0, "direction": "unchanged", "months_old": 25,
+                                "stale": True, "anomaly": False, "recent": []}]
+        snap["market_fx"] = [{"country": "YE", "iso3": "YEM", "dataset": "https://data.humdata.org/dataset/x",
+                              "period": "2026-10", "median_change_pct": 1.0, "markets": 11, "per_usd_median": 1760.0,
+                              "per_usd_low": 1700.0, "per_usd_high": 1800.0, "split": False, "unofficial": True,
+                              "labels": ["Exchange rate (unofficial)"], "direction": "weaker", "share_weaker": 0.6,
+                              "z": 0.4, "baseline_n": 60, "flag_rate": 0.01, "months_old": 1, "stale": False,
+                              "anomaly": False, "recent": [["2026-09", 1650.0], ["2026-10", 1760.0], ["2026-11", 1800.0]]}]
+        snap["lanes"]["gem"] = {"fetched_at": "2026-11-13T05:00:00Z"}
+        fc = feed.build_feed(snap)
+        self.assertEqual(lint(fc), [])
+        p = {f["properties"]["id"]: f["properties"] for f in fc["features"]}
+        ye = p["headwind:fxofficial:YE:2026-10"]
+        self.assertEqual((ye["tier"], ye["indicator_id"], ye["hypothesis_id"]), ("anomaly", "HW-IND-4", "HW-H-2A"))
+        self.assertEqual(ye["sources"][0]["id"], "worldbank-gem")
+        self.assertNotIn("headwind:fxofficial:SD:2024-10", p)       # stale official rate stays off the feed
+        mk = p["headwind:fxmarket:YE:2026-10"]
+        self.assertEqual(mk["tier"], "routine")
+        self.assertIn("unofficial market", mk["title"])
+        view = {r["country"]: r for r in feed.country_view(snap)}
+        self.assertEqual(sorted(view), sorted(feed.WATCHED))
+        self.assertEqual(view["YE"]["market_vs_official"], {"period": "2026-10", "pct": 10.0})
+        self.assertEqual(view["YE"]["indicators_present"], ["HW-IND-4"])
+        self.assertEqual(view["SD"]["indicators_present"], ["HW-IND-6"])
+        self.assertIsNone(view["CU"]["daily"])
 
     def test_hw_wp_2_indicators_on_anomalies(self):
         snap = self.snapshot()
@@ -781,6 +851,10 @@ class TestEndToEnd(unittest.TestCase):
             snap = headwind_cli.collect(tmp, getter=fake_getter)
             self.assertEqual({k: v["status"] for k, v in snap["lanes"].items()}, dict.fromkeys(headwind_cli.LANES, "ok"))
             self.assertEqual([w["country"] for w in snap["local_food"]], ["SD"])
+            self.assertEqual([w["country"] for w in snap["market_fx"]], ["SD"])
+            self.assertEqual(sorted(o["country"] for o in snap["fx_official"]), ["CD", "LB", "PH", "SD", "YE"])
+            self.assertIn("worldbank-gem", snap["health"])
+            self.assertEqual(len(snap["country_view"]), len(feed.WATCHED))
             self.assertTrue(any(m["reason"].startswith("no WFP") for m in snap["local_food_missing"]))
             self.assertTrue((tmp / "data" / "raw" / "index.jsonl").exists())
             self.assertEqual(snap["sanctions"], [])                 # the first run only sets the baseline

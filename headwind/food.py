@@ -33,6 +33,16 @@ FAO_HORIZON, FAO_WINDOW, FAO_FLOOR = 1, 120, 2.0       # one month against ten y
 WFP_HORIZON, WFP_WINDOW, WFP_FLOOR = 3, 60, 10.0       # three months against five years; at least 10%
 WFP_MIN_SERIES = 5
 WFP_STALE_MONTHS = 4
+# WFP's files also carry exchange rates by market ("Exchange rate" or "Exchange rate (unofficial)", local currency
+# per US dollar). They are read on their own (measure_wfp_fx), never as a food price: one month against five years,
+# at least 5%, from one market up (Lebanon's file has only Beirut).
+WFPFX_HORIZON, WFPFX_WINDOW, WFPFX_FLOOR = 1, 60, 5.0
+WFPFX_MIN_SERIES = 1
+WFPFX_SPLIT = 1.5      # markets whose rates differ by more than this ratio are not one market (Yemen's two rials)
+
+
+def is_fx_row(r: dict) -> bool:
+    return (r.get("commodity") or "").strip().lower().startswith("exchange rate")
 
 MONTHS = {m: i + 1 for i, m in enumerate(
     ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october",
@@ -112,11 +122,24 @@ def hdx_resources(search_json: dict) -> dict[str, dict]:
     return out
 
 
-def measure_wfp(csv_text: str, today_period: str) -> dict | None:
-    """One country's reading from its WFP price file, or None when it holds too few series."""
+def _shift(period: str, n: int) -> str:
+    y, m = int(period[:4]), int(period[5:7]) - n
+    while m < 1:
+        y, m = y - 1, m + 12
+    return f"{y:04d}-{m:02d}"
+
+
+def _months_old(period: str, today_period: str) -> int:
+    return (int(today_period[:4]) - int(period[:4])) * 12 + int(today_period[5:7]) - int(period[5:7])
+
+
+def _monthly(csv_text: str, keep) -> tuple[dict, set, set]:
+    """({series key: {month: mean price}}, markets, commodity names) for the rows `keep` accepts."""
     by_series: dict[tuple, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
-    markets = set()
+    markets, names = set(), set()
     for r in csv.DictReader(io.StringIO(csv_text.lstrip("﻿"))):
+        if not keep(r):
+            continue
         date = (r.get("date") or "")[:7]
         if not re.fullmatch(r"\d{4}-\d{2}", date) or "forecast" in (r.get("priceflag") or "").lower():
             continue
@@ -130,36 +153,80 @@ def measure_wfp(csv_text: str, today_period: str) -> dict | None:
                r.get("unit"), r.get("pricetype"), r.get("currency"))
         by_series[key][date].append(price)
         markets.add(key[0])
-    if not by_series:
-        return None
+        names.add((r.get("commodity") or "").strip())
     monthly = {k: {d: statistics.fmean(v) for d, v in months.items()} for k, months in by_series.items()}
+    return monthly, markets, names
+
+
+def _median_reading(monthly: dict, horizon: int, window: int, floor_pct: float, min_series: int):
+    """The latest month's median change across series, scored against the country's own earlier medians:
+    (period, median, series, share rising, score) or None."""
     periods = sorted({d for m in monthly.values() for d in m})
-
-    def shift(period: str, n: int) -> str:
-        y, m = int(period[:4]), int(period[5:7]) - n
-        while m < 1:
-            y, m = y - 1, m + 12
-        return f"{y:04d}-{m:02d}"
-
     medians: list[tuple[str, float, int, float]] = []
     for p in periods:
-        prev = shift(p, WFP_HORIZON)
+        prev = _shift(p, horizon)
         ch = [m[p] / m[prev] - 1.0 for m in monthly.values() if p in m and prev in m and m[prev] > 0]
-        if len(ch) >= WFP_MIN_SERIES:
+        if len(ch) >= min_series:
             medians.append((p, statistics.median(ch), len(ch), sum(1 for c in ch if c > 0) / len(ch)))
     if not medians:
         return None
     period, med, n, up_share = medians[-1]
-    # Baseline: the country's own medians, ending WFP_HORIZON months before the latest, so none overlaps it.
-    cutoff = shift(period, WFP_HORIZON)
-    base = [m for p, m, _, _ in medians if p <= cutoff][-WFP_WINDOW:]
-    sc = stats.score(med, base, WFP_FLOOR / 100.0)
+    # Baseline: the country's own medians, ending `horizon` months before the latest, so none overlaps it.
+    cutoff = _shift(period, horizon)
+    base = [m for p, m, _, _ in medians if p <= cutoff][-window:]
+    return period, med, n, up_share, stats.score(med, base, floor_pct / 100.0)
+
+
+def measure_wfp(csv_text: str, today_period: str) -> dict | None:
+    """One country's food reading from its WFP price file, or None when it holds too few series. Exchange-rate
+    rows are left out (since headwind-1.6); measure_wfp_fx reads them."""
+    monthly, markets, _ = _monthly(csv_text, lambda r: not is_fx_row(r))
+    if not monthly:
+        return None
+    got = _median_reading(monthly, WFP_HORIZON, WFP_WINDOW, WFP_FLOOR, WFP_MIN_SERIES)
+    if not got:
+        return None
+    period, med, n, up_share, sc = got
     pct = med * 100.0
-    months_old = (int(today_period[:4]) - int(period[:4])) * 12 + int(today_period[5:7]) - int(period[5:7])
+    months_old = _months_old(period, today_period)
     stale = months_old > WFP_STALE_MONTHS
     return {
         "period": period, "median_change_pct": round(pct, 1), "series": n, "markets": len(markets),
         "share_rising": round(up_share, 2), "z": sc["z"], "baseline_n": sc["baseline_n"],
         "flag_rate": sc["flag_rate"], "months_old": months_old, "stale": stale,
         "anomaly": bool(sc["anomaly"] and not stale),
+    }
+
+
+def measure_wfp_fx(csv_text: str, today_period: str) -> dict | None:
+    """One country's market exchange rate from its WFP price file (local currency per US dollar; a rise is a
+    weaker currency): the median one-month change across markets, against the country's own earlier medians, and
+    the range of rates in the latest month. None when the file has no exchange-rate rows."""
+    monthly, _, names = _monthly(csv_text, is_fx_row)
+    if not monthly:
+        return None
+    got = _median_reading(monthly, WFPFX_HORIZON, WFPFX_WINDOW, WFPFX_FLOOR, WFPFX_MIN_SERIES)
+    if not got:
+        return None
+    period, med, n, up_share, sc = got
+    levels = sorted(m[period] for m in monthly.values() if period in m)
+    low, high = levels[0], levels[-1]
+    months = sorted({d for m in monthly.values() for d in m})[-13:]
+    recent = [[d, round(statistics.median(m[d] for m in monthly.values() if d in m), 4)] for d in months]
+    months_old = _months_old(period, today_period)
+    stale = months_old > WFP_STALE_MONTHS
+    pct = med * 100.0
+    return {
+        "period": period, "median_change_pct": round(pct, 1), "markets": n,
+        "per_usd_median": round(statistics.median(levels), 4), "per_usd_low": round(low, 4),
+        "per_usd_high": round(high, 4),
+        # Markets far apart are separate currencies in all but name (Yemen: Aden's and Sana'a's rials), so no single
+        # level, and no comparison with an official rate, is given for them.
+        "split": bool(low > 0 and high / low > WFPFX_SPLIT),
+        "unofficial": any("unofficial" in x.lower() for x in names), "labels": sorted(names),
+        "direction": "weaker" if pct > 0 else "stronger" if pct < 0 else "unchanged",
+        "share_weaker": round(up_share, 2), "z": sc["z"], "baseline_n": sc["baseline_n"],
+        "flag_rate": sc["flag_rate"], "months_old": months_old, "stale": stale,
+        "anomaly": bool(sc["anomaly"] and not stale),
+        "recent": recent,
     }
