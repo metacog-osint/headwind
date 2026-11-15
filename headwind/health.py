@@ -18,6 +18,8 @@ from __future__ import annotations
 import statistics
 from datetime import date, datetime, timezone
 
+from headwind import minerals
+
 HISTORY_N = 10          # readings kept per source for the drift check
 MIN_HISTORY = 3         # readings needed before the drift check applies
 FAIL_SHARE = 0.5        # under this share of the usual size, a strict source fails its lane
@@ -204,6 +206,9 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
     add("us-federal-register", "controls", None, f"{len(snap.get('controls') or [])} rules in the last 60 days")
     add("usgs-mcs", "minerals", None,
         f"{len((snap.get('minerals') or {}).get('reliance') or [])} commodities with net import reliance")
+    watch = minerals.watch_notes(snap.get("minerals") or {})
+    if watch:
+        out["usgs-mcs"]["warnings"] = list(out["usgs-mcs"].get("warnings") or []) + watch
 
     # Each sanctions list stands alone: a list that failed shows "failing" while the others are read.
     lane = lanes.get("sanctions") or {}

@@ -249,8 +249,30 @@ def _lane_minerals(raw_dir, prev, getter):
     by_name = {c["name"]: c["cc"] for c in json.loads(
         (ROOT / "doctrine" / "kit" / "geo" / "countries.json").read_text(encoding="utf-8"))["countries"]}
     cc_of = lambda name: minerals.NAME_CC.get(name) or by_name.get(name)  # noqa: E731
-    return {"minerals": minerals.build(found, minerals.parse_reliance(bodies["reliance"]),
-                                       minerals.parse_sources(bodies["sources"]), cc_of)}, recs
+    doc = minerals.build(found, minerals.parse_reliance(bodies["reliance"]), minerals.parse_sources(bodies["sources"]),
+                         cc_of)
+    doc["watch"] = _minerals_watch(raw_dir, getter, recs)
+    return {"minerals": doc}, recs
+
+
+def _minerals_watch(raw_dir, getter, recs) -> dict:
+    """Has USGS published the next Summaries, or Interior a newer critical minerals list? Both keyless. A check
+    that fails is noted on the health entry; the lane still passes."""
+    watch = {"checked_at": fetch.now_utc(), "edition_year": minerals.EDITION_YEAR,
+             "list_document": minerals.CRITICAL_LIST["document"], "newer_editions": [], "newer_lists": [],
+             "errors": []}
+    checks = (("usgs-mcs-search", minerals.SB_SEARCH_URL.format(year=minerals.EDITION_YEAR + 1), "newer_editions",
+               minerals.newer_editions, "a newer USGS edition"),
+              ("fr-critical-minerals", minerals.FR_LISTS_URL.format(since=minerals.CRITICAL_LIST["published"]),
+               "newer_lists", minerals.newer_lists, "a newer critical minerals list"))
+    for source_id, url, key, parse, what in checks:
+        try:
+            body, rec = fetch.fetch(source_id, url, raw_dir, "json", getter=getter)
+            watch[key] = parse(body)
+            recs.append(rec)
+        except Exception as exc:  # noqa: BLE001
+            watch["errors"].append(f"{what}: {type(exc).__name__}: {exc}"[:200])
+    return watch
 
 
 LANES = {"fx": _lane_fx, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,

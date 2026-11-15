@@ -58,6 +58,70 @@ RARE_EARTHS = ("cerium", "dysprosium", "erbium", "europium", "gadolinium", "holm
                "neodymium", "praseodymium", "samarium", "terbium", "thulium", "ytterbium")
 
 
+# Watching for what replaces the two constants above. Each run asks ScienceBase whether USGS has published the
+# next Summaries, and the Federal Register whether Interior has published a List of Critical Minerals (draft,
+# final or a correction) other than the one carried. Either shows as a warning on the usgs-mcs health entry,
+# never as a feed item; the constants are still changed by hand.
+EDITION_YEAR = int(EDITION[3:])
+SB_SEARCH_URL = ("https://www.sciencebase.gov/catalog/items?q=%22Mineral+Commodity+Summaries+{year}%22"
+                 "&format=json&max=100&fields=title,dates")
+SB_ITEM_PAGE = "https://www.sciencebase.gov/catalog/item/{item}"
+FR_LISTS_URL = ("https://www.federalregister.gov/api/v1/documents.json?per_page=50&order=newest"
+                "&conditions%5Bterm%5D=%22list+of+critical+minerals%22"
+                "&conditions%5Bagencies%5D%5B%5D=geological-survey&conditions%5Bagencies%5D%5B%5D=interior-department"
+                "&conditions%5Bpublication_date%5D%5Bgte%5D={since}"
+                "&fields%5B%5D=document_number&fields%5B%5D=title&fields%5B%5D=publication_date"
+                "&fields%5B%5D=type&fields%5B%5D=html_url")
+
+
+def newer_editions(body: bytes | str, edition_year: int = EDITION_YEAR) -> list[dict]:
+    """Editions of the Summaries newer than the one read, from a ScienceBase search: one record per year.
+
+    USGS releases one item per commodity beside the edition's own ("Mineral Commodity Summaries 2026 Data
+    Release"); the record names that one when the search returns it, and counts the items.
+    """
+    out: dict[int, dict] = {}
+    for it in json.loads(body).get("items") or []:
+        title = (it.get("title") or "").strip()
+        m = re.match(r"Mineral Commodity Summaries (\d{4})\b", title)
+        if not m or int(m.group(1)) <= edition_year:
+            continue
+        year = int(m.group(1))
+        pub = next((d.get("dateString") for d in it.get("dates") or [] if d.get("type") == "Publication"), None)
+        rec = out.setdefault(year, {"year": year, "title": None, "id": None, "url": None, "published": None,
+                                    "items": 0})
+        rec["items"] += 1
+        if title == f"Mineral Commodity Summaries {year} Data Release" or rec["id"] is None:
+            rec.update(title=title, id=it.get("id"), url=SB_ITEM_PAGE.format(item=it.get("id")), published=pub)
+    return [out[y] for y in sorted(out)]
+
+
+def newer_lists(body: bytes | str, known: dict = CRITICAL_LIST) -> list[dict]:
+    """Interior's Federal Register notices titled with a List of Critical Minerals, other than the one carried
+    and published on or after its date. The search also returns notices that only share words with it."""
+    out = []
+    for r in json.loads(body).get("results") or []:
+        title = r.get("title") or ""
+        if "list of critical minerals" not in title.lower():
+            continue
+        if r.get("document_number") == known["document"] or (r.get("publication_date") or "") < known["published"]:
+            continue
+        out.append({"document": r.get("document_number"), "title": title, "published": r.get("publication_date"),
+                    "type": r.get("type"), "url": r.get("html_url")})
+    return sorted(out, key=lambda x: (x["published"] or "", x["document"] or ""))
+
+
+def watch_notes(m: dict) -> list[str]:
+    """Health warnings from the minerals lane's watch record."""
+    w = (m or {}).get("watch") or {}
+    notes = [f"USGS has published {e['title']} ({e['published'] or 'no date given'}); Headwind still reads the "
+             f"{EDITION_YEAR} edition" for e in w.get("newer_editions") or []]
+    notes += [f'the Federal Register has published "{n["title"]}" ({n["published"]}, document {n["document"]}); '
+              f"Headwind still carries the {CRITICAL_LIST['title']}" for n in w.get("newer_lists") or []]
+    notes += [f"could not check for {e}" for e in w.get("errors") or []]
+    return notes
+
+
 def parse_list_sentence(text: str) -> list[str]:
     """The minerals named in a list notice's sentence 'includes the following N minerals: a, b, ..., and z.'
 

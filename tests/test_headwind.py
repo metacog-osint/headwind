@@ -47,6 +47,10 @@ def text(name: str) -> str:
 
 def fake_getter(url: str, timeout: int = 60) -> bytes:
     """Serve fixtures in place of the network."""
+    if "list+of+critical+minerals" in url:
+        return (FIX / "fr_critical_minerals_lists.json").read_bytes()
+    if "sciencebase.gov/catalog/items?" in url:
+        return (FIX / "sciencebase_mcs_search_2027.json").read_bytes()
     if "eurofxref-hist.zip" in url:
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, "w") as zf:
@@ -279,6 +283,55 @@ class TestParsers(unittest.TestCase):
         self.assertNotIn("1W", rows)             # aggregates dropped
         old = json.dumps([{}, [{"country": {"id": "SD"}, "date": "1999", "value": 865.87}]])
         self.assertEqual(baseline.parse_wb(old, {"SD"}, this_year=2026), {})
+
+
+class TestMineralsWatch(unittest.TestCase):
+    """Step 7: a newer USGS edition or critical minerals list is a warning on usgs-mcs. Fixtures are real replies
+    of 14 Nov 2026: ScienceBase searched for the 2026 and the 2027 editions, the Federal Register since 2021."""
+    OLDER_LIST = {"document": "2022-04027", "published": "2022-02-24"}
+
+    def test_newer_editions(self):
+        body = (FIX / "sciencebase_mcs_search_2026.json").read_bytes()
+        self.assertEqual(minerals.newer_editions(body), [])                    # 2026 is the edition read
+        found = minerals.newer_editions(body, 2025)
+        self.assertEqual([(e["year"], e["id"], e["published"]) for e in found],
+                         [(2026, "696a75d5d4be0228872d3bf8", "2026-02-06")])
+        self.assertEqual(found[0]["title"], "Mineral Commodity Summaries 2026 Data Release")
+        self.assertEqual(minerals.newer_editions((FIX / "sciencebase_mcs_search_2027.json").read_bytes()), [])
+
+    def test_newer_lists(self):
+        body = (FIX / "fr_critical_minerals_lists.json").read_bytes()
+        self.assertEqual(minerals.newer_lists(body), [])                       # the Final 2025 list is the newest
+        found = minerals.newer_lists(body, self.OLDER_LIST)
+        self.assertEqual([n["document"] for n in found], ["2025-16311", "2025-19813"])   # the OCS notice is not one
+
+    def test_notes_and_a_failed_check(self):
+        sb = (FIX / "sciencebase_mcs_search_2026.json").read_bytes()
+        fr = (FIX / "fr_critical_minerals_lists.json").read_bytes()
+        m = {"watch": {"newer_editions": minerals.newer_editions(sb, 2025),
+                       "newer_lists": minerals.newer_lists(fr, self.OLDER_LIST), "errors": []}}
+        notes = minerals.watch_notes(m)
+        self.assertEqual(len(notes), 3)
+        self.assertIn("USGS has published Mineral Commodity Summaries 2026 Data Release (2026-02-06)", notes[0])
+        self.assertIn("document 2025-19813", notes[2])
+
+        def getter(url, timeout=60):
+            if "catalog/items?" in url:
+                raise urllib.error.URLError("ScienceBase down")
+            return fake_getter(url, timeout)
+        with tempfile.TemporaryDirectory() as tmp:
+            result, recs = headwind_cli._lane_minerals(Path(tmp) / "raw", {}, getter)
+        w = result["minerals"]["watch"]
+        self.assertEqual((w["newer_editions"], w["newer_lists"]), ([], []))
+        self.assertEqual(len(w["errors"]), 1)
+        self.assertEqual(minerals.watch_notes(result["minerals"])[0][:41], "could not check for a newer USGS edition:")
+        self.assertEqual(len(recs), 4)                                          # item, two CSVs, the FR search
+
+    def test_end_to_end_has_no_warning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            snap = headwind_cli.collect(Path(tmp), getter=fake_getter)
+        self.assertEqual(snap["minerals"]["watch"]["errors"], [])
+        self.assertNotIn("warnings", snap["health"]["usgs-mcs"])
 
 
 class TestFeed(unittest.TestCase):
