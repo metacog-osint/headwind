@@ -236,7 +236,10 @@ def _observation(item_id: str, title: str, summary: str, *, anomaly: bool, data_
         if hypothesis_id:
             # HW-WP-2: an anomaly for a watched country (or an energy benchmark) is its indicator present. The
             # direction is the register's: each indicator is emerging under the hypothesis named here.
-            props.update({"indicator_id": indicator_id, "hypothesis_id": hypothesis_id, "direction": "supports",
+            # HW-IND-6 (local food) is emerging under HW-H-2A and HW-H-2B alike, so it tells neither apart: it is
+            # present but neutral. Which hypothesis holds is an analyst's reading of the indicators together.
+            props.update({"indicator_id": indicator_id, "hypothesis_id": hypothesis_id,
+                          "direction": "neutral" if indicator_id in NON_DIAGNOSTIC else "supports",
                           "indicator_state": "present"})
     geom = None
     if len(countries) == 1:
@@ -694,6 +697,7 @@ def live_features(snapshot: dict) -> list[dict]:
 # The currency each watched country uses, where the ECB quotes it but under another country (the Palestinian
 # territories use the Israeli shekel). Shown in the country view only; the feed item stays Israel's.
 CURRENCY_IN_USE = {"PS": "ILS"}
+NON_DIAGNOSTIC = frozenset({"HW-IND-6"})     # doctrine/indicators.json: gentry.diagnostic false
 
 # Shown with "market against official" on the page. A gap this wide more often means the two sources report
 # different rates than that one market trades at that premium.
