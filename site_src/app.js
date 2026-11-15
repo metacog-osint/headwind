@@ -82,7 +82,7 @@
           cell(o, o ? num(o.per_usd) : "", o ? pct(o.change_pct) + " on the month" : "", o ? o.period : ""),
           cell(m, m ? (m.split ? num(m.per_usd_low) + " to " + num(m.per_usd_high) : num(m.per_usd_median)) : "", m ? pct(m.median_change_pct) + " on the month" : "", m ? m.period : "",
             m ? m.markets + " market" + (m.markets === 1 ? "" : "s") + (m.unofficial ? ", unofficial" : "") + (m.split ? ", too far apart to be one market" : "") : ""),
-          g ? esc(pct(g.pct)) + '<br><span class="small muted">' + esc(g.period) + "</span>" : '<span class="muted">none</span>',
+          g ? esc(pct(g.pct)) + (g.caveat ? ' <span class="badge">caveat</span>' : "") + '<br><span class="small muted">' + esc(g.period) + (g.caveat ? "; " + esc(g.caveat) : "") + "</span>" : '<span class="muted">none</span>',
           f ? cell(f, pct(f.median_change_pct), "", f.period) : '<span class="muted">' + esc(r.local_food_missing || "none") + "</span>"];
       }));
     document.getElementById("country-note").textContent = "No official monthly rate: " + ((s.fx_official_missing || []).map(function (m) { return names[m.country] || m.country; }).join(", ") || "none") +

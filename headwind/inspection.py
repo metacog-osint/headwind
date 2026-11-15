@@ -24,6 +24,7 @@ from . import controls
 
 PI_API = "https://www.federalregister.gov/api/v1/public-inspection-documents.json"
 PI_PAGE = "https://www.federalregister.gov/public-inspection/current"
+DOC_PAGE = "https://www.federalregister.gov/d/{id}"   # the register's short address: the number, no title slug
 DAYS_READ = 5          # issues read each run, today's included: covers a long weekend between runs
 KEEP_DAYS = 30         # a filing stays in the snapshot this long
 FEED_DAYS = 7          # and in the feed this long (by then it is published and shows as a rule or notice)
@@ -88,7 +89,7 @@ def parse_issue(body: bytes | str, day: str) -> list[dict]:
             continue
         counted_only = kind == "Notice" and agency in ("BIS", "OFAC")
         note = " ".join((r.get("editorial_note") or "").split())
-        out.append({
+        out.append(public_form({
             "id": r["document_number"], "agency": agency, "type": kind or "Unknown",
             "filing_type": r.get("filing_type"), "issue": day,
             "filed_at": r.get("filed_at"), "filed_at_utc": to_utc(r.get("filed_at")),
@@ -100,8 +101,18 @@ def parse_issue(body: bytes | str, day: str) -> list[dict]:
             "counted_only": counted_only,
             "title": None if counted_only else title,
             "dockets": [] if counted_only else controls.docket_tokens(r.get("docket_numbers")),
-        })
+        }))
     return out
+
+
+def public_form(rec: dict) -> dict:
+    """A counted-only filing as it may be published. The register's addresses carry the title as a slug
+    ("denial-of-export-privileges-<names>"), and an editorial note can quote it, so such a filing keeps the
+    document number's short address and no text address or note. Applied to kept filings too (merge)."""
+    if not rec.get("counted_only"):
+        return rec
+    return {**rec, "url": DOC_PAGE.format(id=rec["id"]), "raw_text_url": None, "note": None, "title": None,
+            "dockets": []}
 
 
 def wants_text(rec: dict) -> bool:
@@ -163,7 +174,7 @@ def merge(prev: list[dict], read: list[dict], now: str, today: date) -> list[dic
             r["text"] = o["text"]
         out[r["id"]] = r
     for rid, o in old.items():
-        out.setdefault(rid, o)
+        out.setdefault(rid, public_form(o))
     lo = (today - timedelta(days=KEEP_DAYS)).isoformat()
     keep = [r for r in out.values() if (r.get("filed_on") or r.get("issue") or "") >= lo]
     return sorted(keep, key=lambda r: (r.get("filed_at_utc") or r.get("issue") or "", r["id"]), reverse=True)

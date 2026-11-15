@@ -229,7 +229,10 @@ def _observation(item_id: str, title: str, summary: str, *, anomaly: bool, data_
         "sources": [{**source, "accessed_at": lane_accessed or generated}],
     }
     if anomaly:
-        props["baseline_ref"] = baseline_ref
+        # The kit's form (feed-contract-v2: id, window, type, version). The id names the lane's own rule, from
+        # the item id ("headwind:fxmarket:SD:2026-10" -> "headwind-fxmarket"); every series rule is rolling.
+        props["baseline_ref"] = {"id": f"headwind-{item_id.split(':')[1]}", "type": "rolling", "version": METHOD,
+                                 "window": baseline_ref.removeprefix("rolling: ")}
         if hypothesis_id:
             # HW-WP-2: an anomaly for a watched country (or an energy benchmark) is its indicator present. The
             # direction is the register's: each indicator is emerging under the hypothesis named here.
@@ -262,7 +265,7 @@ def _point(countries: list[str]):
 def _official(item_id: str, title: str, summary: str, *, data_as_of: str, generated: str, valid_until: str,
               countries: list[str], pmesii: list[str], ascope: list[str], ncf: list[str], requirement_ids: list[str],
               measures: dict, visual: dict, source: dict, accessed: str | None, extra: dict | None = None,
-              anomaly_ref: str | None = None) -> dict:
+              anomaly_ref: dict | None = None) -> dict:
     geom = _point(countries)
     tier = {"tier": "anomaly", "baseline_ref": anomaly_ref} if anomaly_ref else {}
     return {"type": "Feature", "geometry": geom, "properties": {**(extra or {}),
@@ -278,21 +281,27 @@ def _official(item_id: str, title: str, summary: str, *, data_as_of: str, genera
 
 
 def _batch_measures(s: dict) -> dict:
+    """The largest batch, the highest z, and that batch's flag_rate (how often the list's own earlier batches
+    would have tripped the same rule)."""
     b = s.get("batches") or []
-    zs = [x["z"] for x in b if x.get("z") is not None]
-    return {"batch_size_max": max((x["size"] for x in b), default=0), "batch_z_max": max(zs) if zs else None}
+    scored = [x for x in b if x.get("z") is not None]
+    top = max(scored, key=lambda x: x["z"], default=None)
+    return {"batch_size_max": max((x["size"] for x in b), default=0), "batch_z_max": top["z"] if top else None,
+            "flag_rate": top.get("flag_rate") if top else None}
 
 
-def _batch_ref(s: dict) -> str | None:
+def _batch_ref(s: dict) -> dict | None:
     """A list change is an anomaly only when one of its designation batches is (headwind/batches.py)."""
     if not s.get("anomaly"):
         return None
     basis = {x["basis"] for x in s.get("batches") or [] if x.get("anomaly")}
-    what = ("the list's own " + str(batches.BATCH_WINDOW) + " earlier designation dates, by size"
-            if "designation date" in basis else
+    dated = "designation date" in basis
+    what = ("the list's own " + str(batches.BATCH_WINDOW) + " earlier designation dates, by size" if dated else
             "the earlier changes Headwind saw on the list, up to " + str(batches.BATCH_WINDOW) + ", by size")
-    return (f"rolling: {what}; anomaly at z >= {stats.Z_ANOMALY:g} on the logarithm of the batch size and at least "
-            f"{batches.BATCH_FLOOR} entries")
+    return {"id": "headwind-designation-batch" if dated else "headwind-observed-additions", "type": "rolling",
+            "version": METHOD,
+            "window": f"{what}; anomaly at z >= {stats.Z_ANOMALY:g} on the logarithm of the batch size and at least "
+                      f"{batches.BATCH_FLOOR} entries"}
 
 
 VESSELS_IN_TEXT = 25
@@ -686,6 +695,16 @@ def live_features(snapshot: dict) -> list[dict]:
 # territories use the Israeli shekel). Shown in the country view only; the feed item stays Israel's.
 CURRENCY_IN_USE = {"PS": "ILS"}
 
+# Shown with "market against official" on the page. A gap this wide more often means the two sources report
+# different rates than that one market trades at that premium.
+GAP_CAVEAT = {
+    "YE": ("Yemen has had two rials in use since 2019, Aden's and Sana'a's. Which rate the World Bank's monthly "
+           "figure reports is not verified, so this gap may set two different rates side by side."),
+}
+GAP_WIDE_PCT = 100.0
+GAP_WIDE = ("A gap this wide can mean the two sources report different rates, not a market premium; which rate the "
+            "World Bank's figure is has not been checked for this country.")
+
 
 def country_view(snapshot: dict) -> list[dict]:
     """One row per watched country: its daily rate (ECB) where there is one, its official monthly rate (World Bank
@@ -713,11 +732,15 @@ def country_view(snapshot: dict) -> list[dict]:
                                                                   "anomaly", "period", "stale", "markets")}
         gap = None
         if o and w and not w.get("split"):
-            # The newest month both give (WFP's and the World Bank's months seldom end together).
+            # The newest month both give (WFP's and the World Bank's months seldom end together), and never a
+            # month in which the markets were too far apart to be one market.
             official, market = dict(o.get("recent") or []), dict(w.get("recent") or [])
-            both = sorted(set(official) & set(market))
+            both = sorted((set(official) & set(market)) - set(w.get("split_months") or []))
             if both and official[both[-1]] > 0:
                 gap = {"period": both[-1], "pct": round((market[both[-1]] / official[both[-1]] - 1.0) * 100.0, 1)}
+                caveat = GAP_CAVEAT.get(cc) or (GAP_WIDE if abs(gap["pct"]) >= GAP_WIDE_PCT else None)
+                if caveat:
+                    gap["caveat"] = caveat
         row["market_vs_official"] = gap
         row["local_food"] = None if not f else {k: f[k] for k in ("median_change_pct", "z", "anomaly", "period",
                                                                   "stale")}

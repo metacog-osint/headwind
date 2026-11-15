@@ -213,6 +213,13 @@ def measure_wfp_fx(csv_text: str, today_period: str) -> dict | None:
     low, high = levels[0], levels[-1]
     months = sorted({d for m in monthly.values() for d in m})[-13:]
     recent = [[d, round(statistics.median(m[d] for m in monthly.values() if d in m), 4)] for d in months]
+    # The split test month by month, so a comparison with the official rate is never made on a month whose
+    # markets were two currencies, whatever the latest month shows.
+    split_months = []
+    for d in months:
+        lv = [m[d] for m in monthly.values() if d in m and m[d] > 0]
+        if len(lv) > 1 and max(lv) / min(lv) > WFPFX_SPLIT:
+            split_months.append(d)
     months_old = _months_old(period, today_period)
     stale = months_old > WFP_STALE_MONTHS
     pct = med * 100.0
@@ -228,5 +235,5 @@ def measure_wfp_fx(csv_text: str, today_period: str) -> dict | None:
         "share_weaker": round(up_share, 2), "z": sc["z"], "baseline_n": sc["baseline_n"],
         "flag_rate": sc["flag_rate"], "months_old": months_old, "stale": stale,
         "anomaly": bool(sc["anomaly"] and not stale),
-        "recent": recent,
+        "recent": recent, "split_months": split_months,
     }

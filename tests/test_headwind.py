@@ -547,9 +547,12 @@ class TestBatches(unittest.TestCase):
         self.assertEqual(lint(fc), [])
         p = fc["features"][0]["properties"]
         self.assertEqual(p["tier"], "anomaly")
-        self.assertIn("designation dates", p["baseline_ref"])
+        self.assertIn("designation dates", p["baseline_ref"]["window"])
+        self.assertEqual((p["baseline_ref"]["id"], p["baseline_ref"]["type"]), ("headwind-designation-batch", "rolling"))
         self.assertIn("Designation batches: 2026-11-12: 45 entries", p["summary"])
         self.assertEqual(p["measures"]["batch_size_max"], 45)
+        self.assertIn("flag_rate", p["measures"])                 # every scored item carries its flag rate
+        self.assertEqual(p["measures"]["flag_rate"], d["batches"][0]["flag_rate"])
         self.assertNotIn("probability", p)
         self.assertNotIn("new0", json.dumps(fc))                  # entry ids are not published
 
@@ -625,7 +628,18 @@ class TestFeed(unittest.TestCase):
         self.assertIn("unofficial market", mk["title"])
         view = {r["country"]: r for r in feed.country_view(snap)}
         self.assertEqual(sorted(view), sorted(feed.WATCHED))
-        self.assertEqual(view["YE"]["market_vs_official"], {"period": "2026-10", "pct": 10.0})
+        gap = view["YE"]["market_vs_official"]
+        self.assertEqual((gap["period"], gap["pct"]), ("2026-10", 10.0))
+        self.assertIn("two rials", gap["caveat"])                     # Yemen's gap always carries its caveat
+        # A month whose markets were too far apart to be one market is never compared: the month before is.
+        split_snap = dict(snap, market_fx=[dict(snap["market_fx"][0], split_months=["2026-10"])])
+        gap = {r["country"]: r for r in feed.country_view(split_snap)}["YE"]["market_vs_official"]
+        self.assertEqual((gap["period"], gap["pct"]), ("2026-09", 10.0))
+        # Any other country with a gap of 100% or more gets the general caveat.
+        wide = dict(snap, market_fx=[dict(snap["market_fx"][0], country="LB", recent=[["2026-10", 3300.0]])],
+                    fx_official=[dict(snap["fx_official"][0], country="LB")])
+        gap = {r["country"]: r for r in feed.country_view(wide)}["LB"]["market_vs_official"]
+        self.assertEqual((gap["pct"], gap["caveat"]), (106.2, feed.GAP_WIDE))
         self.assertEqual(view["YE"]["indicators_present"], ["HW-IND-4"])
         self.assertEqual(view["SD"]["indicators_present"], ["HW-IND-6"])
         self.assertIsNone(view["CU"]["daily"])
@@ -860,6 +874,25 @@ class TestInspection(unittest.TestCase):
         self.assertEqual((stay["filed_at_utc"], stay["filed_on"], stay["publication_date"]),
                          ("2026-11-05T21:15:00Z", "2026-11-05", "2026-11-09"))
         self.assertTrue(all(r["title"] is None for r in five if r["counted_only"]))   # notices are counts only
+        counted = [r for r in five if r["counted_only"]]
+        self.assertEqual([r["url"] for r in counted], ["https://www.federalregister.gov/d/2026-22725",
+                                                       "https://www.federalregister.gov/d/2026-22726"])
+        self.assertTrue(all(r["raw_text_url"] is None and r["note"] is None for r in counted))
+        self.assertIn("/public-inspection/2026-22793/extension-of-the-suspension", stay["url"])   # titled: as given
+        # And a build from a snapshot that predates the fix publishes the same short form.
+        self.assertEqual(inspection.public_form({"id": "2026-22598", "counted_only": True, "note": "x",
+                                                 "url": "https://www.federalregister.gov/public-inspection/"
+                                                        "2026-22598/denial-of-export-privileges-y"})["url"],
+                         "https://www.federalregister.gov/d/2026-22598")
+        # A filing kept from a run before this fix loses its slug when merged, even if not read again.
+        old = {"id": "2026-21840", "agency": "BIS", "type": "Notice", "counted_only": True, "title": None,
+               "filed_on": "2026-11-04", "note": "Names in a note", "dockets": [],
+               "url": "https://www.federalregister.gov/public-inspection/2026-21840/denial-of-export-privileges-x-y",
+               "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/621/840.txt"}
+        kept = next(r for r in inspection.merge([old], five, "2026-11-05T22:00:00Z", date(2026, 11, 5))
+                    if r["id"] == "2026-21840")
+        self.assertEqual((kept["url"], kept["raw_text_url"], kept["note"]),
+                         ("https://www.federalregister.gov/d/2026-21840", None, None))
         nine = inspection.parse_issue(text("fr_pi_2026-11-09.json"), "2026-11-09")
         special = next(r for r in nine if r["id"] == "2026-22802")
         self.assertEqual((special["filed_at"], special["filed_on"]), (None, "2026-11-09"))   # no filing time given
