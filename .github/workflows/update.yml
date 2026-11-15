@@ -20,6 +20,12 @@ name: update
 # Secrets: EIA_API_KEY (energy lane; without it that lane fails and the rest run), CLOUDFLARE_PAGES_TOKEN
 # (Cloudflare Pages: Edit), and the account ID as repo variable CLOUDFLARE_ACCOUNT_ID. Without the Cloudflare
 # pair everything runs except the deploy. Collected data is not committed.
+#
+# History (since 15 Nov 2026, the kit's tic-history/1, doctrine/kit/docs/history-log.md): after the feed check, the
+# kit compares the feed with history/state.json and writes one line per item that is new, changed or ended to
+# history/log/YYYY/MM/DD.jsonl, and the items ended in the last 7 days to site/data/ended.geojson (deployed with the
+# site, read by COP). history/ is committed to main by the workflow's token, which starts no further run. It holds
+# only published feed items, never the run state. A failure there is a gap in the history, never a missed deploy.
 on:
   push:
     branches: [main]
@@ -32,7 +38,7 @@ on:
         type: boolean
         default: false
 permissions:
-  contents: write     # the release that keeps the second copy of the state; nothing is committed or pushed
+  contents: write     # the release that keeps the second copy of the state, and the history/ commit
 concurrency:
   group: update
   cancel-in-progress: false
@@ -81,6 +87,21 @@ jobs:
         run: python tools/headwind.py build
       - name: Feed check
         run: python tools/headwind.py check
+      - name: History (history/, and site/data/ended.geojson)
+        run: |
+          python doctrine/kit/tic.py history site/data/feed.geojson --dir history --ended site/data/ended.geojson \
+            || { echo "::warning::history step failed; this run is missing from history/"; exit 0; }
+          [ -n "$(git status --porcelain -- history)" ] || exit 0
+          git config user.name "headwind-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add history
+          git commit -q -m "history: $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do
+            git push -q origin HEAD:main && exit 0
+            echo "::warning::history push attempt $i failed"
+            sleep $((i * 15)); git pull -q --rebase origin main || true
+          done
+          echo "::warning::history not committed this run; the next run logs these changes again from the last state"
       - name: Keep this run's state for the next run
         uses: actions/cache/save@v6
         with:
