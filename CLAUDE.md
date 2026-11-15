@@ -4,6 +4,27 @@ Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind
 energy and food prices measured against their own normal range, changes to official sanctions and US screening
 lists, export-control and sanctions rules, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No probabilities, no investment advice.
 
+**State, 14 Nov 2026, 10:00 PM CST: working through the remaining plan** (Tom: "complete all remaining open and
+incomplete items"; commit each step once tests and check pass, **push nothing until Tom says so at the end**, in any
+repo). Done: **step 7** (`d320d8e`, watch for the next USGS Summaries and a newer critical minerals list; see
+Minerals), committed on `live/first-slice`, not pushed. Stopped at 92% of the 5-hour usage window. Next, in this
+order: step 8 (Verdict repo: calendar sync reads Headwind's `events.json`, kit copy 0.4.2 still calls Headwind
+planned), 9, 10, 11, 12 (confirm the Pink Sheet licence first), 13, 14 (kit history log; COP config gets the ended
+URL), 15 (COP repo), 16 (Census). Tom's decisions for the rest:
+- **HW-WP-2: add it to the register** (`doctrine/indicators.json`) and tie `HW-IND-4` to `HW-IND-6` to it, so
+  anomaly items carry indicator ids. The 14 Nov draft is in no file; write it fresh from the indicators Headwind has.
+- **Census key:** Tom has one and sets it himself as the user-level `CENSUS_API_KEY` and the repo secret
+  `CENSUS_API_KEY` (`gh secret set CENSUS_API_KEY --repo metacog-osint/headwind`). Read it like the EIA key; never
+  print it. Not yet confirmed set.
+- **HW-H-1B review (first pass, from the registers only, not checked against current events):** (1) the title
+  states an intent, "calibrated diplomatic truce", that no indicator can show; a neutral form is "BIS or USTR
+  extend stays or suspensions ahead of scheduled deadlines". (2) Its only emerging indicator, `HW-IND-2`, needs
+  USTR notices and Federal Register public inspection, which Headwind does not read (step 10), so `collectable`
+  is true on paper only. (3) `HW-IND-1`'s `dual_use_network == true` is not something Headwind computes (people and
+  organizations are counts only), so only its vessel half is collectable; `HW-IND-1` and `HW-IND-2` are the two
+  halves of every hypothesis, so H-1A and H-1B are mirror images and H-1C (artefact) has no emerging indicator.
+  Rewording needs Tom's yes.
+
 **State, 14 Nov 2026, 9:10 PM CST: `headwind-1.5` live** (Tom: push, keep the method bump, delete `tic-nav-v1.10`,
 update the plan file without committing it). `9fbc526` is on `main` and `live/first-slice`; run 43670866655 (9:07 PM
 CST) passed every step and deployed: all ten lanes ok, 60 items, 13 health entries (4 fresh, 9 up), check PASS, state
