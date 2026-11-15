@@ -6,8 +6,28 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 15 Nov 2026, about 2:50 PM CST: `headwind-1.6` is live (pushed and deployed at 1:27 PM CST, run
+43752551902); review fixes committed on `live/first-slice`, not pushed.** `49de59b` fixes, from the 15 Nov review:
+(1) counted-only public-inspection filings (BIS and OFAC notices) published the register's slugged address, and
+the live `snapshot.json` held BIS denial orders 2026-21840 and 2026-22598 whose addresses name an individual and
+airlines; they now keep `federalregister.gov/d/<number>` and no text address or note (when read, on merge, and at
+build); a scan of every published file found no other name (vessel names aside); (2) the workflow's history push
+(no rebase now; see History log); (4) `flag_rate` on designation-batch items; (5) method.md; (6) `baseline_ref` in
+the kit's object form; (7) the market-against-official split test month by month and a caveat on Yemen's gap.
+`f311667` merges `origin/main` (`e4df8ce` house bar v1.13, another session's; `5200a9d` history). Ahead of
+`origin/main`: only those two. 66 of 67 tests pass: `test_the_kit_copy_is_current` fails because
+`../tic-doctrine` is at 0.5.5 (Wake, Undertow) and Headwind carries 0.5.2 (not caused by this; skipped on the
+runner). check PASS on a local build. **Waiting for Tom:** the push; fix 3 (HW-IND-4 covers three readings with
+different windows and floors, HW-WP-2's watch condition, HW-IND-6 always tagged HW-H-2A), wording proposed in
+the session, not written to the register; whether the kit validator should check `baseline_ref`'s shape
+(Blackout sends strings, so tightening it breaks Blackout's check until Blackout changes); step 12; HW-H-1A/1B
+wording; whether COP treats superseded FX, GEM and WFP readings as ended; Actions minutes (the 2:23 PM CST push
+run took 3m27s, 167 s of it collection, with no backfill; about 4 billed minutes a run). The first run after the
+push reads every WFP file with exchange-rate rows again once (`split_months`), so it runs longer. The paragraph
+below is the state before this.
+
 **State, 15 Nov 2026, 1:15 PM CST: steps 11, 13, 14, 15 and 16 done and committed, step 12 held for Tom, nothing
-pushed.** Headwind, on `live/first-slice`: `390c708` (step 11, official and market exchange rates and the per-country
+pushed.** (Pushed later the same day, see above.) Headwind, on `live/first-slice`: `390c708` (step 11, official and market exchange rates and the per-country
 view), `edf7ced` (step 13, designation batches), `055e8ff` (step 14, history log in the workflow), `b3aadc7` (step
 16, Census trade data), and this notes commit. 67 tests pass, check PASS. COP, on `main`: `a874c58` (Headwind's
 `ended` address) and `0de98a9` (step 15, `source_health`: items from a source Headwind did not read go grey and
@@ -211,6 +231,11 @@ the page reads).
 - **Country view** (`feed.country_view`, snapshot `country_view`, page section `#countries`): per watched country
   the daily, official and market rates, market against official (the newest month both give, from each record's
   `recent` 13 months), local food, and `indicators_present`. Nothing is combined into a score.
+- **Market against official (since `49de59b`):** the newest month both give, never a month in `split_months`
+  (the split test run on each of the 13 recent months; SS had one, Nov 2025; SO all 13). The gap carries a
+  `caveat` shown on the page: Yemen's always (`feed.GAP_CAVEAT`: two rials in use since 2019, Aden's and
+  Sana'a's, stated from memory; which rate GEM reports is not verified), any other at 100% or more `GAP_WIDE`.
+  Yemen's WFP markets were one rial in every recent month (1,553 to 1,564 in Oct 2026), so its gap stays.
 - **Live 15 Nov, 12:40 PM CST:** one anomaly, Sudan's unofficial market rate (Khartoum, WFP) 23.3% weaker in Oct
   2026, z +5.1, so Sudan carries `HW-IND-4`. Market against official: CD +0.8%, LB +0.1%, YE +555.1% (GEM's Yemen
   figure is about 238 per dollar and flat; WFP's markets, Aden's side, about 1,556; which rate GEM reports is not
@@ -222,7 +247,10 @@ the page reads).
 One rule for every series: the latest change against the series' own earlier changes, as a robust z (median and
 MAD). Anomaly at |z| >= 3.5 and a move of at least the lane's floor: 1% currencies, 5% energy, 2% FAO indices,
 10% local food (constants in `markets.py` and `food.py`). Each item carries `flag_rate`, how often the series
-trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
+trips the rule in ordinary times (designation-batch items carry their highest-scoring batch's since
+`49de59b`). An anomaly's `baseline_ref` is the kit's object: `id` `headwind-<lane token of the item id>` or
+`headwind-designation-batch` / `headwind-observed-additions`, `window`, `type` `rolling`, `version` the method.
+On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
 
 ## Sanctions lists and rules (`headwind-1.2`)
 - **A list change is the difference between two of Headwind's own readings.** Each run reduces a list to
@@ -340,7 +368,11 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   filtered. Issues by `available_on`; weekends return none. `days_to_read()`: 5 days after a good reading, back to
   the last good reading after a gap, 30 on a first run. Filings kept 30 days in the snapshot (`inspection`, merged
   by document number, `first_seen_at` kept), 7 in the feed. OFAC's and BIS's notices (sanctions actions, denial
-  orders) are `counted_only`, with no title: their titles and texts can name people and companies. For each rule,
+  orders) are `counted_only`, with no title: their titles and texts can name people and companies. Since
+  `49de59b` such a filing keeps only `url` `https://www.federalregister.gov/d/<number>` (`inspection.public_form`,
+  applied in `parse_issue`, `merge` and `build`): the register's own `html_url` carries the title as a slug, and
+  `raw_text_url` and `note` are dropped. The `/d/` short address is the register's permalink form, from memory:
+  federalregister.gov turned automated checks away (302 to its unblock page) on 15 Nov. For each rule,
   proposed rule and USTR notice the raw text (`raw_text_url`, UTF-8) is read once per `pdf_updated_at` for its
   action line, RINs, docket numbers, the first sentence of its SUMMARY and the dates it says were scheduled
   (`_SCHEDULED`: "was set to end", "scheduled to expire", first date after the phrase); the text is not kept
@@ -406,7 +438,12 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   runs `python doctrine/kit/tic.py history site/data/feed.geojson --dir history --ended site/data/ended.geojson`
   after the feed check and before the state is saved and the site deployed, as Cordon does. It writes
   `history/log/YYYY/MM/DD.jsonl` and `history/state.json` and commits `history/` to `main` as `headwind-bot` with the
-  workflow token (starts no run; three tries with `pull --rebase`). `site/data/ended.geojson` (items ended in the
+  workflow token (starts no run). Since `49de59b` the step first takes `history/` from main's tip (a run
+  queued behind another starts from the commit that triggered it, without the run before's history commit),
+  then commits only `history/` on main's tip with `git reset --mixed FETCH_HEAD` (HEAD and index move, the
+  working tree with the build's `site/` files does not), three tries. The old `pull --rebase` retry stopped on
+  the build's unstaged `site/` files whenever main had moved. Tried on a local bare repo with main moved and
+  `site/` dirty: pushed fast-forward, `site/` untouched. `site/data/ended.geojson` (items ended in the
   last 7 days) is deployed with the site. A failure there is a warning, never a missed deploy. No `--health` and
   no `--lane-map`: the feed's own `health` names every source id the items carry (a test checks this). Tried
   locally on the 15 Nov build: 85 new, 0 ended, no warning about an unnamed lane.
