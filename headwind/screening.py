@@ -20,6 +20,8 @@ import json
 import re
 from collections import Counter
 
+from . import batches
+
 CSL_URL = "https://data.trade.gov/downloadable_consolidated_screening_list/v1/consolidated.json"
 CSL_PAGE = "https://www.trade.gov/consolidated-screening-list"
 
@@ -69,7 +71,7 @@ def parse(body: bytes | str) -> dict[str, dict]:
         abbr, name, pub = split_source(s.get("source"))
         if abbr not in SKIP:
             lists[abbr] = {"name": name, "publisher": pub, "url": CSL_PAGE,
-                           "source_last_updated": s.get("source_last_updated"), "index": {}}
+                           "source_last_updated": s.get("source_last_updated"), "index": {}, "dates": {}}
     for e in results:
         abbr, name, pub = split_source(e.get("source"))
         if abbr in SKIP:
@@ -78,11 +80,14 @@ def parse(body: bytes | str) -> dict[str, dict]:
         if not entry_id:
             raise ValueError(f"screening list: an entry on {abbr} has no id")
         lst = lists.setdefault(abbr, {"name": name, "publisher": pub, "url": CSL_PAGE,
-                                      "source_last_updated": None, "index": {}})
+                                      "source_last_updated": None, "index": {}, "dates": {}})
         if e.get("source_list_url") and lst["url"] == CSL_PAGE:
             lst["url"] = e["source_list_url"]
         lst["index"][entry_id] = [(e.get("type") or "not stated").lower(), sorted(e.get("programs") or []),
                                   _countries(e), name_key(e.get("name"))]
+        # The listing date, for the batch measure only (never kept in the state).
+        sd = str(e.get("start_date") or "").strip()[:10]
+        lst["dates"][entry_id] = sd if re.fullmatch(r"\d{4}-\d{2}-\d{2}", sd) else None
     return lists
 
 
@@ -144,7 +149,8 @@ def edits(prev_index: dict, index: dict, pairs: list[tuple[str, str]]) -> dict:
             "programs_lost": dict(lost.most_common())}
 
 
-def delta(abbr: str, lst: dict, prev_index: dict, detected_at: str, prior_checked_at: str | None) -> dict | None:
+def delta(abbr: str, lst: dict, prev_index: dict, detected_at: str, prior_checked_at: str | None,
+          added_history: list | None = None) -> dict | None:
     """The difference between two readings of one list, or None when nothing changed.
 
     An id that went and one that came with the same name and type are counted once, as re-keyed, and not as a
@@ -158,6 +164,7 @@ def delta(abbr: str, lst: dict, prev_index: dict, detected_at: str, prior_checke
     ed = edits(prev_index, index, pairs)
     if not added and not removed and not pairs and not ed["changed"]:
         return None
+    batch = batches.measure(added, lst.get("dates"), added_history, detected_at)
     a_type, a_prog, a_cc = _tally(index, added)
     r_type, r_prog, r_cc = _tally(prev_index, removed)
     stamp = detected_at.replace("-", "").replace(":", "")[:13]
@@ -168,6 +175,7 @@ def delta(abbr: str, lst: dict, prev_index: dict, detected_at: str, prior_checke
         "added_by_type": a_type, "added_by_program": a_prog, "added_by_country": a_cc,
         "removed_by_type": r_type, "removed_by_program": r_prog, "removed_by_country": r_cc,
         "rekeyed": len(pairs), **ed,
+        "batches": batch, "anomaly": any(b["anomaly"] for b in batch),
         "countries": sorted(c for c in set(a_cc) | set(r_cc) if _CC_RE.match(c)),
     }
 
@@ -179,18 +187,22 @@ def compare(lists: dict[str, dict], state: dict, now: str) -> tuple[list[dict], 
     had_baseline = bool(state.get("baseline_set_at"))
     baseline_set = state.get("baseline_set_at") or now
     deltas, statuses = [], []
+    history = {a: (old.get("added_history") or []) for a, old in prev_lists.items()}
     # A list that was known and is gone from the file is compared as an empty list.
     gone = {a: {**{k: old.get(k) for k in ("name", "publisher", "url")}, "source_last_updated": None, "index": {}}
             for a, old in prev_lists.items() if a not in lists}
     for abbr, lst in sorted({**lists, **gone}.items()):
         if had_baseline and abbr in prev_lists:
-            d = delta(abbr, lst, prev_lists[abbr].get("index") or {}, now, state.get("checked_at"))
+            d = delta(abbr, lst, prev_lists[abbr].get("index") or {}, now, state.get("checked_at"),
+                      history.get(abbr))
             if d:
                 deltas.append(d)
+                history[abbr] = batches.remember(history.get(abbr), d["added"])
         statuses.append(status(abbr, lst, now, (prev_lists.get(abbr) or {}).get("baseline_set_at") or
                                (baseline_set if abbr in prev_lists or not had_baseline else now)))
     new_state = {"checked_at": now, "baseline_set_at": baseline_set,
                  "lists": {s["id"]: {"name": s["name"], "publisher": s["publisher"], "url": s["url"],
                                      "baseline_set_at": s["baseline_set_at"],
+                                     "added_history": history.get(s["id"]) or [],
                                      "index": ({**lists, **gone})[s["id"]]["index"]} for s in statuses}}
     return deltas, sorted(statuses, key=lambda s: -s["total"]), new_state

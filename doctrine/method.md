@@ -135,6 +135,16 @@ HW-IND-4 is carried by an anomaly in any of a watched country's three currency r
 the World Bank's official monthly average or WFP's market rate. The page's "Watched countries side by side"
 table (`country_view` in the snapshot) sets them next to the local food reading; nothing combines them.
 
+## Designation batches (15 Nov 2026)
+A list change is a measurement of what Headwind saw change. Since `headwind-1.6` it is also scored: each
+designation date among the entries it adds is a batch, sized from the publisher's own dates in the same file (EU,
+UK, UN, and trade.gov's screening lists), and judged against the list's 60 earlier designation dates with the robust
+z on the logarithm of the size. Unusual at z >= 3.5 and at least 10 entries; a smaller or ordinary batch stays
+routine. OFAC's file has no designation dates, so its batch is what Headwind saw added at once, against the earlier
+changes Headwind itself saw (no baseline until 24 are kept). Past batches are counted from the current file, so
+entries since removed are missing from them. The item stays an observation with no probability; no indicator id is
+attached.
+
 ## Screening lists
 The same measure, applied to each list in the US International Trade Administration's Consolidated
 Screening List. One item per list that changed, with counts by the address country the list gives

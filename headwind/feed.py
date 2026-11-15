@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, geo  # noqa: E402
 
-from . import controls, food, inspection, markets, stats  # noqa: E402
+from . import batches, controls, food, inspection, markets, stats  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
 METHOD = "headwind-1.6"
@@ -261,8 +261,10 @@ def _point(countries: list[str]):
 
 def _official(item_id: str, title: str, summary: str, *, data_as_of: str, generated: str, valid_until: str,
               countries: list[str], pmesii: list[str], ascope: list[str], ncf: list[str], requirement_ids: list[str],
-              measures: dict, visual: dict, source: dict, accessed: str | None, extra: dict | None = None) -> dict:
+              measures: dict, visual: dict, source: dict, accessed: str | None, extra: dict | None = None,
+              anomaly_ref: str | None = None) -> dict:
     geom = _point(countries)
+    tier = {"tier": "anomaly", "baseline_ref": anomaly_ref} if anomaly_ref else {}
     return {"type": "Feature", "geometry": geom, "properties": {**(extra or {}),
         "contract": CONTRACT, "id": item_id, "program": "headwind", "title": title, "summary": summary,
         "kind": "observation", "tier": "routine", "status": "actual", "msg_type": "new", "human_review": "none",
@@ -271,8 +273,26 @@ def _official(item_id: str, title: str, summary: str, *, data_as_of: str, genera
         "pmesii_pt": pmesii, "ascope": ascope, "ie_aspect": ["informational"], "ncf": ncf,
         "requirement_ids": requirement_ids, "method_version": METHOD, "coverage_fraction": 1.0,
         "precision_class": "country" if geom else "none", "measures": measures, "visual": visual,
-        "sources": [{**source, "accessed_at": accessed or generated}],
+        "sources": [{**source, "accessed_at": accessed or generated}], **tier,
     }}
+
+
+def _batch_measures(s: dict) -> dict:
+    b = s.get("batches") or []
+    zs = [x["z"] for x in b if x.get("z") is not None]
+    return {"batch_size_max": max((x["size"] for x in b), default=0), "batch_z_max": max(zs) if zs else None}
+
+
+def _batch_ref(s: dict) -> str | None:
+    """A list change is an anomaly only when one of its designation batches is (headwind/batches.py)."""
+    if not s.get("anomaly"):
+        return None
+    basis = {x["basis"] for x in s.get("batches") or [] if x.get("anomaly")}
+    what = ("the list's own " + str(batches.BATCH_WINDOW) + " earlier designation dates, by size"
+            if "designation date" in basis else
+            "the earlier changes Headwind saw on the list, up to " + str(batches.BATCH_WINDOW) + ", by size")
+    return (f"rolling: {what}; anomaly at z >= {stats.Z_ANOMALY:g} on the logarithm of the batch size and at least "
+            f"{batches.BATCH_FLOOR} entries")
 
 
 VESSELS_IN_TEXT = 25
@@ -365,7 +385,7 @@ def list_features(snapshot: dict) -> list[dict]:
             f"Headwind's readings{since}, seen on {s['detected_at'][:10]}; the dates of the designations are in "
             f"the publisher's own notices.{_vessel_text('added', s.get('vessels_added') or [])}"
             f"{_vessel_text('removed', s.get('vessels_removed') or [])}{_rekeyed_text(s.get('vessels_rekeyed') or [])}"
-            f"{_renamed_text(s.get('vessels_changed') or [])}"
+            f"{_renamed_text(s.get('vessels_changed') or [])}{batches.text(s.get('batches') or [])}"
             f" People and organizations are counts "
             f"only; their names are on the official list.",
             data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
@@ -373,10 +393,11 @@ def list_features(snapshot: dict) -> list[dict]:
             ncf=["maintain_supply_chains", "provide_funding_liquidity"], requirement_ids=["HW-PIR-1"],
             measures={"added": s["added"], "removed": s["removed"], "total": s["total"],
                       "changed": s.get("changed", 0), "vessels_added": s["added_by_type"].get("vessel", 0),
-                      "vessels_changed": len(s.get("vessels_changed") or []), "rekeyed": s.get("rekeyed", 0)},
+                      "vessels_changed": len(s.get("vessels_changed") or []), "rekeyed": s.get("rekeyed", 0),
+                      **_batch_measures(s)},
             visual={"type": "page", "url": f"{SITE}/#sanctions"},
             source=LIST_SOURCE[s["list"]],
-            accessed=(lanes.get("sanctions") or {}).get("fetched_at")))
+            accessed=(lanes.get("sanctions") or {}).get("fetched_at"), anomaly_ref=_batch_ref(s)))
 
     for s in snapshot.get("screening") or []:
         if s["detected_at"] < cutoff:
@@ -397,15 +418,16 @@ def list_features(snapshot: dict) -> list[dict]:
             f"{s['list_name']} ({s['publisher']}): {s['added']} added, {s['removed']} removed{_changed_title(s)}",
             f"{' '.join(x for x in parts if x)} The list now holds {s['total']} entries. This is the difference between two of "
             f"Headwind's readings of the Consolidated Screening List{since}, seen on {s['detected_at'][:10]}; the "
-            f"dates of the listings are in the publisher's own notices. Counts only; names are on the official list.",
+            f"dates of the listings are in the publisher's own notices.{batches.text(s.get('batches') or [])} Counts "
+            f"only; names are on the official list.",
             data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
             pmesii=["economic", "political"], ascope=["organizations"],
             ncf=["maintain_supply_chains", "manufacture_equipment"], requirement_ids=["HW-PIR-1"],
             measures={"added": s["added"], "removed": s["removed"], "total": s["total"],
-                      "changed": s.get("changed", 0), "rekeyed": s.get("rekeyed", 0)},
+                      "changed": s.get("changed", 0), "rekeyed": s.get("rekeyed", 0), **_batch_measures(s)},
             visual={"type": "page", "url": f"{SITE}/#screening"},
             source={**SRC_CSL, "url": s.get("url") or SRC_CSL["url"]},
-            accessed=(lanes.get("screening") or {}).get("fetched_at")))
+            accessed=(lanes.get("screening") or {}).get("fetched_at"), anomaly_ref=_batch_ref(s)))
 
     for r in controls.recent(snapshot.get("controls") or [], generated, RULE_DAYS):
         dates = []
