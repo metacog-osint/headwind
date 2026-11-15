@@ -939,6 +939,18 @@ class TestEndToEnd(unittest.TestCase):
                          "data/minerals.json", "index.html"):
                 self.assertIn(name, files)
             self.assertEqual(headwind_cli.check_all(tmp), [])
+            # The kit's history log ends an item only when its lane (the item's first source id) is in the health
+            # record; an item whose lane is missing would never end.
+            fc = json.loads(files["data/feed.geojson"])
+            self.assertTrue({f["properties"]["sources"][0]["id"] for f in fc["features"]} <= set(fc["health"]))
+            from tic_doctrine import history as tic_history
+            from datetime import datetime
+            now = datetime.fromisoformat(fc["generated_at"].replace("Z", "+00:00"))
+            _, lines = tic_history.update({}, fc, fc["health"], now, [])
+            self.assertEqual({l["change"] for l in lines}, {"new"})
+            self.assertEqual(len(lines), len(fc["features"]))
+            wf = (ROOT / ".github" / "workflows" / "update.yml").read_text(encoding="utf-8")
+            self.assertIn("tic.py history site/data/feed.geojson --dir history --ended site/data/ended.geojson", wf)
 
             # A source that fails keeps its last good copy and says so; nothing is invented.
             def broken(url, timeout=60):

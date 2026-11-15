@@ -350,8 +350,7 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   rhythm (`WINDOWS`: ECB 4/8 days, EIA 7/14, FAO 40/70 and WFP 75/135 after the month's end, capped at today);
   `up` when read with no date to judge; `failing` when not read this run. Each sanctions list has its own entry.
   The kit's history log (`tic.py history`) reads this record as it is: tried 14 Nov on the live build, 61 items
-  logged new, nothing ended. **COP does not read per-lane health yet** (it judges Headwind by `generated_at`):
-  that is a COP change. The history log itself is not adopted yet (plan item 14).
+  logged new, nothing ended. COP reads per-source health since plan step 15 (see "History log and COP").
 - **Drift** (`health.DRIFT`): sizes of the last ten good readings per source in the snapshot (`drift_history`).
   From three readings on, under half the median fails the lane for sources parsed from pages or files (fx,
   energy, FAO indices, baseline, the two calendars, minerals), keeping the last good copy; under four fifths, or
@@ -379,6 +378,22 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   private repository. A run restores the Actions cache first, then that asset; with neither it fails (`::error::`)
   unless run by hand with `first_reading` ticked. **Delete the release before the repository is ever made public**:
   the indexes hold the publishers' entry ids for people. Not yet run on GitHub.
+
+## History log and COP (plan steps 14 and 15, built 15 Nov 2026)
+- **History log** (the kit's `tic-history/1`, `doctrine/kit/docs/history-log.md`): the workflow's step "History"
+  runs `python doctrine/kit/tic.py history site/data/feed.geojson --dir history --ended site/data/ended.geojson`
+  after the feed check and before the state is saved and the site deployed, as Cordon does. It writes
+  `history/log/YYYY/MM/DD.jsonl` and `history/state.json` and commits `history/` to `main` as `headwind-bot` with the
+  workflow token (starts no run; three tries with `pull --rebase`). `site/data/ended.geojson` (items ended in the
+  last 7 days) is deployed with the site. A failure there is a warning, never a missed deploy. No `--health` and
+  no `--lane-map`: the feed's own `health` names every source id the items carry (a test checks this). Tried
+  locally on the 15 Nov build: 85 new, 0 ended, no warning about an unnamed lane.
+- **Consequences:** `main` gains a bot commit on most runs, so `live/first-slice` must merge `origin/main` before
+  every push. `history/` holds only published feed items (no run state, no entry ids). The first run after the
+  deploy logs every item as new. FX, GEM and WFP item ids carry their date, so each new reading ends the one
+  before it: expect about 30 ended items a day.
+- **COP** (`D:\Projects\cop`): `config/programs.json` gives Headwind `ended` (COP `a874c58`) and `source_health`
+  (step 15, below). Until this batch is deployed the ended address answers 404; deploy Headwind before COP.
 
 ## Energy and the EIA key (changed 13 Nov 2026, Tom's decision)
 - **The energy lane reads EIA's API, not FRED.** FRED's terms bar scraping and passing stored content on.
