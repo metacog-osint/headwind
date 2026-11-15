@@ -6,6 +6,25 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 15 Nov 2026, 1:15 PM CST: steps 11, 13, 14, 15 and 16 done and committed, step 12 held for Tom, nothing
+pushed.** Headwind, on `live/first-slice`: `390c708` (step 11, official and market exchange rates and the per-country
+view), `edf7ced` (step 13, designation batches), `055e8ff` (step 14, history log in the workflow), `b3aadc7` (step
+16, Census trade data), and this notes commit. 67 tests pass, check PASS. COP, on `main`: `a874c58` (Headwind's
+`ended` address) and `0de98a9` (step 15, `source_health`: items from a source Headwind did not read go grey and
+are never picked; the Sources board names unread sources); COP's 10 Python test files and `npm test` (27) pass.
+**Push order:** merge `origin/main` (`0814445`, house bar v1.12) into `live/first-slice`, push Headwind `main` (it
+deploys `headwind-1.6`, the first run logs every item as new in `history/` and starts serving `ended.geojson`),
+then push COP. From then on Headwind's workflow commits `history/` to `main`, so merge `origin/main` before every
+push. **Step 12 (Pink Sheet) is held:** the World Bank's commodity page links its "Data Access and Licensing" to
+CC BY 4.0, and the World Bank's summary terms give CC BY 4.0 unless the data or metadata say otherwise and say some
+datasets come from third parties and may not be redistributed without their consent. The monthly file
+(`CMO-Historical-Data-Monthly.xlsx`, Nov 2026) states no licence of its own, and its Description sheet names
+Bloomberg Finance L.P., Platts Metals Week, S&P Global, Green Markets (fertilizers) and Thomson Reuters Datastream
+among its sources. The data catalog's API refused three tries (429), so its record for the dataset was not read.
+Whether that allows reuse is Tom's call. Open for Tom besides: GEM's Yemen rate (about 238 per dollar, flat)
+against WFP's markets (about 1,556): which rate GEM reports is not verified. The paragraph below is the state
+before this.
+
 **State, 15 Nov 2026, 12:25 PM CST: step 10 and HW-WP-2 done, nothing pushed; hand-over for steps 11 to 16.**
 Committed on `live/first-slice`, not pushed: `5a996d8` (step 10: USTR documents, the register of scheduled dates,
 the `inspection` lane for Federal Register public inspection, HW-IND-2 measured; method `headwind-1.6`) and the
