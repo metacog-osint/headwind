@@ -4,6 +4,14 @@ Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind
 energy and food prices measured against their own normal range, changes to official sanctions and US screening
 lists, export-control and sanctions rules, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No probabilities, no investment advice.
 
+**State, 14 Nov 2026, 8:45 PM CST: `headwind-1.5` committed on `live/first-slice`, not pushed or deployed** (plan
+step 6, Tom's "Start with step 6", then "Commit"). The stale worktree `headwind-nav110` was removed the same
+evening (Tom's yes). Vessel naming was tested on real UK changes: six Wayback copies of the UK Sanctions List (1 Oct
+to 12 Nov 2026) run through Headwind's own code and checked against FCDO's notices. Two faults found and fixed: UK
+ship names came out as FCDO's "IMO n (NAME)" form, and a ship FCDO revoked and remade under a new id showed as
+removed and added. See "UK ships and step 6" below. 41 tests pass. `ce7f31b` (EU `UKR` and `SDNZ`) is live
+(run 43664358348, 7:42 PM CST). The paragraph below is the state before this.
+
 **State, 14 Nov 2026, 7:30 PM CST: `headwind-1.4` live** (Tom's "Build items 1-5", then yes to commit and to push).
 Source health in the feed and on the page, one fetch retry, drift checks, edits to entries that stay on a list
 (and re-keyed trade.gov entries), kit 0.5.2 with a kit test, and a second private copy of the run state in the
@@ -64,7 +72,7 @@ python tools/headwind.py collect --only fx    # one or more lanes; the rest keep
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
-python -m unittest discover -s tests          # 38 offline tests against real fixtures
+python -m unittest discover -s tests          # 41 offline tests against real fixtures
 python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
@@ -136,6 +144,33 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   Countries are only those a title names. USTR notices and public-inspection filings are not read.
 - **Every list and rule item is tier `routine`.** No anomaly rule exists for them yet: there is no history of
   Headwind's own readings to measure against.
+
+## UK ships and step 6 (`headwind-1.5`, built 14 Nov 2026)
+- **FCDO names many ships by IMO number.** The primary name is `IMO 9344411 ("GALLE ENERGY")` (quotes or none;
+  54 of 694 ships on 12 Nov) or `IMO 9958303` alone with the ship's name only as an alias (11, all from the 12 Nov
+  notice). `uk_ship_name()` takes the name in brackets, else the first alias that is not an IMO number, and marks
+  the second case `name_is_alias` (shown as "alias" in the feed and on the page). Other primary names are kept as
+  printed. Checked on both the 1 Oct and 12 Nov files: every ship has a clean name; one has no IMO number.
+- **A ship remade under a new id is one entry** (`rekeyed_vessels()`): a vessel that goes and one that comes on the
+  same list with the same IMO number, that number on no other vessel going or coming, counts once (`rekeyed`,
+  `vessels_rekeyed` with `old_id`) and is compared as one entry, so a move between regimes shows as programs
+  gained and lost. Applies to every list with vessels (OFAC too). Title: "..., 2 under a new id".
+- **`vessel_format`** in each list's state (`sanctions.VESSEL_FORMAT`, UK = 2): a reading kept in an older form is
+  not compared field by field, so the change of name form is not reported as 65 ships renamed. **The first run after
+  this deploys** will log "uk-sanctions: vessel details were kept in an older form; not compared this run" once;
+  additions, removals and re-key pairing still work that run.
+- **What the Wayback copies showed** (1 Oct 15:38 UTC to 13 Nov 14:54 UTC; files generated 1 Oct to 12 Nov): 75
+  added, 5 removed, 2 under a new id. Every figure matches FCDO: Russia notices of 2 Oct ("2 additions, 2
+  corrections, 2 revocations": RUS3739 and RUS3747 revoked, remade as RUS3752 BEBEK-E and RUS3751 GALLE ENERGY), 8 Oct
+  (38 additions: 26 designations, 12 ships) and 12 Nov (20 additions: 9 entities, 11 ships); and the GOV.UK change
+  notes for Iran (+2, 12 Oct), Iraq (−1, 7 Oct), Syria (−1, 6 Oct), Sudan (+15, 26 Oct) and ISIL/Al-Qaida (−3, 27
+  Oct). GOV.UK's change note for 12 Nov says "11 new designations, 9 new specifications"; the notice itself and the
+  list give 9 entities and 11 ships, so the note has them swapped. Trust the notice PDF over the change note.
+- **Not seen, by design:** FCDO "variations" and "corrections" (12 Nov, 16 and 27 Oct ISIL, 3 Nov) change details of
+  people and organizations, which Headwind does not compare (type and regime only). They show as no change.
+- **Fixtures** `uk_ships_2026-10-01.xml` and `uk_ships_2026-11-12.xml` are cut from those Wayback copies with each
+  Designation kept as published (tests in `TestUkShips`). OFAC vessel naming is still untested on a real change: the
+  Wayback Machine has no copies of `sdn.csv`.
 
 ## Source health and state (`headwind-1.4`, built 14 Nov 2026)
 - **`health` in the feed and on the page** (`headwind/health.py`). One entry per source, keyed by the source id the
@@ -267,7 +302,8 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   (SDGT 2, FTO 1, ILLICIT-DRUGS-EO14059 1), no countries (conduct programs), no vessels. It matches OFAC's 13 Nov
   "Counter Narcotics and Counter Terrorism Designations". The live site will never report it: the runner's
   baseline (13 Nov, 10:43 AM CST) was set after OFAC published. The change item and feed text read right; vessel
-  names and trade.gov's entry ids are still untested. `check` PASS, all ten lanes ok.
+  names and trade.gov's entry ids are still untested. `check` PASS, all ten lanes ok. UK vessel naming was tested
+  on 14 Nov against Wayback copies (see "UK ships and step 6"); OFAC's and trade.gov's are still untested.
 - **The workflow** (`.github/workflows/update.yml`) follows Blackout's: tests, state from the Actions cache,
   `collect`, `build`, `check`, state saved, then `wrangler pages deploy`. **It does not publish state** (Tom, 13
   Nov: go with the recommendation): the list indexes hold the publishers' entry ids for people, and people are

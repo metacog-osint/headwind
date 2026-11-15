@@ -19,7 +19,7 @@ from tic_doctrine import CONTRACT, geo  # noqa: E402
 from . import controls, food, markets, stats  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
-METHOD = "headwind-1.4"
+METHOD = "headwind-1.5"
 DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
 RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
@@ -247,15 +247,29 @@ def _vessel_text(word: str, vessels: list[dict]) -> str:
     if not vessels:
         return ""
     def one(v):
-        bits = [f"IMO {v['imo']}" if v.get("imo") else "no IMO number given", f"flag {v['flag']}" if v.get("flag") else ""]
-        return f"{v['name']} ({', '.join(b for b in bits if b)})"
+        bits = ["alias" if v.get("name_is_alias") else "",
+                f"IMO {v['imo']}" if v.get("imo") else "no IMO number given", f"flag {v['flag']}" if v.get("flag") else ""]
+        return f"{v.get('name') or 'unnamed'} ({', '.join(b for b in bits if b)})"
     more = len(vessels) - VESSELS_IN_TEXT
     tail = f"; and {more} more on the page" if more > 0 else ""
     return f" Vessels {word}: {'; '.join(one(v) for v in vessels[:VESSELS_IN_TEXT])}{tail}."
 
 
+def _rekeyed_text(vessels: list[dict]) -> str:
+    """Vessels that went and came back under a new entry id with the same IMO number: one entry, still listed."""
+    if not vessels:
+        return ""
+    rows = [f"{v.get('name') or 'unnamed'} (IMO {v['imo']}, {v['old_id']} to {v['list_id']})"
+            for v in vessels[:VESSELS_IN_TEXT]]
+    more = len(vessels) - VESSELS_IN_TEXT
+    tail = f"; and {more} more on the page" if more > 0 else ""
+    return (f" Vessels removed and listed again under a new entry id with the same IMO number, counted as the same "
+            f"entry and not as removed and added ({len(vessels)}): {'; '.join(rows)}{tail}.")
+
+
 def _changed_title(s: dict) -> str:
-    return f", {s['changed']} changed" if s.get("changed") else ""
+    return (f", {s['changed']} changed" if s.get("changed") else "") + \
+        (f", {s['rekeyed']} under a new id" if s.get("rekeyed") else "")
 
 
 def _edit_text(s: dict) -> str:
@@ -312,7 +326,8 @@ def list_features(snapshot: dict) -> list[dict]:
             f"{' '.join(x for x in parts if x)} The list now holds {s['total']} entries. This is the difference between two of "
             f"Headwind's readings{since}, seen on {s['detected_at'][:10]}; the dates of the designations are in "
             f"the publisher's own notices.{_vessel_text('added', s.get('vessels_added') or [])}"
-            f"{_vessel_text('removed', s.get('vessels_removed') or [])}{_renamed_text(s.get('vessels_changed') or [])}"
+            f"{_vessel_text('removed', s.get('vessels_removed') or [])}{_rekeyed_text(s.get('vessels_rekeyed') or [])}"
+            f"{_renamed_text(s.get('vessels_changed') or [])}"
             f" People and organizations are counts "
             f"only; their names are on the official list.",
             data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
@@ -320,7 +335,7 @@ def list_features(snapshot: dict) -> list[dict]:
             ncf=["maintain_supply_chains", "provide_funding_liquidity"], requirement_ids=["HW-PIR-1"],
             measures={"added": s["added"], "removed": s["removed"], "total": s["total"],
                       "changed": s.get("changed", 0), "vessels_added": s["added_by_type"].get("vessel", 0),
-                      "vessels_changed": len(s.get("vessels_changed") or [])},
+                      "vessels_changed": len(s.get("vessels_changed") or []), "rekeyed": s.get("rekeyed", 0)},
             visual={"type": "page", "url": f"{SITE}/#sanctions"},
             source=LIST_SOURCE[s["list"]],
             accessed=(lanes.get("sanctions") or {}).get("fetched_at")))

@@ -156,21 +156,51 @@ def _uk_date(text: str | None) -> str | None:
 
 
 UK_TYPE = {"Individual": "individual", "Entity": "entity", "Ship": "vessel"}
+_QUOTES = "\"'\u201c\u201d\u2018\u2019"
+_IMO_NAME = re.compile(r"IMO\s*\d{7}\s*(?:\((.*)\))?")
+
+
+def uk_ship_name(primary: str | None, aliases: list[str]) -> tuple[str | None, bool]:
+    """The ship's name in an FCDO entry, and whether it came from an alias.
+
+    FCDO names many of the ships it specifies by IMO number: 'IMO 9344411 ("GALLE ENERGY")', with or without
+    the quotes, or 'IMO 9958303' alone with the ship's name given only as an alias (the 12 Nov 2026 notice
+    lists all eleven of that day's ships so). The name is the part in brackets, else the first alias that is
+    not itself an IMO number. A primary name in any other form is kept as printed."""
+    m = _IMO_NAME.fullmatch(" ".join((primary or "").split()))
+    if not m:
+        return primary or None, False
+    inner = (m.group(1) or "").strip().strip(_QUOTES).strip()
+    if inner:
+        return inner, False
+    for a in aliases:
+        a = " ".join((a or "").split()).strip(_QUOTES).strip()
+        if a and not _IMO_NAME.fullmatch(a):
+            return a, True
+    return None, False
 
 
 def _uk_ship(d) -> dict:
     """The public fields of a UK ship designation: name, IMO number, flag and type. Owners and operators
-    are left out, as for OFAC: they can name a person."""
-    name = None
+    are left out, as for OFAC: they can name a person. `name_is_alias` marks a name FCDO gives only as an
+    alias, the entry itself being named by IMO number."""
+    primary, aliases = None, []
     for n in d.findall("Names/Name"):
-        if (n.findtext("NameType") or "").strip().lower() == "primary name":     # the file has both cases
-            name = " ".join(filter(None, ((n.findtext(f"Name{i}") or "").strip() for i in (1, 2, 3, 4, 5, 6)))) or None
-            break
+        kind = (n.findtext("NameType") or "").strip().lower()                    # the file has both cases
+        text = " ".join(filter(None, ((n.findtext(f"Name{i}") or "").strip() for i in (1, 2, 3, 4, 5, 6))))
+        if kind == "primary name" and primary is None:
+            primary = text or None
+        elif kind == "alias" and text:
+            aliases.append(text)
+    name, from_alias = uk_ship_name(primary, aliases)
     imo = (d.findtext("ShipDetails/Ship/IMONumbers/IMONumber") or "").strip()
     imo = re.sub(r"^IMO\s*", "", imo)
-    return {"name": name, "imo": imo if re.fullmatch(r"\d{7}", imo) else None, "mmsi": None,
-            "flag": (d.findtext("ShipDetails/Ship/CurrentBelievedFlagOfShips/CurrentBelievedFlagOfShip") or "").strip() or None,
-            "vessel_type": (d.findtext("ShipDetails/Ship/TypeOfShipDetails/TypeOfShip") or "").strip() or None}
+    out = {"name": name, "imo": imo if re.fullmatch(r"\d{7}", imo) else None, "mmsi": None,
+           "flag": (d.findtext("ShipDetails/Ship/CurrentBelievedFlagOfShips/CurrentBelievedFlagOfShip") or "").strip() or None,
+           "vessel_type": (d.findtext("ShipDetails/Ship/TypeOfShipDetails/TypeOfShip") or "").strip() or None}
+    if from_alias:
+        out["name_is_alias"] = True
+    return out
 
 
 def parse_uk_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
@@ -220,13 +250,14 @@ def _vessel(row: list[str]) -> dict:
 
 def _vessels(index: dict, ids) -> list[dict]:
     """Vessels among these entry ids, with their identifiers. An index written before 13 Nov 2026
-    holds no vessel details; those vessels are counted but cannot be named."""
+    holds no vessel details; those vessels are counted but cannot be named. A vessel with an IMO number
+    and no name is listed by its number."""
     out = []
     for i in ids:
         e = index[i]
-        if e[0] == "vessel" and len(e) > 2 and e[2].get("name"):
+        if e[0] == "vessel" and len(e) > 2 and (e[2].get("name") or e[2].get("imo")):
             out.append({"list_id": i, **e[2], "programs": e[1]})
-    return sorted(out, key=lambda v: v["name"])
+    return sorted(out, key=lambda v: (v["name"] or "", v["imo"] or ""))
 
 
 def parse_un_xml(body: bytes) -> tuple[str | None, dict[str, list]]:
@@ -272,26 +303,48 @@ def status(list_id: str, index: dict, checked_at: str, baseline_set_at: str, sou
 
 VESSEL_FIELDS = ("name", "imo", "mmsi", "flag", "vessel_type")
 
+# The form of the vessel details kept in each list's index (`vessel_format` in the state). A reading kept in an
+# older form is not compared field by field with a new one, so a change of form is never reported as ships
+# renamed. 2: UK ship names taken out of FCDO's "IMO n (NAME)" form (14 Nov 2026).
+VESSEL_FORMAT = {"uk-sanctions": 2}
 
-def edits(prev_index: dict, index: dict) -> dict:
+
+def rekeyed_vessels(prev_index: dict, index: dict, added: list, removed: list) -> list[tuple[str, str]]:
+    """(old id, new id) pairs: a vessel that went and a vessel that came on the same list with the same IMO
+    number, where that number is on no other vessel going or coming. FCDO revokes and remakes a specification
+    under a new id: on 2 Oct 2026 RUS3739 and RUS3747 became RUS3752 and RUS3751, and the ships never left
+    the list. A pair is one entry still listed, compared like an id on both readings."""
+    def by_imo(idx, ids):
+        groups: dict = {}
+        for i in ids:
+            e = idx[i]
+            if e[0] == "vessel" and len(e) > 2 and e[2].get("imo"):
+                groups.setdefault(e[2]["imo"], []).append(i)
+        return {k: v[0] for k, v in groups.items() if len(v) == 1}
+    gone, came = by_imo(prev_index, removed), by_imo(index, added)
+    return sorted((gone[k], came[k]) for k in set(gone) & set(came))
+
+
+def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True) -> dict:
     """Entries on both readings whose type or programs changed, and vessels whose public details changed.
 
     Returns counts only for people and organizations: how many entries changed, and which programs were
     gained and lost across them. Vessels are named, as on additions: before and after for each field that moved.
-    An index written before vessel details were kept gives no vessel comparison."""
+    `pairs` are (old id, new id) for one entry under a new id, compared as one. An index written before vessel
+    details were kept, or kept in an older form (`compare_vessels` False), gives no vessel comparison."""
     changed, gained, lost, retyped, vessels = [], Counter(), Counter(), Counter(), []
-    for i in sorted(set(index) & set(prev_index)):
-        old, new = prev_index[i], index[i]
+    for old_id, new_id in [(i, i) for i in sorted(set(index) & set(prev_index))] + list(pairs):
+        old, new = prev_index[old_id], index[new_id]
         if old[0] != new[0] or sorted(old[1]) != sorted(new[1]):
-            changed.append(i)
+            changed.append(new_id)
             gained.update(set(new[1]) - set(old[1]))
             lost.update(set(old[1]) - set(new[1]))
             if old[0] != new[0]:
                 retyped[f"{old[0]} to {new[0]}"] += 1
-        if new[0] == "vessel" and len(old) > 2 and len(new) > 2:
+        if compare_vessels and new[0] == "vessel" and len(old) > 2 and len(new) > 2:
             moved = {f: [old[2].get(f), new[2].get(f)] for f in VESSEL_FIELDS if old[2].get(f) != new[2].get(f)}
             if moved:
-                vessels.append({"list_id": i, "name": new[2].get("name"), "imo": new[2].get("imo"),
+                vessels.append({"list_id": new_id, "name": new[2].get("name"), "imo": new[2].get("imo"),
                                 "changed": moved, "programs": new[1]})
     by_type = Counter(index[i][0] for i in changed)
     return {"changed": len(changed), "changed_by_type": dict(sorted(by_type.items())),
@@ -299,16 +352,23 @@ def edits(prev_index: dict, index: dict) -> dict:
             "retyped": dict(retyped), "vessels_changed": sorted(vessels, key=lambda v: v["name"] or "")}
 
 
-def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None) -> dict | None:
+def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None,
+          compare_vessels: bool = True) -> dict | None:
     """The difference between two readings of one list, or None when nothing changed.
 
     Additions and removals are ids that appear or go; a change is an id on both readings whose type or
-    programs moved (or, for a vessel, its name, IMO, MMSI, flag or type)."""
+    programs moved (or, for a vessel, its name, IMO, MMSI, flag or type). A vessel that went and came back
+    under a new id with the same IMO number is counted once, as re-keyed, not as a removal and an addition."""
     added = sorted(set(index) - set(prev_index))
     removed = sorted(set(prev_index) - set(index))
-    ed = edits(prev_index, index)
-    if not added and not removed and not ed["changed"] and not ed["vessels_changed"]:
+    pairs = rekeyed_vessels(prev_index, index, added, removed)
+    added = sorted(set(added) - {n for _, n in pairs})
+    removed = sorted(set(removed) - {o for o, _ in pairs})
+    ed = edits(prev_index, index, pairs, compare_vessels)
+    if not added and not removed and not pairs and not ed["changed"] and not ed["vessels_changed"]:
         return None
+    rekeyed = sorted(({**v, "old_id": o} for o, n in pairs for v in _vessels(index, [n])),
+                     key=lambda v: (v["name"] or "", v["imo"] or ""))
     a_type, a_group = _tally(index, added)
     r_type, r_group = _tally(prev_index, removed)
     stamp = detected_at.replace("-", "").replace(":", "")[:13]
@@ -320,6 +380,7 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
         "added_by_type": a_type, "added_by_program": a_group,
         "removed_by_type": r_type, "removed_by_program": r_group,
         "vessels_added": _vessels(index, added), "vessels_removed": _vessels(prev_index, removed),
+        "rekeyed": len(pairs), "vessels_rekeyed": rekeyed,
         **ed,
         "countries": countries_for(list(a_group) + list(r_group) + list(ed["programs_gained"])
                                    + list(ed["programs_lost"]), list_id),
