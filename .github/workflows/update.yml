@@ -89,19 +89,26 @@ jobs:
         run: python tools/headwind.py build
       - name: Feed check
         run: python tools/headwind.py check
+      # The run's checkout can be older than main: a run queued behind another starts from the commit that
+      # triggered it, without the history commit the run before made. So history/ is taken from main's tip first,
+      # and the commit is made on main's tip with only history/ staged (reset --mixed moves HEAD and the index,
+      # never the working tree, which holds the build's site/ files). No rebase, so nothing unstaged can stop it.
       - name: History (history/, and site/data/ended.geojson)
         run: |
+          git fetch -q --depth=1 origin main && git checkout -q FETCH_HEAD -- history 2>/dev/null \
+            || echo "::warning::could not take history/ from main's tip; using this checkout's"
           python doctrine/kit/tic.py history site/data/feed.geojson --dir history --ended site/data/ended.geojson \
             || { echo "::warning::history step failed; this run is missing from history/"; exit 0; }
-          [ -n "$(git status --porcelain -- history)" ] || exit 0
           git config user.name "headwind-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add history
-          git commit -q -m "history: $(date -u +%Y-%m-%dT%H:%MZ)"
+          stamp="history: $(date -u +%Y-%m-%dT%H:%MZ)"
           for i in 1 2 3; do
-            git push -q origin HEAD:main && exit 0
+            git fetch -q --depth=1 origin main && git reset -q --mixed FETCH_HEAD || { sleep $((i * 15)); continue; }
+            git add history
+            git diff --cached --quiet -- history && { echo "history: nothing new"; exit 0; }
+            git commit -q -m "$stamp" && git push -q origin HEAD:main && exit 0
             echo "::warning::history push attempt $i failed"
-            sleep $((i * 15)); git pull -q --rebase origin main || true
+            sleep $((i * 15))
           done
           echo "::warning::history not committed this run; the next run logs these changes again from the last state"
       - name: Keep this run's state for the next run

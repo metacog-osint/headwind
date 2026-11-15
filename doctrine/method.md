@@ -6,7 +6,7 @@ normal range, changes to official sanctions and US screening lists, new export-c
 rules, US import reliance for mineral commodities, and the scheduled dates on which economic decisions and figures are published.
 It reports measurements. It states no probability and gives no investment advice.
 
-## Live lanes (13 Nov 2026)
+## Live lanes (15 Nov 2026)
 
 | Lane | Source | Cadence | Measure |
 |---|---|---|---|
@@ -18,10 +18,12 @@ It reports measurements. It states no probability and gives no investment advice
 | Local food prices | WFP prices by market, from the Humanitarian Data Exchange | Monthly, one to three months late | Median 3-month change across a country's price series, against its own 60 prior medians |
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
-| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program |
-| Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country |
+| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
+| Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country; scored by designation batches where the list gives dates |
 | Minerals | USGS Mineral Commodity Summaries data release (net import reliance; import shares by country) | Annual | No anomaly test; context only, in `data/minerals.json` |
-| Rules | US Federal Register API: BIS and OFAC rules and proposed rules | Federal working days | What was published in the last 60 days, and the future dates each document names |
+| Rules | US Federal Register API: BIS, OFAC and USTR rules and proposed rules, and USTR notices | Federal working days | What was published in the last 60 days, and the future dates each document names; no anomaly test |
+| Public inspection (since 15 Nov 2026) | Office of the Federal Register, public inspection: BIS, OFAC and USTR filings | Federal working days | Filings of the last 30 days; HW-IND-2 measured on BIS and USTR filings (below); no anomaly test |
+| US mineral imports (since 15 Nov 2026) | US Census Bureau international trade API, general imports by HS code and country | Monthly, about six weeks late | The last 12 months against the 12 before, leading sources, China's share; context only, in `data/minerals.json`, no anomaly test |
 
 ## The anomaly rule
 For each series, the latest change is compared with the same series' earlier changes:
@@ -35,8 +37,14 @@ past spike inflates a standard deviation enough to hide the next. An item is tie
 scale in the formula is never allowed below floor / 3.5, so a nearly constant history cannot
 produce a z in the hundreds.
 
-Every item carries `flag_rate`: the share of the baseline's own changes that the same rule would
-have flagged. It says how often that series trips the rule in ordinary times.
+Every item scored by an anomaly rule carries `flag_rate`: the share of the baseline's own changes that
+the same rule would have flagged. It says how often that series trips the rule in ordinary times. A list
+change carries the flag rate of its highest-scoring designation batch. Rules, public-inspection filings and
+context tables are not scored and carry none.
+
+An anomaly carries `baseline_ref` in the kit's form: `id` (the lane's rule, such as `headwind-fxmarket` or
+`headwind-designation-batch`), `window` (the baseline and threshold in words), `type` `rolling`, and `version`
+(the method version).
 
 ## What the measure does not do
 - **The baseline is rolling only.** A long slide becomes the new normal. A fixed baseline beside it
@@ -47,7 +55,10 @@ have flagged. It says how often that series trips the rule in ordinary times.
   most marked unofficial). Markets more than half again apart (Somalia's two shillings) give no single level and
   no comparison with the official rate. An official figure can be one the market does not use: GEM gives Yemen
   about 238 rials per US dollar while WFP's markets give about 1,556 (Aug 2026); the comparison prints the gap
-  as measured and does not say which rate is in use.
+  as measured and does not say which rate is in use. Since 15 Nov 2026 the page carries a caveat with Yemen's
+  gap (two rials in use; which rate the World Bank reports is not verified) and with any other gap of 100% or
+  more. The comparison uses the newest month both sources give, and never a month in which the country's
+  markets were more than half again apart (tested month by month, not only on the latest month).
 - **WFP exchange rates are not food prices.** Before `headwind-1.6` they were counted among a country's price
   series in the local food median; now they are read only as market rates (Sudan's 3-month food median moved
   from 50.1% to 50.0% on the 15 Nov file).
@@ -73,8 +84,8 @@ by sanctions program. Headwind does not republish the names of people or organiz
 - **Rules** are reported as the agency titled and described them. Dates come from the document's
   effective date, its comment deadline and dates written out in its DATES paragraph. Headwind does
   not say what a rule means or whether a stay will be extended.
-- **No anomaly rule yet.** Every list and rule item is tier `routine`; a baseline needs a history of
-  Headwind's own readings.
+- **Rules have no anomaly rule** and are tier `routine`. A list change is tier `anomaly` only when one of
+  its designation batches is (see Designation batches, since `headwind-1.6`); otherwise `routine`.
 - **Edits are seen (`headwind-1.4`).** An entry on both readings whose type or programs changed is
   counted as changed, with the programs gained and lost across those entries. A listed vessel whose
   name, IMO number, MMSI, flag or type changed is named, before and after.
@@ -107,7 +118,10 @@ by sanctions program. Headwind does not republish the names of people or organiz
   line, RINs, docket numbers, the first sentence of its summary and each date it says was already
   scheduled ("was set to end", "scheduled to expire": the first date after the phrase). The text itself
   is not kept. OFAC's and BIS's notices (sanctions actions, denial orders) are counted, not titled,
-  because their titles and texts can name people and companies. A filing stays in the feed 7 days.
+  because their titles and texts can name people and companies. Such a filing keeps only its document
+  number and the register's short address for it (`federalregister.gov/d/<number>`): the register's own
+  addresses carry the title as a slug, and its editorial notes can quote the title, so neither is kept. A
+  filing stays in the feed 7 days.
 - **HW-IND-2 is measured, not judged.** A BIS or USTR filing meets it when (1) its title, action line or
   summary's first sentence makes it a stay, suspension, extension or Entity List filing (not a comment
   period or information collection), and (2) a scheduled date falls on the day it was filed or within 14
@@ -140,7 +154,7 @@ A list change is a measurement of what Headwind saw change. Since `headwind-1.6`
 designation date among the entries it adds is a batch, sized from the publisher's own dates in the same file (EU,
 UK, UN, and trade.gov's screening lists), and judged against the list's 60 earlier designation dates with the robust
 z on the logarithm of the size. Unusual at z >= 3.5 and at least 10 entries; a smaller or ordinary batch stays
-routine. OFAC's file has no designation dates, so its batch is what Headwind saw added at once, against the earlier
+routine. The item carries the largest batch, the highest z and that batch's `flag_rate`. OFAC's file has no designation dates, so its batch is what Headwind saw added at once, against the earlier
 changes Headwind itself saw (no baseline until 24 are kept). Past batches are counted from the current file, so
 entries since removed are missing from them. The item stays an observation with no probability; no indicator id is
 attached.
