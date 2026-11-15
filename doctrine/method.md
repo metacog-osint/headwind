@@ -114,6 +114,14 @@ by sanctions program. Headwind does not republish the names of people or organiz
   9 Nov, the day documents 2025-21671 and 2025-19873 had set). USTR's extension of its Vietnam
   investigation (same day) met no scheduled date in the register.
 
+## HW-WP-2: economic stress in a watched country (15 Nov 2026)
+An anomaly for a watched country's currency (HW-IND-4) or local food prices (HW-IND-6), or for an energy
+benchmark (HW-IND-5), carries its indicator, the hypothesis it is emerging under (HW-H-2A, stress within the
+country, for the first two; HW-H-2B, stress from outside, for energy), `direction` supports and
+`indicator_state` present. It stays a measurement (tier anomaly, no probability): which hypothesis holds is
+told apart by which indicators are present together, and that reading is an analyst's. Routine items carry no
+indicator. Watched countries are those whose WFP prices Headwind reads (`config/wfp_countries.json`).
+
 ## Screening lists
 The same measure, applied to each list in the US International Trade Administration's Consolidated
 Screening List. One item per list that changed, with counts by the address country the list gives

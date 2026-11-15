@@ -1,6 +1,6 @@
 {
   "program": "headwind",
-  "version": "1.1",
+  "version": "1.2",
   "indicators": [
     {
       "id": "HW-IND-1",
@@ -45,7 +45,7 @@
       "text": "A currency moves against the US dollar over five business days by a robust z of 3.5 or more against its own 250 prior five-day changes, and by at least 1%.",
       "gentry": {
         "predictive": false,
-        "diagnostic": false,
+        "diagnostic": true,
         "unambiguous": true,
         "collectable": true
       }
@@ -57,7 +57,7 @@
       "text": "Brent, WTI or Henry Hub moves over five trading days by a robust z of 3.5 or more against its own 250 prior five-day changes, and by at least 5%.",
       "gentry": {
         "predictive": false,
-        "diagnostic": false,
+        "diagnostic": true,
         "unambiguous": true,
         "collectable": true
       }
@@ -111,6 +111,48 @@
           "not_emerging": [
             "HW-IND-1",
             "HW-IND-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HW-WP-2",
+      "title": "Economic stress in a watched country",
+      "watch_condition": "Continuous measurement of each watched country's currency against the US dollar (HW-IND-4) and its local market food prices (HW-IND-6), with the Brent, WTI and Henry Hub benchmarks (HW-IND-5) as the outside reference. Watched countries are those in config/wfp_countries.json (Watchfloor's zones). The ECB rates cover only the Philippines of the 19, so HW-IND-4 is collectable for one country until a wider source of exchange rates is read.",
+      "issue_on_change": "Each anomaly item for a watched country, and each energy anomaly, carries its indicator, the hypothesis it bears on and its state. Headwind issues measurements only; a warning on a country is a judgment for an analyst, made with these items and outside them.",
+      "deactivation": "The country's currency and local food prices are back within their own ranges for three readings in a row, or the country leaves the watched list.",
+      "frozen": "2026-11-15",
+      "hypotheses": [
+        {
+          "id": "HW-H-2A",
+          "title": "Stress within the country: its currency and local food prices move outside their own ranges while the energy benchmarks stay within theirs",
+          "emerging": [
+            "HW-IND-4",
+            "HW-IND-6"
+          ],
+          "not_emerging": [
+            "HW-IND-5"
+          ]
+        },
+        {
+          "id": "HW-H-2B",
+          "title": "Stress from outside: an energy price shock reaches the country's local food prices while its currency holds",
+          "emerging": [
+            "HW-IND-5",
+            "HW-IND-6"
+          ],
+          "not_emerging": [
+            "HW-IND-4"
+          ]
+        },
+        {
+          "id": "HW-H-2C",
+          "title": "Artefact: a change of method or data, such as a redenomination, a change in WFP's markets or commodities, a short or late series, or a base effect",
+          "emerging": [],
+          "not_emerging": [
+            "HW-IND-4",
+            "HW-IND-5",
+            "HW-IND-6"
           ]
         }
       ]

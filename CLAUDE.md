@@ -6,6 +6,33 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 15 Nov 2026, 12:25 PM CST: step 10 and HW-WP-2 done, nothing pushed; hand-over for steps 11 to 16.**
+Committed on `live/first-slice`, not pushed: `5a996d8` (step 10: USTR documents, the register of scheduled dates,
+the `inspection` lane for Federal Register public inspection, HW-IND-2 measured; method `headwind-1.6`) and the
+HW-WP-2 commit (register 1.2; anomaly items carry `HW-IND-4` to `HW-IND-6`), with this note. 56 tests pass, check
+PASS. Still waiting from before: `d320d8e`, `0ec47f2`, `ce03e81`, `08c0caa`. `origin/main` has `0814445` (house bar
+tic-nav v1.12, another session's) that `live/first-slice` does not: merge it before pushing. **Verdict:** `main` holds
+`800efd6` and the merge `4454345` (origin/main's pre-EASA guards kept beside the Headwind sync; asked for by the
+Verdict pre-EASA session, 33 tests, `check --base origin/main` PASS), 2 ahead, 0 behind, not pushed. The method
+bump to `headwind-1.6` covers everything in this batch, since none of it is deployed yet. Next, in order, each
+built, tested, checked and committed before the next, nothing pushed until Tom says so:
+- **Step 11, currency gap.** ECB covers only PH of the 19 watched countries. The WFP files already downloaded
+  (`data/raw/wfp-prices-*`) carry exchange rates, many unofficial, for CD, LB, SD, SO, SS, YE; World Bank GEM (WDI
+  source 15) has monthly official rates. Then a per-country view. HW-IND-4 attaches to watched countries only
+  (`feed.WATCHED`), so new rates widen it.
+- **Step 12, World Bank Pink Sheet** (fertilizers, ten critical-list metals). Confirm its licence first; stop and
+  ask Tom if it does not allow reuse.
+- **Step 13, anomaly rule for designation batches** (EU, UK and Entity List files carry designation dates; OFAC
+  needs Headwind's own readings).
+- **Step 14:** adopt the kit history log (`tic-history/1`, `doctrine/kit/docs/history-log.md`); add the ended URL
+  to COP's config (`[local path]`, read its CLAUDE.md).
+- **Step 15:** COP reads per-source health from Headwind's feed (COP repo).
+- **Step 16:** Census trade data for minerals. Check that the user-level `CENSUS_API_KEY` is set (read it like the
+  EIA key, never print it); if not, give Tom `gh secret set CENSUS_API_KEY --repo metacog-osint/headwind` and the
+  user-level command, and skip.
+- Then update Headwind's row and step 13 in `[local path]` and list each repo's commits ahead
+  (`git log origin/<branch>..<branch>`, as its own step) for Tom's yes.
+
 **State, 15 Nov 2026, 9:35 AM CST: steps 7, 8 and 9 done, nothing pushed.** Commits waiting for Tom's push at the
 end: Headwind `d320d8e` (step 7), `0ec47f2` (notes), `ce03e81` (step 9, ships across lists) and this notes commit,
 on `live/first-slice`; **Verdict `800efd6` on `main`** (step 8: `calendar --sync headwind`, the daily workflow pulls
@@ -114,7 +141,7 @@ python tools/headwind.py collect --only fx    # one or more lanes; the rest keep
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
-python -m unittest discover -s tests          # 55 offline tests against real fixtures
+python -m unittest discover -s tests          # 56 offline tests against real fixtures
 python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
@@ -375,8 +402,16 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   `last_modified` changes.
 - **`data/snapshot.json` is the last-good store.** A scheduled build has to carry it between runs or a failed
   lane goes empty.
-- **Anomaly items carry no `indicator_id`.** The contract ties an indicator to a hypothesis, and Headwind has no
-  warning problem for economic stress yet. `HW-IND-4` to `HW-IND-6` are registered for when Tom writes one.
+- **Anomaly items carry indicator ids for HW-WP-2** (economic stress in a watched country; added to
+  `doctrine/indicators.json` 15 Nov 2026, register 1.2, Tom's decision of 14 Nov): an anomaly for a currency of a
+  watched country (`feed.WATCHED`, from `config/wfp_countries.json`) carries `HW-IND-4` and `HW-H-2A`, an energy
+  anomaly `HW-IND-5` and `HW-H-2B`, a local food anomaly `HW-IND-6` and `HW-H-2A`; each with `direction`
+  supports and `indicator_state` present. Routine items, other countries' currencies and FAO indices (`HW-IND-3`)
+  carry none. HW-H-2A is stress within the country (currency and food out of range, energy within), HW-H-2B
+  stress from outside (energy shock reaching local food, currency holding), HW-H-2C artefact. `HW-IND-4` and
+  `HW-IND-5` are now marked diagnostic (they tell 2A from 2B); `HW-IND-6` is not (expected under both). Written
+  from the indicators Headwind has, not checked against current events; the wording is Tom's to change. Until
+  step 11, ECB rates cover only PH of the 19 watched countries, so `HW-IND-4` can appear for PH only.
 - **No judgments in the feed.** The seed build's sanctions and rule blocks carried a fixed 0.85 probability and
   invented test records (`MADE_UP`); both are removed. `commodities.py` (the old IGC lane) is unused.
 - A rate decision is exported to Verdict as kind `rule_date`, the nearest kind Verdict accepts.
