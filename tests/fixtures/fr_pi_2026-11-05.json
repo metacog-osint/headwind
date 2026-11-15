@@ -1,0 +1,110 @@
+{
+ "count": 4,
+ "description": "cut from the real issue available on 2026-11-05 (87 documents)",
+ "results": [
+  {
+   "document_number": "2026-22725",
+   "title": "Agency Information Collection Activities; Proposals, Submissions, and Approvals: Section 232 National Security Adjustments to Imports of Specialty Pharmaceuticals and Associated Ingredients ",
+   "type": "Notice",
+   "filing_type": "regular",
+   "agencies": [
+    {
+     "raw_name": "Industry and Security Bureau",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "filed_at": "2026-11-05T08:45:00.000-05:00",
+   "publication_date": "2026-11-06",
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22725/agency-information-collection-activities-proposals-submissions-and-approvals-section-232-national",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22725.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/725.txt",
+   "pdf_updated_at": "2026-11-05T08:45:17.000-05:00",
+   "editorial_note": null,
+   "docket_numbers": [],
+   "num_pages": 4
+  },
+  {
+   "document_number": "2026-22726",
+   "title": "Agency Information Collection Activities; Proposals, Submissions, and Approvals: Application Process to Waive the Import Qualification Criteria Measures to Restrict Stockpiling of Polysilicon and Polysilicon Derivatives ",
+   "type": "Notice",
+   "filing_type": "regular",
+   "agencies": [
+    {
+     "raw_name": "Industry and Security Bureau",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "filed_at": "2026-11-05T08:45:00.000-05:00",
+   "publication_date": "2026-11-06",
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22726/agency-information-collection-activities-proposals-submissions-and-approvals-application-process-to",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22726.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/726.txt",
+   "pdf_updated_at": "2026-11-05T08:45:17.000-05:00",
+   "editorial_note": null,
+   "docket_numbers": [],
+   "num_pages": 3
+  },
+  {
+   "document_number": "2026-22793",
+   "title": "Extension of the Suspension of Expansion of End-User Controls for Affiliates of Certain Listed Entities  ",
+   "type": "Rule",
+   "filing_type": "special",
+   "agencies": [
+    {
+     "raw_name": "Industry and Security Bureau",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "filed_at": "2026-11-05T16:15:00.000-05:00",
+   "publication_date": "2026-11-09",
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22793/extension-of-the-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22793.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/793.txt",
+   "pdf_updated_at": "2026-11-05T16:15:08.000-05:00",
+   "editorial_note": null,
+   "docket_numbers": [],
+   "num_pages": 4
+  },
+  {
+   "document_number": "2026-22661",
+   "title": "Meetings; Sunshine Act  ",
+   "type": "Notice",
+   "filing_type": "special",
+   "agencies": [
+    {
+     "raw_name": "CONSUMER PRODUCT SAFETY COMMISSION",
+     "name": "Consumer Product Safety Commission",
+     "id": 84,
+     "url": "https://www.federalregister.gov/agencies/consumer-product-safety-commission",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/84",
+     "parent_id": null,
+     "slug": "consumer-product-safety-commission"
+    }
+   ],
+   "filed_at": "2026-11-04T11:15:00.000-05:00",
+   "publication_date": "2026-11-06",
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22661/meetings-sunshine-act",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22661.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/661.txt",
+   "pdf_updated_at": "2026-11-04T11:15:10.000-05:00",
+   "editorial_note": null,
+   "docket_numbers": [],
+   "num_pages": 1
+  }
+ ]
+}

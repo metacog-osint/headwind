@@ -16,10 +16,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, geo  # noqa: E402
 
-from . import controls, food, markets, stats  # noqa: E402
+from . import controls, food, inspection, markets, stats  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
-METHOD = "headwind-1.5"
+METHOD = "headwind-1.6"
 DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
 RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
@@ -88,14 +88,26 @@ SRC_CSL = {
 
 SRC_FR = {
     "id": "us-federal-register",
-    "publisher": "US Federal Register (BIS, OFAC)",
-    "title": "Federal Register Documents & Public Inspection Filings",
+    "publisher": "US Federal Register (BIS, OFAC, USTR)",
+    "title": "Federal Register documents",
     "url": "https://www.federalregister.gov/api/v1/documents.json",
     "licence": "US public domain",
     "grade": "A1",
     "independence_group": "us-federal-register",
     "source_type": "official or market data",
-    "descriptor": "Rules and proposed rules as published by the agency in the official journal.",
+    "descriptor": "Rules, proposed rules and notices as published by the agency in the official journal.",
+}
+
+SRC_PI = {
+    "id": "fr-public-inspection",
+    "publisher": "Office of the Federal Register (public inspection)",
+    "title": "Federal Register public inspection",
+    "url": inspection.PI_PAGE,
+    "licence": "US public domain",
+    "grade": "A1",
+    "independence_group": "us-federal-register",
+    "source_type": "official or market data",
+    "descriptor": "Documents filed with the Office of the Federal Register and open to the public before they are published.",
 }
 
 SRC_FAO = {
@@ -225,9 +237,9 @@ def _point(countries: list[str]):
 
 def _official(item_id: str, title: str, summary: str, *, data_as_of: str, generated: str, valid_until: str,
               countries: list[str], pmesii: list[str], ascope: list[str], ncf: list[str], requirement_ids: list[str],
-              measures: dict, visual: dict, source: dict, accessed: str | None) -> dict:
+              measures: dict, visual: dict, source: dict, accessed: str | None, extra: dict | None = None) -> dict:
     geom = _point(countries)
-    return {"type": "Feature", "geometry": geom, "properties": {
+    return {"type": "Feature", "geometry": geom, "properties": {**(extra or {}),
         "contract": CONTRACT, "id": item_id, "program": "headwind", "title": title, "summary": summary,
         "kind": "observation", "tier": "routine", "status": "actual", "msg_type": "new", "human_review": "none",
         "us_person_data": "none", "status_class": "reported", "product_category": "current",
@@ -379,7 +391,7 @@ def list_features(snapshot: dict) -> list[dict]:
             dates.append(f"Comments close {r['comments_close_on']}.")
         if r.get("named_dates"):
             dates.append(f"Later dates named in its DATES paragraph: {', '.join(r['named_dates'])}.")
-        kind = "proposed rule" if r["type"].lower().startswith("proposed") else "rule"
+        kind = _doc_kind(r["type"])
         feats.append(_official(
             f"headwind:control:{r['id']}",
             f"{r['agency']} {kind} ({r['published_date']}): {r['title']}",
@@ -391,7 +403,97 @@ def list_features(snapshot: dict) -> list[dict]:
             measures={"named_dates": len(r.get("named_dates") or [])},
             visual={"type": "page", "url": r["url"]}, source={**SRC_FR, "url": r["url"]},
             accessed=(lanes.get("controls") or {}).get("fetched_at")))
+
+    feats += inspection_features(snapshot, generated, valid_until, (lanes.get("inspection") or {}).get("fetched_at"))
     return feats
+
+
+def _doc_kind(doc_type: str | None) -> str:
+    t = (doc_type or "").lower()
+    return "proposed rule" if t.startswith("proposed") else "notice" if t == "notice" else "rule"
+
+
+KIND_WORDS = {"stay_or_extension": "a stay, suspension or extension", "entity_list": "an Entity List change"}
+STATE_TEXT = {
+    "present": ("HW-IND-2's condition is met: {kind} by {agency}, filed {days} before a date that {basis_doc}."),
+    "absent": "HW-IND-2's condition is not met: {why}.",
+    "no_data": "HW-IND-2 could not be measured: the filing's text could not be read and nothing else matched it.",
+}
+
+
+def _match_text(m: dict) -> str:
+    when = "the day it was filed" if m["days"] == 0 else f"{m['days']} day{'s' if m['days'] != 1 else ''} after the filing"
+    if m.get("sentence"):
+        return f"{m['date']} ({when}; the filing says: \"{m['sentence']}\")"
+    return f"{m['date']} ({when}; {m['basis']}: {m['what']} in document {m['doc']}, published {m['doc_published']})"
+
+
+def inspection_features(snapshot: dict, generated: str, valid_until: str, accessed: str | None) -> list[dict]:
+    """Filings on public inspection by BIS, OFAC and USTR, from the day filed for FEED_DAYS. Published facts and the
+    dates they line up with; HW-IND-2's state on BIS and USTR filings. Notices counted only are not items."""
+    cutoff = _plus_hours(generated, -24 * inspection.FEED_DAYS)[:10]
+    out = []
+    for r in snapshot.get("inspection") or []:
+        if r.get("counted_only") or (r.get("filed_on") or r.get("issue")) < cutoff:
+            continue
+        text = r.get("text") or {}
+        kind = _doc_kind(r["type"])
+        filed = (r.get("filed_at_utc") or "")
+        filed_text = (f"on {filed[:10]} at {filed[11:16]} UTC" if filed else f"in the issue of {r['issue']}")
+        parts = [f"Filed for public inspection at the Office of the Federal Register {filed_text}"
+                 + (f", to be published {r['publication_date']}" if r.get("publication_date") else
+                    ", with no publication date set") + "."]
+        if text.get("action") and text["action"].lower() != "notice":
+            parts.append(f"Action: {text['action']}.")
+        if text.get("summary_first"):
+            parts.append(f"The filing's summary begins: \"{text['summary_first']}\"")
+        ids = [f"RIN {', '.join(text['rins'])}" if text.get("rins") else "",
+               f"docket {', '.join(sorted(set(r.get('dockets') or []) | set(text.get('dockets') or [])))}"
+               if (r.get("dockets") or text.get("dockets")) else ""]
+        if any(ids):
+            line = "; ".join(x for x in ids if x)
+            parts.append(line[:1].upper() + line[1:] + ".")
+        matches = r.get("matches") or []
+        if matches:
+            parts.append(f"Scheduled dates within {inspection.WINDOW_DAYS} days after the filing: "
+                         + "; ".join(_match_text(m) for m in matches[:5]) + ".")
+        extra = None
+        state = r.get("indicator_state")
+        if state:
+            first = matches[0] if matches else None
+            if state == "present":
+                basis_doc = (f"the filing itself says was scheduled" if first.get("sentence") else
+                             f"document {first['doc']} ({first['basis']}) set")
+                parts.append(STATE_TEXT["present"].format(
+                    kind=KIND_WORDS[r["kind"]], agency=r["agency"],
+                    days="the same day as" if first["days"] == 0 else f"{first['days']} days",
+                    basis_doc=basis_doc).replace("filed the same day as before", "filed on the day of"))
+            elif state == "absent":
+                why = ("it is not a stay, suspension, extension or Entity List filing" if r.get("kind") == "other"
+                       else f"no date of the same rule, docket or investigation falls within {inspection.WINDOW_DAYS} "
+                            f"days after it, and the filing names none as scheduled")
+                parts.append(STATE_TEXT["absent"].format(why=why))
+            else:
+                parts.append(STATE_TEXT["no_data"])
+            extra = {"indicator_id": "HW-IND-2", "hypothesis_id": "HW-H-1B",
+                     "direction": "supports" if state == "present" else "neutral", "indicator_state": state}
+        if r.get("withdrawn"):
+            parts.append(f"Editorial note: {r['note']}")
+        parts.append(f"Federal Register document {r['id']}.")
+        countries = controls.countries_in(r.get("title") or "")
+        out.append(_official(
+            f"headwind:inspection:{r['id']}",
+            f"{r['agency']} {kind} filed for public inspection ({r['filed_on']}){' (withdrawn)' if r.get('withdrawn') else ''}: "
+            f"{r['title']}",
+            " ".join(parts),
+            data_as_of=filed or f"{r['issue']}T00:00:00Z", generated=generated, valid_until=valid_until,
+            countries=countries, pmesii=["economic", "political"], ascope=["organizations"],
+            ncf=["maintain_supply_chains", "manufacture_equipment"], requirement_ids=["HW-EEI-2", "HW-PIR-2"],
+            measures={"days_to_deadline": r.get("days_to_deadline"), "scheduled_dates_matched": len(matches),
+                      "pages": r.get("pages")},
+            visual={"type": "page", "url": r["url"]}, source={**SRC_PI, "url": r["url"]},
+            accessed=accessed, extra=extra))
+    return out
 
 
 
@@ -495,13 +597,14 @@ def build_feed(snapshot: dict) -> dict:
         "generated_at": generated,
         "licence": ("Headwind code MIT; ECB reference rates free to reuse with credit; EIA data US public domain; "
                     "FAO CC BY 4.0; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
-                    "Federal Register US public domain; UN Security Council list, no licence stated; EU financial "
+                    "Federal Register and its public inspection US public domain; UN Security Council list, no "
+                    "licence stated; EU financial "
                     "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
                         "and Development Office; US International Trade Administration; "
-                        "US Federal Register."),
+                        "US Federal Register and the Office of the Federal Register."),
         "language_key": LANGUAGE_KEY,
         # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read
         # it, how old its newest data are, and any drift or quiet-publisher warning. COP and the kit's history log

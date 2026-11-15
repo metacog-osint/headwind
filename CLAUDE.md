@@ -2,7 +2,9 @@
 
 Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind`, prefix `HW`): currencies,
 energy and food prices measured against their own normal range, changes to official sanctions and US screening
-lists, export-control and sanctions rules, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No probabilities, no investment advice.
+lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their filings on Federal Register public
+inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
+probabilities, no investment advice.
 
 **State, 15 Nov 2026, 9:35 AM CST: steps 7, 8 and 9 done, nothing pushed.** Commits waiting for Tom's push at the
 end: Headwind `d320d8e` (step 7), `0ec47f2` (notes), `ce03e81` (step 9, ships across lists) and this notes commit,
@@ -112,7 +114,7 @@ python tools/headwind.py collect --only fx    # one or more lanes; the rest keep
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
-python -m unittest discover -s tests          # 48 offline tests against real fixtures
+python -m unittest discover -s tests          # 55 offline tests against real fixtures
 python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
@@ -131,7 +133,8 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | `calendar` | `releases.py` | Federal Reserve and ECB schedule pages; FAO release dates | 9 events in the next 180 days |
 | `sanctions` | `sanctions.py` | OFAC `sdn.csv` (5.8 MB), the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML, 26 MB) and the UK Sanctions List (XML, 22 MB) | 14 Nov, 2:57 PM CST: 19,565 OFAC (1,570 vessels), 1,007 UN, 6,269 EU, 6,440 UK (694 ships). The EU download takes 30 s to 2 min |
 | `screening` | `screening.py` | trade.gov Consolidated Screening List (one 34 MB JSON), every list but the SDN list | 13 Nov, 8:46 AM CST: 12 lists, 6,702 entries (Entity List 3,419). First reading, so no change to report yet. The download took 4 s |
-| `controls` | `controls.py` | Federal Register API: BIS and OFAC rules and proposed rules, last 60 days | 13 Nov: 25 rules; 2 future dates for Verdict (3 Dec polysilicon rule ends, 10 Jan 2027 affiliates-rule stay ends) |
+| `controls` | `controls.py` | Federal Register API: BIS, OFAC and USTR rules and proposed rules and USTR notices, last 60 days; the same agencies' documents of the last 800 days for the register of scheduled dates | 13 Nov: 25 rules; 2 future dates for Verdict (3 Dec polysilicon rule ends, 10 Jan 2027 affiliates-rule stay ends). 15 Nov: 34 rules and USTR notices, 18 scheduled dates |
+| `inspection` | `inspection.py` | Office of the Federal Register, public inspection: the issues of the last 5 days (30 on a first run or after a gap), BIS, OFAC and USTR filings, and each rule's or USTR notice's text | 15 Nov: 30 days read, 26 filings (17 notices counted only); HW-IND-2 met by BIS 2026-22793 and USTR 2026-22925 and 2026-22867 |
 | `minerals` | `minerals.py` | USGS Mineral Commodity Summaries 2026 data release on ScienceBase (item JSON, then two CSVs) | 13 Nov: 68 commodities with net import reliance, 47 with import shares by country |
 
 The sanctions lane was read three times on 13 Nov (to about 9 AM CST) and both files were byte-for-byte the same as
@@ -181,7 +184,7 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   and shows the error on the page; the lane fails only when no list can be read.
 - **Rules:** a document stays in the feed 14 days. Future dates come from its effective date, its comment
   deadline, and dates written out in its DATES paragraph (`named_dates`); each becomes a `rule_date` for Verdict.
-  Countries are only those a title names. USTR notices and public-inspection filings are not read.
+  Countries are only those a title names. USTR's notices are read since step 10 (see below).
 - **Every list and rule item is tier `routine`.** No anomaly rule exists for them yet: there is no history of
   Headwind's own readings to measure against.
 
@@ -224,6 +227,45 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   7303803), OFAC 23730 and UK DPR0097, as read 14 Nov.
 - Not a method change (no count moves). `HW-EEI-1` (matching designated vessels with Wake's tracks) can use
   `vessels.json`; the match itself is still not built.
+
+## USTR and public inspection (plan step 10, built 15 Nov 2026, `headwind-1.6`)
+- **USTR** (`trade-representative-office-of-united-states`) is the third agency of the rules lane: its rules and
+  its notices, which is how it publishes Section 301 actions and exclusions. Notices about the office itself
+  (`controls.ADMIN_TITLE`: Performance Review Board, Privacy Act, meetings) are left out. The lane now makes four
+  Federal Register requests: rules (60 days, with abstracts), USTR notices (60 days), and the register's two (800
+  days, no abstracts; 173 rules and 99 USTR notices on 15 Nov). Records carry `rins` and `dockets`.
+- **The register of scheduled dates** (`controls.scheduled()`, snapshot `scheduled_dates`, not published): each
+  date a document set (DATES paragraph, effective date, comment close), from 45 days ago on, with the document's
+  RINs, dockets and, for USTR, `subject()`: the words after the title's first colon, before any "; ...", without
+  small words, so "Notice of Modification of Section 301 Action: China's Targeting of the Maritime, ..." and
+  "Section 301 Action: China's Targeting the Maritime, ...; Modification" are one investigation.
+- **Public inspection** (`inspection.py`, lane `inspection`, source `fr-public-inspection`). The API ignores the
+  agency filter on public inspection (checked 15 Nov), so each issue is read whole (about 100 to 140 filings) and
+  filtered. Issues by `available_on`; weekends return none. `days_to_read()`: 5 days after a good reading, back to
+  the last good reading after a gap, 30 on a first run. Filings kept 30 days in the snapshot (`inspection`, merged
+  by document number, `first_seen_at` kept), 7 in the feed. OFAC's and BIS's notices (sanctions actions, denial
+  orders) are `counted_only`, with no title: their titles and texts can name people and companies. For each rule,
+  proposed rule and USTR notice the raw text (`raw_text_url`, UTF-8) is read once per `pdf_updated_at` for its
+  action line, RINs, docket numbers, the first sentence of its SUMMARY and the dates it says were scheduled
+  (`_SCHEDULED`: "was set to end", "scheduled to expire", first date after the phrase); the text is not kept
+  (the raw copy is, in git-ignored `data/raw/`). A text that cannot be read is `text_error` on the filing.
+- **HW-IND-2** (`inspection.match()`, run in `finish_snapshot`): a BIS or USTR filing whose title, action or
+  summary's first sentence makes it a stay, suspension, extension or Entity List filing, with a scheduled date on
+  the filing day or up to 14 days after it, from an earlier document of the same agency sharing a RIN, a docket or
+  (USTR) the investigation, or named by the filing as scheduled. Feed items `headwind:inspection:<doc>` carry
+  `indicator_id` HW-IND-2, `hypothesis_id` HW-H-1B, `direction` supports (present) or neutral, and
+  `indicator_state` present, absent or no_data; tier `routine`; `requirement_ids` HW-EEI-2 and HW-PIR-2. OFAC
+  filings get no indicator (HW-IND-2 is written for BIS or USTR). Same agency alone is not a match: unrelated
+  comment deadlines and effective dates fall within 14 days of most filings.
+- **Checked live 15 Nov** on the 30-day backfill: met by BIS 2026-22793 (affiliates-rule suspension extended,
+  filed 5 Nov 4:15 PM ET, 4 days before the 9 Nov end set by 2025-19846, RIN 0694-AK34; the filing also says
+  "The suspension was set to end November 9, 2026."), USTR 2026-22925 (178 China exclusions extended) and
+  2026-22867 (maritime Section 301 action further suspended), both filed 9 Nov, the day 2025-21671 and 2025-19873
+  had set. Not met: USTR 2026-22868 (Vietnam investigation extended; nothing scheduled in the register) and
+  2026-21755 (filed 23 Oct, 17 days before). HW-H-1B's wording ("calibrated diplomatic truce") is still Tom's to
+  change; the items now point at it.
+- Fixtures: the 5 and 9 Nov issues cut to the three agencies' filings and one other, four filing texts without
+  their contact paragraph, and cut replies for USTR notices and the register (`TestInspection`).
 
 ## Source health and state (`headwind-1.4`, built 14 Nov 2026)
 - **`health` in the feed and on the page** (`headwind/health.py`). One entry per source, keyed by the source id the
@@ -340,11 +382,11 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - A rate decision is exported to Verdict as kind `rule_date`, the nearest kind Verdict accepts.
 
 ## Not done
-- **Planned and not built:** Census trade data for minerals (needs a key), USTR notices, Federal Register public
-  inspection.
+- **Planned and not built:** Census trade data for minerals (needs a key). USTR notices and Federal Register
+  public inspection are built (step 10).
 - **Edits to entries that stay on a list** are reported since `headwind-1.4` (see Source health and state).
-- `HW-EEI-1` and `HW-EEI-2` (vessel matches in Wake, public-inspection filings) are unmet. Headwind now carries
-  the IMO numbers `HW-EEI-1` needs; the match itself is not built, and Wake is seed data only.
+- `HW-EEI-1` (vessel matches in Wake) is unmet. Headwind now carries the IMO numbers it needs; the match itself
+  is not built, and Wake is seed data only. `HW-EEI-2` (public-inspection filings) is served since step 10.
 - Page layout was checked on 13 Nov at 1280 and 375 pixels wide for the sanctions, rules, screening and minerals
   sections. Fixed then: links had no colour set (browser blue on the dark panel), date badges stretched and wrapped,
   and the rules card listed all 25 documents (now six, with the rest behind a control). Wide tables scroll sideways

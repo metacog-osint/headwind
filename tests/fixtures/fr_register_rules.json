@@ -1,0 +1,114 @@
+{
+ "count": 3,
+ "description": "cut from a real reply of 15 Nov 2026 (173 documents)",
+ "results": [
+  {
+   "document_number": "2026-22793",
+   "title": "Extension of the Suspension of Expansion of End-User Controls for Affiliates of Certain Listed Entities",
+   "type": "Rule",
+   "publication_date": "2026-11-09",
+   "effective_on": "2026-11-09",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/11/09/2026-22793/extension-of-the-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Effective November 9, 2026, the amendments to 15 CFR parts 732, 734, 736, 744, and 748 in the interim final rule published at 90 FR 47201, on September 30, 2025, and stayed on November 10, 2025, at 90 FR 50857, are further stayed until January 10, 2027.",
+   "regulation_id_numbers": [
+    "0694-AK34"
+   ],
+   "docket_ids": [
+    "Docket No. 261027-0002"
+   ]
+  },
+  {
+   "document_number": "2026-19537",
+   "title": "Measures To Restrict Stockpiling of Polysilicon and Polysilicon Derivatives Under Proclamation 11052",
+   "type": "Rule",
+   "publication_date": "2026-09-24",
+   "effective_on": "2026-09-22",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/09/24/2026-19537/measures-to-restrict-stockpiling-of-polysilicon-and-polysilicon-derivatives-under-proclamation-11052",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "This rule is effective September 22, 2026, through December 3, 2026.",
+   "regulation_id_numbers": [
+    "0694-AK57"
+   ],
+   "docket_ids": [
+    "Docket No. 260915-0004"
+   ]
+  },
+  {
+   "document_number": "2025-19846",
+   "title": "One Year Suspension of Expansion of End-User Controls for Affiliates of Certain Listed Entities",
+   "type": "Rule",
+   "publication_date": "2025-11-12",
+   "effective_on": "2025-11-10",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/11/12/2025-19846/one-year-suspension-of-expansion-of-end-user-controls-for-affiliates-of-certain-listed-entities",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Effective November 10, 2025, the amendments to 15 CFR parts 732, 734, 736, 744, and 748 in the interim final rule published at 90 FR 47201, on September 30, 2025, are stayed until November 9, 2026.",
+   "regulation_id_numbers": [
+    "0694-AK34"
+   ],
+   "docket_ids": [
+    "Docket No. 251106-0169"
+   ]
+  }
+ ]
+}

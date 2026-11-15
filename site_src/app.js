@@ -180,7 +180,30 @@
         ? '<details class="more"><summary>Show ' + (ruleRows.length - RULES_SHOWN) + " earlier documents</summary>" + ruleRows.slice(RULES_SHOWN).join("") + "</details>" : "")
       : '<p class="small muted">No rules collected.</p>';
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules (US Federal Register)", fx: "Exchange rates (ECB)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var counted = {};
+    (s.inspection || []).forEach(function (r) { if (r.counted_only) { counted[r.agency] = (counted[r.agency] || 0) + 1; } });
+    var stateWord = { present: "HW-IND-2 met", absent: "HW-IND-2 not met", no_data: "HW-IND-2 not measured" };
+    var piRows = (s.inspection || []).filter(function (r) { return !r.counted_only; }).map(function (r) {
+      var t = r.text || {}, bits = [];
+      bits.push("filed " + (r.filed_at_utc ? when(r.filed_at_utc) : "in the issue of " + r.issue) + (r.publication_date ? ", to be published " + r.publication_date : ""));
+      if (t.action && t.action.toLowerCase() !== "notice") { bits.push(t.action); }
+      (r.matches || []).slice(0, 3).forEach(function (m) {
+        bits.push("scheduled date " + m.date + " (" + (m.days === 0 ? "the day it was filed" : m.days + " days after the filing") + "; " +
+          (m.sentence ? "the filing says it was scheduled" : m.basis + ", document " + m.doc) + ")");
+      });
+      if (r.withdrawn) { bits.push("withdrawn after it was filed"); }
+      if (r.text_error) { bits.push("its text could not be read"); }
+      var badge = r.indicator_state ? '<span class="badge' + (r.indicator_state === "present" ? " badge-warn" : "") + '">' + esc(stateWord[r.indicator_state]) + "</span>" : "";
+      return '<div class="row"><div class="row-title"><span><a href="' + esc(r.url) + '" rel="noopener">' + esc(r.agency + ": " + r.title) + "</a></span>" + badge + '</div><div class="small muted">' + esc(bits.join("; ")) + "</div></div>";
+    });
+    var piLane = (s.lanes || {}).inspection || {};
+    var countedText = Object.keys(counted).map(function (k) { return k + " " + counted[k]; }).join(", ");
+    document.getElementById("inspection-list").innerHTML = (piRows.length ? piRows.join("")
+      : '<p class="small muted">' + (piLane.status === "ok" ? "No BIS, OFAC or USTR rule, and no USTR notice, on public inspection in the last 30 days."
+        : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
+      + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, counted only because their titles can name people and companies: notices, ' + esc(countedText) + ".</p>" : "");
+
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {

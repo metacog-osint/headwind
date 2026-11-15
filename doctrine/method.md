@@ -1,4 +1,4 @@
-# Headwind method (`headwind-1.5`)
+# Headwind method (`headwind-1.6`)
 
 ## Purpose
 Headwind measures economic stress: currencies, energy and food prices that move outside their own
@@ -82,6 +82,38 @@ by sanctions program. Headwind does not republish the names of people or organiz
   or as the number alone with the ship's name given only as an alias. Headwind shows the name in brackets,
   else the alias, marked as an alias.
 
+## USTR, public inspection and HW-IND-2 (`headwind-1.6`)
+- **USTR.** The rules lane reads USTR's rules and its notices (Section 301 actions, exclusions and their
+  extensions) beside BIS's and OFAC's rules, in the same form. USTR notices about the office itself
+  (Performance Review Board, Privacy Act, meetings) are left out.
+- **The register of scheduled dates.** The same agencies' documents of the last 800 days give every date a
+  document set: one written out in its DATES paragraph, its effective date, the close of its comment
+  period. Each is kept with the document's RINs and docket numbers and, for USTR, the investigation its
+  title names (the words after the title's colon, without case, punctuation or small words). A date stays
+  45 days after it passes.
+- **Public inspection.** Each run reads the issues of the last five days from the Office of the Federal
+  Register and keeps BIS's, OFAC's and USTR's filings for 30 days, with the time each was filed and the day
+  it is to be published. The text of each rule, proposed rule and USTR notice is read once for its action
+  line, RINs, docket numbers, the first sentence of its summary and each date it says was already
+  scheduled ("was set to end", "scheduled to expire": the first date after the phrase). The text itself
+  is not kept. OFAC's and BIS's notices (sanctions actions, denial orders) are counted, not titled,
+  because their titles and texts can name people and companies. A filing stays in the feed 7 days.
+- **HW-IND-2 is measured, not judged.** A BIS or USTR filing meets it when (1) its title, action line or
+  summary's first sentence makes it a stay, suspension, extension or Entity List filing (not a comment
+  period or information collection), and (2) a scheduled date falls on the day it was filed or within 14
+  days after: a date that an earlier document of the same agency set and that shares the filing's RIN, a
+  docket number or (USTR) its investigation, or a date the filing itself says was scheduled. The item
+  then carries `indicator_id` HW-IND-2, `hypothesis_id` HW-H-1B, `direction` supports and
+  `indicator_state` present; otherwise absent (neutral), or no_data when the text could not be read and
+  nothing else matched. The tier stays `routine`: there is no baseline, and a met condition is not a
+  warning. Matching on the same agency alone is not enough, because comment deadlines and effective dates
+  of unrelated rules fall within 14 days of most filings.
+- **Seen on the real filings of 5 and 9 Nov 2026:** BIS's extension of the affiliates-rule suspension
+  (filed 5 Nov, 4 days before the 9 Nov end that document 2025-19846 set, same RIN 0694-AK34), and USTR's
+  extension of 178 China exclusions and further suspension of the maritime Section 301 action (both filed
+  9 Nov, the day documents 2025-21671 and 2025-19873 had set). USTR's extension of its Vietnam
+  investigation (same day) met no scheduled date in the register.
+
 ## Screening lists
 The same measure, applied to each list in the US International Trade Administration's Consolidated
 Screening List. One item per list that changed, with counts by the address country the list gives
@@ -123,7 +155,7 @@ for which each country is named first among the major import sources. It is a co
 ordering and says nothing about substitutes, stockpiles or domestic capacity.
 
 ## Not live
-Census trade data for minerals, USTR notices and Federal Register public-inspection filings.
+Census trade data for minerals.
 
 ## Verdict
 `data/question_drafts.json` holds draft questions on the next FAO release with a climatology
