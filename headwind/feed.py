@@ -240,6 +240,7 @@ def _official(item_id: str, title: str, summary: str, *, data_as_of: str, genera
 
 
 VESSELS_IN_TEXT = 25
+ALSO_ON = {"ofac-sdn": "the OFAC SDN list", "uk-sanctions": "the UK Sanctions List"}
 
 
 def _vessel_text(word: str, vessels: list[dict]) -> str:
@@ -248,7 +249,8 @@ def _vessel_text(word: str, vessels: list[dict]) -> str:
         return ""
     def one(v):
         bits = ["alias" if v.get("name_is_alias") else "",
-                f"IMO {v['imo']}" if v.get("imo") else "no IMO number given", f"flag {v['flag']}" if v.get("flag") else ""]
+                f"IMO {v['imo']}" if v.get("imo") else "no IMO number given", f"flag {v['flag']}" if v.get("flag") else "",
+                "also on " + " and ".join(ALSO_ON.get(l, l) for l in v["also_on"]) if v.get("also_on") else ""]
         return f"{v.get('name') or 'unnamed'} ({', '.join(b for b in bits if b)})"
     more = len(vessels) - VESSELS_IN_TEXT
     tail = f"; and {more} more on the page" if more > 0 else ""

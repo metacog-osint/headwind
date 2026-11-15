@@ -102,7 +102,7 @@ python tools/headwind.py collect --only fx    # one or more lanes; the rest keep
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
-python -m unittest discover -s tests          # 45 offline tests against real fixtures
+python -m unittest discover -s tests          # 48 offline tests against real fixtures
 python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
@@ -201,6 +201,19 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - **Fixtures** `uk_ships_2026-10-01.xml` and `uk_ships_2026-11-12.xml` are cut from those Wayback copies with each
   Designation kept as published (tests in `TestUkShips`). OFAC vessel naming is still untested on a real change: the
   Wayback Machine has no copies of `sdn.csv`.
+
+## Ships across lists (plan step 9, built 15 Nov 2026)
+- `sanctions.vessel_crosslist()` matches ships on OFAC and the UK list (`VESSEL_LISTS`) by IMO number after every
+  run, from this run's indexes (a list that failed uses its kept index and is named in `from_earlier_run`).
+  Snapshot: `vessel_crosslist` (counts, on the page under the list rows) and `vessel_table` (one record per IMO,
+  written to `site/data/vessels.json`, about 440 KB, not in the page snapshot). `mark_also_on()` gives each ship in
+  a change `also_on`; the feed text says "also on the OFAC SDN list" and the page the same.
+- Live 15 Nov, 9:24 AM CST: 1,944 IMO numbers, 304 on both, 1,251 OFAC only, 389 UK only; 15 OFAC entries and 1 UK
+  entry give no number; no IMO number has two entries on one list. Names differ in case and spelling between
+  lists, so only numbers are matched. Fixtures `crosslist_ofac.csv` and `crosslist_uk.xml`: AN SAN 1 (IMO
+  7303803), OFAC 23730 and UK DPR0097, as read 14 Nov.
+- Not a method change (no count moves). `HW-EEI-1` (matching designated vessels with Wake's tracks) can use
+  `vessels.json`; the match itself is still not built.
 
 ## Source health and state (`headwind-1.4`, built 14 Nov 2026)
 - **`health` in the feed and on the page** (`headwind/health.py`). One entry per source, keyed by the source id the

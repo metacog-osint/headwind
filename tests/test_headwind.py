@@ -334,6 +334,52 @@ class TestMineralsWatch(unittest.TestCase):
         self.assertNotIn("warnings", snap["health"]["usgs-mcs"])
 
 
+class TestVesselCrosslist(unittest.TestCase):
+    """Step 9. crosslist_ofac.csv and crosslist_uk.xml are one ship on both lists, AN SAN 1 (IMO 7303803), cut
+    from the OFAC and UK files read on 14 Nov 2026. The full lists that day: 1,944 IMO numbers, 304 on both,
+    1,251 on OFAC's only, 389 on the UK's only."""
+
+    def indexes(self):
+        ofac = sanctions.parse_sdn_csv(text("ofac_sdn.csv").rstrip("\n") + "\n" + text("crosslist_ofac.csv"))
+        _, uk = sanctions.parse_uk_xml((FIX / "uk_ships_2026-11-12.xml").read_bytes())
+        _, one = sanctions.parse_uk_xml((FIX / "crosslist_uk.xml").read_bytes())
+        return ofac, {**uk, **one}
+
+    def test_crosslist(self):
+        ofac, uk = self.indexes()
+        s, t = sanctions.vessel_crosslist({"ofac-sdn": ofac, "uk-sanctions": uk})
+        self.assertEqual((s["imo_numbers"], s["on_both"], s["only"]), (15, 1, {"ofac-sdn": 8, "uk-sanctions": 6}))
+        r = next(r for r in t if r["imo"] == "7303803")
+        self.assertEqual(r["on"]["ofac-sdn"], {"ids": ["23730"], "name": "AN SAN 1",
+                                               "flag": "Democratic People's Republic of Korea"})
+        self.assertEqual((r["on"]["uk-sanctions"]["ids"], r["on"]["uk-sanctions"]["name"]), (["DPR0097"], "An San 1"))
+        s2, _ = sanctions.vessel_crosslist({"ofac-sdn": ofac}, stale=("uk-sanctions",))
+        self.assertEqual((s2["on_both"], s2["read"]["uk-sanctions"], s2["from_earlier_run"]),
+                         (0, False, ["uk-sanctions"]))
+
+    def test_also_on_in_a_change_and_the_feed(self):
+        ofac, uk = self.indexes()
+        prev = {k: v for k, v in uk.items() if k != "DPR0097"}
+        d = sanctions.delta("uk-sanctions", prev, uk, "2026-11-15T15:00:00Z", "2026-11-14T22:52:09Z")
+        _, t = sanctions.vessel_crosslist({"ofac-sdn": ofac, "uk-sanctions": uk})
+        sanctions.mark_also_on(d, t)
+        v = d["vessels_added"][0]
+        self.assertEqual((v["name"], v["imo"], v["also_on"]), ("An San 1", "7303803", ["ofac-sdn"]))
+        self.assertIn("An San 1 (IMO 7303803, flag North Korea, also on the OFAC SDN list)",
+                      feed._vessel_text("added", d["vessels_added"]))
+
+    def test_lane_and_site_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            snap = headwind_cli.collect(Path(tmp), getter=fake_getter)
+            self.assertEqual(snap["vessel_crosslist"]["imo_numbers"], len(snap["vessel_table"]))
+            files = headwind_cli.build_site(Path(tmp), snap)
+            self.assertIn("data/vessels.json", files)
+            doc = json.loads((Path(tmp) / "site" / "data" / "vessels.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(doc["vessels"]), snap["vessel_crosslist"]["imo_numbers"])
+            page = json.loads((Path(tmp) / "site" / "data" / "snapshot.json").read_text(encoding="utf-8"))
+            self.assertNotIn("vessel_table", page)
+
+
 class TestFeed(unittest.TestCase):
     def snapshot(self) -> dict:
         m = {"date": "2026-11-12", "prior_date": "2026-11-05", "change_pct": 9.4, "z": 6.2, "baseline_n": 250,

@@ -79,6 +79,18 @@
       return '<div class="row"><div class="row-title"><span><a href="' + esc(l.url) + '" rel="noopener">' + esc(l.name) + '</a></span><span class="badge">' + esc(Number(l.total).toLocaleString()) + ' entries</span></div><div class="small muted">' +
         esc(types + ". Read " + when(l.checked_at) + "; compared since " + when(l.baseline_set_at) + "." + note) + "</div></div>";
     }).join("") || '<p class="small muted">No list has been read yet.</p>';
+    var listName = {};
+    lists.forEach(function (l) { listName[l.id] = l.name; });
+    function alsoOn(v) { return (v.also_on || []).length ? ", also on " + v.also_on.map(function (l) { return listName[l] || l; }).join(" and ") : ""; }
+    var vc = s.vessel_crosslist || {};
+    document.getElementById("vessel-cross").innerHTML = vc.imo_numbers ? '<p class="small muted">' + esc(
+      "Ships matched by IMO number: " + Number(vc.imo_numbers).toLocaleString() + " numbers, " +
+      Number(vc.on_both).toLocaleString() + " on both the OFAC and UK lists, " +
+      Number((vc.only || {})["ofac-sdn"] || 0).toLocaleString() + " on OFAC's only, " +
+      Number((vc.only || {})["uk-sanctions"] || 0).toLocaleString() + " on the UK's only; " +
+      Number((vc.without_imo || {})["ofac-sdn"] || 0) + " OFAC and " + Number((vc.without_imo || {})["uk-sanctions"] || 0) +
+      " UK entries give no IMO number." + ((vc.from_earlier_run || []).length ? " From an earlier reading: " + vc.from_earlier_run.join(", ") + "." : "")) +
+      ' <a href="data/vessels.json">Every ship, with each list\'s entry ids, name and flag</a>.</p>' : "";
     function counts(o) { return Object.keys(o || {}).slice(0, 6).map(function (k) { return k + " " + o[k]; }).join(", "); }
     function edited(lines, d) {
       if (!d.changed) { return; }
@@ -94,7 +106,7 @@
       function ships(word, vs) {
         if (!vs || !vs.length) { return; }
         lines.push("Vessels " + word + ": " + vs.map(function (v) {
-          return (v.name || "unnamed") + " (" + (v.name_is_alias ? "alias, " : "") + (v.imo ? "IMO " + v.imo : "no IMO number given") + (v.flag ? ", flag " + v.flag : "") + ")";
+          return (v.name || "unnamed") + " (" + (v.name_is_alias ? "alias, " : "") + (v.imo ? "IMO " + v.imo : "no IMO number given") + (v.flag ? ", flag " + v.flag : "") + alsoOn(v) + ")";
         }).join("; ") + ".");
       }
       ships("added", d.vessels_added); ships("removed", d.vessels_removed);
