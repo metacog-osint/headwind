@@ -49,8 +49,17 @@
     },
     {
       "id": "us-federal-register",
-      "name": "US Federal Register API (BIS and OFAC rules and proposed rules)",
+      "name": "US Federal Register API (BIS, OFAC and USTR rules and proposed rules, USTR notices)",
       "url": "https://www.federalregister.gov/api/v1/documents.json",
+      "licence": "US public domain",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "us-federal-register"
+    },
+    {
+      "id": "fr-public-inspection",
+      "name": "Office of the Federal Register, public inspection (API public-inspection-documents; BIS, OFAC and USTR filings)",
+      "url": "https://www.federalregister.gov/public-inspection/current",
       "licence": "US public domain",
       "use": "ingest",
       "grade": "A1",

@@ -21,8 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import (baseline, commodities, controls, feed, fetch, food, health, markets, minerals,  # noqa: E402,F401
-                      releases, sanctions, screening)
+from headwind import (baseline, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
+                      markets, minerals, releases, sanctions, screening)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -34,12 +34,14 @@ LANE_FIELDS = {
     "calendar": ["fomc_dates", "ecb_dates"],
     "sanctions": ["sanctions", "sanctions_lists", "vessel_crosslist", "vessel_table"],
     "screening": ["screening", "screening_lists"],
-    "controls": ["controls"],
+    "controls": ["controls", "scheduled_dates"],
+    "inspection": ["inspection", "inspection_issues"],
     "minerals": ["minerals"],
 }
 EMPTY = {"fx": [], "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
          "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
-         "screening_lists": [], "controls": [], "minerals": {}}
+         "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
+         "minerals": {}}
 
 
 def _lane_fx(raw_dir, prev, getter):
@@ -235,11 +237,53 @@ def _lane_screening(raw_dir, prev, getter):
 
 
 def _lane_controls(raw_dir, prev, getter):
-    body, rec = fetch.fetch("us-federal-register", controls.fr_url(date.today()), raw_dir, "json", getter=getter)
+    """BIS, OFAC and USTR rules and USTR's notices of the last 60 days (the page and the feed), and the register of
+    dates the same agencies' documents of the last 800 days scheduled (what a public-inspection filing is matched
+    against)."""
+    today = date.today()
+    body, rec = fetch.fetch("us-federal-register", controls.fr_url(today), raw_dir, "json", getter=getter)
     rules = controls.parse_fr(body)
     if not rules:
-        raise ValueError("Federal Register returned no BIS or OFAC rules for the window")
-    return {"controls": rules}, [rec]
+        raise ValueError("Federal Register returned no BIS, OFAC or USTR rules for the window")
+    body, rec2 = fetch.fetch("us-federal-register", controls.ustr_url(today), raw_dir, "json", getter=getter)
+    notices = controls.parse_fr(body)
+    docs, recs = [], [rec, rec2]
+    for url in controls.register_urls(today).values():
+        b, r = fetch.fetch("us-federal-register", url, raw_dir, "json", timeout=90, getter=getter)
+        docs += controls.parse_fr(b)
+        recs.append(r)
+    docs = list({d["id"]: d for d in docs + rules + notices}.values())
+    shown = sorted({d["id"]: d for d in rules + notices}.values(), key=lambda x: (x["published_date"], x["id"]),
+                   reverse=True)
+    return {"controls": shown, "scheduled_dates": controls.scheduled(docs, today)}, recs
+
+
+def _lane_inspection(raw_dir, prev, getter):
+    """Filings on public inspection by BIS, OFAC and USTR: the issues of the last few days, kept 30 days, and the
+    text of each rule, proposed rule and USTR notice (read once per PDF). A text that cannot be read is noted on
+    the filing; the lane still passes."""
+    today = date.today()
+    read, issues, recs = [], [], []
+    last_ok = ((prev.get("lanes") or {}).get("inspection") or {}).get("fetched_at")
+    for back in range(inspection.days_to_read(today, last_ok)):
+        day = (today - timedelta(days=back)).isoformat()
+        body, rec = fetch.fetch("fr-public-inspection", inspection.pi_url(day), raw_dir, "json", getter=getter)
+        recs.append(rec)
+        got = inspection.parse_issue(body, day)
+        issues.append({"day": day, "total": json.loads(body).get("count") or 0, "filings": len(got)})
+        read += got
+    kept = inspection.merge(prev.get("inspection") or [], read, fetch.now_utc(), today)
+    for r in kept:
+        if r.get("text") or not inspection.wants_text(r):
+            continue
+        try:
+            body, rec = fetch.fetch("fr-public-inspection-text", r["raw_text_url"], raw_dir, "txt", getter=getter)
+            r["text"] = inspection.read_text(body)
+            r.pop("text_error", None)
+            recs.append(rec)
+        except Exception as exc:  # noqa: BLE001 - one filing's text is noted on that filing
+            r["text_error"] = f"{type(exc).__name__}: {exc}"[:200]
+    return {"inspection": kept, "inspection_issues": issues}, recs
 
 
 def _lane_minerals(raw_dir, prev, getter):
@@ -284,7 +328,7 @@ def _minerals_watch(raw_dir, getter, recs) -> dict:
 
 LANES = {"fx": _lane_fx, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
          "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
-         "controls": _lane_controls, "minerals": _lane_minerals}
+         "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals}
 
 
 def finish_snapshot(snap: dict, today: date) -> dict:
@@ -293,6 +337,7 @@ def finish_snapshot(snap: dict, today: date) -> dict:
     ffpi = next((m for m in fao if m["id"] == "ffpi"), None)
     fao_dates = snap.get("fao_release_dates") or []
     next_release = next((d for d in fao_dates if d >= today.isoformat()), None)
+    inspection.match(snap.get("inspection") or [], snap.get("scheduled_dates") or [])
     events = controls.build_events(snap.get("controls") or [], today)
     events += releases.build_events(today, snap.get("fomc_dates") or [], snap.get("ecb_dates") or [], fao_dates,
                                     food.next_period(ffpi["period"]) if ffpi else None)
@@ -405,8 +450,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
              | {m["country"] for m in snap.get("local_food_missing") or []}}
     page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "health", "fx", "energy", "fao",
                                      "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
-                                     "screening_lists", "controls", "minerals", "question_drafts",
-                                     "vessel_crosslist")}
+                                     "screening_lists", "controls", "inspection", "inspection_issues", "minerals",
+                                     "question_drafts", "vessel_crosslist")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
 
@@ -504,7 +549,9 @@ def main(argv=None) -> int:
               f"baselines, {len(snap['events']['events'])} events; {anomalies} anomalies. Sanctions lists: "
               f"{len(snap['sanctions_lists'])} read, {len(snap['sanctions'])} changes kept; screening lists: "
               f"{len(snap['screening_lists'])} read, {len(snap['screening'])} changes kept; "
-              f"{len(snap['controls'])} Federal Register rules; "
+              f"{len(snap['controls'])} Federal Register rules and USTR notices, "
+              f"{len(snap.get('scheduled_dates') or [])} scheduled dates, "
+              f"{len(snap.get('inspection') or [])} public-inspection filings; "
               f"{len((snap.get('minerals') or {}).get('reliance') or [])} mineral commodities.")
         return 0 if any(s.get("status") == "ok" for s in snap["lanes"].values()) else 1
     if args.cmd == "build":

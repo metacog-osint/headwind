@@ -39,7 +39,8 @@ QUIET_SEEN_DAYS = {"ofac-sdn": 21}
 LANE_OF = {"ecb-eurofxref": "fx", "eia-spot": "energy", "fao-ffpi": "fao", "wfp-food-prices-hdx": "wfp",
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
-           "trade-gov-csl": "screening", "us-federal-register": "controls", "usgs-mcs": "minerals"}
+           "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
+           "usgs-mcs": "minerals"}
 LIST_KEY = {"ofac-sdn": "ofac-sdn", "un-consolidated": "un-sc-consolidated", "eu-fsf": "eu-fsf",
             "uk-sanctions": "uk-sanctions-list"}
 
@@ -203,7 +204,16 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
         f"{len(snap.get('fomc_dates') or [])} FOMC and {len(snap.get('ecb_dates') or [])} ECB dates")
     sl = snap.get("screening_lists") or []
     add("trade-gov-csl", "screening", None, f"{len(sl)} lists, {sum(l.get('total') or 0 for l in sl)} entries")
-    add("us-federal-register", "controls", None, f"{len(snap.get('controls') or [])} rules in the last 60 days")
+    add("us-federal-register", "controls", None,
+        f"{len(snap.get('controls') or [])} BIS, OFAC and USTR rules and USTR notices in the last 60 days, "
+        f"{len(snap.get('scheduled_dates') or [])} scheduled dates from the last 800 days")
+    pi = snap.get("inspection") or []
+    days = snap.get("inspection_issues") or []
+    unread = sum(1 for r in pi if r.get("text_error"))
+    add("fr-public-inspection", "inspection", _newest(r.get("issue") for r in pi) if pi else None,
+        f"{len(pi)} BIS, OFAC and USTR filings in the last 30 days ({sum(1 for r in pi if r.get('counted_only'))} "
+        f"counted only), {sum(1 for d in days if d.get('total'))} of {len(days)} days with an issue"
+        + (f"; {unread} filing texts could not be read" if unread else ""))
     add("usgs-mcs", "minerals", None,
         f"{len((snap.get('minerals') or {}).get('reliance') or [])} commodities with net import reliance")
     watch = minerals.watch_notes(snap.get("minerals") or {})

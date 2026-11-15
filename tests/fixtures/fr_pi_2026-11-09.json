@@ -1,0 +1,162 @@
+{
+ "count": 6,
+ "description": "cut from the real issue available on 2026-11-09 (110 documents)",
+ "results": [
+  {
+   "document_number": "2026-22802",
+   "title": "Sanctions Action  ",
+   "type": "Notice",
+   "filing_type": "special",
+   "agencies": [
+    {
+     "raw_name": "Foreign Assets Control Office",
+     "name": "Foreign Assets Control Office",
+     "id": 203,
+     "url": "https://www.federalregister.gov/agencies/foreign-assets-control-office",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/203",
+     "parent_id": 497,
+     "slug": "foreign-assets-control-office"
+    }
+   ],
+   "filed_at": null,
+   "publication_date": null,
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22802/sanctions-action",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22802.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/802.txt",
+   "pdf_updated_at": "2026-11-06T12:08:07.000-05:00",
+   "editorial_note": "An agency letter requesting withdrawal of this document was received after placement on public inspection. The document will remain on public inspection through close of business November 9, 2026.  You may request a copy of the agency's withdrawal letter, and/or the withdrawn document, by sending an email to fr.inspection@nara.gov.",
+   "docket_numbers": [],
+   "num_pages": 1
+  },
+  {
+   "document_number": "2026-22861",
+   "title": "Sanctions Action  ",
+   "type": "Notice",
+   "filing_type": "regular",
+   "agencies": [
+    {
+     "raw_name": "Foreign Assets Control Office",
+     "name": "Foreign Assets Control Office",
+     "id": 203,
+     "url": "https://www.federalregister.gov/agencies/foreign-assets-control-office",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/203",
+     "parent_id": 497,
+     "slug": "foreign-assets-control-office"
+    }
+   ],
+   "filed_at": "2026-11-09T08:45:00.000-05:00",
+   "publication_date": "2026-11-10",
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22861/sanctions-action",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22861.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/861.txt",
+   "pdf_updated_at": "2026-11-09T08:45:11.000-05:00",
+   "editorial_note": null,
+   "docket_numbers": [],
+   "num_pages": 11
+  },
+  {
+   "document_number": "2026-22867",
+   "title": "Section 301 Action: China's Targeting of the Maritime, Logistics, and Shipbuilding Sectors for Dominance; Modification ",
+   "type": "Notice",
+   "filing_type": "regular",
+   "agencies": [
+    {
+     "raw_name": "TRADE REPRESENTATIVE, OFFICE OF UNITED STATES",
+     "name": "Trade Representative, Office of United States",
+     "id": 491,
+     "url": "https://www.federalregister.gov/agencies/trade-representative-office-of-united-states",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/491",
+     "parent_id": null,
+     "slug": "trade-representative-office-of-united-states"
+    }
+   ],
+   "filed_at": "2026-11-09T08:45:00.000-05:00",
+   "publication_date": "2026-11-10",
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22867/section-301-action-chinas-targeting-of-the-maritime-logistics-and-shipbuilding-sectors-for-dominance",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22867.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/867.txt",
+   "pdf_updated_at": "2026-11-09T08:45:11.000-05:00",
+   "editorial_note": null,
+   "docket_numbers": [],
+   "num_pages": 5
+  },
+  {
+   "document_number": "2026-22868",
+   "title": "Determination: Vietnam's Acts, Policies, and Practices Related to Intellectual Property Protection and Enforcement; Extension of Section 301 Investigation ",
+   "type": "Notice",
+   "filing_type": "regular",
+   "agencies": [
+    {
+     "raw_name": "TRADE REPRESENTATIVE, OFFICE OF UNITED STATES",
+     "name": "Trade Representative, Office of United States",
+     "id": 491,
+     "url": "https://www.federalregister.gov/agencies/trade-representative-office-of-united-states",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/491",
+     "parent_id": null,
+     "slug": "trade-representative-office-of-united-states"
+    }
+   ],
+   "filed_at": "2026-11-09T08:45:00.000-05:00",
+   "publication_date": "2026-11-10",
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22868/determination-vietnams-acts-policies-and-practices-related-to-intellectual-property-protection-and",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22868.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/868.txt",
+   "pdf_updated_at": "2026-11-09T08:45:11.000-05:00",
+   "editorial_note": null,
+   "docket_numbers": [],
+   "num_pages": 2
+  },
+  {
+   "document_number": "2026-22925",
+   "title": "Product Exclusion Extensions: China's Acts, Policies, and Practices Related to Technology Transfer, Intellectual Property, and Innovation ",
+   "type": "Notice",
+   "filing_type": "regular",
+   "agencies": [
+    {
+     "raw_name": "TRADE REPRESENTATIVE, OFFICE OF UNITED STATES",
+     "name": "Trade Representative, Office of United States",
+     "id": 491,
+     "url": "https://www.federalregister.gov/agencies/trade-representative-office-of-united-states",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/491",
+     "parent_id": null,
+     "slug": "trade-representative-office-of-united-states"
+    }
+   ],
+   "filed_at": "2026-11-09T08:45:00.000-05:00",
+   "publication_date": "2026-11-10",
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22925/product-exclusion-extensions-chinas-acts-policies-and-practices-related-to-technology-transfer",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22925.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/925.txt",
+   "pdf_updated_at": "2026-11-09T08:45:17.000-05:00",
+   "editorial_note": null,
+   "docket_numbers": [],
+   "num_pages": 5
+  },
+  {
+   "document_number": "2026-22812",
+   "title": "Medicare and Medicaid Programs: Cutting Administrative Requirements for Excellence in Patient Care ",
+   "type": "Proposed Rule",
+   "filing_type": "special",
+   "agencies": [
+    {
+     "raw_name": "Centers for Medicare & Medicaid Services",
+     "name": "Centers for Medicare & Medicaid Services",
+     "id": 45,
+     "url": "https://www.federalregister.gov/agencies/centers-for-medicare-medicaid-services",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/45",
+     "parent_id": 221,
+     "slug": "centers-for-medicare-medicaid-services"
+    }
+   ],
+   "filed_at": "2026-11-05T16:15:00.000-05:00",
+   "publication_date": "2026-11-10",
+   "html_url": "https://www.federalregister.gov/public-inspection/2026-22812/medicare-and-medicaid-programs-cutting-administrative-requirements-for-excellence-in-patient-care",
+   "pdf_url": "https://public-inspection.federalregister.gov/2026-22812.pdf",
+   "raw_text_url": "https://www.federalregister.gov/public-inspection/raw_text/202/622/812.txt",
+   "pdf_updated_at": "2026-11-05T16:15:08.000-05:00",
+   "editorial_note": null,
+   "docket_numbers": [],
+   "num_pages": 378
+  }
+ ]
+}

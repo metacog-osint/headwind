@@ -9,6 +9,7 @@ import importlib.util
 import io
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -24,8 +25,8 @@ FIX = ROOT / "tests" / "fixtures"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import (baseline, controls, feed, food, markets, minerals, releases, sanctions, screening,  # noqa: E402
-                      stats)
+from headwind import (baseline, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
+                      sanctions, screening, stats)
 from tic_doctrine import contract, registers  # noqa: E402
 
 _spec = importlib.util.spec_from_file_location("headwind_cli", ROOT / "tools" / "headwind.py")
@@ -56,6 +57,20 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         with zipfile.ZipFile(buf, "w") as zf:
             zf.writestr("eurofxref-hist.csv", text("ecb.csv"))
         return buf.getvalue()
+    if "public-inspection-documents.json" in url:
+        day = re.search(r"available_on%5D=(\d{4}-\d{2}-\d{2})", url).group(1)
+        f = FIX / f"fr_pi_{day}.json"
+        return f.read_bytes() if f.exists() else b'{"count": 0, "results": []}'
+    if "public-inspection/raw_text/" in url:
+        digits = "".join(re.findall(r"\d+", url.split("raw_text/", 1)[1].rsplit(".", 1)[0]))
+        f = FIX / f"fr_pi_raw_{digits[:4]}-{digits[4:]}.txt"
+        if f.exists():
+            return f.read_bytes()
+        raise OSError(f"no fixture for {url}")
+    if "federalregister.gov/api/v1/documents.json" in url and "type%5D%5B%5D=NOTICE" in url:
+        return (FIX / ("fr_ustr_notices.json" if "fields%5B%5D=abstract" in url else "fr_register_ustr.json")).read_bytes()
+    if "federalregister.gov/api/v1/documents.json" in url and "fields%5B%5D=abstract" not in url:
+        return (FIX / "fr_register_rules.json").read_bytes()
     table = [("petroleum/pri/spt", "eia_petroleum.json"), ("natural-gas/pri/fut", "eia_natural_gas.json"),
              ("foodpricesindex", "fao_page.html"),
              ("food_price_indices_data.csv", "fao.csv"), ("package_search", "hdx.json"),
@@ -581,6 +596,160 @@ class TestListParsers(unittest.TestCase):
             controls.parse_fr(json.dumps({"count": 9, "results": json.loads(text("federal_register.json"))["results"]}))
 
 
+class FixedDate(date):
+    """date.today() on 9 Nov 2026, the day USTR filed its two China notices, for the lanes that read by date."""
+    @classmethod
+    def today(cls):
+        return cls(2026, 11, 9)
+
+
+def _pi_records(today=date(2026, 11, 9)):
+    """The filings of the 5 and 9 Nov issues, with their texts read and matched against the register."""
+    docs = controls.parse_fr((FIX / "fr_register_rules.json").read_bytes()) + controls.parse_fr(
+        (FIX / "fr_register_ustr.json").read_bytes())
+    reg = controls.scheduled(docs, today)
+    read = inspection.parse_issue((FIX / "fr_pi_2026-11-05.json").read_bytes(), "2026-11-05")
+    read += inspection.parse_issue((FIX / "fr_pi_2026-11-09.json").read_bytes(), "2026-11-09")
+    recs = inspection.merge([], read, "2026-11-09T15:00:00Z", today)
+    for r in recs:
+        f = FIX / f"fr_pi_raw_{r['id']}.txt"
+        if inspection.wants_text(r) and f.exists():
+            r["text"] = inspection.read_text(f.read_bytes())
+    return inspection.match(recs, reg)
+
+
+class TestInspection(unittest.TestCase):
+    """Step 10: USTR documents, the register of scheduled dates, and filings on public inspection. Fixtures are real
+    replies of 15 Nov 2026: the issues available on 5 and 9 Nov, cut to the three agencies' filings and one other,
+    and the texts of four filings without their contact paragraph."""
+
+    def test_ustr_notices_and_register(self):
+        notices = controls.parse_fr(text("fr_ustr_notices.json"))
+        self.assertEqual([n["id"] for n in notices], ["2026-22925", "2026-22867", "2026-20615"])  # PRB notice left out
+        self.assertTrue(all(n["agency"] == "USTR" and n["type"] == "Notice" for n in notices))
+        self.assertEqual(next(n for n in notices if n["id"] == "2026-20615")["dockets"], ["USTR-2026-0661"])
+        rules = controls.parse_fr(text("fr_register_rules.json"))
+        self.assertEqual(next(r for r in rules if r["id"] == "2025-19846")["rins"], ["0694-AK34"])
+        self.assertEqual(controls.subject("Notice of Modification of Section 301 Action: China's Targeting of the "
+                                          "Maritime, Logistics, and Shipbuilding Sectors for Dominance"),
+                         controls.subject("Section 301 Action: China's Targeting the Maritime, Logistics, and "
+                                          "Shipbuilding Sectors for Dominance; Modification"))
+        self.assertIsNone(controls.subject("Extension of the Suspension of Expansion of End-User Controls"))
+        reg = controls.scheduled(rules + controls.parse_fr(text("fr_register_ustr.json")), date(2026, 11, 5))
+        nov9 = sorted(e["doc"] for e in reg if e["date"] == "2026-11-09")
+        self.assertEqual(nov9, ["2025-19846", "2025-19873", "2025-21671", "2026-22793"])
+        self.assertTrue(all(e["date"] >= "2026-09-21" for e in reg))       # passed dates kept 45 days only
+
+    def test_issue_and_text(self):
+        five = inspection.parse_issue(text("fr_pi_2026-11-05.json"), "2026-11-05")
+        self.assertEqual([(r["id"], r["counted_only"]) for r in five],
+                         [("2026-22725", True), ("2026-22726", True), ("2026-22793", False)])
+        stay = five[2]
+        self.assertEqual((stay["filed_at_utc"], stay["filed_on"], stay["publication_date"]),
+                         ("2026-11-05T21:15:00Z", "2026-11-05", "2026-11-09"))
+        self.assertTrue(all(r["title"] is None for r in five if r["counted_only"]))   # notices are counts only
+        nine = inspection.parse_issue(text("fr_pi_2026-11-09.json"), "2026-11-09")
+        special = next(r for r in nine if r["id"] == "2026-22802")
+        self.assertEqual((special["filed_at"], special["filed_on"]), (None, "2026-11-09"))   # no filing time given
+        t = inspection.read_text((FIX / "fr_pi_raw_2026-22793.txt").read_bytes())
+        self.assertEqual((t["action"], t["rins"], t["dockets"]), ("Final rule; stay", ["0694-AK34"], ["261027-0002"]))
+        self.assertEqual(t["schedule"], [{"date": "2026-11-09",
+                                          "sentence": "The suspension was set to end November 9, 2026."}])
+        u = inspection.read_text((FIX / "fr_pi_raw_2026-22925.txt").read_bytes())
+        self.assertEqual([x["date"] for x in u["schedule"]], ["2025-11-29"])  # the date the phrase governs, not the next
+        m = inspection.read_text((FIX / "fr_pi_raw_2026-22867.txt").read_bytes())
+        self.assertIn("further suspend", m["summary_first"])          # "the U.S. Trade Representative" is one sentence
+        with self.assertRaises(ValueError):
+            inspection.parse_issue(json.dumps({"count": 9, "results": []}), "2026-11-09")
+
+    def test_hw_ind_2_on_the_real_extensions(self):
+        recs = {r["id"]: r for r in _pi_records()}
+        stay = recs["2026-22793"]
+        self.assertEqual((stay["indicator_state"], stay["days_to_deadline"], stay["kind"]), ("present", 4, "stay_or_extension"))
+        self.assertEqual([(m["basis"], m.get("doc")) for m in stay["matches"]],
+                         [("same RIN 0694-AK34", "2025-19846"), ("the filing says it was scheduled", None)])
+        for doc, earlier in (("2026-22925", "2025-21671"), ("2026-22867", "2025-19873")):
+            r = recs[doc]
+            self.assertEqual((r["indicator_state"], r["days_to_deadline"], r["matches"][0]["basis"], r["matches"][0]["doc"]),
+                             ("present", 0, "same investigation", earlier))
+        self.assertEqual((recs["2026-22868"]["indicator_state"], recs["2026-22868"]["matches"]), ("absent", []))
+        self.assertEqual(inspection.counted(list(recs.values())), {"BIS": 2, "OFAC": 2})
+        self.assertNotIn("indicator_state", recs["2026-22861"])
+
+    def test_a_filing_without_text_is_no_data_unless_matched(self):
+        recs = _pi_records()
+        for r in recs:
+            r.pop("text", None)
+        recs = {r["id"]: r for r in inspection.match(recs, [])}
+        self.assertEqual(recs["2026-22793"]["indicator_state"], "no_data")
+        self.assertEqual(recs["2026-22868"]["indicator_state"], "no_data")
+
+    def test_merge_keeps_first_sight_and_text(self):
+        read = inspection.parse_issue(text("fr_pi_2026-11-05.json"), "2026-11-05")
+        first = inspection.merge([], read, "2026-11-05T22:00:00Z", date(2026, 11, 5))
+        self.assertEqual(first[0]["id"], "2026-22793")                 # newest filing first
+        first[0]["text"] = {"action": "kept"}
+        again = {r["id"]: r for r in inspection.merge(first, read, "2026-11-06T04:00:00Z", date(2026, 11, 6))}
+        self.assertEqual((again["2026-22793"]["first_seen_at"], again["2026-22793"]["text"]),
+                         ("2026-11-05T22:00:00Z", {"action": "kept"}))
+        changed = [dict(r, pdf_updated_at="2026-11-06T09:00:00.000-05:00") for r in read]
+        redone = {r["id"]: r for r in inspection.merge(first, changed, "2026-11-06T16:00:00Z", date(2026, 11, 6))}
+        self.assertNotIn("text", redone["2026-22793"])                 # a replaced PDF is read again
+        self.assertEqual(inspection.merge(first, [], "2026-12-10T00:00:00Z", date(2026, 12, 10)), [])   # 30 days
+
+    def test_feed_items(self):
+        snap = {"generated_at": "2026-11-10T12:00:00Z", "lanes": {}, "inspection": _pi_records()}
+        fc = {"features": feed.inspection_features(snap, "2026-11-10T12:00:00Z", "2026-11-12T12:00:00Z", None)}
+        self.assertEqual(lint(fc), [])
+        props = {f["properties"]["id"]: f["properties"] for f in fc["features"]}
+        self.assertEqual(sorted(props), ["headwind:inspection:2026-22793", "headwind:inspection:2026-22867",
+                                         "headwind:inspection:2026-22868", "headwind:inspection:2026-22925"])
+        p = props["headwind:inspection:2026-22793"]
+        self.assertEqual((p["kind"], p["tier"], p["indicator_id"], p["hypothesis_id"], p["direction"], p["indicator_state"]),
+                         ("observation", "routine", "HW-IND-2", "HW-H-1B", "supports", "present"))
+        self.assertEqual((p["measures"]["days_to_deadline"], p["data_as_of"], p["requirement_ids"]),
+                         (4, "2026-11-05T21:15:00Z", ["HW-EEI-2", "HW-PIR-2"]))
+        self.assertIn("filed 4 days before a date that document 2025-19846 (same RIN 0694-AK34) set", p["summary"])
+        self.assertEqual(props["headwind:inspection:2026-22868"]["direction"], "neutral")
+        self.assertEqual(props["headwind:inspection:2026-22925"]["countries"], ["CN"])
+        self.assertNotIn("Sanctions Action", json.dumps(fc))          # OFAC and BIS notices are not items
+        later = feed.inspection_features(dict(snap, generated_at="2026-11-20T12:00:00Z"), "2026-11-20T12:00:00Z",
+                                         "2026-11-22T12:00:00Z", None)
+        self.assertEqual(later, [])                                     # in the feed 7 days from filing
+
+    def test_lane_reads_each_text_once(self):
+        tmp = Path(tempfile.mkdtemp())
+        calls = []
+
+        def counting(url, timeout=60):
+            if "public-inspection/raw_text/" in url:
+                calls.append(url)
+            return fake_getter(url, timeout)
+        try:
+            with mock.patch.object(headwind_cli, "date", FixedDate):
+                out, recs = headwind_cli._lane_inspection(tmp / "raw", {}, counting)
+                self.assertEqual(len(out["inspection_issues"]), 30)      # a first run reads back 30 days
+                out["lanes"] = {"inspection": {"fetched_at": "2026-11-09T09:00:00Z"}}
+                self.assertEqual(len(out["inspection"]), 8)
+                self.assertEqual(len(calls), 4)                         # rules and USTR notices only
+                self.assertTrue(next(r for r in out["inspection"] if r["id"] == "2026-22793")["text"]["rins"])
+                calls.clear()
+                again, _ = headwind_cli._lane_inspection(tmp / "raw", out, counting)
+                self.assertEqual(calls, [])                             # same PDFs, texts kept
+                self.assertEqual([d["day"] for d in again["inspection_issues"]],
+                                 ["2026-11-09", "2026-11-08", "2026-11-07", "2026-11-06", "2026-11-05"])
+                self.assertEqual((inspection.days_to_read(date(2026, 11, 20), "2026-11-09T09:00:00Z"),
+                                  inspection.days_to_read(date(2026, 11, 20), None)), (16, 30))
+                self.assertEqual(len(again["inspection"]), 8)
+                h = health.build({"generated_at": "2026-11-09T15:00:00Z", "lanes": {"inspection": {"status": "ok"}},
+                                  **again}, {}, date(2026, 11, 9))["fr-public-inspection"]
+                self.assertEqual((h["state"], h["lane"]), ("up", "inspection"))
+                self.assertIn("8 BIS, OFAC and USTR filings in the last 30 days (4 counted only), 2 of 5 days",
+                              h["detail"])
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
 class TestEndToEnd(unittest.TestCase):
     def test_doctrine_registers_pass(self):
         self.assertEqual(registers.check(ROOT / "doctrine"), [])
@@ -599,7 +768,9 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
                              [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11)])
             self.assertTrue(list((tmp / "data" / "raw" / "eu-fsf").glob("*.xml.gz")))
-            self.assertEqual(len(snap["controls"]), 5)
+            self.assertEqual(len(snap["controls"]), 8)              # 5 rules and 3 USTR notices (one left out)
+            self.assertEqual(snap["lanes"]["inspection"]["status"], "ok")
+            self.assertIn("fr-public-inspection", snap["health"])
             self.assertTrue((tmp / "data" / "state" / "sanctions_index.json").exists())
             self.assertEqual(snap["screening"], [])                 # first reading
             self.assertEqual(len(snap["screening_lists"]), 12)
