@@ -8,6 +8,7 @@ an official list, and what an agency published. No item carries a judgment.
 from __future__ import annotations
 
 import calendar
+import json
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -23,6 +24,8 @@ METHOD = "headwind-1.6"
 DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
 RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
+# HW-WP-2 (doctrine/indicators.json) is about the countries in config/wfp_countries.json.
+WATCHED = frozenset(json.loads((ROOT / "config" / "wfp_countries.json").read_text(encoding="utf-8"))["countries"])
 
 SRC_OFAC = {
     "id": "ofac-sdn",
@@ -176,7 +179,8 @@ def _z_text(z) -> str:
 def _observation(item_id: str, title: str, summary: str, *, anomaly: bool, data_as_of: str, generated: str,
                  valid_until: str, countries: list[str], ncf: list[str], requirement_ids: list[str],
                  measures: dict, anchor: str, source: dict, indicator_id: str, baseline_ref: str,
-                 coverage: float, lane_accessed: str | None, ascope: list[str]) -> dict:
+                 coverage: float, lane_accessed: str | None, ascope: list[str],
+                 hypothesis_id: str | None = None) -> dict:
     props = {
         "contract": CONTRACT,
         "id": item_id,
@@ -208,9 +212,12 @@ def _observation(item_id: str, title: str, summary: str, *, anomaly: bool, data_
         "sources": [{**source, "accessed_at": lane_accessed or generated}],
     }
     if anomaly:
-        # No indicator_id: the contract ties an indicator to a hypothesis, and Headwind has no warning
-        # problem for economic stress yet. HW-IND-4 to HW-IND-6 are registered for when one is written.
         props["baseline_ref"] = baseline_ref
+        if hypothesis_id:
+            # HW-WP-2: an anomaly for a watched country (or an energy benchmark) is its indicator present. The
+            # direction is the register's: each indicator is emerging under the hypothesis named here.
+            props.update({"indicator_id": indicator_id, "hypothesis_id": hypothesis_id, "direction": "supports",
+                          "indicator_state": "present"})
     geom = None
     if len(countries) == 1:
         pt = geo.point(countries[0])
@@ -524,7 +531,8 @@ def live_features(snapshot: dict) -> list[dict]:
             anchor="fx", source=SRC_ECB, indicator_id="HW-IND-4",
             baseline_ref=f"rolling: the series' own {markets.FX_WINDOW} prior {markets.FX_HORIZON}-day changes; "
                          f"anomaly at |z| >= {stats.Z_ANOMALY:g} and a move of at least {markets.FX_FLOOR:g}%",
-            coverage=1.0, lane_accessed=accessed("fx"), ascope=["events"]))
+            coverage=1.0, lane_accessed=accessed("fx"), ascope=["events"],
+            hypothesis_id="HW-H-2A" if cc in WATCHED else None))
 
     for e in snapshot.get("energy") or []:
         feats.append(_observation(
@@ -539,7 +547,7 @@ def live_features(snapshot: dict) -> list[dict]:
             anchor="energy", source=SRC_EIA, indicator_id="HW-IND-5",
             baseline_ref=f"rolling: the series' own {markets.EN_WINDOW} prior {markets.EN_HORIZON}-day changes; "
                          f"anomaly at |z| >= {stats.Z_ANOMALY:g} and a move of at least {markets.EN_FLOOR:g}%",
-            coverage=1.0, lane_accessed=accessed("energy"), ascope=["events"]))
+            coverage=1.0, lane_accessed=accessed("energy"), ascope=["events"], hypothesis_id="HW-H-2B"))
 
     for c in snapshot.get("fao") or []:
         feats.append(_observation(
@@ -578,7 +586,8 @@ def live_features(snapshot: dict) -> list[dict]:
             indicator_id="HW-IND-6",
             baseline_ref=f"rolling: the country's own {food.WFP_WINDOW} prior monthly medians; anomaly at "
                          f"|z| >= {stats.Z_ANOMALY:g} and a median move of at least {food.WFP_FLOOR:g}%",
-            coverage=1.0, lane_accessed=accessed("wfp"), ascope=["events", "people"]))
+            coverage=1.0, lane_accessed=accessed("wfp"), ascope=["events", "people"],
+            hypothesis_id="HW-H-2A" if cc in WATCHED else None))
     return feats
 
 

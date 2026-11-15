@@ -437,6 +437,25 @@ class TestFeed(unittest.TestCase):
         self.assertIsNone(eur["geometry"])
         self.assertEqual(eur["properties"]["precision_class"], "none")
 
+    def test_hw_wp_2_indicators_on_anomalies(self):
+        snap = self.snapshot()
+        php = dict(snap["fx"][0], currency="PHP", country="PH", per_usd=61.2, prior_per_usd=57.0)
+        snap["fx"].append(php)
+        fc = feed.build_feed(snap)
+        self.assertEqual(lint(fc), [])
+        p = {f["properties"]["id"].split(":")[1] + ":" + f["properties"]["id"].split(":")[2]: f["properties"]
+             for f in fc["features"]}
+        self.assertEqual([p["fx:PHP"][k] for k in ("indicator_id", "hypothesis_id", "direction", "indicator_state")],
+                         ["HW-IND-4", "HW-H-2A", "supports", "present"])
+        self.assertNotIn("indicator_id", p["fx:TRY"])               # Turkey is not a watched country
+        self.assertNotIn("indicator_id", p["fx:EUR"])               # routine items carry none
+        self.assertEqual((p["energy:brent"]["indicator_id"], p["energy:brent"]["hypothesis_id"]), ("HW-IND-5", "HW-H-2B"))
+        self.assertEqual((p["localfood:SD"]["indicator_id"], p["localfood:SD"]["hypothesis_id"]), ("HW-IND-6", "HW-H-2A"))
+        self.assertNotIn("indicator_id", p["food:cereals"])         # HW-IND-3 has no warning problem
+        wp = next(w for w in json.loads((ROOT / "doctrine" / "indicators.json").read_text(encoding="utf-8"))["warning_problems"] if w["id"] == "HW-WP-2")
+        self.assertEqual([h["id"] for h in wp["hypotheses"]], ["HW-H-2A", "HW-H-2B", "HW-H-2C"])
+        self.assertTrue(all(cc in feed.WATCHED for cc in ("PH", "SD", "YE")))
+
     def test_list_changes_and_rules_are_counts_and_published_facts(self):
         snap = self.snapshot()
         old = sanctions.parse_sdn_csv(text("ofac_sdn.csv"))
