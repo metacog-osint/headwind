@@ -76,7 +76,8 @@
           SDN list, the UN Security Council's consolidated list, the EU's financial sanctions list and the UK
           Sanctions List. A list read for the first time sets its baseline; changes are counted from then. People and
           organizations are counts only; their names are on the publisher's list. Vessels are named, with their IMO
-          numbers. The date is when Headwind saw the change, not the date of the
+          numbers. An entry that stays on a list and changes its programs or type is counted as changed, and a
+          listed vessel whose name, IMO, MMSI, flag or type changes is named before and after. The date is when Headwind saw the change, not the date of the
           designation.</p></div>
       <div id="sanction-lists"></div>
       <div id="sanction-deltas"></div>
@@ -93,8 +94,10 @@
     <div class="card-head"><h2 id="sc-h">US export-control and screening lists</h2>
       <p class="muted small">The Entity List and the other US Commerce, State and Treasury lists, read from
         trade.gov's Consolidated Screening List. What changed between Headwind's own readings, as counts by the
-        address country each list gives. Counts only; the names are on the publishers' lists. An entry a publisher
-        edits can count as one removed and one added.</p></div>
+        address country each list gives. Counts only; the names are on the publishers' lists. An entry that stays on a
+        list and changes its programs, type or address country is counted as changed. trade.gov assigns the ids of
+        the BIS and State lists itself; an entry that comes back under a new id with the same name and type is
+        counted once, as the same entry.</p></div>
     <div id="screening-deltas"></div>
     <div class="scroll"><table id="screening-table"></table></div>
   </section>
@@ -116,7 +119,7 @@
     </section>
     <section class="card" aria-labelledby="src-h">
       <div class="card-head"><h2 id="src-h">Sources and their state</h2>
-        <p class="muted small">A source that failed shows its last good copy and says so.</p></div>
+        <p class="muted small">A source that failed shows its last good copy and says so. Fresh, late and stale compare a source's newest data with its own rhythm (business days for the ECB, months for FAO and WFP); read means it was read and its data carry no date to judge. A note flags a reading much smaller than usual, or a publisher date that has not moved for a long time.</p></div>
       <div id="lanes"></div>
     </section>
   </div>

@@ -19,7 +19,7 @@ from tic_doctrine import CONTRACT, geo  # noqa: E402
 from . import controls, food, markets, stats  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
-METHOD = "headwind-1.3"
+METHOD = "headwind-1.4"
 DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
 RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
@@ -254,6 +254,38 @@ def _vessel_text(word: str, vessels: list[dict]) -> str:
     return f" Vessels {word}: {'; '.join(one(v) for v in vessels[:VESSELS_IN_TEXT])}{tail}."
 
 
+def _changed_title(s: dict) -> str:
+    return f", {s['changed']} changed" if s.get("changed") else ""
+
+
+def _edit_text(s: dict) -> str:
+    """Entries that stayed on the list and changed: counts, and the programs gained and lost across them."""
+    if not s.get("changed"):
+        return ""
+    bits = [f"Changed {s['changed']} that stayed on the list"]
+    if s.get("changed_by_type"):
+        bits.append(f"by type, {_counts(s['changed_by_type'])}")
+    if s.get("programs_gained"):
+        bits.append(f"programs gained, {_counts(s['programs_gained'])}")
+    if s.get("programs_lost"):
+        bits.append(f"programs lost, {_counts(s['programs_lost'])}")
+    if s.get("retyped"):
+        bits.append(f"type changed, {_counts(s['retyped'])}")
+    return "; ".join(bits) + "."
+
+
+def _renamed_text(vessels: list[dict], limit: int = 25) -> str:
+    """Vessels that stayed listed and changed a public detail (name, IMO, MMSI, flag or type): before and after."""
+    if not vessels:
+        return ""
+    rows = []
+    for v in vessels[:limit]:
+        moves = ", ".join(f"{f} {a or 'none'} to {b or 'none'}" for f, (a, b) in v["changed"].items())
+        rows.append(f"{v.get('name') or 'unnamed'}" + (f" (IMO {v['imo']})" if v.get("imo") else "") + f": {moves}")
+    more = f" and {len(vessels) - limit} more" if len(vessels) > limit else ""
+    return f" Vessels still listed whose details changed ({len(vessels)}): {'; '.join(rows)}{more}."
+
+
 def list_features(snapshot: dict) -> list[dict]:
     """Sanctions-list changes and Federal Register rules. Counts and published facts; tier routine."""
     generated = snapshot["generated_at"]
@@ -272,20 +304,23 @@ def list_features(snapshot: dict) -> list[dict]:
         if s["removed"]:
             parts.append(f"Removed {s['removed']}: by type, {_counts(s['removed_by_type'])}; by program, "
                          f"{_counts(s['removed_by_program'])}.")
+        parts.append(_edit_text(s))
         since = f" since Headwind's reading of {s['prior_checked_at'][:10]}" if s.get("prior_checked_at") else ""
         feats.append(_official(
             f"headwind:sanctions:{s['id']}",
-            f"{s['list_name']}: {s['added']} added, {s['removed']} removed",
-            f"{' '.join(parts)} The list now holds {s['total']} entries. This is the difference between two of "
+            f"{s['list_name']}: {s['added']} added, {s['removed']} removed{_changed_title(s)}",
+            f"{' '.join(x for x in parts if x)} The list now holds {s['total']} entries. This is the difference between two of "
             f"Headwind's readings{since}, seen on {s['detected_at'][:10]}; the dates of the designations are in "
             f"the publisher's own notices.{_vessel_text('added', s.get('vessels_added') or [])}"
-            f"{_vessel_text('removed', s.get('vessels_removed') or [])} People and organizations are counts "
+            f"{_vessel_text('removed', s.get('vessels_removed') or [])}{_renamed_text(s.get('vessels_changed') or [])}"
+            f" People and organizations are counts "
             f"only; their names are on the official list.",
             data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
             pmesii=["economic", "political"], ascope=["organizations"],
             ncf=["maintain_supply_chains", "provide_funding_liquidity"], requirement_ids=["HW-PIR-1"],
             measures={"added": s["added"], "removed": s["removed"], "total": s["total"],
-                      "vessels_added": s["added_by_type"].get("vessel", 0)},
+                      "changed": s.get("changed", 0), "vessels_added": s["added_by_type"].get("vessel", 0),
+                      "vessels_changed": len(s.get("vessels_changed") or [])},
             visual={"type": "page", "url": f"{SITE}/#sanctions"},
             source=LIST_SOURCE[s["list"]],
             accessed=(lanes.get("sanctions") or {}).get("fetched_at")))
@@ -299,18 +334,22 @@ def list_features(snapshot: dict) -> list[dict]:
                 by_prog = s[key + "_by_program"]
                 prog = f"; by program, {_counts(by_prog)}" if by_prog else ""
                 parts.append(f"{word} {s[key]}: by address country, {_counts(s[key + '_by_country'])}{prog}.")
+        parts.append(_edit_text(s))
+        if s.get("rekeyed"):
+            parts.append(f"{s['rekeyed']} {'entry' if s['rekeyed'] == 1 else 'entries'} came back under a new id with "
+                         f"the same name and type, counted as the same entry and not as removed and added.")
         since = f" since Headwind's reading of {s['prior_checked_at'][:10]}" if s.get("prior_checked_at") else ""
         feats.append(_official(
             f"headwind:screening:{s['id']}",
-            f"{s['list_name']} ({s['publisher']}): {s['added']} added, {s['removed']} removed",
-            f"{' '.join(parts)} The list now holds {s['total']} entries. This is the difference between two of "
+            f"{s['list_name']} ({s['publisher']}): {s['added']} added, {s['removed']} removed{_changed_title(s)}",
+            f"{' '.join(x for x in parts if x)} The list now holds {s['total']} entries. This is the difference between two of "
             f"Headwind's readings of the Consolidated Screening List{since}, seen on {s['detected_at'][:10]}; the "
-            f"dates of the listings are in the publisher's own notices. An entry the publisher edits can count as "
-            f"one removed and one added. Counts only; names are on the official list.",
+            f"dates of the listings are in the publisher's own notices. Counts only; names are on the official list.",
             data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
             pmesii=["economic", "political"], ascope=["organizations"],
             ncf=["maintain_supply_chains", "manufacture_equipment"], requirement_ids=["HW-PIR-1"],
-            measures={"added": s["added"], "removed": s["removed"], "total": s["total"]},
+            measures={"added": s["added"], "removed": s["removed"], "total": s["total"],
+                      "changed": s.get("changed", 0), "rekeyed": s.get("rekeyed", 0)},
             visual={"type": "page", "url": f"{SITE}/#screening"},
             source={**SRC_CSL, "url": s.get("url") or SRC_CSL["url"]},
             accessed=(lanes.get("screening") or {}).get("fetched_at")))
@@ -447,5 +486,9 @@ def build_feed(snapshot: dict) -> dict:
                         "and Development Office; US International Trade Administration; "
                         "US Federal Register."),
         "language_key": LANGUAGE_KEY,
+        # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read
+        # it, how old its newest data are, and any drift or quiet-publisher warning. COP and the kit's history log
+        # read this; a source shown "failing" is a last good copy, not a quiet one.
+        "health": snapshot.get("health") or {},
         "features": features,
     }

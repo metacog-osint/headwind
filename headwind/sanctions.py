@@ -255,22 +255,56 @@ def _tally(index: dict, ids) -> tuple[dict, dict]:
     return dict(sorted(by_type.items())), dict(by_group.most_common())
 
 
-def status(list_id: str, index: dict, checked_at: str, baseline_set_at: str, source_generated: str | None = None) -> dict:
+def status(list_id: str, index: dict, checked_at: str, baseline_set_at: str, source_generated: str | None = None,
+           last_change_at: str | None = None) -> dict:
     by_type, _ = _tally(index, index)
     out = {"id": list_id, "name": LISTS[list_id]["name"], "publisher": LISTS[list_id]["publisher"],
            "url": LISTS[list_id]["url"], "total": len(index), "by_type": by_type, "checked_at": checked_at,
-           "baseline_set_at": baseline_set_at, "source_generated": source_generated}
+           "baseline_set_at": baseline_set_at, "source_generated": source_generated, "last_change_at": last_change_at}
     unknown = unknown_programs(list_id, index)
     if unknown:
         out["unknown_programs"] = unknown
     return out
 
 
+VESSEL_FIELDS = ("name", "imo", "mmsi", "flag", "vessel_type")
+
+
+def edits(prev_index: dict, index: dict) -> dict:
+    """Entries on both readings whose type or programs changed, and vessels whose public details changed.
+
+    Returns counts only for people and organizations: how many entries changed, and which programs were
+    gained and lost across them. Vessels are named, as on additions: before and after for each field that moved.
+    An index written before vessel details were kept gives no vessel comparison."""
+    changed, gained, lost, retyped, vessels = [], Counter(), Counter(), Counter(), []
+    for i in sorted(set(index) & set(prev_index)):
+        old, new = prev_index[i], index[i]
+        if old[0] != new[0] or sorted(old[1]) != sorted(new[1]):
+            changed.append(i)
+            gained.update(set(new[1]) - set(old[1]))
+            lost.update(set(old[1]) - set(new[1]))
+            if old[0] != new[0]:
+                retyped[f"{old[0]} to {new[0]}"] += 1
+        if new[0] == "vessel" and len(old) > 2 and len(new) > 2:
+            moved = {f: [old[2].get(f), new[2].get(f)] for f in VESSEL_FIELDS if old[2].get(f) != new[2].get(f)}
+            if moved:
+                vessels.append({"list_id": i, "name": new[2].get("name"), "imo": new[2].get("imo"),
+                                "changed": moved, "programs": new[1]})
+    by_type = Counter(index[i][0] for i in changed)
+    return {"changed": len(changed), "changed_by_type": dict(sorted(by_type.items())),
+            "programs_gained": dict(gained.most_common()), "programs_lost": dict(lost.most_common()),
+            "retyped": dict(retyped), "vessels_changed": sorted(vessels, key=lambda v: v["name"] or "")}
+
+
 def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None) -> dict | None:
-    """The difference between two readings of one list, or None when nothing changed."""
+    """The difference between two readings of one list, or None when nothing changed.
+
+    Additions and removals are ids that appear or go; a change is an id on both readings whose type or
+    programs moved (or, for a vessel, its name, IMO, MMSI, flag or type)."""
     added = sorted(set(index) - set(prev_index))
     removed = sorted(set(prev_index) - set(index))
-    if not added and not removed:
+    ed = edits(prev_index, index)
+    if not added and not removed and not ed["changed"] and not ed["vessels_changed"]:
         return None
     a_type, a_group = _tally(index, added)
     r_type, r_group = _tally(prev_index, removed)
@@ -283,7 +317,9 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
         "added_by_type": a_type, "added_by_program": a_group,
         "removed_by_type": r_type, "removed_by_program": r_group,
         "vessels_added": _vessels(index, added), "vessels_removed": _vessels(prev_index, removed),
-        "countries": countries_for(list(a_group) + list(r_group), list_id),
+        **ed,
+        "countries": countries_for(list(a_group) + list(r_group) + list(ed["programs_gained"])
+                                   + list(ed["programs_lost"]), list_id),
     }
 
 

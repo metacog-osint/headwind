@@ -15,6 +15,7 @@ Headwind saw the change, not the date of the listing.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from collections import Counter
@@ -37,6 +38,13 @@ def split_source(source: str) -> tuple[str, str, str]:
     if not m:
         raise ValueError(f"screening list: source name not understood: {source!r}")
     return m["abbr"], m["name"] + (m["tail"] or ""), "US " + m["pub"].strip()
+
+
+def name_key(name: str | None) -> str | None:
+    """A short hash of an entry's name, kept only in the private state, so that an entry whose id changes
+    when its publisher edits it can be paired with itself. Never published."""
+    norm = re.sub(r"[^0-9a-z]+", " ", (name or "").casefold()).strip()
+    return hashlib.sha1(norm.encode("utf-8")).hexdigest()[:12] if norm else None
 
 
 def _countries(entry: dict) -> list[str]:
@@ -74,7 +82,7 @@ def parse(body: bytes | str) -> dict[str, dict]:
         if e.get("source_list_url") and lst["url"] == CSL_PAGE:
             lst["url"] = e["source_list_url"]
         lst["index"][entry_id] = [(e.get("type") or "not stated").lower(), sorted(e.get("programs") or []),
-                                  _countries(e)]
+                                  _countries(e), name_key(e.get("name"))]
     return lists
 
 
@@ -92,7 +100,7 @@ def check_size(lists: dict[str, dict], prev_lists: dict[str, dict] | None) -> No
 def _tally(index: dict, ids) -> tuple[dict, dict, dict]:
     by_type, by_program, by_country = Counter(), Counter(), Counter()
     for i in ids:
-        kind, programs, countries = index[i]
+        kind, programs, countries = index[i][:3]
         by_type[kind] += 1
         for p in programs:
             by_program[p] += 1
@@ -107,12 +115,48 @@ def status(abbr: str, lst: dict, checked_at: str, baseline_set_at: str) -> dict:
             "source_last_updated": lst.get("source_last_updated")}
 
 
+def rekeyed(index: dict, prev_index: dict, added: list, removed: list) -> list[tuple[str, str]]:
+    """(old id, new id) pairs: an id that went and an id that came on the same list with the same name and type,
+    where that name is on no other entry going or coming. trade.gov assigns the ids of the BIS and State lists
+    itself, and whether an edit changes them is not known; a pair like this is the same entry under a new id."""
+    def by_key(idx, ids):
+        groups: dict = {}
+        for i in ids:
+            e = idx[i]
+            if len(e) > 3 and e[3]:
+                groups.setdefault((e[3], e[0]), []).append(i)
+        return {k: v[0] for k, v in groups.items() if len(v) == 1}
+    gone, came = by_key(prev_index, removed), by_key(index, added)
+    return sorted((gone[k], came[k]) for k in set(gone) & set(came))
+
+
+def edits(prev_index: dict, index: dict, pairs: list[tuple[str, str]]) -> dict:
+    """Entries on both readings (or re-keyed) whose type, programs or address countries changed. Counts only."""
+    changed, gained, lost = [], Counter(), Counter()
+    both = [(i, i) for i in sorted(set(index) & set(prev_index))] + list(pairs)
+    for old_id, new_id in both:
+        old, new = prev_index[old_id][:3], index[new_id][:3]
+        if old[0] != new[0] or sorted(old[1]) != sorted(new[1]) or sorted(old[2]) != sorted(new[2]):
+            changed.append(new_id)
+            gained.update(set(new[1]) - set(old[1]))
+            lost.update(set(old[1]) - set(new[1]))
+    return {"changed": len(changed), "programs_gained": dict(gained.most_common()),
+            "programs_lost": dict(lost.most_common())}
+
+
 def delta(abbr: str, lst: dict, prev_index: dict, detected_at: str, prior_checked_at: str | None) -> dict | None:
-    """The difference between two readings of one list, or None when nothing changed."""
+    """The difference between two readings of one list, or None when nothing changed.
+
+    An id that went and one that came with the same name and type are counted once, as re-keyed, and not as a
+    removal and an addition."""
     index = lst["index"]
     added = sorted(set(index) - set(prev_index))
     removed = sorted(set(prev_index) - set(index))
-    if not added and not removed:
+    pairs = rekeyed(index, prev_index, added, removed)
+    added = sorted(set(added) - {n for _, n in pairs})
+    removed = sorted(set(removed) - {o for o, _ in pairs})
+    ed = edits(prev_index, index, pairs)
+    if not added and not removed and not pairs and not ed["changed"]:
         return None
     a_type, a_prog, a_cc = _tally(index, added)
     r_type, r_prog, r_cc = _tally(prev_index, removed)
@@ -123,6 +167,7 @@ def delta(abbr: str, lst: dict, prev_index: dict, detected_at: str, prior_checke
         "added": len(added), "removed": len(removed), "total": len(index),
         "added_by_type": a_type, "added_by_program": a_prog, "added_by_country": a_cc,
         "removed_by_type": r_type, "removed_by_program": r_prog, "removed_by_country": r_cc,
+        "rekeyed": len(pairs), **ed,
         "countries": sorted(c for c in set(a_cc) | set(r_cc) if _CC_RE.match(c)),
     }
 

@@ -424,7 +424,7 @@ class TestListParsers(unittest.TestCase):
         self.assertEqual(lists["EL"]["publisher"], "US Bureau of Industry and Security")
         self.assertEqual(lists["MEU"]["name"], "Military End User List")
         self.assertEqual(lists["FSE"]["index"], {})                 # named in the file, no entries
-        kind, programs, countries = next(iter(lists["EL"]["index"].values()))
+        kind, programs, countries = next(iter(lists["EL"]["index"].values()))[:3]
         self.assertEqual((kind, programs), ("not stated", []))
         self.assertTrue(countries and all(len(c) == 2 for c in countries))
         self.assertEqual(lists["EL"]["source_last_updated"][:10], "2026-08-21")
