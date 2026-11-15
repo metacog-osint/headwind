@@ -4,6 +4,16 @@ Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind
 energy and food prices measured against their own normal range, changes to official sanctions and US screening
 lists, export-control and sanctions rules, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No probabilities, no investment advice.
 
+**State, 15 Nov 2026, 9:35 AM CST: steps 7, 8 and 9 done, nothing pushed.** Commits waiting for Tom's push at the
+end: Headwind `d320d8e` (step 7), `0ec47f2` (notes), `ce03e81` (step 9, ships across lists) and this notes commit,
+on `live/first-slice`; **Verdict `800efd6` on `main`** (step 8: `calendar --sync headwind`, the daily workflow pulls
+Headwind's events after Cordon's and only warns if Headwind fails; a Federal Register document number links
+forecasts like a CZIB number; kit 0.5.2 synced, so Headwind is listed live; 23 Verdict tests pass, the dry run merged
+all 11 of Headwind's events with no calendar problem). Headwind's `question_drafts.json` is still read by nothing:
+a Verdict draft needs a probability Tom approves, and Headwind's drafts carry only a base rate. Next: step 10, then
+HW-WP-2 into the register, 11, 12, 13, 14, 15, 16, as listed below. Before pushing, list what is ahead in each repo
+(Verdict's `main` is shared with other sessions; a worktree `D:\Projects\_worktrees\verdict-pre-easa` exists).
+
 **State, 14 Nov 2026, 10:00 PM CST: working through the remaining plan** (Tom: "complete all remaining open and
 incomplete items"; commit each step once tests and check pass, **push nothing until Tom says so at the end**, in any
 repo). Done: **step 7** (`d320d8e`, watch for the next USGS Summaries and a newer critical minerals list; see
