@@ -4,6 +4,15 @@ Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind
 energy and food prices measured against their own normal range, changes to official sanctions and US screening
 lists, export-control and sanctions rules, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No probabilities, no investment advice.
 
+**State, 14 Nov 2026, 9:10 PM CST: `headwind-1.5` live** (Tom: push, keep the method bump, delete `tic-nav-v1.10`,
+update the plan file without committing it). `9fbc526` is on `main` and `live/first-slice`; run 43670866655 (9:07 PM
+CST) passed every step and deployed: all ten lanes ok, 60 items, 13 health entries (4 fresh, 9 up), check PASS, state
+from cache key `headwind-state-43664358348-1`, saved as `-43670866655-1`. It logged "uk-sanctions: vessel details
+were kept in an older form; not compared this run" once in collect, as expected; the run after it should not. Still
+no list change on the live site (0 sanctions and 0 screening changes; baselines unchanged). The local branch
+`tic-nav-v1.10` is deleted. Headwind's row and step 13 in `_ideas/new-programs.md` were brought up to date, not
+committed. The paragraph below is the state before this.
+
 **State, 14 Nov 2026, 8:45 PM CST: `headwind-1.5` committed on `live/first-slice`, not pushed or deployed** (plan
 step 6, Tom's "Start with step 6", then "Commit"). The stale worktree `headwind-nav110` was removed the same
 evening (Tom's yes). Vessel naming was tested on real UK changes: six Wayback copies of the UK Sanctions List (1 Oct
