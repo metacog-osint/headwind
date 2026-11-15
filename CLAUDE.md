@@ -4,11 +4,17 @@ Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind
 energy and food prices measured against their own normal range, changes to official sanctions and US screening
 lists, export-control and sanctions rules, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No probabilities, no investment advice.
 
-**Built 14 Nov 2026, about 5:30 PM CST, not yet committed (Tom's "Build items 1-5"): `headwind-1.4`.** Source
-health in the feed and on the page, one fetch retry, drift checks, edits to entries that stay on a list (and
-re-keyed trade.gov entries), kit 0.5.2 with a kit test, and a second private copy of the run state in the release
-`state`. See "Source health and state (`headwind-1.4`)" below. 38 tests pass; a live collect, build and check
-passed locally at 4:51 PM CST. Not on `main` and not on the runner yet.
+**State, 14 Nov 2026, 7:30 PM CST: `headwind-1.4` live** (Tom's "Build items 1-5", then yes to commit and to push).
+Source health in the feed and on the page, one fetch retry, drift checks, edits to entries that stay on a list
+(and re-keyed trade.gov entries), kit 0.5.2 with a kit test, and a second private copy of the run state in the
+release `state`. See "Source health and state (`headwind-1.4`)" below. `6865f16` is on `main` and
+`live/first-slice`; run 43662609087 (7:20 PM CST) passed every step and deployed: 60 items, 13 health entries
+(4 fresh, 9 read), state restored from the cache, and the `state` prerelease created with `headwind-state.tar.gz`
+and `headwind-state-2026-11-15.tar.gz` (468 KB each). 38 tests pass. Drift checks start after three readings. Still
+open for Tom: COP reading per-source health (a COP change), EU `UKR` (recommended: Russia only, since 1,609 of its
+2,962 entries name Russia and 86 Ukraine) and `SDNZ` (recommended: Sudan; its entries' addresses are Sudan and the
+UAE and it cites EU Sudan acts), and the stale worktree `D:\Projects\_worktrees\headwind-nav110`. The paragraph
+below is the state before this.
 
 **State, 14 Nov 2026, 3:40 PM CST: live and updating itself.** Ten lanes, method `headwind-1.3`; the sanctions lane
 reads four lists (OFAC, UN, EU, UK) since `df39196`, and the minerals lane carries the 2025 critical minerals list
