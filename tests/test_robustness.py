@@ -171,6 +171,74 @@ class TestListEdits(unittest.TestCase):
         self.assertIsNone(screening.delta("EL", same, old_format, "2026-11-15T00:00:00Z", None))
 
 
+FIX = ROOT / "tests" / "fixtures"
+
+
+class TestUkShips(unittest.TestCase):
+    """Cut from the UK Sanctions List as published on 1 Oct and 12 Nov 2026 (Wayback copies), checked against
+    FCDO's Russia notices of 2 Oct, 8 Oct and 12 Nov 2026."""
+
+    def read(self, day):
+        return sanctions.parse_uk_xml((FIX / f"uk_ships_{day}.xml").read_bytes())[1]
+
+    def test_names_come_out_of_fcdos_imo_forms(self):
+        idx = self.read("2026-11-12")
+        names = {k: (v[2]["name"], v[2]["imo"], v[2].get("name_is_alias", False)) for k, v in idx.items()}
+        self.assertEqual(names, {
+            "DPR0075": ("Petrel 8", "9562233", False),             # a plain primary name, kept as printed
+            "RUS3751": ("GALLE ENERGY", "9344411", False),         # IMO 9344411 ("GALLE ENERGY")
+            "RUS3752": ("BEBEK-E", "7808401", False),              # IMO 7808401 (BEBEK-E)
+            "RUS3775": ("BELLARIS", "9332614", False),             # IMO 9332614 ("BELLARIS")
+            "RUS3805": ("PERLE", "9630028", True),                 # IMO9630028, alias PERLE
+            "RUS3810": ("YVIKA", "9252967", True)})                # IMO 9252967, alias YVIKA
+        self.assertEqual(sanctions.uk_ship_name("IMO 9000001 (“CURLY”)", []), ("CURLY", False))
+        self.assertEqual(sanctions.uk_ship_name("IMO 9000001", ["IMO9000001", "REAL NAME"]), ("REAL NAME", True))
+        self.assertEqual(sanctions.uk_ship_name("IMO 9000001", []), (None, False))
+
+    def test_a_ship_remade_under_a_new_id_is_one_entry(self):
+        old, new = self.read("2026-10-01"), self.read("2026-11-12")
+        d = sanctions.delta("uk-sanctions", old, new, "2026-11-13T00:00:00Z", "2026-10-01T15:38:55Z")
+        self.assertEqual((d["added"], d["removed"], d["rekeyed"], d["changed"]), (3, 0, 2, 0))
+        self.assertEqual([(v["name"], v["old_id"], v["list_id"]) for v in d["vessels_rekeyed"]],
+                         [("BEBEK-E", "RUS3739", "RUS3752"), ("GALLE ENERGY", "RUS3747", "RUS3751")])
+        self.assertEqual([v["name"] for v in d["vessels_added"]], ["BELLARIS", "PERLE", "YVIKA"])
+        self.assertEqual((d["vessels_removed"], d["vessels_changed"]), ([], []))    # quotes differ; the name does not
+        p = feed.list_features({"generated_at": "2026-11-13T00:00:00Z", "sanctions": [d], "lanes": {}})[0]["properties"]
+        self.assertEqual(p["title"], "UK Sanctions List: 3 added, 0 removed, 2 under a new id")
+        self.assertIn("BEBEK-E (IMO 7808401, RUS3739 to RUS3752)", p["summary"])
+        self.assertIn("PERLE (alias, IMO 9630028, flag Oman)", p["summary"])
+        self.assertEqual(p["measures"]["rekeyed"], 2)
+        # A ship that goes under one regime and comes under another keeps its IMO: one entry, programs moved.
+        moved = {k: [v[0], ["Iran"], *v[2:]] if k == "RUS3752" else v for k, v in new.items()}
+        d = sanctions.delta("uk-sanctions", old, moved, "2026-11-13T00:00:00Z", None)
+        self.assertEqual((d["rekeyed"], d["changed"], d["programs_gained"], d["programs_lost"]),
+                         (2, 1, {"Iran": 1}, {"Russia": 1}))
+
+    def test_a_reading_kept_in_the_old_form_is_not_reported_as_renamed(self):
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            raw = tmp / "data" / "raw"
+            state = tmp / "data" / "state" / "sanctions_index.json"
+            state.parent.mkdir(parents=True)
+            idx = sanctions.parse_uk_xml((FIX / "uk_sanctions.xml").read_bytes())[1]
+            ship = next(k for k, v in idx.items() if v[0] == "vessel")
+            idx[ship][2]["name"] = "IMO 9000001 (OLD FORM)"
+            state.write_text(json.dumps({"uk-sanctions": {"checked_at": "2026-11-14T00:00:00Z",
+                                                          "baseline_set_at": "2026-11-14T00:00:00Z",
+                                                          "index": idx}}), encoding="utf-8")
+            out, _ = headwind_cli._lane_sanctions(raw, {}, fake_getter)
+            self.assertEqual(out["sanctions"], [])                  # an older form: vessel details not compared
+            kept = json.loads(state.read_text(encoding="utf-8"))["uk-sanctions"]
+            self.assertEqual(kept["vessel_format"], sanctions.VESSEL_FORMAT["uk-sanctions"])
+            kept["index"][ship][2]["name"] = "A REAL OLD NAME"      # same form now: a rename is reported
+            state.write_text(json.dumps({"uk-sanctions": kept}), encoding="utf-8")
+            out, _ = headwind_cli._lane_sanctions(raw, {}, fake_getter)
+            uk = [d for d in out["sanctions"] if d["list"] == "uk-sanctions"]
+            self.assertEqual([v["changed"]["name"][0] for v in uk[0]["vessels_changed"]], ["A REAL OLD NAME"])
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
 class TestRetry(unittest.TestCase):
     def test_a_timeout_is_tried_once_more_and_a_refusal_is_not(self):
         class Resp:

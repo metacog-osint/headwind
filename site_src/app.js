@@ -94,10 +94,15 @@
       function ships(word, vs) {
         if (!vs || !vs.length) { return; }
         lines.push("Vessels " + word + ": " + vs.map(function (v) {
-          return v.name + " (" + (v.imo ? "IMO " + v.imo : "no IMO number given") + (v.flag ? ", flag " + v.flag : "") + ")";
+          return (v.name || "unnamed") + " (" + (v.name_is_alias ? "alias, " : "") + (v.imo ? "IMO " + v.imo : "no IMO number given") + (v.flag ? ", flag " + v.flag : "") + ")";
         }).join("; ") + ".");
       }
       ships("added", d.vessels_added); ships("removed", d.vessels_removed);
+      if ((d.vessels_rekeyed || []).length) {
+        lines.push("Vessels removed and listed again under a new entry id with the same IMO number, counted as the same entry: " + d.vessels_rekeyed.map(function (v) {
+          return (v.name || "unnamed") + " (IMO " + v.imo + ", " + v.old_id + " to " + v.list_id + ")";
+        }).join("; ") + ".");
+      }
       edited(lines, d);
       if ((d.vessels_changed || []).length) {
         lines.push("Vessels still listed whose details changed: " + d.vessels_changed.map(function (v) {
@@ -106,7 +111,7 @@
           }).join(", ");
         }).join("; ") + ".");
       }
-      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "")) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
+      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
     }).join("") || (lists.length ? '<p class="small muted">No change seen in the last 30 days of readings.</p>' : "");
 
     var sl = s.screening_lists || [];
@@ -120,7 +125,7 @@
       if (d.removed) { lines.push("Removed by address country: " + counts(d.removed_by_country) + "."); }
       edited(lines, d);
       if (d.rekeyed) { lines.push(d.rekeyed + " came back under a new id with the same name and type, counted as the same entry."); }
-      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "")) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(d.publisher + ". " + lines.join(" ")) + "</div></div>";
+      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(d.publisher + ". " + lines.join(" ")) + "</div></div>";
     }).join("") || (sl.length ? '<p class="small muted">No change seen in the last 30 days of readings. Compared since ' + esc(when(sl[0].baseline_set_at)) + ".</p>" : "");
     table("screening-table", ["List", "Publisher", "Entries", "Publisher's last update"], sl.map(function (l) {
       return ['<a href="' + esc(l.url) + '" rel="noopener">' + esc(l.name) + "</a>", esc(l.publisher), esc(Number(l.total).toLocaleString()), esc(day(l.source_last_updated))];

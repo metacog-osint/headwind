@@ -192,14 +192,19 @@ def _lane_sanctions(raw_dir, prev, getter):
             continue
         recs.append(rec)
         last_change = old.get("last_change_at")
+        form = sanctions.VESSEL_FORMAT.get(list_id, 1)
         if old.get("index"):
-            d = sanctions.delta(list_id, old["index"], index, now, old.get("checked_at"))
+            same_form = old.get("vessel_format", 1) == form
+            if not same_form:
+                print(f"  sanctions: {list_id}: vessel details were kept in an older form; not compared this run",
+                      file=sys.stderr)
+            d = sanctions.delta(list_id, old["index"], index, now, old.get("checked_at"), compare_vessels=same_form)
             if d:
                 deltas.append(d)
                 last_change = now
         baseline_set = old.get("baseline_set_at") or now
         new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "last_change_at": last_change,
-                              "index": index}
+                              "vessel_format": form, "index": index}
         lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated, last_change))
     if not recs:
         raise RuntimeError("no sanctions list could be read: " + "; ".join(errors))

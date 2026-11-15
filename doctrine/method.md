@@ -1,4 +1,4 @@
-# Headwind method (`headwind-1.4`)
+# Headwind method (`headwind-1.5`)
 
 ## Purpose
 Headwind measures economic stress: currencies, energy and food prices that move outside their own
@@ -68,6 +68,13 @@ by sanctions program. Headwind does not republish the names of people or organiz
 - **Edits are seen (`headwind-1.4`).** An entry on both readings whose type or programs changed is
   counted as changed, with the programs gained and lost across those entries. A listed vessel whose
   name, IMO number, MMSI, flag or type changed is named, before and after.
+- **A ship remade under a new id is one entry (`headwind-1.5`).** A vessel that goes and a vessel that
+  comes on the same list with the same IMO number, and no other vessel with that number going or coming,
+  are counted once, as re-keyed, and compared as one entry. The UK revokes and remakes a ship's
+  specification under a new id (2 Oct 2026: two ships); the ship never leaves the list.
+- **UK ship names.** The UK names many ships it specifies by IMO number, as `IMO 9344411 ("GALLE ENERGY")`
+  or as the number alone with the ship's name given only as an alias. Headwind shows the name in brackets,
+  else the alias, marked as an alias.
 
 ## Screening lists
 The same measure, applied to each list in the US International Trade Administration's Consolidated
