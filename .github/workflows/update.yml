@@ -17,7 +17,8 @@ name: update
 # first_reading ticked. State is saved after the feed check and before the deploy, so a failed deploy does not
 # lose a change.
 #
-# Secrets: EIA_API_KEY (energy lane; without it that lane fails and the rest run), CLOUDFLARE_PAGES_TOKEN
+# Secrets: EIA_API_KEY (energy lane; without it that lane fails and the rest run), CENSUS_API_KEY (the trade lane,
+# US mineral imports by country; the same), CLOUDFLARE_PAGES_TOKEN
 # (Cloudflare Pages: Edit), and the account ID as repo variable CLOUDFLARE_ACCOUNT_ID. Without the Cloudflare
 # pair everything runs except the deploy. Collected data is not committed.
 #
@@ -83,6 +84,7 @@ jobs:
         run: python tools/headwind.py collect
         env:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
       - name: Build site/
         run: python tools/headwind.py build
       - name: Feed check

@@ -14,6 +14,7 @@ import json
 import os
 import sys
 import urllib.error
+import urllib.parse
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -22,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      markets, minerals, releases, sanctions, screening)
+                      markets, minerals, releases, sanctions, screening, trade)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -38,12 +39,13 @@ LANE_FIELDS = {
     "controls": ["controls", "scheduled_dates"],
     "inspection": ["inspection", "inspection_issues"],
     "minerals": ["minerals"],
+    "trade": ["mineral_trade"],
 }
 EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
          "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
          "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
          "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
-         "minerals": {}}
+         "minerals": {}, "mineral_trade": {}}
 
 
 def _lane_fx(raw_dir, prev, getter):
@@ -101,6 +103,53 @@ def _lane_energy(raw_dir, prev, getter):
         series.update(markets.parse_eia_json(body, ids))
         recs.append(rec)
     return {"energy": markets.measure_energy(series)}, recs
+
+
+def census_key_file() -> Path:
+    return Path(os.environ.get("HEADWIND_CENSUS_KEY_FILE") or Path.home() / ".headwind" / "census_api_key.txt")
+
+
+def _census_key() -> str:
+    """The Census Bureau API key, from CENSUS_API_KEY or a one-line file outside the repository. Never logged."""
+    key = (os.environ.get("CENSUS_API_KEY") or "").strip()
+    if not key and census_key_file().is_file():
+        key = census_key_file().read_text(encoding="utf-8-sig").strip()
+    if not key:
+        raise RuntimeError(f"no Census API key: set CENSUS_API_KEY or put the key in {census_key_file()}")
+    return key
+
+
+def _lane_trade(raw_dir, prev, getter):
+    """US imports of critical minerals by source country (Census Bureau). Monthly; context, not feed items. One
+    request per HS code; a code that fails is named and the others go on."""
+    key = _census_key()
+    base = getter or fetch.get
+
+    def keyed(url, timeout=60):
+        # The key goes only into the request as sent, so the recorded URL stays keyless; it is kept out of errors too.
+        try:
+            return base(url + "&key=" + urllib.parse.quote(key), timeout)
+        except Exception as exc:
+            raise OSError(f"{type(exc).__name__}: {exc}".replace(key, "[key]")) from None
+
+    today = date.today()
+    y, m = today.year, today.month - trade.MONTHS
+    while m < 1:
+        y, m = y - 1, m + 12
+    start = f"{y:04d}-{m:02d}"
+    parsed, errors, recs = {}, [], []
+    for code in trade.CODES:
+        try:
+            body, rec = fetch.fetch("census-trade", trade.url(code, start), raw_dir, "json", getter=keyed)
+            parsed[code] = trade.parse(body)
+            recs.append(rec)
+        except Exception as exc:  # noqa: BLE001 - one code's failure is reported on the lane
+            errors.append(f"{code}: {type(exc).__name__}: {exc}"[:200])
+    end = max((max(p["months"]) for p in parsed.values() if p["months"]), default=None)
+    records = [trade.summarize(code, p, end, start) for code, p in parsed.items()]
+    if not records:
+        raise RuntimeError("no Census trade code could be read: " + "; ".join(errors[:3]))
+    return {"mineral_trade": trade.build(records, errors)}, recs
 
 
 def _lane_fao(raw_dir, prev, getter):
@@ -360,7 +409,8 @@ def _minerals_watch(raw_dir, getter, recs) -> dict:
 
 LANES = {"fx": _lane_fx, "gem": _lane_gem, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
          "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
-         "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals}
+         "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals,
+         "trade": _lane_trade}
 
 
 def finish_snapshot(snap: dict, today: date) -> dict:
@@ -487,7 +537,7 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                      "energy", "fao",
                                      "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
                                      "screening_lists", "controls", "inspection", "inspection_issues", "minerals",
-                                     "question_drafts", "vessel_crosslist")}
+                                     "question_drafts", "vessel_crosslist", "mineral_trade")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
 
@@ -506,7 +556,9 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
             "countries": snap.get("baseline") or {},
         }),
         "data/minerals.json": dump({"generated_at": snap["generated_at"],
-                                    "lane": (snap.get("lanes") or {}).get("minerals"), **(snap.get("minerals") or {})}),
+                                    "lane": (snap.get("lanes") or {}).get("minerals"), **(snap.get("minerals") or {}),
+                                    "trade": {"lane": (snap.get("lanes") or {}).get("trade"),
+                                              **(snap.get("mineral_trade") or {})}}),
         "data/vessels.json": dump({
             "generated_at": snap["generated_at"],
             "note": ("Ships on the OFAC SDN list and the UK Sanctions List, matched by IMO number. Each list's own "

@@ -160,6 +160,17 @@
       return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
     }).join("") || (lists.length ? '<p class="small muted">No change seen in the last 30 days of readings.</p>' : "");
 
+    var tr = s.mineral_trade || {};
+    function usd(v) { return v === null || v === undefined ? "" : "$" + (v >= 1e9 ? (v / 1e9).toFixed(2) + " bn" : v >= 1e6 ? (v / 1e6).toFixed(1) + " m" : Math.round(v).toLocaleString()); }
+    if ((tr.codes || []).length) {
+      document.getElementById("trade-note").textContent = "General imports, customs value, for HS codes that stand for minerals on the 2025 List of Critical Minerals; the last 12 months to " +
+        (tr.newest_month || "") + " against the 12 before. An HS heading can hold more than one mineral, and ores, metals and compounds are separate codes, so a row is not a mineral's whole trade. " + (tr.notice || "");
+      table("trade-table", ["HS code", "For", "Last 12 months", "Against the 12 before", "China's share (before)", "Leading sources"], tr.codes.filter(function (c) { return c.newest_month; }).map(function (c) {
+        return [esc(c.hs + " " + (c.description || "")), esc((c.minerals || []).join(", ")), esc(usd(c.imports_12m_usd)), esc(c.change_pct !== null && c.change_pct !== undefined ? pct(c.change_pct) : c.imports_prior_12m_usd === 0 ? "none the year before" : "no earlier year"),
+          esc(c.china_share_pct === null ? "" : c.china_share_pct + "%" + (c.china_share_prior_pct === null || c.china_share_prior_pct === undefined ? "" : " (" + c.china_share_prior_pct + "%)")),
+          esc((c.sources || []).map(function (x) { return x.country + " " + x.share_pct + "%"; }).join(", "))];
+      }));
+    }
     var sl = s.screening_lists || [];
     function day(iso) {
       if (!iso) { return ""; }
@@ -238,7 +249,7 @@
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, counted only because their titles can name people and companies: notices, ' + esc(countedText) + ".</p>" : "");
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {

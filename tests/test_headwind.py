@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
-                      sanctions, screening, stats)
+                      sanctions, screening, stats, trade)
 from tic_doctrine import contract, registers  # noqa: E402
 
 _spec = importlib.util.spec_from_file_location("headwind_cli", ROOT / "tools" / "headwind.py")
@@ -34,6 +34,7 @@ headwind_cli = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(headwind_cli)
 
 os.environ["EIA_API_KEY"] = "test-key-not-real"      # the energy lane needs a key; the fixtures stand in for EIA
+os.environ["CENSUS_API_KEY"] = "census-test-key-not-real"   # the same for the trade lane
 
 # The real lists hold thousands of entries; the fixtures hold a few dozen.
 for _l in sanctions.LISTS.values():
@@ -71,6 +72,10 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         return (FIX / ("fr_ustr_notices.json" if "fields%5B%5D=abstract" in url else "fr_register_ustr.json")).read_bytes()
     if "federalregister.gov/api/v1/documents.json" in url and "fields%5B%5D=abstract" not in url:
         return (FIX / "fr_register_rules.json").read_bytes()
+    if "api.census.gov" in url:
+        code = re.search(r"I_COMMODITY=(\d+)", url).group(1)
+        f = FIX / f"census_{code}.json"
+        return f.read_bytes() if f.exists() else b""         # Census answers 204, no body, for a code with no rows
     if "api.worldbank.org" in url and "source=15" in url:
         return (FIX / "worldbank_gem.json").read_bytes()
     table = [("petroleum/pri/spt", "eia_petroleum.json"), ("natural-gas/pri/fut", "eia_natural_gas.json"),
@@ -429,6 +434,59 @@ class TestVesselCrosslist(unittest.TestCase):
             self.assertEqual(len(doc["vessels"]), snap["vessel_crosslist"]["imo_numbers"])
             page = json.loads((Path(tmp) / "site" / "data" / "snapshot.json").read_text(encoding="utf-8"))
             self.assertNotIn("vessel_table", page)
+
+
+class TestTrade(unittest.TestCase):
+    def test_parse_and_summarize_real_replies(self):
+        rec = trade.summarize("2846", trade.parse(text("census_2846.json")), "2026-09", "2024-09")
+        self.assertTrue(rec["description_ok"])
+        self.assertEqual(rec["newest_month"], "2026-09")
+        self.assertEqual(rec["window"], ["2025-10", "2026-09"])
+        self.assertEqual(rec["sources"][0]["country"], "CHINA")
+        self.assertGreater(rec["china_share_pct"], 50)
+        self.assertTrue(all(s["share_pct"] <= 100 for s in rec["sources"]))
+        self.assertNotIn("OECD", [s["country"] for s in rec["sources"]])          # groupings are not countries
+        nickel = trade.summarize("7502", trade.parse(text("census_7502.json")))
+        self.assertIn("NICKLE", nickel["description"])                              # Census's own spelling
+        self.assertTrue(nickel["description_ok"])
+        # A month with no trade is missing from the reply; the windows stay calendar months.
+        cut = trade.parse(text("census_2846.json"))
+        cut["months"].pop("2026-03")
+        gap = trade.summarize("2846", cut, "2026-09", "2024-09")
+        self.assertEqual(gap["window"], ["2025-10", "2026-09"])
+        self.assertLess(gap["imports_12m_usd"], rec["imports_12m_usd"])
+        self.assertEqual(gap["imports_prior_12m_usd"], rec["imports_prior_12m_usd"])
+        self.assertIsNone(trade.summarize("2846", trade.parse(text("census_2846.json")), "2026-09", "2025-06")["change_pct"])
+        self.assertEqual(trade.summarize("2605", trade.parse(b"")), {"hs": "2605", "minerals": ["cobalt"],
+                         "description": None, "description_ok": False, "newest_month": None})
+        with self.assertRaises(ValueError):
+            trade.parse(b'{"error": "bad"}')
+
+    def test_every_code_stands_for_list_minerals(self):
+        names = {n.lower() for n in minerals.CRITICAL_2025}
+        for code, meta in trade.CODES.items():
+            for m in meta["minerals"]:
+                self.assertTrue(m in names or m == "rare earths", (code, m))
+
+    def test_the_key_stays_out_of_what_is_kept(self):
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            result, recs = headwind_cli._lane_trade(tmp / "raw", {}, fake_getter)
+            kept = (tmp / "raw" / "index.jsonl").read_text(encoding="utf-8") + json.dumps(result)
+            self.assertNotIn("census-test-key-not-real", kept)
+            self.assertTrue(all("key=" not in r["url"] for r in recs))
+            self.assertEqual([c["hs"] for c in result["mineral_trade"]["codes"] if c["newest_month"]], ["2846", "7502"])
+
+            def refused(url, timeout=60):
+                raise OSError(f"HTTP 400 for {url}")
+            with self.assertRaises(RuntimeError) as cm:
+                headwind_cli._lane_trade(tmp / "raw", {}, refused)
+            self.assertNotIn("census-test-key-not-real", str(cm.exception))
+            with mock.patch.dict(os.environ, {"CENSUS_API_KEY": "", "HEADWIND_CENSUS_KEY_FILE": str(tmp / "none.txt")}):
+                with self.assertRaises(RuntimeError):
+                    headwind_cli._lane_trade(tmp / "raw", {}, fake_getter)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
 
 class TestBatches(unittest.TestCase):

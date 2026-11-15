@@ -30,7 +30,9 @@ WARN_SHARE = 0.8        # under this share, a warning
 # monthly and dated by month (counted from the month's end).
 # GEM is monthly too; the World Bank updated it on 8 Sep 2026 with August's rates, so it runs further behind.
 WINDOWS = {"ecb-eurofxref": (4, 8), "eia-spot": (7, 14), "fao-ffpi": (40, 70), "wfp-food-prices-hdx": (75, 135),
-           "worldbank-gem": (100, 160)}
+           "worldbank-gem": (100, 160),
+           # The Census Bureau publishes a month's trade about five weeks after it ends.
+           "census-trade": (70, 100)}
 
 # A publisher date that has not moved for this many days is noted (not a failure: an unchanged list is still a
 # reading). The UN regenerates its file every day, so two quiet days is already unusual.
@@ -42,7 +44,7 @@ LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", 
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
            "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
-           "usgs-mcs": "minerals"}
+           "usgs-mcs": "minerals", "census-trade": "trade"}
 LIST_KEY = {"ofac-sdn": "ofac-sdn", "un-consolidated": "un-sc-consolidated", "eu-fsf": "eu-fsf",
             "uk-sanctions": "uk-sanctions-list"}
 
@@ -79,6 +81,7 @@ DRIFT = {
     "ecb": ("release-calendars", "ECB dates", True),
     "controls": ("us-federal-register", "rules in the window", False),
     "minerals": ("usgs-mcs", "commodities", True),
+    "trade": ("census-trade", "HS codes with imports", True),
     # Warn only: the lane has written its index by the time this runs, and it has its own guard against a short file.
     "screening": ("trade-gov-csl", "entries", False),
 }
@@ -104,6 +107,8 @@ def sizes(lane: str, result: dict) -> dict[str, int]:
         return {"controls": len(result.get("controls") or [])}
     if lane == "minerals":
         return {"minerals": len((result.get("minerals") or {}).get("reliance") or [])}
+    if lane == "trade":
+        return {"trade": sum(1 for c in (result.get("mineral_trade") or {}).get("codes") or [] if c.get("newest_month"))}
     if lane == "screening":
         return {"screening": sum(l.get("total") or 0 for l in result.get("screening_lists") or [])}
     return {}
@@ -228,6 +233,15 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
         + (f"; {unread} filing texts could not be read" if unread else ""))
     add("usgs-mcs", "minerals", None,
         f"{len((snap.get('minerals') or {}).get('reliance') or [])} commodities with net import reliance")
+    tr = snap.get("mineral_trade") or {}
+    codes = tr.get("codes") or []
+    add("census-trade", "trade", min(_month_end(tr["newest_month"]), today) if tr.get("newest_month") else None,
+        f"{sum(1 for c in codes if c.get('newest_month'))} of {len(codes)} HS codes with imports, newest month "
+        f"{tr.get('newest_month') or 'none'}")
+    notes_tr = ([f"HS {c} no longer carries the expected word in the Census description" for c in
+                 tr.get("description_mismatch") or []] + [f"not read: {e}" for e in tr.get("errors") or []])
+    if notes_tr:
+        out["census-trade"]["warnings"] = list(out["census-trade"].get("warnings") or []) + notes_tr
     watch = minerals.watch_notes(snap.get("minerals") or {})
     if watch:
         out["usgs-mcs"]["warnings"] = list(out["usgs-mcs"].get("warnings") or []) + watch
