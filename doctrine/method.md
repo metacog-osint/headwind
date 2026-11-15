@@ -141,12 +141,14 @@ by sanctions program. Headwind does not republish the names of people or organiz
 ## HW-WP-2: economic stress in a watched country (15 Nov 2026)
 An anomaly for a watched country's currency (HW-IND-4) or local food prices (HW-IND-6), or for an energy
 benchmark (HW-IND-5), carries its indicator, the hypothesis it is emerging under (HW-H-2A, stress within the
-country, for the first two; HW-H-2B, stress from outside, for energy), `direction` supports and
-`indicator_state` present. It stays a measurement (tier anomaly, no probability): which hypothesis holds is
+country, for the first two; HW-H-2B, stress from outside, for energy) and `indicator_state` present. `direction`
+is supports for HW-IND-4 and HW-IND-5, and neutral for HW-IND-6 (register 1.3, 15 Nov 2026), which is expected
+under HW-H-2A and HW-H-2B alike and so tells them not apart. It stays a measurement (tier anomaly, no probability): which hypothesis holds is
 told apart by which indicators are present together, and that reading is an analyst's. Routine items carry no
 indicator. Watched countries are those whose WFP prices Headwind reads (`config/wfp_countries.json`).
-HW-IND-4 is carried by an anomaly in any of a watched country's three currency readings: the ECB's daily rate,
-the World Bank's official monthly average or WFP's market rate. The page's "Watched countries side by side"
+HW-IND-4 is carried by an anomaly in any of a watched country's three currency readings, each by its own rule
+(register 1.3 states all three): the ECB's daily rate (five business days, 1% floor), the World Bank's official
+monthly average (one month, 2% floor) or WFP's market rate (median one-month change, 5% floor). The page's "Watched countries side by side"
 table (`country_view` in the snapshot) sets them next to the local food reading; nothing combines them.
 
 ## Designation batches (15 Nov 2026)

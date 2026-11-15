@@ -657,7 +657,12 @@ class TestFeed(unittest.TestCase):
         self.assertNotIn("indicator_id", p["fx:TRY"])               # Turkey is not a watched country
         self.assertNotIn("indicator_id", p["fx:EUR"])               # routine items carry none
         self.assertEqual((p["energy:brent"]["indicator_id"], p["energy:brent"]["hypothesis_id"]), ("HW-IND-5", "HW-H-2B"))
-        self.assertEqual((p["localfood:SD"]["indicator_id"], p["localfood:SD"]["hypothesis_id"]), ("HW-IND-6", "HW-H-2A"))
+        self.assertEqual([p["localfood:SD"][k] for k in ("indicator_id", "hypothesis_id", "direction", "indicator_state")],
+                         ["HW-IND-6", "HW-H-2A", "neutral", "present"])     # expected under 2A and 2B alike
+        reg = {i["id"]: i for i in json.loads((ROOT / "doctrine" / "indicators.json").read_text(encoding="utf-8"))["indicators"]}
+        self.assertEqual(sorted(feed.NON_DIAGNOSTIC), sorted(k for k, v in reg.items() if k in ("HW-IND-4", "HW-IND-5",
+                         "HW-IND-6") and not v["gentry"]["diagnostic"]))      # the code follows the register
+        self.assertIn("World Bank", reg["HW-IND-4"]["text"])         # HW-IND-4 names all three readings
         self.assertNotIn("indicator_id", p["food:cereals"])         # HW-IND-3 has no warning problem
         wp = next(w for w in json.loads((ROOT / "doctrine" / "indicators.json").read_text(encoding="utf-8"))["warning_problems"] if w["id"] == "HW-WP-2")
         self.assertEqual([h["id"] for h in wp["hypotheses"]], ["HW-H-2A", "HW-H-2B", "HW-H-2C"])
