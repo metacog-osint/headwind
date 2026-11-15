@@ -32,13 +32,13 @@ LANE_FIELDS = {
     "wfp": ["local_food", "local_food_missing"],
     "baseline": ["baseline"],
     "calendar": ["fomc_dates", "ecb_dates"],
-    "sanctions": ["sanctions", "sanctions_lists"],
+    "sanctions": ["sanctions", "sanctions_lists", "vessel_crosslist", "vessel_table"],
     "screening": ["screening", "screening_lists"],
     "controls": ["controls"],
     "minerals": ["minerals"],
 }
 EMPTY = {"fx": [], "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
-         "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "screening": [],
+         "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
          "screening_lists": [], "controls": [], "minerals": {}}
 
 
@@ -212,7 +212,14 @@ def _lane_sanctions(raw_dir, prev, getter):
         print(f"  sanctions: {e}", file=sys.stderr)
     state_path.parent.mkdir(parents=True, exist_ok=True)
     state_path.write_text(json.dumps(new_state, separators=(",", ":")) + "\n", encoding="utf-8", newline="\n")
-    return {"sanctions": sanctions.roll(prev.get("sanctions") or [], deltas, now), "sanctions_lists": lists}, recs
+    failed = tuple(e.split(":", 1)[0] for e in errors)
+    cross, table = sanctions.vessel_crosslist({k: v.get("index") or {} for k, v in new_state.items()},
+                                              stale=tuple(l for l in failed if l in new_state))
+    cross["checked_at"] = now
+    for d in deltas:
+        sanctions.mark_also_on(d, table)
+    return {"sanctions": sanctions.roll(prev.get("sanctions") or [], deltas, now), "sanctions_lists": lists,
+            "vessel_crosslist": cross, "vessel_table": table}, recs
 
 
 def _lane_screening(raw_dir, prev, getter):
@@ -398,7 +405,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
              | {m["country"] for m in snap.get("local_food_missing") or []}}
     page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "health", "fx", "energy", "fao",
                                      "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
-                                     "screening_lists", "controls", "minerals", "question_drafts")}
+                                     "screening_lists", "controls", "minerals", "question_drafts",
+                                     "vessel_crosslist")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
 
@@ -418,6 +426,14 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
         }),
         "data/minerals.json": dump({"generated_at": snap["generated_at"],
                                     "lane": (snap.get("lanes") or {}).get("minerals"), **(snap.get("minerals") or {})}),
+        "data/vessels.json": dump({
+            "generated_at": snap["generated_at"],
+            "note": ("Ships on the OFAC SDN list and the UK Sanctions List, matched by IMO number. Each list's own "
+                     "entry ids, name and flag. Owners are not given. Ships without an IMO number are counted only."),
+            "sources": {l: {"name": sanctions.LISTS[l]["name"], "url": sanctions.LISTS[l]["url"]}
+                        for l in sanctions.VESSEL_LISTS},
+            "summary": snap.get("vessel_crosslist") or {},
+            "vessels": snap.get("vessel_table") or []}),
         "data/question_drafts.json": dump({"note": "Drafts only. Nothing here is registered in Verdict.",
                                            "drafts": snap.get("question_drafts") or []}),
     }

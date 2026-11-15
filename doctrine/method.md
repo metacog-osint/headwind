@@ -72,6 +72,12 @@ by sanctions program. Headwind does not republish the names of people or organiz
   comes on the same list with the same IMO number, and no other vessel with that number going or coming,
   are counted once, as re-keyed, and compared as one entry. The UK revokes and remakes a ship's
   specification under a new id (2 Oct 2026: two ships); the ship never leaves the list.
+- **Ships across lists (15 Nov 2026).** After every reading, ships on the OFAC SDN list and the UK Sanctions
+  List are matched by IMO number: how many numbers are on both, on one only, and how many entries give no
+  number. `vessels.json` lists every number with each list's entry ids, name and flag (owners left out). A
+  ship named in a change carries the other list that holds its number after that reading ("also on"). Names
+  are not matched, because the lists spell them differently (AN SAN 1 and An San 1, IMO 7303803). This adds
+  a table; it changes no count, so the method version stays `headwind-1.5`.
 - **UK ship names.** The UK names many ships it specifies by IMO number, as `IMO 9344411 ("GALLE ENERGY")`
   or as the number alone with the ship's name given only as an alias. Headwind shows the name in brackets,
   else the alias, marked as an alias.

@@ -387,6 +387,52 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
     }
 
 
+# The lists that carry ships. The UN file has none; EU vessel measures sit in regulation annexes, not in its file.
+VESSEL_LISTS = ("ofac-sdn", "uk-sanctions")
+
+
+def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict, list[dict]]:
+    """Ships by IMO number across the lists that carry them: (summary, one record per IMO number).
+
+    A record gives, for each list the ship is on, the entry ids and the name and flag that list gives (the
+    two lists often spell a name differently, and one ship can hold more than one entry on a list). Ships
+    with no IMO number cannot be matched and are only counted. `stale` names lists whose index is the one
+    kept from an earlier run because this run could not read them."""
+    by_imo: dict[str, dict] = {}
+    no_imo: Counter = Counter()
+    for list_id in VESSEL_LISTS:
+        for i, e in (indexes.get(list_id) or {}).items():
+            if e[0] != "vessel":
+                continue
+            det = e[2] if len(e) > 2 else {}
+            if not det.get("imo"):
+                no_imo[list_id] += 1
+                continue
+            on = by_imo.setdefault(det["imo"], {"imo": det["imo"], "on": {}})["on"]
+            rec = on.setdefault(list_id, {"ids": [], "name": det.get("name"), "flag": det.get("flag")})
+            rec["ids"].append(i)
+    combos: Counter = Counter("+".join(sorted(r["on"])) for r in by_imo.values())
+    both = "+".join(sorted(VESSEL_LISTS))
+    summary = {"lists": list(VESSEL_LISTS), "imo_numbers": len(by_imo), "on_both": combos.get(both, 0),
+               "only": {l: combos.get(l, 0) for l in VESSEL_LISTS},
+               "without_imo": {l: no_imo.get(l, 0) for l in VESSEL_LISTS},
+               "read": {l: bool(indexes.get(l)) for l in VESSEL_LISTS}, "from_earlier_run": sorted(stale)}
+    table = sorted(by_imo.values(), key=lambda r: r["imo"])
+    for r in table:
+        for rec in r["on"].values():
+            rec["ids"].sort()
+    return summary, table
+
+
+def mark_also_on(d: dict, table: list[dict]) -> dict:
+    """Give each ship named in a change the other lists that carry its IMO number (after this run's reading)."""
+    on = {r["imo"]: set(r["on"]) for r in table}
+    for key in ("vessels_added", "vessels_removed", "vessels_rekeyed", "vessels_changed"):
+        for v in d.get(key) or []:
+            v["also_on"] = sorted(on.get(v.get("imo"), set()) - {d["list"]}) if v.get("imo") else []
+    return d
+
+
 def roll(previous: list[dict], new: list[dict], now_iso: str) -> list[dict]:
     """Keep deltas for KEEP_DAYS so a change does not vanish on the next run."""
     cutoff = (datetime.fromisoformat(now_iso.replace("Z", "+00:00")) - timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
