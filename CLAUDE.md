@@ -6,6 +6,17 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 15 Nov 2026, about 3:10 PM CST: review fixes live; fix 3 committed, not pushed.** Tom pushed the
+review fixes ("Yes, push"): `6642f71` on `main` and `live/first-slice`, run 43759701570 (2:43 to 2:46 PM CST, 2m29s)
+passed and deployed; the live snapshot carries no name from a counted-only filing (all 17 use `/d/<number>`),
+Yemen's gap shows its caveat, every WFP market record has `split_months`, the one anomaly carries
+`baseline_ref.id` `headwind-fxmarket` and `flag_rate` 0.117; the new history step committed `ddd2588` on its
+own. Then Tom: "Go with your fix 3 wording": `e749e5e` (register 1.3: HW-IND-4's text, series and rule name its
+three readings; HW-WP-2's watch condition no longer says one country; HW-IND-6 items carry `direction` neutral,
+`feed.NON_DIAGNOSTIC`), on `live/first-slice`, **not pushed**. 66 of 67 tests (the kit-copy test only), check
+PASS. Open for Tom: the push of `e749e5e`, step 12, HW-H-1A/1B wording, superseded readings in COP, Actions
+minutes, the kit validator's `baseline_ref` check. The paragraph below is the state before this.
+
 **State, 15 Nov 2026, about 2:50 PM CST: `headwind-1.6` is live (pushed and deployed at 1:27 PM CST, run
 43752551902); review fixes committed on `live/first-slice`, not pushed.** `49de59b` fixes, from the 15 Nov review:
 (1) counted-only public-inspection filings (BIS and OFAC notices) published the register's slugged address, and
@@ -548,8 +559,9 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
 - **Anomaly items carry indicator ids for HW-WP-2** (economic stress in a watched country; added to
   `doctrine/indicators.json` 15 Nov 2026, register 1.2, Tom's decision of 14 Nov): an anomaly for a currency of a
   watched country (`feed.WATCHED`, from `config/wfp_countries.json`) carries `HW-IND-4` and `HW-H-2A`, an energy
-  anomaly `HW-IND-5` and `HW-H-2B`, a local food anomaly `HW-IND-6` and `HW-H-2A`; each with `direction`
-  supports and `indicator_state` present. Routine items, other countries' currencies and FAO indices (`HW-IND-3`)
+  anomaly `HW-IND-5` and `HW-H-2B`, a local food anomaly `HW-IND-6` and `HW-H-2A`; each with `indicator_state`
+  present and `direction` supports, except HW-IND-6, neutral since register 1.3 (`e749e5e`, Tom's yes): it is
+  expected under HW-H-2A and HW-H-2B alike. Routine items, other countries' currencies and FAO indices (`HW-IND-3`)
   carry none. HW-H-2A is stress within the country (currency and food out of range, energy within), HW-H-2B
   stress from outside (energy shock reaching local food, currency holding), HW-H-2C artefact. `HW-IND-4` and
   `HW-IND-5` are now marked diagnostic (they tell 2A from 2B); `HW-IND-6` is not (expected under both). Written
