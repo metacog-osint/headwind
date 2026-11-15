@@ -1,4 +1,4 @@
-# Headwind method (`headwind-1.3`)
+# Headwind method (`headwind-1.4`)
 
 ## Purpose
 Headwind measures economic stress: currencies, energy and food prices that move outside their own
@@ -65,8 +65,9 @@ by sanctions program. Headwind does not republish the names of people or organiz
   not say what a rule means or whether a stay will be extended.
 - **No anomaly rule yet.** Every list and rule item is tier `routine`; a baseline needs a history of
   Headwind's own readings.
-- **Only additions and removals are seen.** An entry that stays on a list and changes its programs is
-  not reported.
+- **Edits are seen (`headwind-1.4`).** An entry on both readings whose type or programs changed is
+  counted as changed, with the programs gained and lost across those entries. A listed vessel whose
+  name, IMO number, MMSI, flag or type changed is named, before and after.
 
 ## Screening lists
 The same measure, applied to each list in the US International Trade Administration's Consolidated
@@ -75,11 +76,31 @@ for each entry and, where the list has them, by program.
 
 - **Address country is where the list places the entry**, not a finding about who controls it. An entry
   with addresses in three countries is counted under each.
-- **Entry ids** on the Commerce and State lists are assigned by trade.gov. If an id changes when a
-  publisher edits an entry, the edit appears as one removed and one added. This has not been observed
-  either way yet.
+- **Entry ids** on the Commerce and State lists are assigned by trade.gov (a hash). Whether an id
+  changes when a publisher edits an entry has not been observed either way. Since `headwind-1.4` an id
+  that goes and an id that comes on the same list, with the same name and type and no other entry of
+  that name going or coming, are counted once, as re-keyed, and compared as one entry. The name is kept
+  only as a short hash in Headwind's private state; it is never published.
+- **Edits** (an entry whose type, programs or address countries changed) are counted, with the programs
+  gained and lost.
 - **A list that loses more than half its entries** (lists of 20 or more) fails the lane and is not
   reported as delistings.
+
+## Source health (`headwind-1.4`)
+The feed carries a `health` member, one entry per source keyed by the source id its items carry: whether
+this run read the source (`failing` when not; the page shows the last good copy), the date of its newest
+data, and a state against the source's own rhythm: fresh, late or stale for the ECB (4 and 8 days, for
+business days and long weekends), EIA (7 and 14), FAO (40 and 70 days after the month's end) and WFP
+(75 and 135); `up` (read, no date to judge) for the rest.
+
+- **Drift.** Each run keeps the size of what a source gave (rows, dates, entries) for its last ten good
+  readings. Once there are three, a reading under half the median fails the lane for sources parsed from
+  pages or files whose layout Headwind does not control, and the last good copy is kept; under four
+  fifths, or for sizes that move on their own (the 60-day window of rules, WFP's countries, FAO's release
+  dates, the screening file), it is a warning.
+- **Quiet publishers.** A note, not a failure, when a list's own file date has not moved for 3 days
+  (UN, which regenerates daily) or 30 days (EU, UK), or when Headwind has seen no change on OFAC's list,
+  which carries no date, for 21 days.
 
 ## Minerals
 Net import reliance and import shares are copied from the US Geological Survey's Mineral Commodity
@@ -89,7 +110,7 @@ for which each country is named first among the major import sources. It is a co
 ordering and says nothing about substitutes, stockpiles or domestic capacity.
 
 ## Not live
-Census trade data for minerals, the critical minerals list itself, EU and UK sanctions lists, USTR notices and Federal Register public-inspection filings.
+Census trade data for minerals, USTR notices and Federal Register public-inspection filings.
 
 ## Verdict
 `data/question_drafts.json` holds draft questions on the next FAO release with a climatology

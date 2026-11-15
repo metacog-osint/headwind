@@ -4,6 +4,12 @@ Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind
 energy and food prices measured against their own normal range, changes to official sanctions and US screening
 lists, export-control and sanctions rules, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No probabilities, no investment advice.
 
+**Built 14 Nov 2026, about 5:30 PM CST, not yet committed (Tom's "Build items 1-5"): `headwind-1.4`.** Source
+health in the feed and on the page, one fetch retry, drift checks, edits to entries that stay on a list (and
+re-keyed trade.gov entries), kit 0.5.2 with a kit test, and a second private copy of the run state in the release
+`state`. See "Source health and state (`headwind-1.4`)" below. 38 tests pass; a live collect, build and check
+passed locally at 4:51 PM CST. Not on `main` and not on the runner yet.
+
 **State, 14 Nov 2026, 3:40 PM CST: live and updating itself.** Ten lanes, method `headwind-1.3`; the sanctions lane
 reads four lists (OFAC, UN, EU, UK) since `df39196`, and the minerals lane carries the 2025 critical minerals list
 since `b528333`. `main` and `live/first-slice` are both `622f78b` and pushed (run 43642037862 deployed it; EU and UK
@@ -44,8 +50,8 @@ creates). Describe Headwind publicly from what is live.
   bar `tic-nav.js` v1.8 lists Headwind (`Systems · economic stress`, beta) and is on this page since `7df0baa`; the
   hub and the other program sites carry it, PropertyCast from its 14 Nov publish; the registry row, COP's drawing
   entry and a tic-dispatch entry are pushed and deployed. Details are in the hub's `HISTORY.md` and `HANDOFF.md`.
-- **Not done:** Tom adds `headwind` to the `tic-dispatch` token's repository access; until then the dispatcher's
-  start returns 404 and the workflow runs on its own 6-hourly cron, which GitHub fires 4-9 h late.
+- **tic-dispatch starts the workflow** (seen 14 Nov 2026: `workflow_dispatch` runs at :50 past 03, 09, 15 and 21
+  UTC). The 6-hourly cron stays as a fallback.
 
 ## Commands
 
@@ -55,7 +61,7 @@ python tools/headwind.py collect --only fx    # one or more lanes; the rest keep
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
-python -m unittest discover -s tests          # 24 offline tests against real fixtures
+python -m unittest discover -s tests          # 38 offline tests against real fixtures
 python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
@@ -128,6 +134,45 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - **Every list and rule item is tier `routine`.** No anomaly rule exists for them yet: there is no history of
   Headwind's own readings to measure against.
 
+## Source health and state (`headwind-1.4`, built 14 Nov 2026)
+- **`health` in the feed and on the page** (`headwind/health.py`). One entry per source, keyed by the source id the
+  items carry (`ecb-eurofxref`, `eia-spot`, `fao-ffpi`, `wfp-food-prices-hdx`, `ofac-sdn`, `un-sc-consolidated`,
+  `eu-fsf`, `uk-sanctions-list`, `trade-gov-csl`, `us-federal-register`) plus `worldbank-wdi`, `release-calendars`
+  and `usgs-mcs`; Cordon's shape (`state`, `last_ok`, `last_error`, `failures`, `checked_at`, `detail`) plus
+  `lane`, `data_as_of`, `warnings`, and `error` when failing. States: fresh, late or stale by the source's own
+  rhythm (`WINDOWS`: ECB 4/8 days, EIA 7/14, FAO 40/70 and WFP 75/135 after the month's end, capped at today);
+  `up` when read with no date to judge; `failing` when not read this run. Each sanctions list has its own entry.
+  The kit's history log (`tic.py history`) reads this record as it is: tried 14 Nov on the live build, 61 items
+  logged new, nothing ended. **COP does not read per-lane health yet** (it judges Headwind by `generated_at`):
+  that is a COP change. The history log itself is not adopted yet (plan item 14).
+- **Drift** (`health.DRIFT`): sizes of the last ten good readings per source in the snapshot (`drift_history`).
+  From three readings on, under half the median fails the lane for sources parsed from pages or files (fx,
+  energy, FAO indices, baseline, the two calendars, minerals), keeping the last good copy; under four fifths, or
+  for sizes that move on their own (rules window, WFP countries, FAO release dates, the screening file, which has
+  written its index before the check runs), a warning. Warnings go to `health[...]["warnings"]` and, on the
+  runner, to `::warning::` lines.
+- **Quiet publishers** (`QUIET_DAYS`, `QUIET_SEEN_DAYS`): a warning when the UN file's date is over 3 days old, the
+  EU's or UK's over 30, or when OFAC (no file date) has shown no change for 21 days (`last_change_at`, kept per list
+  in `sanctions_index.json` and on each list's status). Not a failure.
+- **Retry** (`fetch.get`): one more try after 10 s on a timeout, a dropped connection, a 5xx or a 429; never on
+  another 4xx. Prompted by EIA's timeouts on 13 and 14 Nov.
+- **Edits**: `sanctions.edits` counts ids on both readings whose type or programs changed (programs gained and lost)
+  and names vessels whose name, IMO, MMSI, flag or type changed, before and after. `screening` keeps a 12-character
+  SHA-1 of each entry's normalised name as a fourth index field (private state only) and pairs a removed and an
+  added id with the same name and type as one re-keyed entry (`rekeyed`), then compares them as one. An index
+  written before this has no name keys: no pairing that run, and no false edits (only the first three fields are
+  compared). Checked 13-14 Nov: trade.gov rewrote the `ids` field of 620 SDN entries with no change of
+  substance, which is why only type, programs and address countries are compared.
+- **Kit 0.5.2** synced 14 Nov. `tests/test_robustness.py` checks that nothing in `doctrine/kit/` was edited (works on
+  the runner) and, when `../tic-doctrine` sits beside the checkout, that the copy is current (skipped on the runner:
+  the kit repo is private). Note: `tic-doctrine/tools/sync.py` takes its first argument as the target, so
+  `sync.py --help` copies the kit into a folder named `--help` (happened once on 14 Nov; removed).
+- **Second copy of the state** (workflow, needs `contents: write`): after the deploy, `data/snapshot.json` and
+  `data/state/` go as `headwind-state.tar.gz` and a dated daily copy (14 kept) to the prerelease `state` in this
+  private repository. A run restores the Actions cache first, then that asset; with neither it fails (`::error::`)
+  unless run by hand with `first_reading` ticked. **Delete the release before the repository is ever made public**:
+  the indexes hold the publishers' entry ids for people. Not yet run on GitHub.
+
 ## Energy and the EIA key (changed 13 Nov 2026, Tom's decision)
 - **The energy lane reads EIA's API, not FRED.** FRED's terms bar scraping and passing stored content on.
 - **The key** is read from the `EIA_API_KEY` environment variable, or from a one-line file at
@@ -150,8 +195,9 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   `data/state/screening_index.json` (about 530 KB) and has to be carried between runs.
 - **The SDN list is skipped** because the sanctions lane reads it from OFAC directly.
 - **Entry ids:** Treasury's lists carry OFAC's own numbers. The BIS and State lists carry a long hash that trade.gov
-  assigns. Whether that hash changes when a publisher edits an entry is not known; if it does, an edit shows as one
-  removed and one added. The page and the feed say so. Check it when the first real change arrives.
+  assigns. Whether that hash changes when a publisher edits an entry is not known (no BIS or State entry changed
+  between the 13 and 14 Nov copies). Since `headwind-1.4` a removed and an added id with the same name and type
+  count as one re-keyed entry. Check it when the first real change arrives.
 - **A list named in the file with no entries** (Foreign Sanctions Evaders on 13 Nov) is kept as an empty list, so its
   first entry is seen as an addition. A list of 20 or more that loses over half its entries fails the lane.
 - **The raw copy is stored gzipped** (2.8 MB against 34 MB). trade.gov re-imports hourly and stamps the file, so every
@@ -198,8 +244,7 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 ## Not done
 - **Planned and not built:** Census trade data for minerals (needs a key), USTR notices, Federal Register public
   inspection.
-- **A list change is only an added or removed id.** An entry that stays on a list and changes its programs or type
-  is not reported, in either list lane.
+- **Edits to entries that stay on a list** are reported since `headwind-1.4` (see Source health and state).
 - `HW-EEI-1` and `HW-EEI-2` (vessel matches in Wake, public-inspection filings) are unmet. Headwind now carries
   the IMO numbers `HW-EEI-1` needs; the match itself is not built, and Wake is seed data only.
 - Page layout was checked on 13 Nov at 1280 and 375 pixels wide for the sanctions, rules, screening and minerals

@@ -21,8 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import (baseline, commodities, controls, feed, fetch, food, markets, minerals, releases,  # noqa: E402,F401
-                      sanctions, screening)
+from headwind import (baseline, commodities, controls, feed, fetch, food, health, markets, minerals,  # noqa: E402,F401
+                      releases, sanctions, screening)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -191,13 +191,16 @@ def _lane_sanctions(raw_dir, prev, getter):
                 lists.append({**prev_status[list_id], "error": str(exc)[:300], "failed_at": now})
             continue
         recs.append(rec)
+        last_change = old.get("last_change_at")
         if old.get("index"):
             d = sanctions.delta(list_id, old["index"], index, now, old.get("checked_at"))
             if d:
                 deltas.append(d)
+                last_change = now
         baseline_set = old.get("baseline_set_at") or now
-        new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "index": index}
-        lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated))
+        new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "last_change_at": last_change,
+                              "index": index}
+        lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated, last_change))
     if not recs:
         raise RuntimeError("no sanctions list could be read: " + "; ".join(errors))
     for e in errors:
@@ -271,6 +274,8 @@ def collect(root: Path = ROOT, getter=None, only: list[str] | None = None) -> di
     prev = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {}
     now = fetch.now_utc()
     snap = {"generated_at": now, "method_version": feed.METHOD, "lanes": {}}
+    drift_history = dict(prev.get("drift_history") or {})
+    drift_warnings: dict[str, list[str]] = {}
     for lane, fn in LANES.items():
         fields = LANE_FIELDS[lane]
         prev_lane = (prev.get("lanes") or {}).get(lane) or {}
@@ -281,6 +286,13 @@ def collect(root: Path = ROOT, getter=None, only: list[str] | None = None) -> di
             continue
         try:
             result, recs = fn(raw_dir, prev, getter)
+            sizes = health.sizes(lane, result)
+            fails, warns = health.drift(lane, sizes, drift_history)
+            if fails:
+                raise ValueError("; ".join(fails))
+            drift_history = health.remember(drift_history, sizes)
+            for source_key, text in warns:
+                drift_warnings.setdefault(source_key, []).append(text)
             snap.update(result)
             snap["lanes"][lane] = {"status": "ok", "fetched_at": now, "from_previous": False,
                                    "fetches": [{k: r[k] for k in ("url", "sha256", "bytes")} for r in recs]}
@@ -291,7 +303,10 @@ def collect(root: Path = ROOT, getter=None, only: list[str] | None = None) -> di
             snap["lanes"][lane] = {"status": "failed", "error": f"{type(exc).__name__}: {exc}"[:300],
                                    "failed_at": now, "from_previous": had,
                                    "fetched_at": prev_lane.get("fetched_at")}
+    snap["drift_history"] = drift_history
+    snap["drift_warnings"] = drift_warnings
     finish_snapshot(snap, datetime.now(timezone.utc).date())
+    snap["health"] = health.build(snap, prev.get("health"), datetime.now(timezone.utc).date())
     data_dir.mkdir(parents=True, exist_ok=True)
     snap_path.write_text(json.dumps(snap, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     return snap
@@ -354,8 +369,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
     names = {c: geo.name(c) for c in {w["country"] for w in snap.get("local_food") or []}
              | {f["country"] for f in snap.get("fx") or [] if f.get("country")}
              | {m["country"] for m in snap.get("local_food_missing") or []}}
-    page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "fx", "energy", "fao", "local_food",
-                                     "local_food_missing", "sanctions", "sanctions_lists", "screening",
+    page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "health", "fx", "energy", "fao",
+                                     "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
                                      "screening_lists", "controls", "minerals", "question_drafts")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
@@ -432,6 +447,14 @@ def main(argv=None) -> int:
         for lane, st in snap["lanes"].items():
             extra = f" ({st.get('error')})" if st.get("status") == "failed" else ""
             print(f"  {lane:9s} {st.get('status')}{' [last good copy]' if st.get('from_previous') else ''}{extra}")
+        gh = bool(os.environ.get("GITHUB_ACTIONS"))
+        for key, h in (snap.get("health") or {}).items():
+            for w in h.get("warnings") or []:
+                print(f"::warning::{key}: {w}" if gh else f"  warning {key}: {w}")
+            if h["state"] in ("late", "stale"):
+                line = f"{key}: data of {h.get('data_as_of')} is {h['state']}"
+                print(f"::warning::{line}" if gh else f"  warning {line}")
+        print("  health: " + ", ".join(f"{n} {s}" for s, n in health.summary(snap.get("health") or {}).items()))
         anomalies = sum(1 for k in ("fx", "energy", "fao", "local_food") for x in snap.get(k) or [] if x.get("anomaly"))
         print(f"Collected {len(snap['fx'])} currencies, {len(snap['energy'])} energy series, {len(snap['fao'])} FAO "
               f"indices, {len(snap['local_food'])} countries' local food prices, {len(snap['baseline'])} country "

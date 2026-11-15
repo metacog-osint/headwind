@@ -1,7 +1,4 @@
 name: update
-# DRAFT, 13 Nov 2026: written and not yet run. It does nothing until it is on main, and it deploys nothing until
-# Tom creates the Cloudflare Pages project `headwind` and sets the secrets below.
-#
 # Four times a day (meant to be started by the hub's tic-dispatch Worker, because GitHub fires schedules 4-9 h
 # late; its own cron is the fallback), on every push to main, and by hand: the tests, the last run's state from
 # this repository's Actions cache, a live collection, the site build and feed check, then a deploy of site/ to
@@ -12,8 +9,13 @@ name: update
 # are kept in the Actions cache, which is private to this repository, and not on the public site, because the
 # indexes hold the publishers' entry ids for people and Headwind publishes people as counts only (13 Nov 2026).
 # Each run saves a new cache entry and the next run restores the newest. GitHub drops an entry nobody has read
-# for 7 days; with no entry a run is a first reading, sets the baselines, reports no list change and says so in a
-# warning. State is saved after the feed check and before the deploy, so a failed deploy does not lose a change.
+# for 7 days. A second copy goes to this repository's release `state` as assets (14 Nov 2026): headwind-state.tar.gz,
+# the newest, and one per UTC day for 14 days. Release assets do not expire, and they are as private as the
+# repository: if it is ever made public, delete the release first, because the indexes hold people's entry ids. A
+# run restores the cache first and the release asset when the cache has nothing. With neither the run fails, so a
+# lost state is an alarm and not a silent first reading; start a deliberate first reading by hand with
+# first_reading ticked. State is saved after the feed check and before the deploy, so a failed deploy does not
+# lose a change.
 #
 # Secrets: EIA_API_KEY (energy lane; without it that lane fails and the rest run), CLOUDFLARE_PAGES_TOKEN
 # (Cloudflare Pages: Edit), and the account ID as repo variable CLOUDFLARE_ACCOUNT_ID. Without the Cloudflare
@@ -24,8 +26,13 @@ on:
   schedule:
     - cron: "23 */6 * * *"
   workflow_dispatch:
+    inputs:
+      first_reading:
+        description: "Start from no state on purpose (sets new list baselines). Only when the state is known lost."
+        type: boolean
+        default: false
 permissions:
-  contents: read
+  contents: write     # the release that keeps the second copy of the state; nothing is committed or pushed
 concurrency:
   group: update
   cancel-in-progress: false
@@ -50,9 +57,22 @@ jobs:
             data/state
           key: headwind-state-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: headwind-state-
-      - name: Say so when there was no state
+      - name: No cache entry, so the state from the release
         if: steps.state.outputs.cache-matched-key == ''
-        run: echo "::warning::No state in the Actions cache, so this run is a first reading and can report no list change."
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FIRST_READING: ${{ inputs.first_reading }}
+        run: |
+          if gh release download state --pattern headwind-state.tar.gz --dir "$RUNNER_TEMP" 2>/dev/null; then
+            tar -xzf "$RUNNER_TEMP/headwind-state.tar.gz"
+            echo "::warning::No state in the Actions cache; restored the copy kept in the release 'state'."
+            ls -l data/snapshot.json data/state
+          elif [ "$FIRST_READING" = "true" ]; then
+            echo "::warning::No state anywhere and first_reading was chosen: this run sets new list baselines."
+          else
+            echo "::error::No state in the Actions cache or the release 'state'. Stopping so the list baselines are not started over. If the state is known lost, run the workflow by hand with first_reading ticked."
+            exit 1
+          fi
       - name: Live collection (a failed lane keeps its last good copy and says so on the page)
         run: python tools/headwind.py collect
         env:
@@ -78,3 +98,19 @@ jobs:
           fi
           npx --yes wrangler@4.151.3 pages deploy site --project-name headwind --branch main \
             --commit-hash "$GITHUB_SHA" --commit-message "update $GITHUB_SHA" --commit-dirty=true
+      # After the deploy, so a failed upload never holds the site back; it still fails the run, which mails the owner.
+      - name: Second copy of the state in the release (private, like the repository)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tar -czf headwind-state.tar.gz data/snapshot.json data/state
+          day="headwind-state-$(date -u +%Y-%m-%d).tar.gz"
+          cp headwind-state.tar.gz "$day"
+          notes="Headwind's run state: the last good snapshot and the list indexes, which hold the publishers' entry ids for people. Kept for the workflow to restore. Delete this release before the repository is ever made public."
+          if ! gh release view state >/dev/null 2>&1; then
+            gh release create state --prerelease --latest=false --title "Run state (private)" --notes "$notes"
+          fi
+          gh release upload state headwind-state.tar.gz "$day" --clobber
+          # Keep the newest and 14 daily copies.
+          daily=$(gh release view state --json assets --jq '.assets[].name' | grep -E '^headwind-state-[0-9-]{10}[.]tar[.]gz$' | sort)
+          for old in $(echo "$daily" | head -n -14); do gh release delete-asset state "$old" --yes; done

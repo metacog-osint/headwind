@@ -80,6 +80,13 @@
         esc(types + ". Read " + when(l.checked_at) + "; compared since " + when(l.baseline_set_at) + "." + note) + "</div></div>";
     }).join("") || '<p class="small muted">No list has been read yet.</p>';
     function counts(o) { return Object.keys(o || {}).slice(0, 6).map(function (k) { return k + " " + o[k]; }).join(", "); }
+    function edited(lines, d) {
+      if (!d.changed) { return; }
+      var bits = ["Changed " + d.changed + " that stayed on the list"];
+      if (Object.keys(d.programs_gained || {}).length) { bits.push("programs gained: " + counts(d.programs_gained)); }
+      if (Object.keys(d.programs_lost || {}).length) { bits.push("programs lost: " + counts(d.programs_lost)); }
+      lines.push(bits.join("; ") + ".");
+    }
     document.getElementById("sanction-deltas").innerHTML = (s.sanctions || []).map(function (d) {
       var lines = [];
       if (d.added) { lines.push("Added by program: " + counts(d.added_by_program) + ". By type: " + counts(d.added_by_type) + "."); }
@@ -91,7 +98,15 @@
         }).join("; ") + ".");
       }
       ships("added", d.vessels_added); ships("removed", d.vessels_removed);
-      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed") + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
+      edited(lines, d);
+      if ((d.vessels_changed || []).length) {
+        lines.push("Vessels still listed whose details changed: " + d.vessels_changed.map(function (v) {
+          return (v.name || "unnamed") + (v.imo ? " (IMO " + v.imo + ")" : "") + ": " + Object.keys(v.changed).map(function (f) {
+            return f + " " + (v.changed[f][0] || "none") + " to " + (v.changed[f][1] || "none");
+          }).join(", ");
+        }).join("; ") + ".");
+      }
+      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "")) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
     }).join("") || (lists.length ? '<p class="small muted">No change seen in the last 30 days of readings.</p>' : "");
 
     var sl = s.screening_lists || [];
@@ -103,7 +118,9 @@
       var lines = [];
       if (d.added) { lines.push("Added by address country: " + counts(d.added_by_country) + "."); }
       if (d.removed) { lines.push("Removed by address country: " + counts(d.removed_by_country) + "."); }
-      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed") + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(d.publisher + ". " + lines.join(" ")) + "</div></div>";
+      edited(lines, d);
+      if (d.rekeyed) { lines.push(d.rekeyed + " came back under a new id with the same name and type, counted as the same entry."); }
+      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "")) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(d.publisher + ". " + lines.join(" ")) + "</div></div>";
     }).join("") || (sl.length ? '<p class="small muted">No change seen in the last 30 days of readings. Compared since ' + esc(when(sl[0].baseline_set_at)) + ".</p>" : "");
     table("screening-table", ["List", "Publisher", "Entries", "Publisher's last update"], sl.map(function (l) {
       return ['<a href="' + esc(l.url) + '" rel="noopener">' + esc(l.name) + "</a>", esc(l.publisher), esc(Number(l.total).toLocaleString()), esc(day(l.source_last_updated))];
@@ -147,10 +164,20 @@
       : '<p class="small muted">No rules collected.</p>';
 
     var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", controls: "Rules (US Federal Register)", fx: "Exchange rates (ECB)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var health = s.health || {};
+    var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {
       var l = s.lanes[k], ok = l.status === "ok";
       var note = ok ? "collected " + when(l.fetched_at) : (l.from_previous && l.fetched_at ? "failed; showing the copy from " + when(l.fetched_at) : "failed; no data");
-      return '<div class="row"><div class="row-title"><span>' + esc(labels[k] || k) + '</span><span class="badge ' + (ok ? "" : "badge-warn") + '">' + esc(ok ? "current" : "not current") + '</span></div><div class="small muted">' + esc(note) + "</div></div>";
+      var subs = Object.keys(health).filter(function (h) { return health[h].lane === k; }).map(function (h) {
+        var e = health[h], good = e.state === "fresh" || e.state === "up";
+        var bits = [e.detail];
+        if (e.data_as_of) { bits.push("newest data " + e.data_as_of); }
+        if (e.state === "failing") { bits.push("not read since " + (e.last_ok ? when(e.last_ok) : "it began") + (e.failures > 1 ? " (" + e.failures + " runs)" : "")); }
+        (e.warnings || []).forEach(function (w) { bits.push("note: " + w); });
+        return '<div class="small"><span class="badge ' + (good ? "" : "badge-warn") + '">' + esc(stateText[e.state] || e.state) + "</span> " + esc(h) + ": " + esc(bits.filter(Boolean).join("; ")) + "</div>";
+      }).join("");
+      return '<div class="row"><div class="row-title"><span>' + esc(labels[k] || k) + '</span><span class="badge ' + (ok ? "" : "badge-warn") + '">' + esc(ok ? "current" : "not current") + '</span></div><div class="small muted">' + esc(note) + "</div>" + subs + "</div>";
     }).join("");
   }
 
