@@ -45,16 +45,19 @@ LISTS = {
 
 # EU programme codes, as the Financial Sanctions Files give them, that name a country. Read against the
 # live file on 14 Nov 2026 (34 codes). "UKR" is the EU's regime on undermining Ukraine's territorial
-# integrity; like OFAC's EO 13660 it is placed on both countries. Left unplaced on purpose: TAQA and EUAQ
-# (ISIL and Al-Qaida), TERR (terrorism), HAM (Hamas and Palestinian Islamic Jihad), HR (global human
-# rights), CHEM (chemical weapons), CYB (cyber attacks), UNLI (UN listings carried before an EU act) and
-# SDNZ (code not explained in the file).
+# integrity; it is placed on Russia only (Tom, 14 Nov 2026): of its 2,962 entries, 1,609 give a Russian address
+# or citizenship and 86 a Ukrainian one, so placing it on Ukraine too would mark Ukraine on nearly every EU
+# change. "SDNZ" is placed on Sudan (Tom, 14 Nov 2026): its 25 entries carry Sudanese addresses (8) and UAE
+# ones (3) and cite EU acts on Sudan such as 2024/384; "SDN" (9 entries) is the older Sudan regime. Left
+# unplaced on purpose: TAQA and EUAQ (ISIL and Al-Qaida), TERR (terrorism), HAM (Hamas and Palestinian
+# Islamic Jihad), HR (global human rights), CHEM (chemical weapons), CYB (cyber attacks) and UNLI (UN
+# listings carried before an EU act).
 EU_PROGRAMME_COUNTRY = {
-    "UKR": ("RU", "UA"), "RUS": "RU", "RUSDA": "RU", "BLR": "BY", "IRN": "IR", "SYR": "SY", "PRK": "KP", "AFG": "AF",
+    "UKR": "RU", "SDNZ": "SD", "RUS": "RU", "RUSDA": "RU", "BLR": "BY", "IRN": "IR", "SYR": "SY", "PRK": "KP", "AFG": "AF",
     "MMR": "MM", "COD": "CD", "IRQ": "IQ", "VEN": "VE", "LBY": "LY", "MDA": "MD", "TUN": "TN", "SDN": "SD", "SSD": "SS",
     "SOM": "SO", "NIC": "NI", "CAF": "CF", "HTI": "HT", "YEM": "YE", "GTM": "GT", "GIN": "GN", "MLI": "ML",
 }
-EU_UNPLACED = {"TAQA", "EUAQ", "TERR", "HAM", "HR", "CHEM", "CYB", "UNLI", "SDNZ"}
+EU_UNPLACED = {"TAQA", "EUAQ", "TERR", "HAM", "HR", "CHEM", "CYB", "UNLI"}
 
 # UK regimes by short name (uk_regime()), read against the live list on 14 Nov 2026 (31 regimes).
 UK_REGIME_COUNTRY = {

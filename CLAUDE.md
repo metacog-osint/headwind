@@ -11,17 +11,14 @@ release `state`. See "Source health and state (`headwind-1.4`)" below. `6865f16`
 `live/first-slice`; run 43662609087 (7:20 PM CST) passed every step and deployed: 60 items, 13 health entries
 (4 fresh, 9 read), state restored from the cache, and the `state` prerelease created with `headwind-state.tar.gz`
 and `headwind-state-2026-11-15.tar.gz` (468 KB each). 38 tests pass. Drift checks start after three readings. Still
-open for Tom: COP reading per-source health (a COP change), EU `UKR` (recommended: Russia only, since 1,609 of its
-2,962 entries name Russia and 86 Ukraine) and `SDNZ` (recommended: Sudan; its entries' addresses are Sudan and the
-UAE and it cites EU Sudan acts), and the stale worktree `[local path]`. The paragraph
+open for Tom: COP reading per-source health (a COP change) and the stale worktree `[local path]`. The paragraph
 below is the state before this.
 
 **State, 14 Nov 2026, 3:40 PM CST: live and updating itself.** Ten lanes, method `headwind-1.3`; the sanctions lane
 reads four lists (OFAC, UN, EU, UK) since `df39196`, and the minerals lane carries the 2025 critical minerals list
 since `b528333`. `main` and `live/first-slice` are both `622f78b` and pushed (run 43642037862 deployed it; EU and UK
 baselines set on the runner at 3:18 PM CST). Hub: tic-doctrine 0.5.2 (`3bffa17`) and COP's kit sync (`4ceecd5`,
-deployed) carry Headwind's new terms and owns. Open for Tom: EU `UKR` placed on Russia and Ukraine, EU `SDNZ`
-unplaced; the stale worktree `[local path]`. A push to `main` runs the workflow,
+deployed) carry Headwind's new terms and owns. Open for Tom then: EU `UKR` and `SDNZ` (decided 14 Nov, see the EU and UK lists); the stale worktree `[local path]`. A push to `main` runs the workflow,
 which collects, builds, checks and deploys. The house bar lists Headwind and the suite registry lists it as live
 (see Deploy). Untracked and to stay that way: `GEMINI.md` and `data/`. Commit history before the deploy:
 `ed4e461` first live slice, `472e802` sanctions and rules (`headwind-1.2`), `921d8f6` screening and minerals
@@ -128,9 +125,9 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
   OFSI's Consolidated List closed on 28 Jan 2026, keyed on `UniqueID`, grouped by regime short name (`uk_regime()`,
   31 regimes). UK ships are named like OFAC vessels (name, IMO, flag, type; owners left out); 693 of 694 have an
   IMO number. Countries come from per-list maps, `EU_PROGRAMME_COUNTRY` and `UK_REGIME_COUNTRY`, with the conduct
-  regimes left unplaced on purpose (`EU_UNPLACED`, `UK_UNPLACED`). EU `UKR` (Ukraine's territorial integrity) is
-  placed on Russia and Ukraine, following Tom's EO 13660 decision; EU `SDNZ` is left unplaced because the file does
-  not explain it. **Both are for Tom to confirm.** A code or regime in neither map nor the unplaced set shows as
+  regimes left unplaced on purpose (`EU_UNPLACED`, `UK_UNPLACED`). Tom's decisions, 14 Nov 2026: EU `UKR` (Ukraine's
+  territorial integrity) is placed on Russia only (1,609 of its 2,962 entries give Russia, 86 Ukraine), and EU
+  `SDNZ` on Sudan (Sudanese and UAE addresses; cites EU Sudan acts such as 2024/384). A code or regime in neither map nor the unplaced set shows as
   `unknown_programs` on the list's status: add it to a map. First readings on the runner set the baselines.
 - **Each list stands alone** (since 14 Nov): a list that cannot be read or parsed keeps its index from the run before
   and shows the error on the page; the lane fails only when no list can be read.

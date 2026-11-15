@@ -392,7 +392,8 @@ class TestListParsers(unittest.TestCase):
         self.assertEqual(len(idx), 9)
         self.assertEqual({v[0] for v in idx.values()}, {"individual", "entity"})
         self.assertTrue(all(len(v) == 2 for v in idx.values()))     # counts only: no names carried
-        self.assertEqual(sanctions.countries_for(["UKR", "TAQA", "IRN"], "eu-fsf"), ["IR", "RU", "UA"])
+        self.assertEqual(sanctions.countries_for(["UKR", "TAQA", "IRN"], "eu-fsf"), ["IR", "RU"])
+        self.assertEqual(sanctions.countries_for(["SDNZ"], "eu-fsf"), ["SD"])   # Tom, 14 Nov 2026
         self.assertEqual(sanctions.countries_for(["SDN"], "eu-fsf"), ["SD"])   # the EU's Sudan code, not OFAC's list
         self.assertEqual(sanctions.unknown_programs("eu-fsf", idx), [])
         self.assertEqual(sanctions.unknown_programs("eu-fsf", {"1": ["entity", ["NEWX"]]}), ["NEWX"])
