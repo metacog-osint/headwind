@@ -185,8 +185,14 @@ figure. They are annual and are not feed items. Headwind adds one count: the num
 for which each country is named first among the major import sources. It is a count of USGS's own
 ordering and says nothing about substitutes, stockpiles or domestic capacity.
 
+## US mineral imports by country (15 Nov 2026)
+For 24 HS codes standing for minerals on the 2025 List of Critical Minerals, the Census Bureau's monthly general
+imports (customs value) by country of origin: the last 12 calendar months against the 12 before, the leading
+sources and China's share. Context only, not feed items, no anomaly test. An HS heading can hold more than one
+mineral, and ores, metals and compounds are separate codes, so a code's figures are not a mineral's whole trade.
+
 ## Not live
-Census trade data for minerals.
+The World Bank Pink Sheet (fertilizer and metal prices): held on its licence.
 
 ## Verdict
 `data/question_drafts.json` holds draft questions on the next FAO release with a climatology

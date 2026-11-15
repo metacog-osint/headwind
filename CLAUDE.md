@@ -105,8 +105,10 @@ which collects, builds, checks and deploys. The house bar lists Headwind and the
 **Planned scope** (`[local path]`, program row and roadmap step 13): sanctions, export
 controls, prices, currency and energy, with critical minerals, trade.gov screening-list diffs and UN list deltas
 (needs a Census key). Built so far: prices, currency, energy, OFAC, UN, EU and UK list changes, BIS and OFAC rules, trade.gov screening-list
-changes, USGS mineral import reliance and the 2025 critical minerals list. Not built: Census trade data for minerals (needs a key, which Tom
-creates). Describe Headwind publicly from what is live.
+changes, USGS mineral import reliance and the 2025 critical minerals list; in the waiting `headwind-1.6` batch also
+USTR, public inspection, official and market exchange rates, designation batches, the history log and Census trade
+data for minerals. Not built: the World Bank Pink Sheet (its licence is Tom's call, step 12). Describe Headwind
+publicly from what is live.
 
 ## Deploy (13 Nov 2026)
 - **Live at https://headwind-2lx.pages.dev** since about 10:41 AM CST, 13 Nov (`headwind.pages.dev` was taken).
@@ -141,7 +143,7 @@ python tools/headwind.py collect --only fx    # one or more lanes; the rest keep
 python tools/headwind.py build                # build site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python tools/headwind.py restore --from URL   # a scheduled run: read the last state from the published site
-python -m unittest discover -s tests          # 64 offline tests against real fixtures
+python -m unittest discover -s tests          # 67 offline tests against real fixtures
 python tools/serve.py                         # site/ on http://127.0.0.1:8751 with the headers in _headers (CSP)
 ```
 
@@ -163,6 +165,7 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | `screening` | `screening.py` | trade.gov Consolidated Screening List (one 34 MB JSON), every list but the SDN list | 13 Nov, 8:46 AM CST: 12 lists, 6,702 entries (Entity List 3,419). First reading, so no change to report yet. The download took 4 s |
 | `controls` | `controls.py` | Federal Register API: BIS, OFAC and USTR rules and proposed rules and USTR notices, last 60 days; the same agencies' documents of the last 800 days for the register of scheduled dates | 13 Nov: 25 rules; 2 future dates for Verdict (3 Dec polysilicon rule ends, 10 Jan 2027 affiliates-rule stay ends). 15 Nov: 34 rules and USTR notices, 18 scheduled dates |
 | `inspection` | `inspection.py` | Office of the Federal Register, public inspection: the issues of the last 5 days (30 on a first run or after a gap), BIS, OFAC and USTR filings, and each rule's or USTR notice's text | 15 Nov: 30 days read, 26 filings (17 notices counted only); HW-IND-2 met by BIS 2026-22793 and USTR 2026-22925 and 2026-22867 |
+| `trade` | `trade.py` | Census Bureau international trade API, imports by HS code and country, 24 codes. **Needs a free Census key** | 15 Nov: 24 codes, newest month Sep 2026 |
 | `minerals` | `minerals.py` | USGS Mineral Commodity Summaries 2026 data release on ScienceBase (item JSON, then two CSVs) | 13 Nov: 68 commodities with net import reliance, 47 with import shares by country |
 
 The sanctions lane was read three times on 13 Nov (to about 9 AM CST) and both files were byte-for-byte the same as
@@ -427,6 +430,28 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - **US persons:** the Denied Persons List is mostly US addresses (1,106 of its address records). Counts only is why
   `us_person_data` stays `none`; publishing names would change that.
 
+## Census trade data for minerals (plan step 16, built 15 Nov 2026, lane `trade`)
+- **Source:** the Census Bureau's international trade API, `timeseries/intltrade/imports/hs`, general imports
+  (customs value, `GEN_VAL_MO`) by HS code and country, one request per code from 25 months back
+  (`headwind/trade.py`, `CODES`: 24 HS codes standing for 2025 list minerals, ores, metals and compounds; each
+  checked against the description Census returns, `expect`; Census spells 7502 "NICKLE"). Context, not feed items:
+  in the page snapshot as `mineral_trade`, in `minerals.json` as `trade`, and a table under Minerals on the page.
+- **Measures per code:** imports in the last 12 calendar months to the newest month any code gives, the 12 before,
+  the change, the five leading source countries with shares, and China's share in both windows. A month with no
+  trade is missing from Census's reply and counts as none (a test). Groupings (OECD, NATO, EU; codes starting 0)
+  and the total row are not countries.
+- **Key:** `CENSUS_API_KEY` (user-level variable on this machine and the repo secret, both set; checked 15 Nov
+  without printing it), or `%USERPROFILE%\.headwind\census_api_key.txt` (`HEADWIND_CENSUS_KEY_FILE`). It goes
+  only into the request as sent; the recorded URL, raw index, snapshot and errors stay keyless (tests). Without a
+  key the lane fails and keeps its last good copy. The workflow passes the secret to `collect`.
+- **Notice:** the API's terms (read 15 Nov 2026) require "This product uses the Census Bureau Data API but is not
+  endorsed or certified by the Census Bureau." It is on the page under the table and in the data file. Licence of
+  the data: a US government work, stated from memory.
+- **Live 15 Nov, 1:01 PM CST:** all 24 codes read, newest month Sep 2026, health `census-trade` fresh (window 70/100
+  days after the month's end). China's share of US imports, Oct 2025 to Sep 2026 against the 12 months before:
+  rare-earth compounds (2846) 63.9% (57.5%), rare-earth metals (280530) 60.3% (89.5%), natural graphite (2504)
+  14.9% (47.8%), tungsten metal (8101) 13.0% (21.1%). Figures as Census published them on that day.
+
 ## Minerals (`headwind-1.3`)
 - **Annual context, like the baseline lane: not in the feed.** USGS's Figure 2 table gives net import reliance for
   2025 for 68 commodities; its Figure 3 table gives import shares by country for 2021-24 for 47.
@@ -480,8 +505,8 @@ trips the rule in ordinary times. On 12 Nov nothing was flagged; the largest z w
 - A rate decision is exported to Verdict as kind `rule_date`, the nearest kind Verdict accepts.
 
 ## Not done
-- **Planned and not built:** Census trade data for minerals (needs a key). USTR notices and Federal Register
-  public inspection are built (step 10).
+- **Planned and not built:** the World Bank Pink Sheet (step 12, held on its licence). Census trade data for
+  minerals (step 16), USTR notices and Federal Register public inspection (step 10) are built.
 - **Edits to entries that stay on a list** are reported since `headwind-1.4` (see Source health and state).
 - `HW-EEI-1` (vessel matches in Wake) is unmet. Headwind now carries the IMO numbers it needs; the match itself
   is not built, and Wake is seed data only. `HW-EEI-2` (public-inspection filings) is served since step 10.

@@ -111,6 +111,15 @@
       "independence_group": "world-bank"
     },
     {
+      "id": "census-trade",
+      "name": "US Census Bureau international trade API: general imports by HS code and country (timeseries/intltrade/imports/hs)",
+      "url": "https://www.census.gov/data/developers/data-sets/international-trade.html",
+      "licence": "US government work (public domain, stated from memory); the API terms require the notice 'This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.'",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "us-census"
+    },
+    {
       "id": "worldbank-gem",
       "name": "World Bank Global Economic Monitor (WDI API source 15): official exchange rate, monthly average (DPANUSSPB)",
       "url": "https://databank.worldbank.org/source/global-economic-monitor-(gem)",
