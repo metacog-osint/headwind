@@ -226,6 +226,28 @@
         ? '<details class="more"><summary>Show ' + (ruleRows.length - RULES_SHOWN) + " earlier documents</summary>" + ruleRows.slice(RULES_SHOWN).join("") + "</details>" : "")
       : '<p class="small muted">No rules collected.</p>';
 
+    function paceLine(p, noun) {
+      if (!p || p.count === undefined || p.count === null) { return ""; }
+      var z = p.z === null || p.z === undefined ? "no baseline yet" : "z " + (p.z >= 0 ? "+" : "") + p.z.toFixed(1);
+      return '<div class="row"><div class="row-title"><span>' + esc(p.count + " " + noun + " from " + p.from + " to " + p.to) + "</span>" +
+        (p.anomaly ? '<span class="badge badge-warn">unusual</span>' : "") + '</div><div class="small muted">' +
+        esc("Median of the " + p.baseline_windows + " windows before: " + p.median + "; " + z + (p.flag_rate !== null && p.flag_rate !== undefined ? "; flag rate " + p.flag_rate : "")) + "</div></div>";
+    }
+    var hts = s.hts_releases || {};
+    var revs = (hts.revisions || []).slice(0, 4).map(function (r) {
+      return r.title + " (posted " + r.posted + (r.in_effect_from ? ", in effect from " + r.in_effect_from : "") + ")";
+    });
+    var years = Object.keys(hts.by_year || {}).slice(-4).map(function (y) { return y + " " + hts.by_year[y]; });
+    var pending = (s.signed_actions || []).filter(function (a) { return !a.fr_document; }).map(function (a) {
+      return '<div class="row"><div class="row-title"><span><a href="' + esc(a.url) + '" rel="noopener">' + esc("The White House: " + a.title) + '</a></span><span class="badge">' + esc(a.date) + '</span></div><div class="small muted">Signed; not yet in the Federal Register.</div></div>';
+    });
+    document.getElementById("tariffs-list").innerHTML =
+      paceLine(s.tariff_pace, "presidential tariff actions published") +
+      paceLine(s.hts_pace, "tariff schedule revisions posted") +
+      (revs.length ? '<p class="small muted">' + esc("Newest revisions: " + revs.join("; ") + ". Revisions a year: " + years.join(", ") + ".") + "</p>" : "") +
+      pending.join("") +
+      (s.signed_error ? '<p class="small muted">The White House feed could not be read this run.</p>' : "");
+
     var counted = {};
     (s.inspection || []).forEach(function (r) { if (r.counted_only) { counted[r.agency] = (counted[r.agency] || 0) + 1; } });
     var stateWord = { present: "HW-IND-2 met", absent: "HW-IND-2 not met", no_data: "HW-IND-2 not measured" };
@@ -249,7 +271,7 @@
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, counted only because their titles can name people and companies: notices, ' + esc(countedText) + ".</p>" : "");
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {

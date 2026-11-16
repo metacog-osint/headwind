@@ -1,0 +1,1920 @@
+{
+ "count": 53,
+ "results": [
+  {
+   "document_number": "2026-22726",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Application Process To Waive the Import Qualification Criteria Measures To Restrict Stockpiling of Polysilicon and Polysilicon Derivatives",
+   "type": "Notice",
+   "publication_date": "2026-11-06",
+   "effective_on": null,
+   "comments_close_on": "2027-01-05",
+   "html_url": "https://www.federalregister.gov/documents/2026/11/06/2026-22726/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "To ensure consideration, comments regarding this proposed information collection must be received on or before January 5, 2027.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice of information collection, request for comment.",
+   "abstract": "The Department of Commerce, in accordance with the Paperwork Reduction Act of 1995 (PRA), invites the general public and other Federal agencies to comment on proposed, and continuing information collections, which helps us assess the impact of our information collection requirements and minimize the public's reporting burden. The purpose of this notice is to allow for 60 days of public comment on the OMB approved emergency collection for the Temporary Final Rule \"Measures To Restrict Stockpiling of Polysilicon and Polysilicon Derivatives Under Proclamation 11052\" (September 24, 2026, 91 FR 60505)."
+  },
+  {
+   "document_number": "2026-22725",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Section 232 National Security Adjustments to Imports of Specialty Pharmaceuticals and Associated Ingredients",
+   "type": "Notice",
+   "publication_date": "2026-11-06",
+   "effective_on": null,
+   "comments_close_on": "2027-01-05",
+   "html_url": "https://www.federalregister.gov/documents/2026/11/06/2026-22725/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "To ensure consideration, comments regarding this proposed information collection must be received on or before January 5, 2027.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice of information collection, request for comment.",
+   "abstract": "The Department of Commerce, in accordance with the Paperwork Reduction Act of 1995 (PRA), invites the general public and other Federal agencies to comment on proposed, and continuing information collections, which helps us assess the impact of our information collection requirements and minimize the public's reporting burden. The purpose of this notice is to allow for 60 days of public comment on the OMB approved emergency collection for the Temporary Final Rule \"Section 232 National Security Adjustments to Imports of Specialty Pharmaceuticals and Associated Ingredients\" September 23, 2026, (91 FR 60360)."
+  },
+  {
+   "document_number": "2026-19498",
+   "title": "Guidance and Procedures for Implementing Tariff Adjustments for Specialty Pharmaceuticals and Associated Pharmaceutical Ingredients and Technical Corrections to the Harmonized Tariff Schedule of the United States for Duties Imposed Under Proclamation 11020",
+   "type": "Notice",
+   "publication_date": "2026-09-23",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/09/23/2026-19498/guidance-and-procedures-for-implementing-tariff-adjustments-for-specialty-pharmaceuticals-and",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Submission of information will be received on an ongoing basis starting September 23, 2026.",
+   "regulation_id_numbers": [
+    "0694-XC15"
+   ],
+   "docket_ids": [
+    "Docket No. 260918-0006"
+   ],
+   "action": "Notice.",
+   "abstract": "This notice defines the pharmaceutical products and lists the jurisdictions that are eligible to receive an ad valorem tariff rate of zero pursuant to Presidential Proclamation 11020 of April 2, 2026, \"Adjusting Imports of Pharmaceuticals and Pharmaceutical Ingredients Into the United States,\" (Proclamation 11020). These pharmaceutical products include drugs and associated ingredients where all approved indications are designated as orphan; nuclear medicines; plasma derived therapies; fertility drugs; cell therapy product; gene therapy product; antibody drug conjugates; medical countermeasures related to chemical, biological, radiological, and nuclear threats; and animal health. Proclamation 11020 states that such products and associated ingredients receive the Section 232 zero tariff rate if they are products of a jurisdiction that has a current or forthcoming trade and security framework agreement or if they meet an urgent U.S. health need. This notice also includes procedures for the public to submit information for the Department of Commerce's (Commerce) approval to determine if imports of the pharmaceutical products and associated ingredients meet an urgent U.S. health need. This notice also issues five technical corrections to Annex I and one technical correction to Annex IV of the Proclamation."
+  },
+  {
+   "document_number": "2026-17619",
+   "title": "Certain Hot-Rolled Steel Flat Products From Japan: Notice of Court Decision Not in Harmony With the Results of Antidumping Administrative Review; Notice of Amended Final Results",
+   "type": "Notice",
+   "publication_date": "2026-08-28",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/08/28/2026-17619/certain-hot-rolled-steel-flat-products-from-japan-notice-of-court-decision-not-in-harmony-with-the",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Applicable April 18, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "A-588-874"
+   ],
+   "action": null,
+   "abstract": "On April 8, 2026, the U.S. Court of International Trade (CIT) issued its final judgment in Nippon Steel Corporation vs the United States, Consol. Court no. 21-00533, sustaining the U.S. Department of Commerce (Commerce)'s second remand results pertaining to the administrative review of the antidumping duty (AD) order on certain hot-rolled steel flat products from Japan covering the period October 1, 2018, through September 30, 2019. Commerce is notifying the public that the CIT's final judgment is not in harmony with Commerce's final results of the administrative review, and that Commerce is amending the final results with respect to the dumping margin assigned to Nippon Steel Corporation (Nippon Steel)."
+  },
+  {
+   "document_number": "2026-17155",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Procedures for Submissions by Certain Steel and Aluminum Producers Committing to New U.S. Steel or Aluminum Production To Obtain Tariff Adjustments Under Proclamation 10984",
+   "type": "Notice",
+   "publication_date": "2026-08-21",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/08/21/2026-17155/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": null,
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": null,
+   "abstract": null
+  },
+  {
+   "document_number": "2026-16859",
+   "title": "Amending Procedures for Submissions by Importers of Automobiles Qualifying for Preferential Tariff Treatment Under the USMCA To Determine U.S. Content",
+   "type": "Notice",
+   "publication_date": "2026-08-19",
+   "effective_on": null,
+   "comments_close_on": "2026-08-19",
+   "html_url": "https://www.federalregister.gov/documents/2026/08/19/2026-16859/amending-procedures-for-submissions-by-importers-of-automobiles-qualifying-for-preferential-tariff",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Importers may begin submitting documentation as described below on or after August 19, 2026.",
+   "regulation_id_numbers": [
+    "0625-XC06"
+   ],
+   "docket_ids": [
+    "Docket No. 260811-0485"
+   ],
+   "action": "Amending procedures for submission of documentation related to automobile tariffs",
+   "abstract": "In Proclamation 10908 of March 26, 2025, \"Adjusting Imports of Automobiles and Automobile Parts Into the United States,\" the President imposed additional tariffs on imports of specified automobiles and automobile parts to eliminate the threat to national security posed by such imports. That Proclamation also provided that for automobiles that qualify for preferential tariff treatment under the United States-Mexico-Canada Agreement (USMCA), importers of such automobiles may submit documentation to the Secretary of Commerce (Secretary) identifying the amount of U.S. content in each model imported into the United States. In a Federal Register Notice published on May 20, 2025, \"Procedures for Submission by Importers of Automobiles Qualifying for Preferential Tariff Treatment Under the USMCA to Determine U.S. Content,\" the Department of Commerce (Department) established procedures for submission and review of such documentation. This Notice amends those procedures to conform those procedures with the submission timelines for medium- and heavy-duty vehicles, consistent with Proclamation 10984 of October 17, 2025, \"Adjusting Imports of Medium- and Heavy-Duty Vehicles, Medium- and Heavy-Duty Vehicle Parts, and Buses Into the United States.\""
+  },
+  {
+   "document_number": "2026-15961",
+   "title": "Request for Public Comments on the Proposed Implementation of Duties on Additional Aluminum, Steel, and Copper Derivative Articles Under Section 232",
+   "type": "Notice",
+   "publication_date": "2026-08-06",
+   "effective_on": null,
+   "comments_close_on": "2026-08-27",
+   "html_url": "https://www.federalregister.gov/documents/2026/08/06/2026-15961/request-for-public-comments-on-the-proposed-implementation-of-duties-on-additional-aluminum-steel",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by August 27, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 260803-0182"
+   ],
+   "action": "Notice.",
+   "abstract": "This notice requests public comments on a proposal to include 14 additional derivative articles within the scope of the Section 232 duties on steel, aluminum, and copper: aluminum powder; brass-wind musical instruments and their parts and accessories; parts of welding machines and apparatus; floor safes; certain electric conductor cables; fire extinguishers; parts of heat exchange units; parts of certain hydraulic engines and motors; certain self-propelled cranes, mobile lifting frames, and straddle carriers; tanker trailers and semi- trailers; self-loading or self-unloading trailers and semi-trailers for agricultural purposes; certain other trailers and semi-trailers; and certain filled steel containers."
+  },
+  {
+   "document_number": "2026-15280",
+   "title": "Procedures To Administer Import Adjustment Offset Amounts for Certain Imports of Automobile and Medium- and Heavy-Duty Vehicle Parts for Automobile and Medium- and Heavy-Duty Vehicle Engine Manufacturers",
+   "type": "Notice",
+   "publication_date": "2026-07-29",
+   "effective_on": null,
+   "comments_close_on": "2026-07-29",
+   "html_url": "https://www.federalregister.gov/documents/2026/07/29/2026-15280/procedures-to-administer-import-adjustment-offset-amounts-for-certain-imports-of-automobile-and",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Applications from domestic manufacturers of automobile engines and MHDV engines can be submitted starting July 29, 2026.",
+   "regulation_id_numbers": [
+    "0625-XC06"
+   ],
+   "docket_ids": [
+    "Docket No. 260720-0174"
+   ],
+   "action": "Notice.",
+   "abstract": "On May 15, 2026, the International Trade Administration published a Notice titled \"Amending the Procedures To Administer Import Adjustment Offset Amounts for Certain Imports of Automobile Parts Under Proclamation 10908 to Include Medium- and Heavy-Duty Vehicle Parts\" (May 15 Notice), which established amended procedures for automobile and medium- and heavy-duty vehicle (MHDV) manufacturers to apply for and use the import adjustment offset amounts established by Presidential Proclamation 10925 of April 29, 2025, \"Amendments to Adjusting Imports of Automobiles and Automobile Parts Into the United States\", and Presidential Proclamation 10984 of October 17, 2025, \"Adjusting Imports of Medium- and Heavy-Duty Vehicles, Medium- and Heavy-Duty Vehicle Parts, and Buses Into the United States.\" This notice provides procedures to allow domestic manufacturers of automobile engines and MHDV engines to claim import adjustment offsets for imports of parts in a manner consistent with those Proclamations. The procedures exclude certain engine assembly operations determined to be limited production operations from being considered in the calculation of offsets."
+  },
+  {
+   "document_number": "2026-13663",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Anthracite Coal",
+   "type": "Notice",
+   "publication_date": "2026-07-07",
+   "effective_on": null,
+   "comments_close_on": "2026-07-21",
+   "html_url": "https://www.federalregister.gov/documents/2026/07/07/2026-13663/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-anthracite",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by July 21, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 260701-0158"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "On June 29, 2026, the Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of anthracite coal. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended (Section 232). Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2026-12343",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Procedures for Submissions by Certain Steel and Aluminum Producers Committing to New U.S. Steel or Aluminum Production to Obtain Tariff Adjustments Under Proclamation 10984",
+   "type": "Notice",
+   "publication_date": "2026-06-18",
+   "effective_on": null,
+   "comments_close_on": "2026-08-17",
+   "html_url": "https://www.federalregister.gov/documents/2026/06/18/2026-12343/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "To ensure consideration, comments regarding this proposed information collection must be received on or before August 17, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice of Information Collection, request for comment.",
+   "abstract": "The Department of Commerce, in accordance with the Paperwork Reduction Act of 1995 (PRA), invites the general public and other Federal agencies to comment on proposed, and continuing information collections, which helps us assess the impact of our information collection requirements and minimize the public's reporting burden. The purpose of this notice is to allow for 60 days of public comment preceding submission of the collection to OMB."
+  },
+  {
+   "document_number": "2026-12092",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Parts Tariff Offset Program for Automobiles, MHDVs, and Engines",
+   "type": "Notice",
+   "publication_date": "2026-06-16",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/06/16/2026-12092/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": null,
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": null,
+   "abstract": null
+  },
+  {
+   "document_number": "2026-10571",
+   "title": "Implementing Certain Tariff-Related Elements of a Trade and Security Agreement Between the American Institute in Taiwan and the Taipei Economic and Cultural Representative Office in the United States",
+   "type": "Notice",
+   "publication_date": "2026-05-28",
+   "effective_on": "2026-05-28",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/05/28/2026-10571/implementing-certain-tariff-related-elements-of-a-trade-and-security-agreement-between-the-american",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    },
+    {
+     "raw_name": "OFFICE OF THE UNITED STATES TRADE REPRESENTATIVE",
+     "name": "Trade Representative, Office of United States",
+     "id": 491,
+     "url": "https://www.federalregister.gov/agencies/trade-representative-office-of-united-states",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/491",
+     "parent_id": null,
+     "slug": "trade-representative-office-of-united-states"
+    }
+   ],
+   "dates": "This notice is effective May 28, 2026. The modifications to the HTSUS set forth in the Annex to this Notice are effective with respect to goods entered for consumption, or withdrawn from warehouse consumption, on or after 12:01 a.m. eastern time on May 1, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice.",
+   "abstract": "On September 5, 2025, President Trump issued Executive Order 14346 (Modifying the Scope of Reciprocal Tariffs and Establishing Procedures for Implementing Trade and Security Agreements). Executive Order 14346 directed and authorized the Secretary of Commerce (Secretary) and the United States Trade Representative (Trade Representative) to implement the terms of any framework trade and security agreement or final trade and security agreement concluded between the United States and a foreign trading partner that involve the national emergency declared in Executive Order 14257 of April 2, 2025 (Regulating Imports with a Reciprocal Tariff to Rectify Trade Practices that Contribute to Large and Persistent Annual United States Goods Trade Deficits), or threats to the national security found pursuant to Section 232 of the Trade Expansion Act of 1962 (Section 232). On January 15, 2026, the American Institute in Taiwan (AIT) and the Taipei Economic and Cultural Representative Office in the United States (TECRO) signed the Memorandum of Understanding Between the Taipei Economic and Cultural Representative Office in the United States and the American Institute in Taiwan Relating to Taiwan-U.S. Investment (MOU). In the MOU, the United States committed to, among other things, modify tariffs imposed under Section 232 in certain respects. On February 12, 2026, AIT and TECRO signed the Agreement Between the American Institute in Taiwan and the Taipei Economic and Cultural Representative Office in the United States on Reciprocal Trade Between the United States of America and Taiwan (ART or Agreement). Both the MOU and the ART qualify for implementation under Executive Order 14346. The Secretary and Trade Representative are taking necessary and appropriate action to implement the MOU at this time. The Secretary and Trade Representative are not implementing the ART at this time as it has not yet entered into force. This notice amends the Harmonized Tariff Schedule of the United States (HTSUS) to implement the terms of the MOU pertaining to the modification of certain Section 232 tariffs applied to automobile parts, timber, lumber, and wood derivative products of Taiwan. In addition, the MOU states that the United States will remove derivative Section 232 steel, aluminum, and copper tariffs from aircraft components that are products of Taiwan."
+  },
+  {
+   "document_number": "2026-09782",
+   "title": "Amending the Procedures To Administer Import Adjustment Offset Amounts for Certain Imports of Automobile Parts Under Proclamation 10908 To Include Medium- and Heavy-Duty Vehicle Parts",
+   "type": "Notice",
+   "publication_date": "2026-05-15",
+   "effective_on": null,
+   "comments_close_on": "2026-05-15",
+   "html_url": "https://www.federalregister.gov/documents/2026/05/15/2026-09782/amending-the-procedures-to-administer-import-adjustment-offset-amounts-for-certain-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Applications from domestic manufacturers of MHDVs can be submitted starting May 15, 2026. Domestic manufacturers of automobiles may continue to submit applications at the address below.",
+   "regulation_id_numbers": [
+    "0625-XC06"
+   ],
+   "docket_ids": [
+    "Docket No. 260506-0125"
+   ],
+   "action": "Notice.",
+   "abstract": "On June 13, 2025, the International Trade Administration published a Notice titled \"Procedures To Administer Import Adjustment Offset Amounts for Certain Imports of Automobile Parts Under Proclamation 10908, as Amended\" (June 13 Notice), which established procedures for automobile manufacturers to apply for and use the import adjustment offset amount established by Presidential Proclamation 10925 of April 29, 2025, \"Amendments to Adjusting Imports of Automobiles and Automobile Parts Into the United States\" to incentivize domestic automobile production and reduce American reliance on imports of foreign automobiles and their parts. This notice amends those procedures consistent with the amendments to Proclamation 10925 set forth in Presidential Proclamation 10984 of October 17, 2025, \"Adjusting Imports of Medium- and Heavy-Duty Vehicles, Medium- and Heavy-Duty Vehicle Parts, and Buses Into the United States\". This notice also amends those procedures to allow domestic manufacturers of Medium- and Heavy-Duty Vehicles (MHDV) to claim import adjustment offsets for imports of MHDV parts (MHDVPs) and automobile parts in a manner consistent with Proclamation 10984. The procedures exclude certain heavy-duty vehicle assembly operations determined to be \"limited production operations\" from being considered in the calculation of offsets, and notes that these procedures will be amended to exclude limited production operations for automobiles and medium- duty vehicles at a later date. This notice replaces the procedures set forth in ITA's June 13 Notice. The import adjustment offset process will be amended at a later date to establish an equivalent process for domestic manufacturers of automobile engines and MHDV engines, as provided for in Proclamation 10984."
+  },
+  {
+   "document_number": "2026-09489",
+   "title": "Procedures To Apply for Company-Specific Onshoring Agreements To Obtain Tariff Adjustments for Pharmaceuticals and Pharmaceutical Ingredients Under Proclamation 11020",
+   "type": "Notice",
+   "publication_date": "2026-05-13",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/05/13/2026-09489/procedures-to-apply-for-company-specific-onshoring-agreements-to-obtain-tariff-adjustments-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Applications are requested by June 12, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 260428-0115"
+   ],
+   "action": "Notice.",
+   "abstract": "This notice announces the procedures for companies that manufacture pharmaceutical products to apply for company-specific agreements with the Department of Commerce (Commerce) to onshore manufacturing of pharmaceutical products and their ingredients. Companies that enter into such agreements are eligible for a reduced Section 232 duty rate for imports of their pharmaceutical products and associated ingredients. Companies are requested to submit applications within 30 days of publication in the Federal Register."
+  },
+  {
+   "document_number": "2026-09318",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Parts Tariff Offset Program for Motor Vehicles and Motor Vehicle Parts",
+   "type": "Notice",
+   "publication_date": "2026-05-12",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/05/12/2026-09318/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": null,
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": null,
+   "abstract": null
+  },
+  {
+   "document_number": "2026-08297",
+   "title": "Notice of Technical Corrections to the Harmonized Tariff Schedule of the United States for Duties Imposed by Presidential Proclamation 11021",
+   "type": "Notice",
+   "publication_date": "2026-04-29",
+   "effective_on": "2026-04-06",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/04/29/2026-08297/notice-of-technical-corrections-to-the-harmonized-tariff-schedule-of-the-united-states-for-duties",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "These technical corrections and clarification are effective with respect to certain products that are entered for consumption, or withdrawn from warehouse for consumption, on or after 12:01 a.m. Eastern Time on April 6, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 260424-0111"
+   ],
+   "action": "Notice.",
+   "abstract": "The President issued Proclamation 11021 \"Strengthening Actions Taken to Adjust Imports of Aluminum, Steel, and Copper Into the United States,\" (Presidential Proclamation) on April 2, 2026, to adjust imports of metal products to address more effectively threats to the national security. In the Presidential Proclamation, the President authorized the Secretary of Commerce (the Secretary) to publish modifications to the Harmonized Tariff Schedule of the United States (HTSUS) to effectuate or implement the Presidential Proclamation. The Secretary also is authorized to make any technical corrections to any Annex of the Presidential Proclamation. This notice issues two technical corrections to Annex IV of the Proclamation and a clarification."
+  },
+  {
+   "document_number": "2026-07987",
+   "title": "Procedures for Submissions by Certain Steel and Aluminum Producers Committing to New U.S. Steel or Aluminum Production To Obtain Tariff Adjustments Under Proclamation 10984",
+   "type": "Notice",
+   "publication_date": "2026-04-23",
+   "effective_on": null,
+   "comments_close_on": "2026-04-23",
+   "html_url": "https://www.federalregister.gov/documents/2026/04/23/2026-07987/procedures-for-submissions-by-certain-steel-and-aluminum-producers-committing-to-new-us-steel-or",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Eligible steel and aluminum producers may submit documentation as of April 23, 2026.",
+   "regulation_id_numbers": [
+    "0625-XC06"
+   ],
+   "docket_ids": [
+    "Docket No. 260420-0105"
+   ],
+   "action": "Notice announcing procedures for seeking tariff adjustments under Proclamation 10984.",
+   "abstract": "In Presidential Proclamation 10984 of October 17, 2025 (Adjusting Imports of Medium- and Heavy-Duty Vehicles, Medium- and Heavy-Duty Vehicle Parts, and Buses Into the United States), the President imposed additional tariffs on imports of specified medium- and heavy-duty vehicles (MHDVs), medium- and heavy-duty vehicles parts (MHDVPs), and buses to eliminate the threat to national security posed by such imports. That Proclamation also authorized the Secretary of Commerce to reduce tariffs owed under Proclamation 9704 of March 8, 2018 (Adjusting Imports of Aluminum Into the United States) as amended, and Proclamation 9705 of March 8, 2018 (Adjusting Imports of Steel Into the United States) as amended, for certain steel and aluminum producers operating production facilities in Canada or Mexico, based on newly committed U.S. production capacity. This notice establishes procedures for submission and review of documentation substantiating new U.S. production capacity commitments and eligibility for adjusted tariffs by the Department of Commerce."
+  },
+  {
+   "document_number": "2026-05681",
+   "title": "Notice of the Opening of the Inclusions Window for the Section 232 Automobile Parts Tariff Inclusions Process",
+   "type": "Notice",
+   "publication_date": "2026-03-24",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/03/24/2026-05681/notice-of-the-opening-of-the-inclusions-window-for-the-section-232-automobile-parts-tariff",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "The inclusions window will open on April 1, 2026, and close at 11:59 p.m. ET on April 14, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 251211-0089"
+   ],
+   "action": "Notice.",
+   "abstract": "The Bureau of Industry and Security (BIS), working with the International Trade Administration (ITA) has established a process for including additional automobile parts within the scope of the duties authorized by the President under section 232 of the Trade Expansion Act of 1962. This notice opens the April 2026 inclusions window for submissions."
+  },
+  {
+   "document_number": "2026-04031",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Inclusions to the Section 232 National Security Adjustments to Automobile Parts Imports",
+   "type": "Notice",
+   "publication_date": "2026-03-02",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2026/03/02/2026-04031/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": null,
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": null,
+   "abstract": null
+  },
+  {
+   "document_number": "2026-02049",
+   "title": "Procedures for Submissions by Importers of Medium- and Heavy-Duty Vehicles Qualifying for Preferential Tariff Treatment Under the USMCA To Determine U.S. Content",
+   "type": "Notice",
+   "publication_date": "2026-02-02",
+   "effective_on": null,
+   "comments_close_on": "2026-02-02",
+   "html_url": "https://www.federalregister.gov/documents/2026/02/02/2026-02049/procedures-for-submissions-by-importers-of-medium--and-heavy-duty-vehicles-qualifying-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Importers may begin submitting documentation as described below on or after February 2, 2026.",
+   "regulation_id_numbers": [
+    "0625-XC05"
+   ],
+   "docket_ids": [
+    "Docket No. 260127-0036"
+   ],
+   "action": "Procedures for submission of documentation related to medium- and heavy-duty vehicles tariffs.",
+   "abstract": "In Presidential Proclamation 10984 of October 17, 2025, \"Adjusting Imports of Medium- and Heavy-Duty Vehicles, Medium- and Heavy-Duty Vehicle Parts, and Buses Into the United States\" (Proclamation 10984), the President imposed additional tariffs on imports of specified medium- and heavy-duty vehicles (MHDVs), medium- and heavy-duty vehicles parts (MHDVPs), and buses to eliminate the threat to national security posed by such imports. That Proclamation also provided that for MHDVs that qualify for preferential tariff treatment under the United States-Mexico-Canada Agreement (USMCA), importers of such MHDVs may submit documentation to the Secretary of Commerce (Secretary) identifying the amount of U.S. content in each model imported into the United States. This notice announces procedures for submission and review of such documentation by the Department of Commerce (Department)."
+  },
+  {
+   "document_number": "2025-23768",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Inclusions to the Section 232 National Security Adjustments to Automobile Parts Imports",
+   "type": "Notice",
+   "publication_date": "2025-12-23",
+   "effective_on": null,
+   "comments_close_on": "2026-02-23",
+   "html_url": "https://www.federalregister.gov/documents/2025/12/23/2025-23768/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "To ensure consideration, comments regarding this proposed information collection must be received on or before February 23, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice of information collection, request for comment.",
+   "abstract": "The Department of Commerce, in accordance with the Paperwork Reduction Act of 1995 (PRA), invites the general public and other Federal agencies to comment on proposed, and continuing information collections, which helps us assess the impact of our information collection requirements and minimize the public's reporting burden. The purpose of this notice is to allow for 60 days of public comment preceding submission of the collection to OMB."
+  },
+  {
+   "document_number": "2025-23628",
+   "title": "Certain Aluminum Foil From the Sultanate of Oman: Amended Final Results of Antidumping Duty Administrative Review; 2022-2023",
+   "type": "Notice",
+   "publication_date": "2025-12-22",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/12/22/2025-23628/certain-aluminum-foil-from-the-sultanate-of-oman-amended-final-results-of-antidumping-duty",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Applicable December 22, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "A-523-815"
+   ],
+   "action": null,
+   "abstract": "The U.S. Department of Commerce (Commerce) is amending the final results of the administrative review of the antidumping duty (AD) order on certain aluminum foil (aluminum foil) from the Sultanate of Oman (Oman) to correct certain ministerial errors. The period of review (POR) is November 1, 2022, through October 31, 2023."
+  },
+  {
+   "document_number": "2025-22845",
+   "title": "Notice of the Opening of the Inclusions Window for the Section 232 Automobile Parts Tariff Inclusions Process",
+   "type": "Notice",
+   "publication_date": "2025-12-16",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/12/16/2025-22845/notice-of-the-opening-of-the-inclusions-window-for-the-section-232-automobile-parts-tariff",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "The inclusions window will open on January 1, 2026, and close at 11:59 p.m. ET on January 14, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 251211-0089"
+   ],
+   "action": "Notice.",
+   "abstract": "The Bureau of Industry and Security (BIS), working with the International Trade Administration (ITA) have established a process for including additional automobile parts within the scope of the duties authorized by the President under section 232 of the Trade Expansion Act of 1962. This notice opens the January 2026 inclusions window for submissions."
+  },
+  {
+   "document_number": "2025-21940",
+   "title": "Implementing Certain Tariff-Related Elements of the U.S.-Korea Strategic Trade and Investment Deal",
+   "type": "Notice",
+   "publication_date": "2025-12-04",
+   "effective_on": "2025-12-04",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/12/04/2025-21940/implementing-certain-tariff-related-elements-of-the-us-korea-strategic-trade-and-investment-deal",
+   "agencies": [
+    {
+     "raw_name": "OFFICE OF THE UNITED STATES TRADE REPRESENTATIVE",
+     "name": "Trade Representative, Office of United States",
+     "id": 491,
+     "url": "https://www.federalregister.gov/agencies/trade-representative-office-of-united-states",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/491",
+     "parent_id": null,
+     "slug": "trade-representative-office-of-united-states"
+    },
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "This notice is effective December 4, 2025. The modifications to the Harmonized Tariff Schedule of the United States set forth in Part A of the Annex are effective with respect to automobiles and automobile parts entered for consumption, or withdrawn from warehouse consumption, on or after 12:01 a.m. eastern time on November 1, 2025. The modifications to the Harmonized Tariff Schedule of the United States set forth in Part B of the Annex are effective with respect to goods subject to the country-specific reciprocal tariffs, timber, lumber, and their derivatives, and certain aircraft and aircraft parts, entered for consumption, or withdrawn from warehouse for consumption, on or after 12:01 a.m. eastern time on November 14, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice.",
+   "abstract": "On November 13, 2025, the United States and the Republic of Korea (ROK) issued a Joint Fact Sheet reaffirming the historic announcement in July of the Korea Strategic Trade and Investment Deal (U.S.-ROK Deal), which reflects the strength and endurance of the U.S.- ROK Alliance. The Joint Fact Sheet sets out steps the United States and the ROK will take to further the U.S.-ROK Alliance under the U.S.-ROK Deal. The Secretary of Commerce and United States Trade Representative, in consultation with the Commissioner of U.S. Customs and Border Protection and the Chair of the United States International Trade Commission, have determined that certain tariff modifications are necessary to implement that deal. This notice amends the Harmonized Tariff Schedule of the United States to implement certain tariff elements of that deal, adjusting tariffs on certain articles that are products of the ROK, including the country-specific reciprocal tariffs provided for under Executive Order 14257, as amended; tariffs on automobiles and automobile parts provided for under Proclamation 10908, as amended; tariffs on timber, lumber, and their derivatives provided for under Proclamation 10976; and tariffs on certain aircraft and aircraft parts provided for under Executive Order 14257, as amended, Proclamation 9704, as amended, Proclamation 9705, as amended, and Proclamation 10962."
+  },
+  {
+   "document_number": "2025-21114",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Section 232 Tariff Offsets and Inclusion Processes for Automobiles and Vehicle Parts",
+   "type": "Notice",
+   "publication_date": "2025-11-26",
+   "effective_on": null,
+   "comments_close_on": "2026-01-26",
+   "html_url": "https://www.federalregister.gov/documents/2025/11/26/2025-21114/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "To ensure consideration, comments regarding this proposed information collection must be received on or before January 26, 2026.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice of information collection, request for comment.",
+   "abstract": "The Department of Commerce, in accordance with the Paperwork Reduction Act of 1995 (PRA), invites the general public and other Federal agencies to comment on proposed, and continuing information collections, which helps us assess the impact of our information collection requirements and minimize the public's reporting burden. The purpose of this notice is to allow for 60 days of public comment preceding submission of the collection to OMB."
+  },
+  {
+   "document_number": "2025-20874",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Inclusions to the Section 232 National Security Adjustments to Imports",
+   "type": "Notice",
+   "publication_date": "2025-11-25",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/11/25/2025-20874/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": null,
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": null,
+   "abstract": null
+  },
+  {
+   "document_number": "2025-18749",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Robotics and Industrial Machinery",
+   "type": "Notice",
+   "publication_date": "2025-09-26",
+   "effective_on": null,
+   "comments_close_on": "2025-10-17",
+   "html_url": "https://www.federalregister.gov/documents/2025/09/26/2025-18749/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by October 17, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250924-0161"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "On September 2, 2025, the Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of robotics and industrial machinery. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended (Section 232). Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-18729",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Personal Protective Equipment, Medical Consumables, and Medical Equipment, Including Devices",
+   "type": "Notice",
+   "publication_date": "2025-09-26",
+   "effective_on": null,
+   "comments_close_on": "2025-10-17",
+   "html_url": "https://www.federalregister.gov/documents/2025/09/26/2025-18729/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by October 17, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250924-0160"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "On September 2, 2025, the Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of personal protective equipment (PPE), medical consumables, and medical equipment including devices. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended (Section 232). Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-18008",
+   "title": "Notice of the Opening of the Inclusions Window for the Section 232 Steel and Aluminum Tariff Inclusions Process",
+   "type": "Notice",
+   "publication_date": "2025-09-17",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/09/17/2025-18008/notice-of-the-opening-of-the-inclusions-window-for-the-section-232-steel-and-aluminum-tariff",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "The inclusions window is opened on September 15, 2025, and closes at 11:59 p.m. ET on September 29, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250915-0134"
+   ],
+   "action": "Notice of the opening of the inclusions window for the steel and aluminum tariff inclusions process.",
+   "abstract": "The Bureau of Industry and Security (BIS) has established a process for including additional derivative steel and aluminum articles within the scope of the duties authorized by the President under section 232 of the Trade Expansion Act of 1962. This notice opens the September 2025 inclusions window for submissions."
+  },
+  {
+   "document_number": "2025-17908",
+   "title": "Implementing Certain Tariff-Related Elements of the United States-Japan Agreement",
+   "type": "Notice",
+   "publication_date": "2025-09-16",
+   "effective_on": "2025-09-16",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/09/16/2025-17908/implementing-certain-tariff-related-elements-of-the-united-states-japan-agreement",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "The changes in the Harmonized Tariff Schedule of the United States are effective September 16, 2025 except as otherwise provided for in this notice.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250912-0154",
+    "RTID 0625-XC057"
+   ],
+   "action": "Notice.",
+   "abstract": "On July 23, 2025, the President announced a framework agreement between the United States and Japan (the Agreement), which lays the foundation for a new era of U.S.-Japan trade relations grounded in principles of reciprocity and our shared national interests. On September 4, 2025, the President issued Executive Order 14345, Implementing the United States-Japan Agreement, finding that specified tariff actions are consistent with the national interests of the United States and are necessary and appropriate to address the national emergency declared in Executive Order 14257, as amended, and to reduce or eliminate the threats to national security found in certain proclamations issued under Section 232 of the Trade Expansion Act of 1962. Executive Order 14345 also directed and authorized the Secretary of Commerce (Secretary) to publish in the Federal Register changes to the Harmonized Tariff Schedule of the United States (HTSUS) with respect to general tariffs on Japanese goods (in consultation with the United States Trade Representative, the Secretary of Homeland Security acting through the Commissioner of U.S. Customs and Border Protection (CBP), and the Chair of the United States International Trade Commission (ITC)); products of Japan that fall under the World Trade Organization Agreement on Trade in Civil Aircraft, except for unmanned aircraft (in consultation with the Chair of the ITC and the Commissioner of CBP); and products of Japan subject to duties under Proclamation 10908 of March 26, 2025 (Adjusting Imports of Automobiles and Automobile Parts Into the United States) (in consultation with the Chair of the ITC and the Commissioner of CBP). This notice amends the HTSUS to implement these provisions of the Agreement."
+  },
+  {
+   "document_number": "2025-16191",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Wind Turbines and Their Parts and Components",
+   "type": "Notice",
+   "publication_date": "2025-08-25",
+   "effective_on": null,
+   "comments_close_on": "2025-09-09",
+   "html_url": "https://www.federalregister.gov/documents/2025/08/25/2025-16191/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by September 9, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250818-0143"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "On August 13, 2025, the Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of wind turbines and their parts and components. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended (Section 232). Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-15819",
+   "title": "Adoption and Procedures of the Section 232 Steel and Aluminum Tariff Inclusions Process",
+   "type": "Notice",
+   "publication_date": "2025-08-19",
+   "effective_on": "2025-08-18",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/08/19/2025-15819/adoption-and-procedures-of-the-section-232-steel-and-aluminum-tariff-inclusions-process",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Steel and aluminum derivatives added to the annex in this notice: The duties set out in the annex for these additional steel and aluminum derivatives are effective with respect to certain products that are entered for consumption, or withdrawn from warehouse for consumption, on or after 12:01 a.m. Eastern Time on August 18, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 240814-0099"
+   ],
+   "action": "Notice.",
+   "abstract": "BIS is adding 407 Harmonized Tariff Schedule of the United States (HTSUS) codes to the list of products that will be considered as steel or aluminum derivative products. For such products, steel and aluminum tariffs based on Section 232 of the Trade Expansion Act of 1962 (Section 232) will apply to the steel and aluminum content. The non-steel and non-aluminum content will remain subject to the reciprocal and other applicable tariffs. For 60 HTSUS codes, BIS has decided not to include them as steel and aluminum derivative products at this time, because they are subject to other ongoing investigations pursuant to Section 232 or other trade statutes. The complete list of HTSUS codes added to the Section 232 tariffs by today's action is listed in the annexes to this notice."
+  },
+  {
+   "document_number": "2025-15504",
+   "title": "Certain Hot-Rolled Steel Flat Products From Japan: Final Results of Antidumping Duty Administrative Review; 2022-2023",
+   "type": "Notice",
+   "publication_date": "2025-08-15",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/08/15/2025-15504/certain-hot-rolled-steel-flat-products-from-japan-final-results-of-antidumping-duty-administrative",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Applicable August 15, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "A-588-874"
+   ],
+   "action": null,
+   "abstract": "The U.S. Department of Commerce (Commerce) determines that one of the two producers/exporters of hot-rolled steel flat products (hot- rolled steel) from Japan, Nippon Steel Corporation (NSC), sold subject merchandise in the United States at prices below normal value during the period of review (POR) October 1, 2022, through September 30, 2023."
+  },
+  {
+   "document_number": "2025-14641",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Inclusions to the Section 232 National Security Adjustments to Imports",
+   "type": "Notice",
+   "publication_date": "2025-08-01",
+   "effective_on": null,
+   "comments_close_on": "2025-09-30",
+   "html_url": "https://www.federalregister.gov/documents/2025/08/01/2025-14641/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "To ensure consideration, comments regarding this proposed information collection must be received on or before September 30, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice of information collection, request for comment.",
+   "abstract": "The Department of Commerce, in accordance with the Paperwork Reduction Act of 1995 (PRA), invites the general public and other Federal agencies to comment on proposed, and continuing information collections, which helps us assess the impact of our information collection requirements and minimize the public's reporting burden. The purpose of this notice is to allow for 60 days of public comment preceding submission of the collection to OMB."
+  },
+  {
+   "document_number": "2025-13365",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Unmanned Aircraft Systems (UAS) and Their Parts and Components",
+   "type": "Notice",
+   "publication_date": "2025-07-16",
+   "effective_on": null,
+   "comments_close_on": "2025-08-06",
+   "html_url": "https://www.federalregister.gov/documents/2025/07/16/2025-13365/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by August 6, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250709-0122",
+    "XRIN 0694-XC130"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "On July 1, 2025, the Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of unmanned aircraft systems (UAS) and their parts and components. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended (Section 232). Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-13345",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Polysilicon and its Derivatives",
+   "type": "Notice",
+   "publication_date": "2025-07-16",
+   "effective_on": null,
+   "comments_close_on": "2025-08-06",
+   "html_url": "https://www.federalregister.gov/documents/2025/07/16/2025-13345/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by August 6, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250709-0121"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "On July 1, 2025, the Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of polysilicon and its derivatives. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended (Section 232). Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-12060",
+   "title": "Imports of Automobiles, Automobile Parts, Civil Aircraft and Civil Aircraft Parts From the United Kingdom Under Executive Order 14309",
+   "type": "Notice",
+   "publication_date": "2025-06-30",
+   "effective_on": "2025-06-30",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/06/30/2025-12060/imports-of-automobiles-automobile-parts-civil-aircraft-and-civil-aircraft-parts-from-the-united",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "The changes in the HTSUS are effective June 30, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250625-0113: RTID 0625-XC056"
+   ],
+   "action": "Notice.",
+   "abstract": "Executive Order 14309 of June 16, 2025 (Implementing the General Terms of the United States of America-United Kingdom Economic Prosperity Deal) (Executive Order 14309) establishes a tariff rate quota on automobiles that are products of the United Kingdom (UK), provides for preferential tariff treatment for automobile parts that are products of the UK and for use in UK automobiles, and removes certain tariffs from products of the UK that fall under the World Trade Organization Agreement on Trade in Civil Aircraft. Executive Order 14309 provides that the Secretary of Commerce, in consultation with the United States International Trade Commission (ITC) and U.S. Customs and Border Protection (CBP) is to publish a notice in the Federal Register to modify the Harmonized Tariff Schedule of the United States (HTSUS) to conform with that treatment."
+  },
+  {
+   "document_number": "2025-11067",
+   "title": "Implementation of Duties on Steel Pursuant to Proclamation 10896 Adjusting Imports of Steel Into the United States",
+   "type": "Notice",
+   "publication_date": "2025-06-16",
+   "effective_on": "2025-06-23",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/06/16/2025-11067/implementation-of-duties-on-steel-pursuant-to-proclamation-10896-adjusting-imports-of-steel-into-the",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Steel derivatives added to the annex in this notice: The duties set out in the annex for these additional steel derivatives are effective with respect to certain products that are entered for consumption, or withdrawn from warehouse for consumption, on or after 12:01 a.m. Eastern Time on June 23, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250612-0097",
+    "XRIN: 0694-XC122"
+   ],
+   "action": "Notice.",
+   "abstract": "In the Proclamation of February 10, 2025, Adjusting Imports of Steel into the United States (Steel Presidential Proclamation), the President imposed specified rates of duty on imports of steel. That Proclamation authorized and directed the Secretary of Commerce to publish modifications to the Harmonized Tariff Schedule of the United States (HTSUS) so that it conforms to the amendments and effective dates in the Proclamation. The Bureau of Industry and Security (BIS) published a notice, Implementation of Duties on Steel Pursuant to Proclamation 10896 Adjusting Imports of Steel into the United States, on behalf of the Secretary of Commerce on March 5, 2025, that fulfilled this directive. The revised HTSUS was set out in Annex 1 to the March 5 notice. In this notice, BIS revises Annex 1 to add additional steel derivative products."
+  },
+  {
+   "document_number": "2025-10740",
+   "title": "Procedures To Administer Import Adjustment Offset Amounts for Certain Imports of Automobile Parts Under Proclamation 10908, as Amended",
+   "type": "Notice",
+   "publication_date": "2025-06-13",
+   "effective_on": null,
+   "comments_close_on": "2025-06-13",
+   "html_url": "https://www.federalregister.gov/documents/2025/06/13/2025-10740/procedures-to-administer-import-adjustment-offset-amounts-for-certain-imports-of-automobile-parts",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Applications can be submitted starting June 13, 2025.",
+   "regulation_id_numbers": [
+    "0625-XC05"
+   ],
+   "docket_ids": [
+    "Docket No. 250609-0096"
+   ],
+   "action": "Notice.",
+   "abstract": "This notice announces the procedures for automobile manufacturers to apply for and use the import adjustment offset amount established by Presidential Proclamation 10925 of April 29, 2025, \"Amendments to Adjusting Imports of Automobiles and Automobile Parts Into the United States,\" (Proclamation 10925) to incentivize domestic automobile production and reduce American reliance on imports of foreign automobiles and their parts. Eligibility for the import adjustment offset amount is based on domestic final assembly of automobiles during an approximately two-year period. Import adjustment offset amounts awarded for qualifying automobiles assembled between April 3, 2025, and April 30, 2027, may be carried forward beyond that period until the full approved import adjustment offset amount is exhausted. No new import adjustment offset amounts will be granted for automobiles assembled after April 30, 2027. The intent of this program is to strengthen the U.S. automobile assembly operation capabilities and ensure national security objectives are met by reducing reliance on foreign automobile production and parts sourcing."
+  },
+  {
+   "document_number": "2025-08917",
+   "title": "Procedures for Submissions by Importers of Automobiles Qualifying for Preferential Tariff Treatment Under the USMCA To Determine U.S. Content",
+   "type": "Notice",
+   "publication_date": "2025-05-20",
+   "effective_on": null,
+   "comments_close_on": "2025-05-20",
+   "html_url": "https://www.federalregister.gov/documents/2025/05/20/2025-08917/procedures-for-submissions-by-importers-of-automobiles-qualifying-for-preferential-tariff-treatment",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Importers may begin submitting documentation as described below on or after May 20, 2025.",
+   "regulation_id_numbers": [
+    "0625-AB28"
+   ],
+   "docket_ids": [
+    "Docket No. 250513-0085"
+   ],
+   "action": "Procedures for submission of documentation related to automobile tariffs.",
+   "abstract": "In the Proclamation of March 26, 2025, \"Adjusting Imports of Automobiles and Automobile Parts Into the United States,\" the President imposed additional tariffs on imports of specified automobiles and automobile parts to eliminate the threat to national security posed by such imports. That Proclamation also provided that for automobiles that qualify for preferential tariff treatment under the United States-Mexico-Canada Agreement (USMCA), importers of such automobiles may submit documentation to the Secretary of Commerce (Secretary) identifying the amount of U.S. content in each model imported into the United States. This notice establishes procedures for submission and review of such documentation by the Department of Commerce (Department)."
+  },
+  {
+   "document_number": "2025-08500",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Commercial Aircraft and Jet Engines and Parts for Commercial Aircraft and Jet Engines",
+   "type": "Notice",
+   "publication_date": "2025-05-13",
+   "effective_on": null,
+   "comments_close_on": "2025-06-03",
+   "html_url": "https://www.federalregister.gov/documents/2025/05/13/2025-08500/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by June 3, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250509-0082"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "On May 1, 2025, the Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of commercial aircraft and jet engines, and parts for commercial aircraft and jet engines. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended (Section 232). Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-07273",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Processed Critical Minerals and Derivative Products",
+   "type": "Notice",
+   "publication_date": "2025-04-25",
+   "effective_on": null,
+   "comments_close_on": "2025-05-16",
+   "html_url": "https://www.federalregister.gov/documents/2025/04/25/2025-07273/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by May 16, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250422-0070"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "On April 22, 2025, the Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of processed critical minerals as well as their derivative products. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended (Section 232). Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-07260",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Trucks",
+   "type": "Notice",
+   "publication_date": "2025-04-25",
+   "effective_on": null,
+   "comments_close_on": "2025-05-16",
+   "html_url": "https://www.federalregister.gov/documents/2025/04/25/2025-07260/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by May 16, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250422-0071"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "On April 22, 2025, the Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of medium-duty trucks, heavy-duty trucks, and medium- and heavy-duty truck parts, and their derivative products. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended (Section 232). Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-06591",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Semiconductors and Semiconductor Manufacturing Equipment",
+   "type": "Notice",
+   "publication_date": "2025-04-16",
+   "effective_on": null,
+   "comments_close_on": "2025-05-07",
+   "html_url": "https://www.federalregister.gov/documents/2025/04/16/2025-06591/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by May 7, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250414-0066"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "The Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of semiconductors and semiconductor manufacturing equipment (SME), and their derivative products. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended. Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-06587",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Pharmaceuticals and Pharmaceutical Ingredients",
+   "type": "Notice",
+   "publication_date": "2025-04-16",
+   "effective_on": null,
+   "comments_close_on": "2025-05-07",
+   "html_url": "https://www.federalregister.gov/documents/2025/04/16/2025-06587/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by May 7, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250414-0065"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "The Secretary of Commerce initiated an investigation to determine the effects on the national security of imports of pharmaceuticals and pharmaceutical ingredients, including finished drug products, medical countermeasures, critical inputs such as active pharmaceutical ingredients, and key starting materials, and derivative products of those items. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended. Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's (Department) Bureau of Industry and Security (BIS), Office of Strategic Industries and Economic Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-05884",
+   "title": "Implementation of Duties on Aluminum Derivatives Beer and Empty Aluminum Cans Pursuant to Proclamation 10895 Adjusting Imports of Aluminum Into the United States",
+   "type": "Notice",
+   "publication_date": "2025-04-04",
+   "effective_on": "2025-04-04",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/04/04/2025-05884/implementation-of-duties-on-aluminum-derivatives-beer-and-empty-aluminum-cans-pursuant-to",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Aluminum derivatives added to the annex in this notice: The duties set out in the annex for these additional aluminum derivatives are effective with respect to certain products that are entered for consumption, or withdrawn from warehouse for consumption, on or after 12:01 a.m. Eastern Time on April 4, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250331-0058"
+   ],
+   "action": "Notice.",
+   "abstract": "The President issued Proclamation 10895, \"Adjusting Imports of Aluminum into the United States\" (Aluminum Presidential Proclamation), on February 10, 2025, imposing specified rates of duty on imports of aluminum. In Proclamation 10895, the President authorized and directed the Secretary of Commerce to publish modifications to the Harmonized Tariff Schedule of the United States (HTSUS) so that it conforms to the amendments and effective dates in the proclamation. The Bureau of Industry and Security (BIS) published the notice, Implementation of Duties on Aluminum Pursuant to Proclamation 10895 Adjusting Imports of Aluminum Into the United States, on behalf of the Secretary of Commerce on March 5, 2025, that fulfilled this directive. The revised HTSUS was set out in Annex 1 to the March 5 notice. BIS, in this notice, revises Annex 1 to add two additional aluminum derivative products: beer and empty aluminum cans."
+  },
+  {
+   "document_number": "2025-04061",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Copper",
+   "type": "Notice",
+   "publication_date": "2025-03-13",
+   "effective_on": null,
+   "comments_close_on": "2025-04-01",
+   "html_url": "https://www.federalregister.gov/documents/2025/03/13/2025-04061/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by April 1, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250310-0032"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "The Secretary of Commerce has initiated an investigation to determine the effects on U.S. national security of imports of copper in all forms, including, but not limited to, raw mined copper; copper concentrates; refined copper; copper alloys; scrap copper; and derivative products. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended. Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's Bureau of Industry and Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-04060",
+   "title": "Notice of Request for Public Comments on Section 232 National Security Investigation of Imports of Timber and Lumber",
+   "type": "Notice",
+   "publication_date": "2025-03-13",
+   "effective_on": null,
+   "comments_close_on": "2025-04-01",
+   "html_url": "https://www.federalregister.gov/documents/2025/03/13/2025-04060/notice-of-request-for-public-comments-on-section-232-national-security-investigation-of-imports-of",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "Comments may be submitted at any time but must be received by April 1, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250310-0030"
+   ],
+   "action": "Notice of request for public comments.",
+   "abstract": "The Secretary of Commerce has initiated an investigation to determine the effects on the national security of imports of wood products: timber, lumber, and their derivative products. This investigation has been initiated under section 232 of the Trade Expansion Act of 1962, as amended. Interested parties are invited to submit written comments, data, analyses, or other information pertinent to the investigation to the Department of Commerce's Bureau of Industry and Security. This notice identifies issues on which the Department is especially interested in obtaining the public's views."
+  },
+  {
+   "document_number": "2025-03596",
+   "title": "Implementation of Duties on Aluminum Pursuant to Proclamation 10895 Adjusting Imports of Aluminum Into the United States",
+   "type": "Notice",
+   "publication_date": "2025-03-05",
+   "effective_on": "2025-03-12",
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2025/03/05/2025-03596/implementation-of-duties-on-aluminum-pursuant-to-proclamation-10895-adjusting-imports-of-aluminum",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "The duties set out in the annex to this document are effective with respect to certain products that are entered for consumption, or withdrawn from warehouse for consumption, on or after 12:01 a.m. Eastern Standard Time on March 12, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "Docket No. 250226-0028"
+   ],
+   "action": "Notice.",
+   "abstract": "The President issued Proclamation 10895 \"Adjusting Imports of Aluminum into the United States,\" (Aluminum Presidential Proclamation) on February 10, 2025, imposing specified rates of duty on imports of aluminum. In Proclamation 10895, the President authorized and directed the Secretary of Commerce to publish modifications to the Harmonized Tariff Schedule of the United States (HTSUS) so that it conforms to the amendments and effective dates in the proclamation. The revised HTSUS is set out in Annex 1 to this notice."
+  },
+  {
+   "document_number": "2025-02071",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Objections From the Section 232 National Security Adjustments of Imports of Steel and Aluminum",
+   "type": "Notice",
+   "publication_date": "2025-01-31",
+   "effective_on": null,
+   "comments_close_on": "2025-04-01",
+   "html_url": "https://www.federalregister.gov/documents/2025/01/31/2025-02071/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "To ensure consideration, comments regarding this proposed information collection must be received on or before April 1, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice of Information Collection, request for comment.",
+   "abstract": "The Department of Commerce, in accordance with the Paperwork Reduction Act of 1995 (PRA), invites the general public and other Federal agencies to comment on proposed, and continuing information collections, which helps us assess the impact of our information collection requirements and minimize the public's reporting burden. The purpose of this notice is to allow for 60 days of public comment preceding submission of the collection to OMB."
+  },
+  {
+   "document_number": "2025-02070",
+   "title": "Agency Information Collection Activities; Submission to the Office of Management and Budget (OMB) for Review and Approval; Comment Request; Exclusions From the Section 232 National Security Adjustments of Imports of Steel and Aluminum",
+   "type": "Notice",
+   "publication_date": "2025-01-31",
+   "effective_on": null,
+   "comments_close_on": "2025-04-01",
+   "html_url": "https://www.federalregister.gov/documents/2025/01/31/2025-02070/agency-information-collection-activities-submission-to-the-office-of-management-and-budget-omb-for",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "Bureau of Industry and Security",
+     "name": "Industry and Security Bureau",
+     "id": 241,
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "parent_id": 54,
+     "slug": "industry-and-security-bureau"
+    }
+   ],
+   "dates": "To ensure consideration, comments regarding this proposed information collection must be received on or before April 1, 2025.",
+   "regulation_id_numbers": [],
+   "docket_ids": [],
+   "action": "Notice of information collection, request for comment.",
+   "abstract": "The Department of Commerce, in accordance with the Paperwork Reduction Act of 1995 (PRA), invites the general public and other Federal agencies to comment on proposed, and continuing information collections, which helps us assess the impact of our information collection requirements and minimize the public's reporting burden. The purpose of this notice is to allow for 60 days of public comment preceding submission of the collection to OMB."
+  },
+  {
+   "document_number": "2024-31080",
+   "title": "Certain Steel Nails From the Sultanate of Oman: Final Results of Antidumping Duty Administrative Review; 2022-2023",
+   "type": "Notice",
+   "publication_date": "2024-12-30",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2024/12/30/2024-31080/certain-steel-nails-from-the-sultanate-of-oman-final-results-of-antidumping-duty-administrative",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Applicable December 30, 2024.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "A-523-808"
+   ],
+   "action": null,
+   "abstract": "The U.S. Department of Commerce (Commerce) determines that Oman Fasteners, LLC (Oman Fasteners), the sole producer and exporter subject to this administrative review, did not make sales of certain steel nails (steel nails) from the Sultanate of Oman (Oman) in the United States at prices below normal value (NV) during the period of review (POR), July 1, 2022, through June 30, 2023."
+  },
+  {
+   "document_number": "2024-29603",
+   "title": "Certain Carbon and Alloy Steel Cut-to-Length Plate From Belgium: Final Results of Antidumping Duty Administrative Review; 2022-2023",
+   "type": "Notice",
+   "publication_date": "2024-12-17",
+   "effective_on": null,
+   "comments_close_on": null,
+   "html_url": "https://www.federalregister.gov/documents/2024/12/17/2024-29603/certain-carbon-and-alloy-steel-cut-to-length-plate-from-belgium-final-results-of-antidumping-duty",
+   "agencies": [
+    {
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "name": "Commerce Department",
+     "id": 54,
+     "url": "https://www.federalregister.gov/agencies/commerce-department",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "parent_id": null,
+     "slug": "commerce-department"
+    },
+    {
+     "raw_name": "International Trade Administration",
+     "name": "International Trade Administration",
+     "id": 261,
+     "url": "https://www.federalregister.gov/agencies/international-trade-administration",
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/261",
+     "parent_id": 54,
+     "slug": "international-trade-administration"
+    }
+   ],
+   "dates": "Applicable December 17, 2024.",
+   "regulation_id_numbers": [],
+   "docket_ids": [
+    "A-423-812"
+   ],
+   "action": null,
+   "abstract": "The U.S. Department of Commerce (Commerce) determines that Industeel Belgium S.A. (Industeel) made sales of subject merchandise at less than normal value during the period of review (POR), May 1, 2022, through April 30, 2023."
+  }
+ ]
+}

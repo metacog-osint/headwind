@@ -44,7 +44,7 @@ LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", 
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
            "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
-           "usgs-mcs": "minerals", "census-trade": "trade"}
+           "usgs-mcs": "minerals", "census-trade": "trade", "usitc-hts": "tariffs", "whitehouse-actions": "tariffs"}
 LIST_KEY = {"ofac-sdn": "ofac-sdn", "un-consolidated": "un-sc-consolidated", "eu-fsf": "eu-fsf",
             "uk-sanctions": "uk-sanctions-list"}
 
@@ -82,6 +82,8 @@ DRIFT = {
     "controls": ("us-federal-register", "rules in the window", False),
     "minerals": ("usgs-mcs", "commodities", True),
     "trade": ("census-trade", "HS codes with imports", True),
+    # Warn only: the release list only grows; a short list already fails in tariffs.parse_releases.
+    "tariffs": ("usitc-hts", "HTS revisions listed", False),
     # Warn only: the lane has written its index by the time this runs, and it has its own guard against a short file.
     "screening": ("trade-gov-csl", "entries", False),
 }
@@ -109,6 +111,8 @@ def sizes(lane: str, result: dict) -> dict[str, int]:
         return {"minerals": len((result.get("minerals") or {}).get("reliance") or [])}
     if lane == "trade":
         return {"trade": sum(1 for c in (result.get("mineral_trade") or {}).get("codes") or [] if c.get("newest_month"))}
+    if lane == "tariffs":
+        return {"tariffs": (result.get("hts_releases") or {}).get("total") or 0}
     if lane == "screening":
         return {"screening": sum(l.get("total") or 0 for l in result.get("screening_lists") or [])}
     return {}
@@ -222,7 +226,8 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
     sl = snap.get("screening_lists") or []
     add("trade-gov-csl", "screening", None, f"{len(sl)} lists, {sum(l.get('total') or 0 for l in sl)} entries")
     add("us-federal-register", "controls", None,
-        f"{len(snap.get('controls') or [])} BIS, OFAC and USTR rules and USTR notices in the last 60 days, "
+        f"{len(snap.get('controls') or [])} BIS, OFAC and USTR rules, USTR notices, Section 232 notices and "
+        f"presidential tariff actions in the last 60 days, "
         f"{len(snap.get('scheduled_dates') or [])} scheduled dates from the last 800 days")
     pi = snap.get("inspection") or []
     days = snap.get("inspection_issues") or []
@@ -242,6 +247,17 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
                  tr.get("description_mismatch") or []] + [f"not read: {e}" for e in tr.get("errors") or []])
     if notes_tr:
         out["census-trade"]["warnings"] = list(out["census-trade"].get("warnings") or []) + notes_tr
+    hts = snap.get("hts_releases") or {}
+    revs = hts.get("revisions") or []
+    add("usitc-hts", "tariffs", None,
+        f"{hts.get('total') or 0} HTS revisions listed, newest {revs[0]['title'] + ' posted ' + revs[0]['posted'] if revs else 'none'}")
+    signed = snap.get("signed_actions") or []
+    wh_ok = lane_ok("tariffs") and not snap.get("signed_error")
+    out["whitehouse-actions"] = _entry(
+        "whitehouse-actions", ok=wh_ok, now=now, prev=prev, newest=None, today=today,
+        detail=f"{len(signed)} tariff actions in the last 30 days, {sum(1 for s in signed if not s.get('fr_document'))} "
+               f"not yet in the Federal Register",
+        error=snap.get("signed_error") or err("tariffs"), warnings=notes.get("whitehouse-actions"))
     watch = minerals.watch_notes(snap.get("minerals") or {})
     if watch:
         out["usgs-mcs"]["warnings"] = list(out["usgs-mcs"].get("warnings") or []) + watch

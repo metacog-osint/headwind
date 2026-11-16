@@ -49,7 +49,7 @@
     },
     {
       "id": "us-federal-register",
-      "name": "US Federal Register API (BIS, OFAC and USTR rules and proposed rules, USTR notices)",
+      "name": "US Federal Register API (BIS, OFAC and USTR rules and proposed rules, USTR notices, BIS and ITA Section 232 notices, presidential documents that are tariff actions)",
       "url": "https://www.federalregister.gov/api/v1/documents.json",
       "licence": "US public domain",
       "use": "ingest",
@@ -163,6 +163,24 @@
       "use": "ingest",
       "grade": "A1",
       "independence_group": "usgs"
+    },
+    {
+      "id": "usitc-hts",
+      "name": "US International Trade Commission, Harmonized Tariff Schedule release list (reststop/releaseList)",
+      "url": "https://hts.usitc.gov/",
+      "licence": "US government work (public domain under 17 USC 105, stated from memory; USITC's legal notice returned 403 on 15 Nov 2026)",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "usitc"
+    },
+    {
+      "id": "whitehouse-actions",
+      "name": "The White House, presidential actions (RSS): tariff actions signed but not yet in the Federal Register",
+      "url": "https://www.whitehouse.gov/presidential-actions/",
+      "licence": "Government-produced materials on whitehouse.gov are not copyright protected (whitehouse.gov/copyright, read 15 Nov 2026)",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "whitehouse"
     }
   ]
 }

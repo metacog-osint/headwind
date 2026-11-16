@@ -17,10 +17,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, geo  # noqa: E402
 
-from . import batches, controls, food, inspection, markets, stats  # noqa: E402
+from . import batches, controls, food, inspection, markets, stats, tariffs  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
-METHOD = "headwind-1.6"
+METHOD = "headwind-1.7"
 DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
 RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
@@ -91,14 +91,26 @@ SRC_CSL = {
 
 SRC_FR = {
     "id": "us-federal-register",
-    "publisher": "US Federal Register (BIS, OFAC, USTR)",
+    "publisher": "US Federal Register (BIS, OFAC, USTR, ITA, presidential documents)",
     "title": "Federal Register documents",
     "url": "https://www.federalregister.gov/api/v1/documents.json",
     "licence": "US public domain",
     "grade": "A1",
     "independence_group": "us-federal-register",
     "source_type": "official or market data",
-    "descriptor": "Rules, proposed rules and notices as published by the agency in the official journal.",
+    "descriptor": "Rules, proposed rules, notices and presidential documents as published in the official journal.",
+}
+
+SRC_USITC = {
+    "id": "usitc-hts",
+    "publisher": "US International Trade Commission",
+    "title": "Harmonized Tariff Schedule release list",
+    "url": tariffs.HTS_PAGE,
+    "licence": "US government work (public domain under 17 USC 105, stated from memory; USITC's legal notice could not be read on 15 Nov 2026)",
+    "grade": "A1",
+    "independence_group": "usitc",
+    "source_type": "official or market data",
+    "descriptor": "Each revision of the US tariff schedule: when it was posted and when it took effect.",
 }
 
 SRC_PI = {
@@ -442,6 +454,9 @@ def list_features(snapshot: dict) -> list[dict]:
             accessed=(lanes.get("screening") or {}).get("fetched_at"), anomaly_ref=_batch_ref(s)))
 
     for r in controls.recent(snapshot.get("controls") or [], generated, RULE_DAYS):
+        if r["agency"] == "President":
+            feats.append(_presidential_feature(r, generated, valid_until, (lanes.get("controls") or {}).get("fetched_at")))
+            continue
         dates = []
         if r.get("effective_on"):
             dates.append(f"Effective {r['effective_on']}.")
@@ -463,6 +478,99 @@ def list_features(snapshot: dict) -> list[dict]:
             accessed=(lanes.get("controls") or {}).get("fetched_at")))
 
     feats += inspection_features(snapshot, generated, valid_until, (lanes.get("inspection") or {}).get("fetched_at"))
+    feats += tariff_features(snapshot, generated, valid_until)
+    return feats
+
+
+def _presidential_feature(r: dict, generated: str, valid_until: str, accessed: str | None) -> dict:
+    """A tariff action in the Federal Register's presidential documents: its own title, subtype, number, signing
+    date and the dates its text sets. Published facts; tier routine."""
+    kind = (r.get("action") or "presidential document").lower()
+    parts = [f"{r.get('action') or 'Presidential document'}" + (f" {r['number']}" if r.get("number") else "")
+             + (f", signed {r['signing_date']}" if r.get("signing_date") else "")
+             + f", published in the Federal Register {r['published_date']}."]
+    if r.get("abstract"):
+        parts.append(r["abstract"])
+    if r.get("named_dates"):
+        parts.append(f"Dates its text sets (12:01 a.m. on): {', '.join(r['named_dates'])}.")
+    if r.get("computed_dates"):
+        parts.append(f"Counted from its signing date (\"within N days of the date of this proclamation\"): "
+                     f"{', '.join(r['computed_dates'])}.")
+    if r.get("text_error"):
+        parts.append("Its text could not be read this run, so the dates it sets are not listed.")
+    parts.append(f"Federal Register document {r['id']}.")
+    return _official(
+        f"headwind:control:{r['id']}", f"President, {kind} ({r['published_date']}): {r['title']}", " ".join(parts),
+        data_as_of=f"{r['published_date']}T00:00:00Z", generated=generated, valid_until=valid_until,
+        countries=r.get("countries") or [], pmesii=["economic", "political"], ascope=["organizations"],
+        ncf=["maintain_supply_chains", "manufacture_equipment"], requirement_ids=["HW-PIR-2"],
+        measures={"named_dates": len(r.get("named_dates") or []), "computed_dates": len(r.get("computed_dates") or [])},
+        visual={"type": "page", "url": r["url"]}, source={**SRC_FR, "url": r["url"]}, accessed=accessed)
+
+
+def _pace_ref(p: dict, what: str) -> dict | None:
+    if not p.get("anomaly"):
+        return None
+    return {"id": f"headwind-{what}-pace", "type": "rolling", "version": METHOD,
+            "window": f"{p['window_days']}-day count against the {p['baseline_windows']} {p['window_days']}-day "
+                      f"windows before it, |z| >= {stats.Z_ANOMALY} and at least {what_floor(what)}"}
+
+
+def what_floor(what: str) -> str:
+    return {"tariff": f"{controls.PACE_FLOOR} documents", "hts": f"{tariffs.HTS_FLOOR} revisions"}[what]
+
+
+def _pace_text(p: dict, noun: str) -> str:
+    z = f"z {p['z']:+.1f}" if p.get("z") is not None else "no baseline yet"
+    return (f"{p['count']} {noun} from {p['from']} to {p['to']}; the median of the {p['baseline_windows']} "
+            f"{p['window_days']}-day windows before was {p.get('median')}, {z}"
+            + (f", flag rate {p['flag_rate']}" if p.get("flag_rate") is not None else "") + ".")
+
+
+def tariff_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
+    """The pace of tariff actions and of HTS revisions (counts against their own history), and each HTS revision
+    posted in the last two weeks. Counts and published facts."""
+    lanes = snapshot.get("lanes") or {}
+    feats = []
+    tp = snapshot.get("tariff_pace") or {}
+    if tp.get("count") is not None:
+        feats.append(_official(
+            "headwind:tariffpace:presidential",
+            f"Tariff actions in the Federal Register's presidential documents: {tp['count']} in {tp['window_days']} days"
+            + (" (unusual)" if tp.get("anomaly") else ""),
+            _pace_text(tp, "proclamations, executive orders and memoranda whose title is a tariff action, by "
+                           "Federal Register publication date,")
+            + (f" Documents: {', '.join(tp['ids'])}." if tp.get("ids") else ""),
+            data_as_of=f"{tp['to']}T00:00:00Z", generated=generated, valid_until=valid_until, countries=[],
+            pmesii=["economic", "political"], ascope=["organizations"], ncf=["maintain_supply_chains"],
+            requirement_ids=["HW-PIR-2"],
+            measures={"count": tp["count"], "z": tp.get("z"), "baseline_n": tp.get("baseline_n"),
+                      "flag_rate": tp.get("flag_rate"), "median": tp.get("median")},
+            visual={"type": "page", "url": f"{SITE}/#rules"}, source=SRC_FR,
+            accessed=(lanes.get("controls") or {}).get("fetched_at"), anomaly_ref=_pace_ref(tp, "tariff")))
+    hp = snapshot.get("hts_pace") or {}
+    accessed = (lanes.get("tariffs") or {}).get("fetched_at")
+    if hp.get("count") is not None:
+        feats.append(_official(
+            "headwind:tariffpace:hts",
+            f"Harmonized Tariff Schedule revisions: {hp['count']} in {hp['window_days']} days"
+            + (" (unusual)" if hp.get("anomaly") else ""),
+            _pace_text(hp, "revisions posted by the US International Trade Commission"),
+            data_as_of=f"{hp['to']}T00:00:00Z", generated=generated, valid_until=valid_until, countries=["US"],
+            pmesii=["economic"], ascope=["organizations"], ncf=["maintain_supply_chains"], requirement_ids=["HW-PIR-2"],
+            measures={"count": hp["count"], "z": hp.get("z"), "baseline_n": hp.get("baseline_n"),
+                      "flag_rate": hp.get("flag_rate"), "median": hp.get("median")},
+            visual={"type": "page", "url": f"{SITE}/#rules"}, source=SRC_USITC, accessed=accessed,
+            anomaly_ref=_pace_ref(hp, "hts")))
+    for r in tariffs.recent((snapshot.get("hts_releases") or {}).get("revisions") or [], generated):
+        feats.append(_official(
+            f"headwind:hts:{r['name']}", f"USITC posted {r['title']} of the Harmonized Tariff Schedule ({r['posted']})",
+            f"Posted {r['posted']}" + (f", in effect from {r['in_effect_from']}" if r.get("in_effect_from") else "")
+            + (f" to {r['in_effect_to']}" if r.get("in_effect_to") else "") + ". The release list gives no summary of "
+            "what changed; the change record is on the USITC's HTS site.",
+            data_as_of=f"{r['posted']}T00:00:00Z", generated=generated, valid_until=valid_until, countries=["US"],
+            pmesii=["economic"], ascope=["organizations"], ncf=["maintain_supply_chains"], requirement_ids=["HW-PIR-2"],
+            measures={}, visual={"type": "page", "url": tariffs.HTS_PAGE}, source=SRC_USITC, accessed=accessed))
     return feats
 
 
@@ -776,14 +884,14 @@ def build_feed(snapshot: dict) -> dict:
         "licence": ("Headwind code MIT; ECB reference rates free to reuse with credit; World Bank Global Economic "
                     "Monitor CC BY 4.0; EIA data US public domain; "
                     "FAO CC BY 4.0; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
-                    "Federal Register and its public inspection US public domain; UN Security Council list, no "
+                    "Federal Register and its public inspection US public domain; USITC tariff schedule releases and White House presidential actions US government works; UN Security Council list, no "
                     "licence stated; EU financial "
                     "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; World Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
                         "and Development Office; US International Trade Administration; "
-                        "US Federal Register and the Office of the Federal Register."),
+                        "US Federal Register and the Office of the Federal Register; US International Trade Commission; The White House."),
         "language_key": LANGUAGE_KEY,
         # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read
         # it, how old its newest data are, and any drift or quiet-publisher warning. COP and the kit's history log

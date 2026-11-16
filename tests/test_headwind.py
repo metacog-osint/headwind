@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
-                      sanctions, screening, stats, trade)
+                      sanctions, screening, stats, tariffs, trade)
 from tic_doctrine import contract, registers  # noqa: E402
 
 _spec = importlib.util.spec_from_file_location("headwind_cli", ROOT / "tools" / "headwind.py")
@@ -68,6 +68,19 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         if f.exists():
             return f.read_bytes()
         raise OSError(f"no fixture for {url}")
+    if "federalregister.gov/api/v1/documents.json" in url and "PRESDOCU" in url:
+        return (FIX / "fr_presidential.json").read_bytes()
+    if "federalregister.gov/api/v1/documents.json" in url and "section+232" in url:
+        return (FIX / "fr_section232.json").read_bytes()
+    if "federalregister.gov/documents/full_text/text/" in url:
+        f = FIX / f"fr_pres_raw_{url.rsplit('/', 1)[1].removesuffix('.txt')}.txt"
+        if f.exists():
+            return f.read_bytes()
+        raise OSError(f"no fixture for {url}")
+    if "hts.usitc.gov/reststop/releaseList" in url:
+        return (FIX / "hts_releases.json").read_bytes()
+    if "whitehouse.gov/presidential-actions/feed" in url:
+        return (FIX / "wh_presidential_actions.xml").read_bytes()
     if "federalregister.gov/api/v1/documents.json" in url and "type%5D%5B%5D=NOTICE" in url:
         return (FIX / ("fr_ustr_notices.json" if "fields%5B%5D=abstract" in url else "fr_register_ustr.json")).read_bytes()
     if "federalregister.gov/api/v1/documents.json" in url and "fields%5B%5D=abstract" not in url:
@@ -1000,6 +1013,114 @@ class TestInspection(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
 
 
+class TestTariffs(unittest.TestCase):
+    """Tariff actions (presidential documents, Section 232 notices), HTS revisions and signed actions, on the
+    replies read live on 15 Nov 2026."""
+
+    def pres(self):
+        return controls.parse_presidential((FIX / "fr_presidential.json").read_bytes())
+
+    def test_presidential_keeps_tariff_actions_only(self):
+        docs = self.pres()
+        self.assertEqual(len(docs), 60)                     # of 85 in the fixture; the 25 others are not tariffs
+        self.assertEqual({d["agency"] for d in docs}, {"President"})
+        robot = next(d for d in docs if d["id"] == "2026-22385")
+        self.assertEqual((robot["action"], robot["signing_date"], robot["published_date"]),
+                         ("Proclamation", "2026-10-28", "2026-11-02"))
+        self.assertFalse(any("Wildfire" in d["title"] for d in docs))
+        self.assertEqual(sum(1 for d in docs if d["published_date"].startswith("2026")), 24)
+        self.assertEqual(sum(1 for d in docs if d["published_date"].startswith("2025")), 36)
+        canada = next(d for d in docs if d["id"] == "2026-22292")
+        self.assertEqual(canada["countries"], ["CA"])
+
+    def test_line_of_duty_is_not_a_tariff(self):
+        self.assertFalse(controls.is_tariff("Honoring the Victims Killed in the Line of Duty"))
+        self.assertTrue(controls.is_tariff("Adjusting Imports of Medium- and Heavy-Duty Vehicles"))
+        self.assertTrue(controls.is_tariff("Continuing the Suspension of Duty-Free De Minimis Treatment"))
+
+    def test_text_dates(self):
+        t = (FIX / "fr_pres_raw_2026-22292.txt").read_text(encoding="utf-8")
+        # Effective 12:01 a.m. on the day it was published; the 22 Aug date it recalls is earlier, so left out.
+        self.assertEqual(controls.text_dates(t, "2026-10-30", "2026-10-23"), (["2026-10-30"], []))
+        t = (FIX / "fr_pres_raw_2026-22385.txt").read_text(encoding="utf-8")
+        # No tariff yet: an agreement within 180 days of the proclamation's date, counted from its signing.
+        self.assertEqual(controls.text_dates(t, "2026-11-02", "2026-10-28"), ([], ["2027-04-26"]))
+
+    def test_section232_notices(self):
+        docs = controls.parse_section232((FIX / "fr_section232.json").read_bytes())
+        ids = {d["id"] for d in docs}
+        self.assertIn("2026-19498", ids)                    # tariff adjustments for specialty pharmaceuticals
+        self.assertIn("2026-13663", ids)                    # comments on a Section 232 investigation
+        self.assertNotIn("2026-22726", ids)                 # an information collection
+        self.assertNotIn("2026-17619", ids)                 # an antidumping court decision
+        # BIS and ITA; a notice issued with USTR (2025-21940, the Korea agreement) carries USTR's label.
+        self.assertEqual({d["agency"] for d in docs}, {"BIS", "ITA", "USTR"})
+        self.assertIn("2026-05681", ids)                    # an inclusions window opening
+
+    def test_register_and_events_carry_presidential_dates(self):
+        docs = self.pres()
+        for d in docs:
+            if d["id"] == "2026-22385":
+                d["computed_dates"] = ["2027-04-26"]
+        reg = controls.scheduled(docs, date(2026, 11, 15))
+        e = next(x for x in reg if x["doc"] == "2026-22385")
+        self.assertEqual((e["date"], e["agency"]), ("2027-04-26", "President"))
+        self.assertIn("counted from its signing date", e["what"])
+        ev = controls.build_events(docs, date(2026, 11, 15))
+        self.assertTrue(any(x["ref"] == "2026-22385" and x["date"] == "2027-04-26" for x in ev))
+
+    def test_pace(self):
+        p = controls.pace(self.pres(), date(2026, 11, 15))
+        self.assertEqual((p["count"], p["ids"]), (3, ["2026-22049", "2026-22292", "2026-22385"]))
+        self.assertEqual(p["baseline_windows"], 27)
+        self.assertFalse(p["anomaly"])                      # three is under the floor of four
+        # One a window for 27 windows, then six in the latest: unusual.
+        today = date(2026, 11, 15)
+        from datetime import timedelta
+        docs = [{"id": f"x{k}", "published_date": (today - timedelta(days=28 * k + 3)).isoformat()} for k in range(1, 28)]
+        docs += [{"id": f"n{i}", "published_date": (today - timedelta(days=i)).isoformat()} for i in range(6)]
+        p = controls.pace(docs, today)
+        self.assertEqual((p["count"], p["median"]), (6, 1.0))
+        self.assertTrue(p["anomaly"])
+
+    def test_hts_releases(self):
+        rel = tariffs.parse_releases((FIX / "hts_releases.json").read_bytes())
+        self.assertEqual(len(rel), 186)
+        self.assertEqual((rel[0]["name"], rel[0]["posted"], rel[0]["in_effect_from"]),
+                         ("2026HTSRev23", "2026-11-09", "2026-11-10"))
+        self.assertFalse(any("creator" in r for r in rel))
+        years = tariffs.year_counts(rel)
+        self.assertEqual((years["2025"], years["2026"]), (33, 23))
+        p = tariffs.hts_pace(rel, date(2026, 11, 15))
+        self.assertEqual(p["baseline_windows"], 27)
+        self.assertIsNotNone(p["z"])
+
+    def test_signed_actions_matched_to_the_register(self):
+        signed = tariffs.parse_signed((FIX / "wh_presidential_actions.xml").read_bytes(), date(2026, 11, 15))
+        self.assertEqual(len(signed), 3)
+        self.assertTrue(all(s["url"].startswith("https://www.whitehouse.gov/presidential-actions/") for s in signed))
+        tariffs.mark_published(signed, self.pres())
+        self.assertEqual(sorted(s["fr_document"] for s in signed), ["2026-22049", "2026-22292", "2026-22385"])
+        extra = [{"title": "Adjusting Imports of Something New", "url": "https://www.whitehouse.gov/x", "date": "2026-11-14"}]
+        self.assertIsNone(tariffs.mark_published(extra, self.pres())[0]["fr_document"])
+
+    def test_feed_items(self):
+        docs = self.pres()
+        snap = {"generated_at": "2026-11-15T12:00:00Z", "lanes": {}, "controls": [d for d in docs if d["published_date"] >= "2026-11-01"],
+                "tariff_pace": controls.pace(docs, date(2026, 11, 15)),
+                "hts_pace": tariffs.hts_pace(tariffs.parse_releases((FIX / "hts_releases.json").read_bytes()), date(2026, 11, 15)),
+                "hts_releases": {"revisions": tariffs.parse_releases((FIX / "hts_releases.json").read_bytes())[:12]}}
+        feats = {f["properties"]["id"]: f["properties"] for f in feed.tariff_features(snap, snap["generated_at"], "2026-11-17T12:00:00Z")}
+        self.assertIn("headwind:tariffpace:presidential", feats)
+        self.assertEqual(feats["headwind:tariffpace:presidential"]["tier"], "routine")
+        self.assertIn("headwind:hts:2026HTSRev23", feats)
+        self.assertEqual(feats["headwind:hts:2026HTSRev23"]["sources"][0]["id"], "usitc-hts")
+        pres = {f["properties"]["id"]: f["properties"] for f in feed.list_features(snap)}
+        item = pres["headwind:control:2026-22385"]
+        self.assertTrue(item["title"].startswith("President, proclamation (2026-11-02): Adjusting Imports of Robotics"))
+        self.assertIn("signed 2026-10-28", item["summary"])
+
+
 class TestEndToEnd(unittest.TestCase):
     def test_doctrine_registers_pass(self):
         self.assertEqual(registers.check(ROOT / "doctrine"), [])
@@ -1022,7 +1143,14 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
                              [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11)])
             self.assertTrue(list((tmp / "data" / "raw" / "eu-fsf").glob("*.xml.gz")))
-            self.assertEqual(len(snap["controls"]), 8)              # 5 rules and 3 USTR notices (one left out)
+            # 5 rules and 3 USTR notices (one left out); tariff actions of the last 60 days come on top, so how many
+            # depends on the day the test runs.
+            s232 = {d["id"] for d in controls.parse_section232((FIX / "fr_section232.json").read_bytes())}
+            self.assertEqual(len([c for c in snap["controls"] if c["agency"] != "President" and c["id"] not in s232]), 8)
+            self.assertEqual(snap["tariff_pace"]["baseline_windows"], 27)
+            self.assertEqual(snap["hts_releases"]["total"], 186)
+            self.assertIn("usitc-hts", snap["health"])
+            self.assertIn("whitehouse-actions", snap["health"])
             self.assertEqual(snap["lanes"]["inspection"]["status"], "ok")
             self.assertIn("fr-public-inspection", snap["health"])
             self.assertTrue((tmp / "data" / "state" / "sanctions_index.json").exists())

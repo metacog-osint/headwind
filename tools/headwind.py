@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      markets, minerals, releases, sanctions, screening, trade)
+                      markets, minerals, releases, sanctions, screening, tariffs, trade)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -36,16 +36,18 @@ LANE_FIELDS = {
     "calendar": ["fomc_dates", "ecb_dates"],
     "sanctions": ["sanctions", "sanctions_lists", "vessel_crosslist", "vessel_table"],
     "screening": ["screening", "screening_lists"],
-    "controls": ["controls", "scheduled_dates"],
+    "controls": ["controls", "scheduled_dates", "tariff_pace"],
     "inspection": ["inspection", "inspection_issues"],
     "minerals": ["minerals"],
     "trade": ["mineral_trade"],
+    "tariffs": ["hts_releases", "hts_pace", "signed_actions", "signed_error"],
 }
 EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
          "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
          "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
          "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
-         "minerals": {}, "mineral_trade": {}}
+         "minerals": {}, "mineral_trade": {}, "tariff_pace": {}, "hts_releases": {}, "hts_pace": {},
+         "signed_actions": [], "signed_error": None}
 
 
 def _lane_fx(raw_dir, prev, getter):
@@ -336,10 +338,65 @@ def _lane_controls(raw_dir, prev, getter):
         b, r = fetch.fetch("us-federal-register", url, raw_dir, "json", timeout=90, getter=getter)
         docs += controls.parse_fr(b)
         recs.append(r)
-    docs = list({d["id"]: d for d in docs + rules + notices}.values())
-    shown = sorted({d["id"]: d for d in rules + notices}.values(), key=lambda x: (x["published_date"], x["id"]),
-                   reverse=True)
-    return {"controls": shown, "scheduled_dates": controls.scheduled(docs, today)}, recs
+    # Tariff actions: presidential documents whose title is a tariff action, and BIS's and ITA's Section 232
+    # notices, both over the register's 800 days. Those of the lookback window are shown with the rules; all of
+    # them go into the register, and the presidential ones give the pace.
+    body, r = fetch.fetch("us-federal-register", controls.presidential_url(today), raw_dir, "json", timeout=90,
+                          getter=getter)
+    pres = controls.parse_presidential(body)
+    recs.append(r)
+    body, r = fetch.fetch("us-federal-register", controls.section232_url(today), raw_dir, "json", timeout=90,
+                          getter=getter)
+    s232 = controls.parse_section232(body)
+    recs.append(r)
+    window = (today - timedelta(days=controls.LOOKBACK_DAYS)).isoformat()
+    _presidential_dates([p for p in pres if p["published_date"] >= window], prev, raw_dir, getter, recs)
+    docs = list({d["id"]: d for d in docs + rules + notices + pres + s232}.values())
+    shown = sorted({d["id"]: d for d in rules + notices + [d for d in pres + s232 if d["published_date"] >= window]
+                    }.values(), key=lambda x: (x["published_date"], x["id"]), reverse=True)
+    return {"controls": shown, "scheduled_dates": controls.scheduled(docs, today),
+            "tariff_pace": controls.pace(pres, today)}, recs
+
+
+def _presidential_dates(pres, prev, raw_dir, getter, recs):
+    """Dates a tariff action's text sets (controls.text_dates), read once per document: a document read on an
+    earlier run keeps what was found then. A text that cannot be read is noted on the document."""
+    kept = {c["id"]: c for c in prev.get("controls") or [] if c.get("agency") == "President"}
+    for p in pres:
+        old = kept.get(p["id"])
+        if old and old.get("text_read"):
+            p.update({k: old.get(k) for k in ("named_dates", "computed_dates", "text_read")})
+            continue
+        if not p.get("raw_text_url"):
+            continue
+        try:
+            body, rec = fetch.fetch("fr-presidential-text", p["raw_text_url"], raw_dir, "txt", getter=getter)
+            p["named_dates"], p["computed_dates"] = controls.text_dates(body.decode("utf-8", "replace"),
+                                                                       p["published_date"], p.get("signing_date"))
+            p["text_read"] = True
+            recs.append(rec)
+        except Exception as exc:  # noqa: BLE001 - one document's text is noted on that document
+            p["text_error"] = f"{type(exc).__name__}: {exc}"[:200]
+
+
+def _lane_tariffs(raw_dir, prev, getter):
+    """USITC's HTS revisions (the release list) and the White House's presidential actions (RSS): revisions and
+    their pace, and tariff actions signed but not yet in the Federal Register (marked in finish_snapshot). The
+    White House feed is noted, not failed, when it cannot be read: the revisions still count."""
+    today = date.today()
+    body, rec = fetch.fetch("usitc-hts", tariffs.HTS_RELEASES, raw_dir, "json", getter=getter)
+    releases = tariffs.parse_releases(body)
+    recs = [rec]
+    out = {"hts_releases": {"revisions": releases[:tariffs.HTS_SHOWN], "by_year": tariffs.year_counts(releases),
+                            "total": len(releases)},
+           "hts_pace": tariffs.hts_pace(releases, today), "signed_actions": [], "signed_error": None}
+    try:
+        body, rec = fetch.fetch("whitehouse-actions", tariffs.WH_FEED, raw_dir, "xml", getter=getter)
+        out["signed_actions"] = tariffs.parse_signed(body, today)
+        recs.append(rec)
+    except Exception as exc:  # noqa: BLE001
+        out["signed_error"] = f"{type(exc).__name__}: {exc}"[:200]
+    return out, recs
 
 
 def _lane_inspection(raw_dir, prev, getter):
@@ -413,7 +470,7 @@ def _minerals_watch(raw_dir, getter, recs) -> dict:
 LANES = {"fx": _lane_fx, "gem": _lane_gem, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
          "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
          "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals,
-         "trade": _lane_trade}
+         "trade": _lane_trade, "tariffs": _lane_tariffs}
 
 
 def finish_snapshot(snap: dict, today: date) -> dict:
@@ -423,6 +480,7 @@ def finish_snapshot(snap: dict, today: date) -> dict:
     fao_dates = snap.get("fao_release_dates") or []
     next_release = next((d for d in fao_dates if d >= today.isoformat()), None)
     inspection.match(snap.get("inspection") or [], snap.get("scheduled_dates") or [])
+    tariffs.mark_published(snap.get("signed_actions") or [], snap.get("controls") or [])
     events = controls.build_events(snap.get("controls") or [], today)
     events += releases.build_events(today, snap.get("fomc_dates") or [], snap.get("ecb_dates") or [], fao_dates,
                                     food.next_period(ffpi["period"]) if ffpi else None)
@@ -540,7 +598,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                      "energy", "fao",
                                      "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
                                      "screening_lists", "controls", "inspection", "inspection_issues", "minerals",
-                                     "question_drafts", "vessel_crosslist", "mineral_trade")}
+                                     "question_drafts", "vessel_crosslist", "mineral_trade", "tariff_pace",
+                                     "hts_releases", "hts_pace", "signed_actions", "signed_error")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
     # Counted-only filings as they may be published, whatever snapshot this is built from (a failed inspection
