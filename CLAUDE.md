@@ -6,6 +6,12 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 15 Nov 2026, about 7:15 PM CST: item 1 of the new coverage plan (US tariff actions, `headwind-1.7`)
+built, tested and checked, NOT committed** (working tree; see "Tariff actions" below). 75 of 76 tests (the
+kit-copy test only), check PASS. Items 2 to 4 go to a fresh session (Tom, 15 Nov): its brief is
+`D:\Projects\_ideas\drafts\2026-11-15-headwind-items-2-4-session.md`. Still not pushed: `e749e5e`, `e6ce38f`.
+The paragraph below is the state before this.
+
 **State, 15 Nov 2026, about 3:10 PM CST: review fixes live; fix 3 committed, not pushed.** Tom pushed the
 review fixes ("Yes, push"): `6642f71` on `main` and `live/first-slice`, run 43759701570 (2:43 to 2:46 PM CST, 2m29s)
 passed and deployed; the live snapshot carries no name from a counted-only filing (all 17 use `/d/<number>`),
@@ -213,9 +219,10 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | `calendar` | `releases.py` | Federal Reserve and ECB schedule pages; FAO release dates | 9 events in the next 180 days |
 | `sanctions` | `sanctions.py` | OFAC `sdn.csv` (5.8 MB), the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML, 26 MB) and the UK Sanctions List (XML, 22 MB) | 14 Nov, 2:57 PM CST: 19,565 OFAC (1,570 vessels), 1,007 UN, 6,269 EU, 6,440 UK (694 ships). The EU download takes 30 s to 2 min |
 | `screening` | `screening.py` | trade.gov Consolidated Screening List (one 34 MB JSON), every list but the SDN list | 13 Nov, 8:46 AM CST: 12 lists, 6,702 entries (Entity List 3,419). First reading, so no change to report yet. The download took 4 s |
-| `controls` | `controls.py` | Federal Register API: BIS, OFAC and USTR rules and proposed rules and USTR notices, last 60 days; the same agencies' documents of the last 800 days for the register of scheduled dates | 13 Nov: 25 rules; 2 future dates for Verdict (3 Dec polysilicon rule ends, 10 Jan 2027 affiliates-rule stay ends). 15 Nov: 34 rules and USTR notices, 18 scheduled dates |
+| `controls` | `controls.py` | Federal Register API: BIS, OFAC and USTR rules and proposed rules and USTR notices, last 60 days; the same agencies' documents of the last 800 days for the register of scheduled dates; since `headwind-1.7` presidential documents that are tariff actions and BIS's and ITA's Section 232 notices (800 days; texts of the presidential ones read once for their dates) | 13 Nov: 25 rules; 2 future dates for Verdict (3 Dec polysilicon rule ends, 10 Jan 2027 affiliates-rule stay ends). 15 Nov: 34 rules and USTR notices, 18 scheduled dates |
 | `inspection` | `inspection.py` | Office of the Federal Register, public inspection: the issues of the last 5 days (30 on a first run or after a gap), BIS, OFAC and USTR filings, and each rule's or USTR notice's text | 15 Nov: 30 days read, 26 filings (17 notices counted only); HW-IND-2 met by BIS 2026-22793 and USTR 2026-22925 and 2026-22867 |
 | `trade` | `trade.py` | Census Bureau international trade API, imports by HS code and country, 24 codes. **Needs a free Census key** | 15 Nov: 24 codes, newest month Sep 2026 |
+| `tariffs` | `tariffs.py` | USITC Harmonized Tariff Schedule release list (JSON); White House presidential actions (RSS) | 15 Nov: 186 revisions (23 in 2026), 3 tariff actions signed in 30 days, all in the Federal Register. Both lanes with texts took 6 s |
 | `minerals` | `minerals.py` | USGS Mineral Commodity Summaries 2026 data release on ScienceBase (item JSON, then two CSVs) | 13 Nov: 68 commodities with net import reliance, 47 with import shares by country |
 
 The sanctions lane was read three times on 13 Nov (to about 9 AM CST) and both files were byte-for-byte the same as
@@ -571,6 +578,28 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
 - **No judgments in the feed.** The seed build's sanctions and rule blocks carried a fixed 0.85 probability and
   invented test records (`MADE_UP`); both are removed. `commodities.py` (the old IGC lane) is unused.
 - A rate decision is exported to Verdict as kind `rule_date`, the nearest kind Verdict accepts.
+
+## Tariff actions (plan item 1, built 15 Nov 2026, `headwind-1.7`, not committed)
+- See doctrine/method.md "Tariff actions and the tariff schedule". Snapshot: `tariff_pace` (controls lane),
+  `hts_releases`, `hts_pace`, `signed_actions`, `signed_error` (lane `tariffs`). Presidential records in
+  `controls` carry agency `President`, `action` the subtype, `signing_date`, `number`, `named_dates`,
+  `computed_dates`, `text_read` (a text is read once; `_presidential_dates` keeps what an earlier run found).
+- Feed: `headwind:control:<doc>` for presidential documents (title "President, proclamation (date): ..."),
+  `headwind:tariffpace:presidential` and `headwind:tariffpace:hts` (stable ids, anomaly with `baseline_ref`
+  `headwind-tariff-pace` or `headwind-hts-pace`), `headwind:hts:<name>` for revisions posted in 14 days.
+  Sources `usitc-hts` (new) and `whitehouse-actions` (new, health only; the feed never carries it).
+- Live 15 Nov, 6:40 PM CST: 3 tariff actions in 28 days (2026-22049, -22292, -22385), median 1, z +1.4, flag
+  rate 0.074; 2 HTS revisions, median 2, z 0. USITC's list names the staff member who posted each revision
+  (`creator`): never kept, and cut from the fixture.
+- The page footer now names every publisher (EU, UK, USITC, White House and Census were missing) and carries
+  the notice the Census API terms require (missing since step 16).
+
+## New coverage plan (15 Nov 2026, planned, not built)
+Full source register, terms read 15 Nov, build order and the minutes estimate: `D:\Projects\_ideas\drafts\2026-11-15-headwind-coverage-plan.md`. **Tom, 15 Nov 2026: build US tariff actions, France's register, UN sanctions committee releases with Canada's list, and the US Supreme Court, in that order; ICC and court items carry the court's own case title and number (us_person_data set when a US person is named); courts, ICC and tariff litigation live inside Headwind, not a new program; Actions minutes left as they are.** Making the repository public is not decided (it is private; see the state release under Source health).
+- **Headwind gets:** US tariff actions (FR presidential documents with tariff terms, 24 in 2026 to 15 Nov and 36 in 2025, counted on the fixture; whitehouse.gov presidential-actions RSS for signing dates, "not copyright protected"; BIS and ITA Section 232 and inclusion-window notices; the USITC HTS release list, 200 JSON keyless, 23 revisions in 2026; all dates into the register). CBP CSMS has no keyless feed. More sanctions lists: France's Registre national des gels (Licence Ouverte 2.0, JSON 15 MB, stable `IdRegistre`, 39 vessels with IMO), Canada's consolidated list (XML 2.9 MB, `DateOfListing` on all 5,781 records, 731 ships with IMO; reproduction allowed for non-commercial purposes; no entry id, key on Schedule + Item), Switzerland (SECO XML 43 MB; reproduction needs SECO's written consent), Japan, New Zealand, Australia (terms unread; dfat.gov.au timed out). UN sanctions committee press releases (press.un.org RSS, about 10 items, count and link only). IMF Board actions only with the IMF's permission (its terms bar systematic or automated download of Content). Stock indices monthly only (OECD SDMX answers keyless, terms unread; GEM `DSTKMKTXN` is built on Datastream, the Pink Sheet question; STOXX's terms bar derivative works, so publishing only changes and z does not help).
+- **Courts in Headwind** (Tom, 15 Nov): ICC, the US Supreme Court and other highest courts, and tariff litigation become Headwind lanes; BRICS membership goes to Readout as a hand-kept table.
+- **Checked 15 Nov:** the Supreme Court's docket for 24-1287 gives the 20 Feb 2026 judgment (24-1287 vacated and remanded to dismiss for lack of jurisdiction, 25-250 affirmed). OFAC's 9 Oct 2026 recent actions add the International Criminal Court to the SDN list as an entity under `ICC-EO14203`; Headwind counts it as one entity in a conduct program.
+- **Names in court items** (Tom, 15 Nov): the court's own case title and number as the court publishes it; `us_person_data` says when a US person is named. Sanctions and screening lists stay counts only.
 
 ## Not done
 - **Planned and not built:** the World Bank Pink Sheet (step 12, held on its licence). Census trade data for

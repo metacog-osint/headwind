@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import re
+import statistics
 import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -28,6 +29,23 @@ from tic_doctrine import geo  # noqa: E402
 AGENCIES = {"industry-and-security-bureau": "BIS", "foreign-assets-control-office": "OFAC",
             "trade-representative-office-of-united-states": "USTR"}
 USTR = "trade-representative-office-of-united-states"
+ITA = "international-trade-administration"
+EOP = "executive-office-of-the-president"
+# Labels for every agency a record can carry. The rules query asks only for AGENCIES; ITA's notices are asked for
+# only with "section 232" in their text, and presidential documents by their type.
+LABELS = {**AGENCIES, ITA: "ITA", EOP: "President"}
+# A presidential document or a Section 232 notice is a tariff action when its title says so. Read against every
+# presidential document of Sep 2024 to Nov 2026 (60 of 839 matched, all by their titles). "Duty" alone is left out:
+# "Line of Duty" titles are not tariff actions; "Heavy-Duty Vehicles" ones are matched by "Adjusting Imports".
+TARIFF_TITLE = re.compile(r"tariff|duties|duty-free|adjusting imports|import adjustment|section (?:122|232|301|338)\b|"
+                          r"harmonized tariff", re.I)
+# Section 232 notices also open and close inclusion windows (products added to a tariff on request).
+INCLUSION = re.compile(r"\binclusions?\b", re.I)
+PRES_FIELDS = ["document_number", "title", "type", "subtype", "publication_date", "signing_date", "html_url",
+               "agencies", "abstract", "raw_text_url", "proclamation_number", "executive_order_number"]
+PACE_WINDOW = 28          # days in one window of the tariff-action count
+PACE_WINDOWS = 27         # earlier windows in its baseline (27 x 28 = 756 days, inside REGISTER_DAYS)
+PACE_FLOOR = 4            # documents: fewer than this in a window is never unusual
 LOOKBACK_DAYS = 60
 # Long enough to hold the date a one-year stay or a year of exclusions was set to end, with room to spare.
 REGISTER_DAYS = 800
@@ -79,6 +97,25 @@ def register_urls(today: date) -> dict[str, str]:
             "ustr": _url([USTR], ("NOTICE",), since, REGISTER_PER_PAGE, REGISTER_FIELDS)}
 
 
+def presidential_url(today: date) -> str:
+    """Every presidential document of the last REGISTER_DAYS (about 840 on 15 Nov 2026, 760 KB): the tariff
+    actions among them are kept, and their count over time is the pace's baseline."""
+    since = (today - timedelta(days=REGISTER_DAYS)).isoformat()
+    return _url([], ("PRESDOCU",), since, REGISTER_PER_PAGE, PRES_FIELDS)
+
+
+def section232_url(today: date) -> str:
+    """BIS's and ITA's notices of the last REGISTER_DAYS whose text says "section 232" (53 on 15 Nov 2026):
+    investigations, comment requests, inclusion windows, tariff procedures."""
+    since = (today - timedelta(days=REGISTER_DAYS)).isoformat()
+    return (_url(["industry-and-security-bureau", ITA], ("NOTICE",), since, REGISTER_PER_PAGE, FIELDS)
+            + "&conditions%5Bterm%5D=%22section+232%22")
+
+
+def is_tariff(title: str | None) -> bool:
+    return bool(TARIFF_TITLE.search(title or ""))
+
+
 def docket_tokens(values) -> list[str]:
     """Docket numbers as tokens (USTR-2026-0364, 261027-0002), from the API's docket strings or a filing's text."""
     out = set()
@@ -122,7 +159,86 @@ def countries_in(title: str) -> list[str]:
 
 
 def agency_of(agencies) -> str | None:
-    return next((AGENCIES[a.get("slug")] for a in agencies or [] if a.get("slug") in AGENCIES), None)
+    return next((LABELS[a.get("slug")] for a in agencies or [] if a.get("slug") in LABELS), None)
+
+
+def parse_section232(body: bytes | str) -> list[dict]:
+    """BIS's and ITA's Section 232 notices, in the rules' form, less the office's own (information collections)
+    and those whose title is not about a tariff (ITA's antidumping notices that mention Section 232 in passing)."""
+    return [r for r in parse_fr(body)
+            if (is_tariff(r["title"]) or INCLUSION.search(r["title"])) and not ADMIN_TITLE.search(r["title"])]
+
+
+def parse_presidential(body: bytes | str) -> list[dict]:
+    """The tariff actions among presidential documents, in the rules' form: agency "President", the document's
+    subtype (Proclamation, Executive Order, Memorandum) as its action, its signing date and number. Dates come
+    later from its text (`text_dates`)."""
+    doc = json.loads(body)
+    rows = doc.get("results") or []
+    if (doc.get("count") or 0) > len(rows):
+        raise ValueError(f"Federal Register returned {len(rows)} of {doc.get('count')} presidential documents")
+    out = []
+    for r in rows:
+        title = " ".join((r.get("title") or "").split())
+        if not r.get("document_number") or not r.get("publication_date") or not is_tariff(title):
+            continue
+        abstract = " ".join((r.get("abstract") or "").split())
+        number = r.get("proclamation_number") or r.get("executive_order_number")
+        out.append({
+            "id": r["document_number"], "agency": "President", "type": "Presidential Document",
+            "action": r.get("subtype") or "Presidential document", "title": title,
+            "published_date": r["publication_date"], "signing_date": r.get("signing_date"),
+            "number": str(number) if number else None, "effective_on": None, "comments_close_on": None,
+            "named_dates": [], "url": r.get("html_url") or "https://www.federalregister.gov/",
+            "raw_text_url": r.get("raw_text_url"),
+            "abstract": abstract if len(abstract) <= 500 else abstract[:497].rsplit(" ", 1)[0] + "...",
+            "countries": countries_in(title), "rins": [], "dockets": [],
+        })
+    out.sort(key=lambda x: (x["published_date"], x["id"]), reverse=True)
+    return out
+
+
+# "... on or after 12:01 a.m. eastern time on October 30, 2026" (proclamations give effective times this way).
+_AT_1201 = re.compile(r"12:01 a\.\s?m\.[^.;]{0,40}?\bon\s+((?:" + "|".join(_MONTHS) + r")\s+\d{1,2},\s+\d{4})")
+_WITHIN_DAYS = re.compile(r"within (\d{1,3}) days (?:of|after) the date of this (?:proclamation|order|memorandum)",
+                          re.I)
+
+
+def text_dates(text: str, published: str, signed: str | None) -> tuple[list[str], list[str]]:
+    """Dates a presidential document's text sets: each "12:01 a.m. ... on <date>" from its publication day on, and
+    (computed, so listed apart) each "within N days of the date of this proclamation" counted from its signing
+    date. Earlier dates in the text (what an older proclamation did) are left out by the publication date."""
+    flat = " ".join(re.sub(r"<[^>]+>", " ", text or "").split())
+    named = set()
+    day_before = (date.fromisoformat(published) - timedelta(days=1)).isoformat()   # effective the day it is published
+    for s in _AT_1201.findall(flat):
+        named.update(named_dates(s, day_before))
+    computed = set()
+    if signed:
+        base = date.fromisoformat(signed)
+        for n in _WITHIN_DAYS.findall(flat):
+            d = (base + timedelta(days=int(n))).isoformat()
+            if d > published:
+                computed.add(d)
+    return sorted(named), sorted(computed)
+
+
+def pace(docs: list[dict], today: date, window: int = PACE_WINDOW, n_windows: int = PACE_WINDOWS,
+         floor: int = PACE_FLOOR) -> dict:
+    """How many tariff actions were published in the last `window` days, against the same count in each of the
+    `n_windows` windows before it (robust z, stats.score, `floor` documents at least). Counted by publication
+    date in the Federal Register, which is when a document becomes public."""
+    from . import stats
+    def count(k):
+        hi = today - timedelta(days=window * k)
+        lo = hi - timedelta(days=window - 1)
+        return [d for d in docs if lo.isoformat() <= d["published_date"] <= hi.isoformat()]
+    latest = count(0)
+    base = [float(len(count(k))) for k in range(1, n_windows + 1)]
+    lo = (today - timedelta(days=window - 1)).isoformat()
+    return {"window_days": window, "from": lo, "to": today.isoformat(), "count": len(latest),
+            "ids": sorted(d["id"] for d in latest), "median": statistics.median(base) if base else None,
+            "baseline_windows": len(base), **stats.score(float(len(latest)), base, float(floor))}
 
 
 def parse_fr(body: bytes | str) -> list[dict]:
@@ -162,7 +278,10 @@ def scheduled(docs: list[dict], today: date) -> list[dict]:
     lo = (today - timedelta(days=REGISTER_KEEP_DAYS)).isoformat()
     out = {}
     for r in docs:
-        dated = [(d, "a date its DATES paragraph names") for d in r.get("named_dates") or []]
+        dated = [(d, "a date its DATES paragraph names" if r["agency"] != "President"
+                  else "a date its text sets (12:01 a.m. on that day)") for d in r.get("named_dates") or []]
+        dated += [(d, "a date counted from its signing date (\"within N days of the date of this proclamation\")")
+                  for d in r.get("computed_dates") or []]
         if r.get("effective_on"):
             dated.append((r["effective_on"], "its effective date"))
         if r.get("comments_close_on"):
@@ -182,7 +301,9 @@ def build_events(rules: list[dict], today: date, horizon_days: int = 180) -> lis
     lo, hi = today.isoformat(), (today + timedelta(days=horizon_days)).isoformat()
     events = {}
     for r in rules:
-        dated = [(d, "date named in the rule") for d in r.get("named_dates") or []]
+        president = r["agency"] == "President"
+        dated = [(d, "date its text sets" if president else "date named in the rule") for d in r.get("named_dates") or []]
+        dated += [(d, "counted from its signing date") for d in r.get("computed_dates") or []]
         if r.get("effective_on"):
             dated.append((r["effective_on"], "effective date"))
         if r.get("comments_close_on"):
@@ -193,7 +314,8 @@ def build_events(rules: list[dict], today: date, horizon_days: int = 180) -> lis
                 events.setdefault(eid, {
                     "id": eid, "date": d, "kind": "rule_date", "countries": r.get("countries") or [], "ref": r["id"],
                     "title": f"{r['agency']}: {r['title']} ({what})",
-                    "source": {"publisher": f"US Federal Register ({r['agency']})", "url": r["url"]},
+                    "source": {"publisher": "US Federal Register (presidential documents)" if president
+                               else f"US Federal Register ({r['agency']})", "url": r["url"]},
                 })
     return sorted(events.values(), key=lambda e: (e["date"], e["id"]))
 

@@ -1,9 +1,9 @@
-# Headwind method (`headwind-1.6`)
+# Headwind method (`headwind-1.7`)
 
 ## Purpose
 Headwind measures economic stress: currencies, energy and food prices that move outside their own
 normal range, changes to official sanctions and US screening lists, new export-control and sanctions
-rules, US import reliance for mineral commodities, and the scheduled dates on which economic decisions and figures are published.
+rules, US tariff actions and revisions of the US tariff schedule, US import reliance for mineral commodities, and the scheduled dates on which economic decisions and figures are published.
 It reports measurements. It states no probability and gives no investment advice.
 
 ## Live lanes (15 Nov 2026)
@@ -22,6 +22,8 @@ It reports measurements. It states no probability and gives no investment advice
 | Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country; scored by designation batches where the list gives dates |
 | Minerals | USGS Mineral Commodity Summaries data release (net import reliance; import shares by country) | Annual | No anomaly test; context only, in `data/minerals.json` |
 | Rules | US Federal Register API: BIS, OFAC and USTR rules and proposed rules, and USTR notices | Federal working days | What was published in the last 60 days, and the future dates each document names; no anomaly test |
+| Tariff actions (since 15 Nov 2026) | US Federal Register API: presidential documents whose title is a tariff action; BIS's and ITA's Section 232 notices | Federal working days; a presidential document 3 to 7 days after signing | The documents of the last 60 days and the dates they set; the count of presidential tariff actions in 28 days against the 27 windows before |
+| Tariff schedule (since 15 Nov 2026) | US International Trade Commission, Harmonized Tariff Schedule release list; The White House, presidential actions (RSS) | As posted | Revisions posted in 28 days against the 27 windows before; actions signed and not yet in the Federal Register |
 | Public inspection (since 15 Nov 2026) | Office of the Federal Register, public inspection: BIS, OFAC and USTR filings | Federal working days | Filings of the last 30 days; HW-IND-2 measured on BIS and USTR filings (below); no anomaly test |
 | US mineral imports (since 15 Nov 2026) | US Census Bureau international trade API, general imports by HS code and country | Monthly, about six weeks late | The last 12 months against the 12 before, leading sources, China's share; context only, in `data/minerals.json`, no anomaly test |
 
@@ -206,6 +208,28 @@ For 24 HS codes standing for minerals on the 2025 List of Critical Minerals, the
 imports (customs value) by country of origin: the last 12 calendar months against the 12 before, the leading
 sources and China's share. Context only, not feed items, no anomaly test. An HS heading can hold more than one
 mineral, and ores, metals and compounds are separate codes, so a code's figures are not a mineral's whole trade.
+
+## Tariff actions and the tariff schedule (`headwind-1.7`, 15 Nov 2026)
+- **Which documents.** A presidential document (proclamation, executive order, memorandum) is a tariff action when
+  its title says tariff, duties, duty-free, adjusting imports, import adjustment, Section 122, 232, 301 or 338, or
+  harmonized tariff. Read against every presidential document from September 2024 to November 2026: 60 of 839
+  matched, all by title (24 in 2026 to 15 Nov, 36 in 2025). "Duty" alone does not count ("Line of Duty").
+  BIS's and ITA's notices that say "section 232" count when their title names a tariff or an inclusions
+  window, less information collections.
+- **Dates.** A proclamation states when it takes effect as "12:01 a.m. eastern time on <date>"; each such
+  date from its publication day on is kept. "Within N days of the date of this proclamation" is counted from
+  the signing date and kept apart as computed (the 28 Oct 2026 wind-turbine and robotics proclamations set
+  180 days for an agreement: 20 and 26 Apr 2027). Each text is read once. All dates go into the register of
+  scheduled dates and to Verdict's calendar.
+- **Pace.** The number of tariff actions the Federal Register published in the last 28 days, against the same
+  count in each of the 27 windows of 28 days before (robust z, as every Headwind series). Unusual at z of 3.5
+  or more and at least four documents. The same rule counts revisions of the Harmonized Tariff Schedule (at
+  least three). Neither says what a tariff does or what it costs; they count published acts.
+- **Signed, not yet published.** The White House posts a document the day it is signed. A tariff action there
+  whose title (case and punctuation aside) is not yet a Federal Register presidential document is listed as
+  signed, not yet published, for 30 days. Page only, not a feed item.
+- **Not read:** CBP's Cargo Systems Messaging Service (no keyless feed), what each HTS revision changed (the
+  release list gives none), and court rulings on tariff authority (planned with the court lanes).
 
 ## Not live
 The World Bank Pink Sheet (fertilizer and metal prices): held on its licence.
