@@ -1,4 +1,4 @@
-# Headwind method (`headwind-1.7`)
+# Headwind method (`headwind-1.8`)
 
 ## Purpose
 Headwind measures economic stress: currencies, energy and food prices that move outside their own
@@ -18,7 +18,7 @@ It reports measurements. It states no probability and gives no investment advice
 | Local food prices | WFP prices by market, from the Humanitarian Data Exchange | Monthly, one to three months late | Median 3-month change across a country's price series, against its own 60 prior medians |
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
-| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
+| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
 | Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country; scored by designation batches where the list gives dates |
 | Minerals | USGS Mineral Commodity Summaries data release (net import reliance; import shares by country) | Annual | No anomaly test; context only, in `data/minerals.json` |
 | Rules | US Federal Register API: BIS, OFAC and USTR rules and proposed rules, and USTR notices | Federal working days | What was published in the last 60 days, and the future dates each document names; no anomaly test |
@@ -104,6 +104,31 @@ by sanctions program. Headwind does not republish the names of people or organiz
 - **UK ship names.** The UK names many ships it specifies by IMO number, as `IMO 9344411 ("GALLE ENERGY")`
   or as the number alone with the ship's name given only as an alias. Headwind shows the name in brackets,
   else the alias, marked as an alias.
+
+## France's asset-freeze register (`headwind-1.8`, 16 Nov 2026)
+- **What it is.** The French Treasury's Registre national des gels lists every person, entity and ship whose assets
+  are frozen in France, keyed on its own `IdRegistre`, each with one or more legal bases. Most entries restate
+  measures the EU and the UN Security Council took, which Headwind already reads on their own lists; a few are
+  France's own national freezes (ministerial orders under the Code monétaire et financier, articles L. 562-2 and
+  following). On the 6 Nov 2026 file: 8,226 entries, 6,963 under EU regimes only, 1,022 under UN regimes only
+  (all 39 ships, North Korea), 161 under both, and 80 national (58 individuals, 22 entities), none of them also EU
+  or UN.
+- **The test.** Each legal basis reads "<act> du <date> (<regime>)". The regime in the last brackets starts "UE"
+  (an EU regime), "ONU" (a UN regime) or "Dispositif national de gel des avoirs" (a national freeze). An entry is
+  national when any of its bases is national. Every one of the 1,107 legal bases on the 6 Nov file is one of the
+  three; a basis that is none of them is shown on the list's status as an unknown program.
+- **Counted apart** (Tom, 16 Nov 2026). A change is reported as national freezes added, removed and changed, by type
+  and by article, and scored by the observed-batch rule (France's file gives no designation date, so the batch is
+  what Headwind saw added between two readings, against the earlier national additions it saw). Entries that
+  restate EU and UN measures are one count line: added, removed and changed, never scored and placing no country,
+  so an EU package is not counted twice. National freezes are conduct measures and place no country either.
+- **Ships** are named with their IMO number, as on the OFAC and UK lists, and matched with them by IMO number
+  (37 of France's 39 on 16 Nov 2026). Copies to August 2026 named them after their owner ("<company> - navire HUI
+  CHON"); the owner is cut and the ship's name kept, so that change is not a rename. The register gives no flag,
+  type or MMSI.
+- **Ids are stable.** On the Wayback Machine's copies of 17 Jul and 7 Aug 2026 (it keeps only their first 5 MiB,
+  about 2,890 entries each), every id on both copies and on the 6 Nov file kept its nature; names changed only for
+  those seven ships and five spelling edits.
 
 ## USTR, public inspection and HW-IND-2 (`headwind-1.6`)
 - **USTR.** The rules lane reads USTR's rules and its notices (Section 301 actions, exclusions and their

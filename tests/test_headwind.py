@@ -98,7 +98,7 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
              ("fomccalendars", "fomc.html"), ("calendars/mgcgc", "ecb_calendar.html"),
              ("ofac/downloads/sdn.csv", "ofac_sdn.csv"), ("scsanctions.un.org", "un_consolidated.xml"),
              ("fsd/fsf/public/files/xmlFullSanctionsList_1_1", "eu_fsf.xml"),
-             ("sanctionslist.fcdo.gov.uk", "uk_sanctions.xml"),
+             ("sanctionslist.fcdo.gov.uk", "uk_sanctions.xml"), ("gels-avoirs.dgtresor.gouv.fr", "fr_gels.json"),
              ("federalregister.gov", "federal_register.json"), ("data.trade.gov", "trade_gov_csl.json")]
     for needle, name in table:
         if needle in url:
@@ -417,7 +417,7 @@ class TestVesselCrosslist(unittest.TestCase):
     def test_crosslist(self):
         ofac, uk = self.indexes()
         s, t = sanctions.vessel_crosslist({"ofac-sdn": ofac, "uk-sanctions": uk})
-        self.assertEqual((s["imo_numbers"], s["on_both"], s["only"]), (15, 1, {"ofac-sdn": 8, "uk-sanctions": 6}))
+        self.assertEqual((s["imo_numbers"], s["on_both"], s["only"]), (15, 1, {"ofac-sdn": 8, "uk-sanctions": 6, "france-gels": 0}))
         r = next(r for r in t if r["imo"] == "7303803")
         self.assertEqual(r["on"]["ofac-sdn"], {"ids": ["23730"], "name": "AN SAN 1",
                                                "flag": "Democratic People's Republic of Korea"})
@@ -447,6 +447,89 @@ class TestVesselCrosslist(unittest.TestCase):
             self.assertEqual(len(doc["vessels"]), snap["vessel_crosslist"]["imo_numbers"])
             page = json.loads((Path(tmp) / "site" / "data" / "snapshot.json").read_text(encoding="utf-8"))
             self.assertNotIn("vessel_table", page)
+
+
+class TestFrance(unittest.TestCase):
+    """France's Registre national des gels, cut redacted from the 6 Nov 2026 file and the 7 Aug 2026 Wayback copy
+    (people keep id, type and legal bases only; ships their name and IMO number)."""
+
+    def readings(self):
+        _, old = sanctions.parse_fr_json((FIX / "fr_gels_2026-08-07.json").read_bytes())
+        gen, new = sanctions.parse_fr_json((FIX / "fr_gels.json").read_bytes())
+        return gen, old, new
+
+    def test_parse(self):
+        gen, old, new = self.readings()
+        self.assertEqual(gen[:10], "2026-11-06")
+        self.assertEqual((len(old), len(new)), (16, 20))
+        self.assertEqual(sanctions._tally(new, new)[0], {"entity": 2, "individual": 15, "vessel": 3})
+        self.assertEqual(new["1121"][1], ["FR national, art L. 562-3"])
+        self.assertEqual({sanctions.fr_origin(g) for e in new.values() for g in e[1]}, {"national", "EU", "UN"})
+        self.assertEqual(sanctions.unknown_programs("france-gels", new), [])
+        self.assertEqual(sanctions.unknown_programs("france-gels", {"1": ["entity", ["Dispositif inconnu"]]}),
+                         ["Dispositif inconnu"])
+        # No name of a person is kept: the index holds type and groups only, ships their public fields.
+        self.assertTrue(all(len(e) == 2 for e in new.values() if e[0] != "vessel"))
+
+    def test_regime_labels(self):
+        self.assertEqual(sanctions.fr_regime("(UE) 2022/332 du 25/02/2022 (UE Ukraine intégrité territoriale - "
+                                             "R (UE) 269/2014)"), "UE Ukraine intégrité territoriale")
+        self.assertEqual(sanctions.fr_regime(" ECOT2628560A du 06/11/2026 (Dispositif national de gel des avoirs - art "
+                                             "L. 562-3 du code monétaire et financier)"), "FR national, art L. 562-3")
+        self.assertEqual(sanctions.fr_regime("ECOT2616999A du 30/07/2026 (Dispositif national de gel des avoirs - art "
+                                             "L. 562-2-1 du code monétaire et financier)"), "FR national, art L. 562-2-1")
+        self.assertEqual(sanctions.fr_origin("ONU Corée du Nord"), "UN")
+        self.assertEqual(sanctions.fr_origin("UE Russie répression R (UE) 2024/1485"), "EU")
+
+    def test_ship_names_drop_the_owner(self):
+        _, old, new = self.readings()
+        self.assertEqual(sanctions.fr_ship_name("Ocean Maritime Management Company, Limited - navire HUI CHON"), "HUI CHON")
+        self.assertEqual(old["2218"][2], {"name": "HUI CHON", "imo": "8405270", "mmsi": None, "flag": None,
+                                          "vessel_type": None})
+        self.assertEqual(old["2218"][2], new["2218"][2])          # the August owner prefix is not a rename
+
+    def test_national_counted_apart(self):
+        _, old, new = self.readings()
+        d = sanctions.delta("france-gels", old, new, "2026-11-15T20:00:00Z", "2026-08-07T16:25:20Z")
+        self.assertEqual((d["added"], d["removed"], d["changed"]), (6, 2, 0))
+        n = d["national"]
+        self.assertEqual((n["added"], n["removed"], n["added_by_type"]), (3, 0, {"entity": 1, "individual": 2}))
+        self.assertEqual(d["restated"], {"added": 3, "removed": 2, "changed": 0})
+        self.assertEqual([(b["basis"], b["added"]) for b in d["batches"]], [("headwind readings", 3)])
+        self.assertEqual((d["countries"], d["vessels_changed"]), ([], []))
+        # An EU package of 300 restated in France scores nothing; three national freezes are the batch.
+        big = {**new, **{f"x{i}": ["entity", ["UE Russie"]] for i in range(300)}}
+        d2 = sanctions.delta("france-gels", new, big, "2026-11-16T00:00:00Z", None, added_history=[2] * 30)
+        self.assertEqual((d2["national"]["added"], d2["restated"]["added"], d2["batches"], d2["anomaly"]),
+                         (0, 300, [], False))
+
+    def test_feed_item(self):
+        _, old, new = self.readings()
+        d = sanctions.delta("france-gels", old, new, "2026-11-15T20:00:00Z", "2026-08-07T16:25:20Z")
+        snap = {"generated_at": "2026-11-15T20:00:00Z", "sanctions": [d], "lanes": {}}
+        f = next(x for x in feed.list_features(snap) if x["properties"]["id"].startswith("headwind:sanctions:"))
+        p = f["properties"]
+        self.assertEqual(p["title"], "France's asset-freeze register (Registre national des gels): 3 national freezes "
+                                     "added, 0 removed; 3 added and 2 removed restating EU and UN measures")
+        self.assertIn("counted here but not scored and place no country: 3 added, 2 removed, 0 changed.", p["summary"])
+        self.assertEqual((p["measures"]["national_added"], p["measures"]["restated_removed"]), (3, 2))
+        self.assertEqual(p["sources"][0]["id"], "dgtresor-gels")
+        self.assertEqual(lint({"features": [f]}), [])
+
+    def test_ships_cross_listed(self):
+        ofac = sanctions.parse_sdn_csv(text("ofac_sdn.csv").rstrip("\n") + "\n" + text("crosslist_ofac.csv"))
+        _, uk = sanctions.parse_uk_xml((FIX / "crosslist_uk.xml").read_bytes())
+        _, _, fr = self.readings()
+        s, t = sanctions.vessel_crosslist({"ofac-sdn": ofac, "uk-sanctions": uk, "france-gels": fr})
+        r = next(r for r in t if r["imo"] == "7303803")
+        self.assertEqual(sorted(r["on"]), ["france-gels", "ofac-sdn", "uk-sanctions"])
+        self.assertEqual(r["on"]["france-gels"], {"ids": ["2205"], "name": "AN SAN 1", "flag": None})
+        self.assertEqual((s["on_both"], s["combos"]["france-gels+ofac-sdn+uk-sanctions"]), (1, 1))
+        self.assertGreaterEqual(s["on_two_or_more"], 1)
+
+    def test_health_entry(self):
+        self.assertEqual(health.LIST_KEY["france-gels"], "dgtresor-gels")
+        self.assertEqual(health.LANE_OF["dgtresor-gels"], "sanctions")
 
 
 class TestTrade(unittest.TestCase):
@@ -1141,7 +1224,8 @@ class TestEndToEnd(unittest.TestCase):
             self.assertTrue((tmp / "data" / "raw" / "index.jsonl").exists())
             self.assertEqual(snap["sanctions"], [])                 # the first run only sets the baseline
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
-                             [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11)])
+                             [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11),
+                              ("france-gels", 20)])
             self.assertTrue(list((tmp / "data" / "raw" / "eu-fsf").glob("*.xml.gz")))
             # 5 rules and 3 USTR notices (one left out); tariff actions of the last 60 days come on top, so how many
             # depends on the day the test runs.

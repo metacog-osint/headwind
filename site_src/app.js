@@ -39,7 +39,7 @@
     fx.forEach(function (f) { if (f.anomaly) { an.push((names[f.country] || f.currency) + " (" + f.currency + "): " + Math.abs(f.change_pct).toFixed(1) + "% " + f.direction + " against the US dollar in 5 business days, z " + zText(f.z)); } });
     en.forEach(function (e) { if (e.anomaly) { an.push(e.name + ": " + pct(e.change_pct) + " in 5 trading days, z " + zText(e.z)); } });
     fao.forEach(function (c) { if (c.anomaly) { an.push(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z)); } });
-    (s.sanctions || []).concat(s.screening || []).forEach(function (d) { if (d.anomaly) { an.push(d.list_name + ": a designation batch larger than the list's usual (" + d.added + " added, seen " + String(d.detected_at).slice(0, 10) + ")"); } });
+    (s.sanctions || []).concat(s.screening || []).forEach(function (d) { if (d.anomaly) { an.push(d.list_name + ": a designation batch larger than the list's usual (" + (d.national ? d.national.added + " national" : d.added) + " added, seen " + String(d.detected_at).slice(0, 10) + ")"); } });
     fresh.forEach(function (w) { if (w.anomaly) { an.push((names[w.country] || w.country) + ": local food prices " + pct(w.median_change_pct) + " in 3 months, z " + zText(w.z)); } });
     (s.fx_official || []).forEach(function (o) { if (o.anomaly) { an.push((names[o.country] || o.country) + ": official exchange rate " + Math.abs(o.change_pct).toFixed(1) + "% " + o.direction + " against the US dollar in " + o.period + ", z " + zText(o.z)); } });
     (s.market_fx || []).forEach(function (w) { if (w.anomaly) { an.push((names[w.country] || w.country) + ": " + (w.unofficial ? "unofficial " : "") + "market exchange rate " + Math.abs(w.median_change_pct).toFixed(1) + "% " + w.direction + " against the US dollar in " + w.period + ", z " + zText(w.z)); } });
@@ -109,10 +109,12 @@
     document.getElementById("vessel-cross").innerHTML = vc.imo_numbers ? '<p class="small muted">' + esc(
       "Ships matched by IMO number: " + Number(vc.imo_numbers).toLocaleString() + " numbers, " +
       Number(vc.on_both).toLocaleString() + " on both the OFAC and UK lists, " +
+      (vc.on_two_or_more !== undefined ? Number(vc.on_two_or_more).toLocaleString() + " on two or more of the OFAC, UK and French lists, " : "") +
       Number((vc.only || {})["ofac-sdn"] || 0).toLocaleString() + " on OFAC's only, " +
-      Number((vc.only || {})["uk-sanctions"] || 0).toLocaleString() + " on the UK's only; " +
-      Number((vc.without_imo || {})["ofac-sdn"] || 0) + " OFAC and " + Number((vc.without_imo || {})["uk-sanctions"] || 0) +
-      " UK entries give no IMO number." + ((vc.from_earlier_run || []).length ? " From an earlier reading: " + vc.from_earlier_run.join(", ") + "." : "")) +
+      Number((vc.only || {})["uk-sanctions"] || 0).toLocaleString() + " on the UK's only, " +
+      Number((vc.only || {})["france-gels"] || 0).toLocaleString() + " on France's only; " +
+      Number((vc.without_imo || {})["ofac-sdn"] || 0) + " OFAC, " + Number((vc.without_imo || {})["uk-sanctions"] || 0) +
+      " UK and " + Number((vc.without_imo || {})["france-gels"] || 0) + " French entries give no IMO number." + ((vc.from_earlier_run || []).length ? " From an earlier reading: " + vc.from_earlier_run.join(", ") + "." : "")) +
       ' <a href="data/vessels.json">Every ship, with each list\'s entry ids, name and flag</a>.</p>' : "";
     function counts(o) { return Object.keys(o || {}).slice(0, 6).map(function (k) { return k + " " + o[k]; }).join(", "); }
     function batchLine(lines, d) {
@@ -133,9 +135,10 @@
       lines.push(bits.join("; ") + ".");
     }
     document.getElementById("sanction-deltas").innerHTML = (s.sanctions || []).map(function (d) {
-      var lines = [];
-      if (d.added) { lines.push("Added by program: " + counts(d.added_by_program) + ". By type: " + counts(d.added_by_type) + "."); }
-      if (d.removed) { lines.push("Removed by program: " + counts(d.removed_by_program) + "."); }
+      var lines = [], nat = d.national, rest = d.restated, base = nat || d;
+      if (base.added) { lines.push((nat ? "National freezes added" : "Added") + " by program: " + counts(base.added_by_program) + ". By type: " + counts(base.added_by_type) + "."); }
+      if (base.removed) { lines.push((nat ? "National freezes removed" : "Removed") + " by program: " + counts(base.removed_by_program) + "."); }
+      if (rest) { lines.push("Restating EU and UN measures (read on those lists too, so counted, not scored): " + rest.added + " added, " + rest.removed + " removed, " + rest.changed + " changed."); }
       function ships(word, vs) {
         if (!vs || !vs.length) { return; }
         lines.push("Vessels " + word + ": " + vs.map(function (v) {
@@ -148,7 +151,7 @@
           return (v.name || "unnamed") + " (IMO " + v.imo + ", " + v.old_id + " to " + v.list_id + ")";
         }).join("; ") + ".");
       }
-      edited(lines, d);
+      edited(lines, base);
       if ((d.vessels_changed || []).length) {
         lines.push("Vessels still listed whose details changed: " + d.vessels_changed.map(function (v) {
           return (v.name || "unnamed") + (v.imo ? " (IMO " + v.imo + ")" : "") + ": " + Object.keys(v.changed).map(function (f) {
@@ -157,7 +160,9 @@
         }).join("; ") + ".");
       }
       batchLine(lines, d);
-      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
+      var head = nat ? d.list_name + ": " + nat.added + " national freezes added, " + nat.removed + " removed" + (nat.changed ? ", " + nat.changed + " changed" : "") + "; " + rest.added + " added and " + rest.removed + " removed restating EU and UN measures"
+        : d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "");
+      return '<div class="row"><div class="row-title"><span>' + esc(head) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
     }).join("") || (lists.length ? '<p class="small muted">No change seen in the last 30 days of readings.</p>' : "");
 
     var tr = s.mineral_trade || {};
@@ -271,7 +276,7 @@
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, counted only because their titles can name people and companies: notices, ' + esc(countedText) + ".</p>" : "");
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {

@@ -6,6 +6,14 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 16 Nov 2026: items 2 to 4 under way in session `local_d0822275`, nothing pushed.** Item 1 committed on
+Tom's yes as `5a26fa4`. Item 2 (France's register, `headwind-1.8`) built and checked; see "France's asset-freeze
+register" below. **Do not push Headwind** until Tom has decided the redacted-history swap
+(`D:\Projects\_inventory\privacy-audit-2026-11-15\swap\headwind\HEADWIND-SWAP.md`): its history is to be rewritten
+and local commits rebased onto it with the commit map. New fixtures are cut redacted (people: ids, type and legal
+basis only; ships: name and IMO, no owner; UN content: ids, numbers, dates and links only). The paragraph below is
+the state before this.
+
 **State, 15 Nov 2026, about 7:15 PM CST: item 1 of the new coverage plan (US tariff actions, `headwind-1.7`)
 built, tested and checked, NOT committed** (working tree; see "Tariff actions" below). 75 of 76 tests (the
 kit-copy test only), check PASS. Items 2 to 4 go to a fresh session (Tom, 15 Nov): its brief is
@@ -217,7 +225,7 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | `wfp` | `food.py` | WFP prices by market from HDX, for the countries in `config/wfp_countries.json` | 18 of 19 countries; Cuba has no file, Venezuela's newest month is May 2025 |
 | `baseline` | `baseline.py` | World Bank WDI API, six indicators | 213 countries. The API timed out twice earlier the same evening |
 | `calendar` | `releases.py` | Federal Reserve and ECB schedule pages; FAO release dates | 9 events in the next 180 days |
-| `sanctions` | `sanctions.py` | OFAC `sdn.csv` (5.8 MB), the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML, 26 MB) and the UK Sanctions List (XML, 22 MB) | 14 Nov, 2:57 PM CST: 19,565 OFAC (1,570 vessels), 1,007 UN, 6,269 EU, 6,440 UK (694 ships). The EU download takes 30 s to 2 min |
+| `sanctions` | `sanctions.py` | OFAC `sdn.csv` (5.8 MB), the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML, 26 MB), the UK Sanctions List (XML, 22 MB) and France's Registre national des gels (JSON, 15 MB, list id `france-gels`, source id `dgtresor-gels`) | 14 Nov, 2:57 PM CST: 19,565 OFAC (1,570 vessels), 1,007 UN, 6,269 EU, 6,440 UK (694 ships). 15 Nov, 11:36 PM CST: France 8,226 (39 ships), file dated 6 Nov; the whole lane took 3 min 39 s. The EU download takes 30 s to 2 min |
 | `screening` | `screening.py` | trade.gov Consolidated Screening List (one 34 MB JSON), every list but the SDN list | 13 Nov, 8:46 AM CST: 12 lists, 6,702 entries (Entity List 3,419). First reading, so no change to report yet. The download took 4 s |
 | `controls` | `controls.py` | Federal Register API: BIS, OFAC and USTR rules and proposed rules and USTR notices, last 60 days; the same agencies' documents of the last 800 days for the register of scheduled dates; since `headwind-1.7` presidential documents that are tariff actions and BIS's and ITA's Section 232 notices (800 days; texts of the presidential ones read once for their dates) | 13 Nov: 25 rules; 2 future dates for Verdict (3 Dec polysilicon rule ends, 10 Jan 2027 affiliates-rule stay ends). 15 Nov: 34 rules and USTR notices, 18 scheduled dates |
 | `inspection` | `inspection.py` | Office of the Federal Register, public inspection: the issues of the last 5 days (30 on a first run or after a gap), BIS, OFAC and USTR filings, and each rule's or USTR notice's text | 15 Nov: 30 days read, 26 filings (17 notices counted only); HW-IND-2 met by BIS 2026-22793 and USTR 2026-22925 and 2026-22867 |
@@ -579,7 +587,32 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   invented test records (`MADE_UP`); both are removed. `commodities.py` (the old IGC lane) is unused.
 - A rate decision is exported to Verdict as kind `rule_date`, the nearest kind Verdict accepts.
 
-## Tariff actions (plan item 1, built 15 Nov 2026, `headwind-1.7`, not committed)
+## France's asset-freeze register (plan item 2, built 16 Nov 2026, `headwind-1.8`)
+- See doctrine/method.md "France's asset-freeze register". List id `france-gels` (not `fr-`: in Headwind that prefix
+  means the Federal Register), source and health id `dgtresor-gels`, `sanctions.parse_fr_json`, `fr_regime`,
+  `fr_origin`, `fr_ship_name`, `_fr_split`. A France delta carries `national` (the full count keys) and `restated`
+  (added, removed, changed); `batches` and `anomaly` come from the national part only, and only national additions
+  enter `added_history`. `countries_for` returns nothing for France (Tom, 16 Nov: national apart, restatements
+  counted only, no countries from them).
+- **Tom's decision, 16 Nov 2026** (shown the split first): "National apart". Split on the 6 Nov file: EU only 6,963,
+  UN only 1,022 (all 39 ships), both 161, national 80 (58 individuals, 22 entities).
+- **Ships across three lists:** `VESSEL_LISTS` now has France; `vessel_crosslist`'s `on_both` keeps its old meaning
+  (on OFAC and UK, whatever else) and gains `on_two_or_more` and `combos`. Live 15 Nov, 11:36 PM CST: 1,946 IMO
+  numbers, 304 on OFAC and UK, 326 on two or more, France only 2, all three 15. **Wake's `live/ais` branch**
+  (`wake/listed.py`, not on Wake's main) refuses a `vessels.json` that names a list it does not credit, so it needs
+  `france-gels` added to its `LISTS` before it merges, or its lane fails once this is deployed.
+- **Ids:** `IdRegistre` held across the 17 Jul and 7 Aug Wayback copies (first 5 MiB only, the archive's cut) and
+  the 6 Nov file; removals could not be tested on those partial copies.
+- **Not used:** the register's cheap date endpoint (`.../publication/derniere-publication-date`, answers
+  "06/11/2026 16:20:40"), which could skip the 15 MB download when the date has not moved; the dates in each
+  legal basis label (each national order's date could serve as a designation date, but national orders freeze one
+  to six entries, under the batch floor of 10).
+- **Fixtures** `fr_gels.json` and `fr_gels_2026-08-07.json`: 20 and 16 entries cut redacted by
+  `.claude/cut_france.py` (git-ignored) from the live file and the 7 Aug Wayback copy: people keep `IdRegistre`,
+  Nature and legal bases, `Nom` becomes `PERSON-<sha1[:10]>`; organizations keep their name; ships keep name, IMO
+  and legal bases (owner, aliases and narrative dropped). Tests in `TestFrance`.
+
+## Tariff actions (plan item 1, built 15 Nov 2026, `headwind-1.7`, committed `5a26fa4`)
 - See doctrine/method.md "Tariff actions and the tariff schedule". Snapshot: `tariff_pace` (controls lane),
   `hts_releases`, `hts_pace`, `signed_actions`, `signed_error` (lane `tariffs`). Presidential records in
   `controls` carry agency `President`, `action` the subtype, `signing_date`, `number`, `named_dates`,
@@ -674,6 +707,9 @@ Full source register, terms read 15 Nov, build order and the minutes estimate: `
   The decision allows reuse with the source acknowledged. Headwind publishes counts and a link.
 - UK Sanctions List: GOV.UK's page for it, read 14 Nov 2026, says all content is under the Open Government Licence
   v3.0 except where otherwise stated. Headwind publishes counts, ship names and a link.
+- France's Registre national des gels: Licence Ouverte / Open Licence 2.0, from the data.gouv.fr record
+  "Registre national des gels" (API licence field `lov2`, record updated 11 Nov 2026), read 15 Nov 2026.
+  Headwind publishes counts, ship names and a link.
 - trade.gov Consolidated Screening List: a US government work, stated from memory. Its page, read 13 Nov 2026,
   states no terms of reuse.
 - Energy: EIA's reuse page, read 13 Nov 2026, says US government publications are in the public domain and asks

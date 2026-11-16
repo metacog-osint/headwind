@@ -250,6 +250,11 @@ def _read_list(list_id, raw_dir, getter):
         body, rec = fetch.fetch("uk-sanctions-list", sanctions.UK_XML, raw_dir, "xml", timeout=180, getter=getter, gz=True)
         generated, index = sanctions.parse_uk_xml(body, dates)
         return index, generated, rec, dates
+    if list_id == "france-gels":
+        # No designation dates in the file: the batch rule uses Headwind's own readings, as for OFAC.
+        body, rec = fetch.fetch("dgtresor-gels", sanctions.FR_JSON, raw_dir, "json", timeout=180, getter=getter, gz=True)
+        generated, index = sanctions.parse_fr_json(body)
+        return index, generated, rec, None
     raise ValueError(f"unknown list {list_id}")
 
 
@@ -289,7 +294,8 @@ def _lane_sanctions(raw_dir, prev, getter):
             if d:
                 deltas.append(d)
                 last_change = now
-                history = batches.remember(history, d["added"])
+                # France: only national freezes are scored, so only they enter the list's baseline.
+                history = batches.remember(history, (d.get("national") or d)["added"])
         baseline_set = old.get("baseline_set_at") or now
         new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "last_change_at": last_change,
                               "vessel_format": form, "added_history": history, "index": index}
@@ -626,7 +632,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                               **(snap.get("mineral_trade") or {})}}),
         "data/vessels.json": dump({
             "generated_at": snap["generated_at"],
-            "note": ("Ships on the OFAC SDN list and the UK Sanctions List, matched by IMO number. Each list's own "
+            "note": ("Ships on the OFAC SDN list, the UK Sanctions List and France's asset-freeze register, matched by IMO "
+                     "number. Each list's own "
                      "entry ids, name and flag. Owners are not given. Ships without an IMO number are counted only."),
             "sources": {l: {"name": sanctions.LISTS[l]["name"], "url": sanctions.LISTS[l]["url"]}
                         for l in sanctions.VESSEL_LISTS},
