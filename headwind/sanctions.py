@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from datetime import datetime, timedelta
 
-from . import batches
+from . import batches, screening
 
 OFAC_SDN_CSV = "https://www.treasury.gov/ofac/downloads/sdn.csv"
 UN_XML = "https://scsanctions.un.org/resources/xml/en/consolidated.xml"
@@ -39,6 +39,12 @@ UK_PAGE = "https://www.gov.uk/government/publications/the-uk-sanctions-list"
 # A HEAD request answers 405; GET works. Licence Ouverte 2.0 (the data.gouv.fr record, read 15 Nov 2026).
 FR_JSON = "https://gels-avoirs.dgtresor.gouv.fr/ApiPublic/api/v1/publication/derniere-publication-fichier-json"
 FR_PAGE = "https://gels-avoirs.dgtresor.gouv.fr/"
+# Canada's Consolidated Canadian Autonomous Sanctions List (Global Affairs Canada), XML, about 2.9 MB. Canada.ca's
+# terms (read 15 Nov 2026) allow reproduction for non-commercial purposes.
+CA_XML = ("https://www.international.gc.ca/world-monde/assets/office_docs/international_relations-relations_internationales/"
+          "sanctions/sema-lmes.xml")
+CA_PAGE = ("https://www.international.gc.ca/world-monde/international_relations-relations_internationales/"
+           "sanctions/consolidated-consolide.aspx?lang=eng")
 
 LISTS = {
     "ofac-sdn": {"name": "OFAC SDN list", "publisher": "US Treasury (OFAC)", "url": OFAC_RECENT, "min_entries": 5000},
@@ -50,6 +56,8 @@ LISTS = {
                      "url": UK_PAGE, "min_entries": 3000},
     "france-gels": {"name": "France's asset-freeze register (Registre national des gels)",
                 "publisher": "French Treasury (Direction générale du Trésor)", "url": FR_PAGE, "min_entries": 3000},
+    "canada-sema": {"name": "Consolidated Canadian Autonomous Sanctions List", "publisher": "Global Affairs Canada",
+                    "url": CA_PAGE, "min_entries": 3000},
 }
 
 # EU programme codes, as the Financial Sanctions Files give them, that name a country. Read against the
@@ -81,7 +89,21 @@ UK_UNPLACED = {"Isil (Da'esh) and Al-Qaeda (United Nations Sanctions)", "Global 
                "Global Anti-Corruption", "Counter-Terrorism (International Sanctions)", "Counter-Terrorism",
                "Global Irregular Migration and Trafficking in Persons", "Chemical Weapons"}
 
-LIST_COUNTRY = {"eu-fsf": (EU_PROGRAMME_COUNTRY, EU_UNPLACED), "uk-sanctions": (UK_REGIME_COUNTRY, UK_UNPLACED)}
+# Canada's regimes, by the English half of the list's Country field (canada_regime()), read against the live list
+# on 16 Nov 2026 (19 regimes). "Ukraine" is Canada's Special Economic Measures (Ukraine) Regulations; it is placed on
+# Russia only, as Tom placed the EU's UKR on 14 Nov 2026 (kept
+# on his yes to item 3, 16 Nov 2026). Left unplaced on purpose:
+# JVCFOR (corrupt foreign officials), Hamas Terrorist Attacks, Extremist Settler Violence (conduct regimes).
+CA_REGIME_COUNTRY = {
+    "Russia": "RU", "Ukraine": "RU", "Iran": "IR", "Belarus": "BY", "Syria": "SY", "Myanmar (Burma)": "MM",
+    "Venezuela": "VE", "Zimbabwe": "ZW", "Moldova": "MD", "Nicaragua": "NI", "Haiti": "HT", "Sudan": "SD",
+    "China": "CN", "Guatemala": "GT", "Sri Lanka": "LK", "South Sudan": "SS",
+}
+CA_UNPLACED = {"Justice for Victims of Corrupt Foreign Officials Regulations (JVCFOR)", "Hamas Terrorist Attacks",
+               "Extremist Settler Violence"}
+
+LIST_COUNTRY = {"eu-fsf": (EU_PROGRAMME_COUNTRY, EU_UNPLACED), "uk-sanctions": (UK_REGIME_COUNTRY, UK_UNPLACED),
+                "canada-sema": (CA_REGIME_COUNTRY, CA_UNPLACED)}
 KEEP_DAYS = 30          # how long a delta stays in the snapshot
 SHRINK_LIMIT = 0.5      # a list that loses more than half its entries is a broken download, not a delisting
 
@@ -368,6 +390,92 @@ def parse_fr_json(body: bytes) -> tuple[str | None, dict[str, list]]:
     return pub.get("DatePublication"), index
 
 
+def canada_regime(country: str | None) -> str:
+    """'Belarus / Bélarus' -> 'Belarus'; 'Moldova ' -> 'Moldova'. The English half of Canada's bilingual field."""
+    return " ".join((country or "").split(" / ", 1)[0].split()) or "none stated"
+
+
+def _ca_schedule(text: str | None) -> str:
+    """'1,Part 3' and '1, Part 1 ' -> '1, Part 3' and '1, Part 1': the same schedule written two ways."""
+    return " ".join(re.sub(r",\s*", ", ", (text or "").strip()).split())
+
+
+def canada_key(rec) -> str:
+    """Canada's list gives no entry id. A record is its regime, schedule and item number, which are unique on the
+    16 Nov 2026 file (5,781 of 5,781; schedule and item alone are not: 792 clashes). Item numbers could be reused or
+    renumbered; that is checked against a second copy before removals are trusted (see method.md)."""
+    return "|".join((canada_regime(rec.findtext("Country-Pays")), _ca_schedule(rec.findtext("Schedule-Annexe")),
+                     (rec.findtext("Item-NumeroDarticle") or "").strip()))
+
+
+def parse_canada_xml(body: bytes, dates: dict | None = None,
+                     names: dict | None = None) -> tuple[str | None, dict[str, list]]:
+    """Canada's consolidated list: [type, [regime]] per record, keyed by canada_key. A ship (one with an IMO number)
+    carries its name, IMO number and type; the list gives no flag. A record with a person's name is an individual,
+    any other an entity. Names of people are never kept. `dates`, when given, is filled with each DateOfListing;
+    `names` with a 12-character hash of each record's name (screening.name_key), for the private state only."""
+    root = ET.fromstring(body)
+    recs = root.findall("record")
+    if recs and not any(r.find("Country-Pays") is not None for r in recs):
+        # Canada renamed every tag between its June and August 2026 files (Country to Country-Pays, and so on).
+        raise ValueError("canada-sema: no record has a Country-Pays field; the file's layout has changed")
+    index = {}
+    for r in recs:
+        key = canada_key(r)
+        imo = (r.findtext("ShipIMONumber-NumeroOMIDuNavire") or "").strip()
+        named = (r.findtext("LastName-NomDeFamille") or r.findtext("GivenName-Prenom") or "").strip()
+        if imo:
+            kind = "vessel"
+        elif named and not (r.findtext("EntityOrShip-EntiteOuNavire") or "").strip():
+            kind = "individual"
+        else:
+            kind = "entity"
+        entry = [kind, [canada_regime(r.findtext("Country-Pays"))]]
+        if kind == "vessel":
+            vtype = (r.findtext("TitleOrShipType-TitreOuTypeDeNavire") or "").split(" | ", 1)[0].strip()
+            entry.append({"name": " ".join((r.findtext("EntityOrShip-EntiteOuNavire") or "").split()) or None,
+                          "imo": imo if re.fullmatch(r"\d{7}", imo) else None, "mmsi": None, "flag": None,
+                          "vessel_type": vtype or None})
+        if key in index:
+            raise ValueError(f"canada-sema: two records share the key {key}")
+        index[key] = entry
+        if dates is not None:
+            dates[key] = _iso_day(r.findtext("DateOfListing-DateDinscription"))
+        if names is not None:
+            whole = " ".join(filter(None, ((r.findtext(t) or "").strip() for t in (
+                "LastName-NomDeFamille", "GivenName-Prenom", "EntityOrShip-EntiteOuNavire"))))
+            names[key] = screening.name_key(whole)
+    return None, index
+
+
+def canada_renumbered(prev_index: dict, index: dict, prev_names: dict | None, names: dict | None) -> list[tuple]:
+    """(old key, new key) pairs for a record that only changed its item number: a key that went and a key that came
+    in the same regime and schedule, with the same type and the same name hash, that hash on no other record going
+    or coming there. Canada's list gives no entry id, so a renumbered schedule would otherwise read as removals and
+    additions. Without name hashes from the reading before (a first reading under this code), nothing is paired."""
+    if not prev_names or not names:
+        return []
+    gone, came = sorted(set(prev_index) - set(index)), sorted(set(index) - set(prev_index))
+
+    def groups(keys, idx, hashes):
+        out: dict = {}
+        for k in keys:
+            h = hashes.get(k)
+            if h:
+                out.setdefault((k.rsplit("|", 1)[0], idx[k][0], h), []).append(k)
+        return {g: v[0] for g, v in out.items() if len(v) == 1}
+    a, b = groups(gone, prev_index, prev_names), groups(came, index, names)
+    return sorted((a[g], b[g]) for g in set(a) & set(b))
+
+
+def apply_renumbering(prev_index: dict, pairs: list[tuple]) -> dict:
+    """The earlier reading with each renumbered record moved to its new key, so the two compare as one entry."""
+    out = dict(prev_index)
+    for old, new in pairs:
+        out[new] = out.pop(old)
+    return out
+
+
 def check_size(list_id: str, index: dict, prev_index: dict | None) -> None:
     if len(index) < LISTS[list_id]["min_entries"]:
         raise ValueError(f"{list_id}: only {len(index)} entries parsed; the download looks cut short")
@@ -511,8 +619,9 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
 
 
 # The lists that carry ships. The UN file has none; EU vessel measures sit in regulation annexes, not in its file.
-# France's register names 39 ships (North Korea, UN measures restated; 6 Nov 2026), each with an IMO number.
-VESSEL_LISTS = ("ofac-sdn", "uk-sanctions", "france-gels")
+# France's register names 39 ships (North Korea, UN measures restated; 6 Nov 2026), each with an IMO number;
+# Canada's list 731 (all under its Russia regulations, 16 Nov 2026).
+VESSEL_LISTS = ("ofac-sdn", "uk-sanctions", "france-gels", "canada-sema")
 
 
 def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict, list[dict]]:

@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, geo  # noqa: E402
 
-from . import batches, controls, food, inspection, markets, stats, tariffs  # noqa: E402
+from . import batches, controls, food, inspection, markets, stats, tariffs, unpress  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
 METHOD = "headwind-1.8"
@@ -75,7 +75,7 @@ SRC_UK = {
     "descriptor": "Every person, entity and ship designated under UK sanctions regulations.",
 }
 
-SRC_FR = {
+SRC_FRANCE = {
     "id": "dgtresor-gels",
     "publisher": "French Treasury (Direction générale du Trésor)",
     "title": "Registre national des gels (France's national asset-freeze register)",
@@ -88,8 +88,34 @@ SRC_FR = {
                    "the EU and UN measures it applies."),
 }
 
+SRC_CANADA = {
+    "id": "gac-sema",
+    "publisher": "Global Affairs Canada",
+    "title": "Consolidated Canadian Autonomous Sanctions List",
+    "url": ("https://www.international.gc.ca/world-monde/international_relations-relations_internationales/"
+            "sanctions/consolidated-consolide.aspx?lang=eng"),
+    "licence": "Canada.ca terms: reproduction allowed for non-commercial purposes",
+    "grade": "A1",
+    "independence_group": "ca-gac-sanctions",
+    "source_type": "official or market data",
+    "descriptor": "Every person, entity and ship listed under Canada's autonomous sanctions regulations.",
+}
+
+SRC_UNPRESS = {
+    "id": "un-press",
+    "publisher": "United Nations (Meetings Coverage and Press Releases)",
+    "title": "UN Meetings Coverage and Press Releases",
+    "url": "https://press.un.org/en",
+    "licence": "UN website terms of use (personal, non-commercial use; no redistribution). Headwind gives the "
+               "document number, date and link only",
+    "grade": "A1",
+    "independence_group": "un-security-council",
+    "source_type": "official or market data",
+    "descriptor": "The UN's own press releases, among them those of the Security Council's sanctions committees.",
+}
+
 LIST_SOURCE = {"ofac-sdn": SRC_OFAC, "un-consolidated": SRC_UN, "eu-fsf": SRC_EU, "uk-sanctions": SRC_UK,
-               "france-gels": SRC_FR}
+               "france-gels": SRC_FRANCE, "canada-sema": SRC_CANADA}
 
 SRC_CSL = {
     "id": "trade-gov-csl",
@@ -335,7 +361,7 @@ def _batch_ref(s: dict) -> dict | None:
 
 VESSELS_IN_TEXT = 25
 ALSO_ON = {"ofac-sdn": "the OFAC SDN list", "uk-sanctions": "the UK Sanctions List",
-           "france-gels": "France's asset-freeze register"}
+           "france-gels": "France's asset-freeze register", "canada-sema": "Canada's consolidated list"}
 
 
 def _vessel_text(word: str, vessels: list[dict]) -> str:
@@ -427,6 +453,9 @@ def list_features(snapshot: dict) -> list[dict]:
             parts.append(f"Removed {base['removed']}{' national' if nat is not None else ''}: by type, "
                          f"{_counts(base['removed_by_type'])}; by program, {_counts(base['removed_by_program'])}.")
         parts.append(_edit_text(base))
+        if s.get("renumbered"):
+            parts.append(f"{s['renumbered']} entries only changed their item number on the list and are counted as "
+                         f"the same entries, not as removed and added.")
         if nat is not None:
             parts.append(_restated_text(rest))
         since = f" since Headwind's reading of {s['prior_checked_at'][:10]}" if s.get("prior_checked_at") else ""
@@ -513,6 +542,7 @@ def list_features(snapshot: dict) -> list[dict]:
 
     feats += inspection_features(snapshot, generated, valid_until, (lanes.get("inspection") or {}).get("fetched_at"))
     feats += tariff_features(snapshot, generated, valid_until)
+    feats += unpress_features(snapshot, generated, valid_until)
     return feats
 
 
@@ -559,6 +589,30 @@ def _pace_text(p: dict, noun: str) -> str:
     return (f"{p['count']} {noun} from {p['from']} to {p['to']}; the median of the {p['baseline_windows']} "
             f"{p['window_days']}-day windows before was {p.get('median')}, {z}"
             + (f", flag rate {p['flag_rate']}" if p.get("flag_rate") is not None else "") + ".")
+
+
+def unpress_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
+    """UN Security Council sanctions committee press releases of the last two weeks: document number, date and
+    link only (UN terms of use). The release's own words are at the link."""
+    lanes = snapshot.get("lanes") or {}
+    cutoff = _plus_hours(generated, -24 * unpress.FEED_DAYS)
+    feats = []
+    for r in snapshot.get("un_committee_releases") or []:
+        if r["published"] < cutoff:
+            continue
+        num = r["id"].split("/", 1)[1].lower()
+        feats.append(_official(
+            f"headwind:unpress:sc{num}",
+            f"UN Security Council sanctions committee press release {r['id']} ({r['published'][:10]})",
+            f"The UN published press release {r['id']} on {r['published'][:10]}, from one of the Security Council's "
+            f"sanctions committees. Headwind gives the document number, date and link only, under the UN's terms of "
+            f"use; the release's own words are at the link. Changes to the UN list itself are reported from the list.",
+            data_as_of=r["published"], generated=generated, valid_until=valid_until, countries=[],
+            pmesii=["political", "economic"], ascope=["organizations"], ncf=["provide_funding_liquidity"],
+            requirement_ids=["HW-PIR-1"], measures={},
+            visual={"type": "page", "url": r["url"]}, source={**SRC_UNPRESS, "url": r["url"]},
+            accessed=(lanes.get("unpress") or {}).get("fetched_at")))
+    return feats
 
 
 def tariff_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
@@ -921,11 +975,12 @@ def build_feed(snapshot: dict) -> dict:
                     "Federal Register and its public inspection US public domain; USITC tariff schedule releases and White House presidential actions US government works; UN Security Council list, no "
                     "licence stated; EU financial "
                     "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0; "
-                    "France's Registre national des gels, Licence Ouverte 2.0"),
+                    "France's Registre national des gels, Licence Ouverte 2.0; Canada's consolidated autonomous "
+                    "sanctions list, non-commercial reproduction (Canada.ca terms); UN press releases, linked only"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; World Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
-                        "and Development Office; French Treasury (Direction générale du Trésor); US International Trade Administration; "
+                        "and Development Office; French Treasury (Direction générale du Trésor); Global Affairs Canada; US International Trade Administration; "
                         "US Federal Register and the Office of the Federal Register; US International Trade Commission; The White House."),
         "language_key": LANGUAGE_KEY,
         # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read

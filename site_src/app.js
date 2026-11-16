@@ -109,12 +109,14 @@
     document.getElementById("vessel-cross").innerHTML = vc.imo_numbers ? '<p class="small muted">' + esc(
       "Ships matched by IMO number: " + Number(vc.imo_numbers).toLocaleString() + " numbers, " +
       Number(vc.on_both).toLocaleString() + " on both the OFAC and UK lists, " +
-      (vc.on_two_or_more !== undefined ? Number(vc.on_two_or_more).toLocaleString() + " on two or more of the OFAC, UK and French lists, " : "") +
+      (vc.on_two_or_more !== undefined ? Number(vc.on_two_or_more).toLocaleString() + " on two or more of the OFAC, UK, French and Canadian lists, " : "") +
       Number((vc.only || {})["ofac-sdn"] || 0).toLocaleString() + " on OFAC's only, " +
       Number((vc.only || {})["uk-sanctions"] || 0).toLocaleString() + " on the UK's only, " +
-      Number((vc.only || {})["france-gels"] || 0).toLocaleString() + " on France's only; " +
+      Number((vc.only || {})["france-gels"] || 0).toLocaleString() + " on France's only, " +
+      Number((vc.only || {})["canada-sema"] || 0).toLocaleString() + " on Canada's only; " +
       Number((vc.without_imo || {})["ofac-sdn"] || 0) + " OFAC, " + Number((vc.without_imo || {})["uk-sanctions"] || 0) +
-      " UK and " + Number((vc.without_imo || {})["france-gels"] || 0) + " French entries give no IMO number." + ((vc.from_earlier_run || []).length ? " From an earlier reading: " + vc.from_earlier_run.join(", ") + "." : "")) +
+      " UK, " + Number((vc.without_imo || {})["france-gels"] || 0) + " French and " + Number((vc.without_imo || {})["canada-sema"] || 0) +
+      " Canadian entries give no IMO number." + ((vc.from_earlier_run || []).length ? " From an earlier reading: " + vc.from_earlier_run.join(", ") + "." : "")) +
       ' <a href="data/vessels.json">Every ship, with each list\'s entry ids, name and flag</a>.</p>' : "";
     function counts(o) { return Object.keys(o || {}).slice(0, 6).map(function (k) { return k + " " + o[k]; }).join(", "); }
     function batchLine(lines, d) {
@@ -164,6 +166,13 @@
         : d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "");
       return '<div class="row"><div class="row-title"><span>' + esc(head) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
     }).join("") || (lists.length ? '<p class="small muted">No change seen in the last 30 days of readings.</p>' : "");
+
+    var up = s.un_press || {}, ur = s.un_committee_releases || [];
+    document.getElementById("un-releases").innerHTML = (ur.length ? '<p class="small muted">' + ur.map(function (r) {
+      return '<a href="' + esc(r.url) + '" rel="noopener">' + esc(r.id) + "</a> (" + esc(r.published.slice(0, 10)) + ")";
+    }).join(", ") + ".</p>" : '<p class="small muted">None seen in the last 60 days.</p>') +
+      '<p class="small muted">' + esc("Document number, date and link only (UN terms of use). The UN's press feed holds its ten newest releases of every kind, so a release can come and go between two of Headwind's readings" +
+      (up.checked_at ? "; on the last reading (" + when(up.checked_at) + ") the feed reached back to " + when(up.oldest) + (!up.previous_read ? " (the first reading, so nothing to compare)." : up.may_have_missed ? ", after the reading before it (" + when(up.previous_read) + "): a release in between may be missed." : ", which covers the time since the reading before.") : ".")) + "</p>";
 
     var tr = s.mineral_trade || {};
     function usd(v) { return v === null || v === undefined ? "" : "$" + (v >= 1e9 ? (v / 1e9).toFixed(2) + " bn" : v >= 1e6 ? (v / 1e6).toFixed(1) + " m" : Math.round(v).toLocaleString()); }
@@ -276,7 +285,7 @@
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, counted only because their titles can name people and companies: notices, ' + esc(countedText) + ".</p>" : "");
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France)", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada)", unpress: "UN sanctions committee press releases", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {

@@ -18,7 +18,8 @@ It reports measurements. It states no probability and gives no investment advice
 | Local food prices | WFP prices by market, from the Humanitarian Data Exchange | Monthly, one to three months late | Median 3-month change across a country's price series, against its own 60 prior medians |
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
-| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
+| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
+| UN sanctions committee releases (since 16 Nov 2026) | The UN's Meetings Coverage and Press Releases feed (RSS) | As the UN publishes | Security Council sanctions committees' press releases: document number, date and link only; no anomaly test |
 | Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country; scored by designation batches where the list gives dates |
 | Minerals | USGS Mineral Commodity Summaries data release (net import reliance; import shares by country) | Annual | No anomaly test; context only, in `data/minerals.json` |
 | Rules | US Federal Register API: BIS, OFAC and USTR rules and proposed rules, and USTR notices | Federal working days | What was published in the last 60 days, and the future dates each document names; no anomaly test |
@@ -129,6 +130,38 @@ by sanctions program. Headwind does not republish the names of people or organiz
 - **Ids are stable.** On the Wayback Machine's copies of 17 Jul and 7 Aug 2026 (it keeps only their first 5 MiB,
   about 2,890 entries each), every id on both copies and on the 6 Nov file kept its nature; names changed only for
   those seven ships and five spelling edits.
+
+## Canada's consolidated list (`headwind-1.8`, 16 Nov 2026)
+- **What it is.** Global Affairs Canada's Consolidated Canadian Autonomous Sanctions List: 5,781 records on the
+  10 Nov 2026 file (3,543 individuals, 1,507 entities, 731 ships, all under the Russia regulations, each with an IMO
+  number), 19 regimes, each record with its date of listing.
+- **No entry id.** A record is its regime, schedule and item number (5,781 unique; schedule and item alone clash 792
+  times). Spelling is normalized ("Moldova " and "Moldova", "1,Part 3" and "1, Part 3").
+- **Tested on five copies** (Wayback 30 Aug, 6 Oct, 24 Oct and 8 Nov 2026, and the 10 Nov file): no key that stayed
+  on the list ever pointed to a different name. Canada does renumber: between 8 and 10 Nov four records listed on
+  4 Sep 2026 moved from items 1700-1703 to 1620-1623 (Russia, Schedule 1, Part 1). So a key that goes while a record
+  of the same type and name comes under a new item number in the same regime and schedule is counted once, as
+  renumbered, not as a removal and an addition. The name is kept only as a 12-character hash in Headwind's private
+  state, never published. The first reading under this rule has no hashes from before and pairs nothing.
+- **Measured** like the EU and UK lists: counts by type and regime, ships named (name, IMO number, type; the list
+  gives no flag), designation batches from the dates of listing. Countries come from the regime; the Ukraine
+  regulations are placed on Russia only, as the EU's Ukraine regime is; JVCFOR (corrupt foreign officials), Hamas
+  Terrorist Attacks and Extremist Settler Violence are conduct regimes and left unplaced.
+- **Layout.** Canada renamed every field between its June and August 2026 files (Country to Country-Pays). A file
+  with none of the expected fields fails the list, keeping the reading before; it is never read as delistings.
+
+## UN sanctions committee press releases (`headwind-1.8`, 16 Nov 2026)
+- **Source.** The UN's Meetings Coverage and Press Releases RSS feed, the only feed found. A release counts when its
+  link is a Security Council document (SC/nnnnn) and its title names a sanctions committee ("... Sanctions
+  Committee ..." or "Committee (established) pursuant to resolution N", other than the 1540 and Counter-Terrorism
+  committees). Headwind keeps and publishes the document number, date and link only (UN terms of use: personal,
+  non-commercial use, no redistribution); the title is read for that test and not kept. No country is attached.
+- **The feed can drop releases.** It holds the ten newest releases of every UN body: about 7 hours on 13 Nov 2026,
+  and from 4 hours to 3 days on ten Wayback copies from 2026. The 26 Oct 2026 release SC/16488 (a committee removing
+  three entries) was gone from the copy of 27 Oct. Headwind runs every 4 to 9 hours, so each reading states whether
+  the feed reached back to the reading before; when it did not, the page and the source's health say a release may
+  have been missed. Release pages and listings sit behind a bot challenge, so Headwind does not walk the numbers.
+  The committees' changes to the UN list itself are read from the list, not from this feed.
 
 ## USTR, public inspection and HW-IND-2 (`headwind-1.6`)
 - **USTR.** The rules lane reads USTR's rules and its notices (Section 301 actions, exclusions and their

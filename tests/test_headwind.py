@@ -15,6 +15,7 @@ import sys
 import tempfile
 import unittest
 import urllib.error
+import xml.etree.ElementTree as ET
 import zipfile
 from unittest import mock
 from datetime import date
@@ -25,6 +26,7 @@ FIX = ROOT / "tests" / "fixtures"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
+from headwind import unpress  # noqa: E402
 from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
                       sanctions, screening, stats, tariffs, trade)
 from tic_doctrine import contract, registers  # noqa: E402
@@ -99,6 +101,7 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
              ("ofac/downloads/sdn.csv", "ofac_sdn.csv"), ("scsanctions.un.org", "un_consolidated.xml"),
              ("fsd/fsf/public/files/xmlFullSanctionsList_1_1", "eu_fsf.xml"),
              ("sanctionslist.fcdo.gov.uk", "uk_sanctions.xml"), ("gels-avoirs.dgtresor.gouv.fr", "fr_gels.json"),
+             ("sanctions/sema-lmes.xml", "canada_sema.xml"), ("press.un.org/en/rss.xml", "un_press.xml"),
              ("federalregister.gov", "federal_register.json"), ("data.trade.gov", "trade_gov_csl.json")]
     for needle, name in table:
         if needle in url:
@@ -417,7 +420,7 @@ class TestVesselCrosslist(unittest.TestCase):
     def test_crosslist(self):
         ofac, uk = self.indexes()
         s, t = sanctions.vessel_crosslist({"ofac-sdn": ofac, "uk-sanctions": uk})
-        self.assertEqual((s["imo_numbers"], s["on_both"], s["only"]), (15, 1, {"ofac-sdn": 8, "uk-sanctions": 6, "france-gels": 0}))
+        self.assertEqual((s["imo_numbers"], s["on_both"], s["only"]), (15, 1, {"ofac-sdn": 8, "uk-sanctions": 6, "france-gels": 0, "canada-sema": 0}))
         r = next(r for r in t if r["imo"] == "7303803")
         self.assertEqual(r["on"]["ofac-sdn"], {"ids": ["23730"], "name": "AN SAN 1",
                                                "flag": "Democratic People's Republic of Korea"})
@@ -530,6 +533,137 @@ class TestFrance(unittest.TestCase):
     def test_health_entry(self):
         self.assertEqual(health.LIST_KEY["france-gels"], "dgtresor-gels")
         self.assertEqual(health.LANE_OF["dgtresor-gels"], "sanctions")
+
+
+class TestCanada(unittest.TestCase):
+    """Canada's consolidated autonomous sanctions list, 24 records cut redacted from the file of 10 Nov 2026 (people:
+    regime, schedule, item and listing date, the name replaced by PERSON-<hash>; ships: name, IMO and type)."""
+
+    def read(self):
+        dates, names = {}, {}
+        _, idx = sanctions.parse_canada_xml((FIX / "canada_sema.xml").read_bytes(), dates, names)
+        return idx, dates, names
+
+    def test_parse(self):
+        idx, dates, names = self.read()
+        self.assertEqual(len(idx), 24)
+        self.assertEqual(sanctions._tally(idx, idx)[0], {"entity": 8, "individual": 13, "vessel": 3})
+        self.assertEqual(sanctions.unknown_programs("canada-sema", idx), [])
+        self.assertTrue(any(k.startswith("Moldova|") for k in idx))         # "Moldova " in the file
+        self.assertTrue(any("|1, Part 3|" in k for k in idx))               # "1,Part 3" in the file
+        self.assertTrue(all(dates[k] for k in idx))
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{12}", names[k]) for k in idx))
+        self.assertTrue(all(len(e) == 2 for e in idx.values() if e[0] != "vessel"))
+        ship = next(e[2] for e in idx.values() if e[0] == "vessel")
+        self.assertEqual(sorted(ship), ["flag", "imo", "mmsi", "name", "vessel_type"])
+        self.assertTrue(re.fullmatch(r"\d{7}", ship["imo"]) and ship["vessel_type"] and ship["name"])
+
+    def test_keys_are_regime_schedule_item(self):
+        rec = ET.fromstring("<record><Country-Pays>Belarus / B\u00e9larus</Country-Pays><Schedule-Annexe>1,Part 3 "
+                            "</Schedule-Annexe><Item-NumeroDarticle> 7</Item-NumeroDarticle></record>")
+        self.assertEqual(sanctions.canada_key(rec), "Belarus|1, Part 3|7")
+        dup = b"<data-set>" + b"<record><Country-Pays>Iran</Country-Pays><Item-NumeroDarticle>1</Item-NumeroDarticle></record>" * 2 + b"</data-set>"
+        with self.assertRaises(ValueError):
+            sanctions.parse_canada_xml(dup)
+
+    def test_change_dated_batches_and_countries(self):
+        idx, dates, _ = self.read()
+        hamas = next(k for k in idx if k.startswith("Hamas"))
+        russian = sorted(k for k in idx if k.startswith("Russia|") and dates[k] == "2022-02-24")
+        prev = {k: v for k, v in idx.items() if k not in russian and k != hamas}
+        d = sanctions.delta("canada-sema", prev, idx, "2026-11-16T06:00:00Z", "2026-11-15T06:00:00Z", dates=dates)
+        self.assertEqual((d["added"], d["countries"]), (len(russian) + 1, ["RU"]))
+        self.assertIn(("designation date", "2022-02-24"), [(b["basis"], b["date"]) for b in d["batches"]])
+
+    def test_renumbered_items_are_not_removals(self):
+        idx, _, names = self.read()
+        people = sorted(k for k in idx if idx[k][0] == "individual" and k.startswith("Russia|"))
+        moved, dropped = people[0], people[1]
+        new_key = moved.rsplit("|", 1)[0] + "|999"
+        new = {(new_key if k == moved else k): v for k, v in idx.items() if k != dropped}
+        new_names = {(new_key if k == moved else k): v for k, v in names.items() if k != dropped}
+        pairs = sanctions.canada_renumbered(idx, new, names, new_names)
+        self.assertEqual(pairs, [(moved, new_key)])
+        d = sanctions.delta("canada-sema", sanctions.apply_renumbering(idx, pairs), new, "2026-11-16T06:00:00Z", None)
+        self.assertEqual((d["added"], d["removed"]), (0, 1))
+        self.assertEqual(sanctions.canada_renumbered(idx, new, None, new_names), [])     # no hashes before: no pairing
+
+    def test_real_renumbering_8_to_10_nov(self):
+        """Canada moved four records listed 4 Sep 2026 from items 1700-1703 to 1620-1623 (Russia, Schedule 1, Part 1)
+        between its files of 8 Nov (Wayback) and 10 Nov 2026; cut redacted, with three records that did not move."""
+        na, nb = {}, {}
+        _, a = sanctions.parse_canada_xml((FIX / "canada_renumber_2026-11-08.xml").read_bytes(), None, na)
+        _, b = sanctions.parse_canada_xml((FIX / "canada_renumber_2026-11-10.xml").read_bytes(), None, nb)
+        pairs = sanctions.canada_renumbered(a, b, na, nb)
+        self.assertEqual(pairs, [(f"Russia|1, Part 1|{o}", f"Russia|1, Part 1|{o - 80}") for o in range(1700, 1704)])
+        self.assertIsNone(sanctions.delta("canada-sema", sanctions.apply_renumbering(a, pairs), b,
+                                          "2026-11-10T12:00:00Z", None))
+        d = sanctions.delta("canada-sema", a, b, "2026-11-10T12:00:00Z", None)              # without the guard
+        self.assertEqual((d["added"], d["removed"]), (4, 4))
+
+    def test_a_new_layout_fails_loudly(self):
+        old = b"<data-set>" + b"<record><Country>Iran</Country><Item>1</Item></record>" * 2 + b"</data-set>"
+        with self.assertRaisesRegex(ValueError, "layout"):
+            sanctions.parse_canada_xml(old)
+
+    def test_ships_cross_listed(self):
+        idx, _, _ = self.read()
+        s, t = sanctions.vessel_crosslist({"canada-sema": idx})
+        self.assertEqual((s["only"]["canada-sema"], s["without_imo"]["canada-sema"]), (3, 0))
+
+
+class TestUnPress(unittest.TestCase):
+    """UN press feed: the copy of 13 Nov 2026 and a Wayback copy of 2 Jul 2026, cut redacted (titles kept only on
+    Security Council releases, which the classifier reads)."""
+
+    def test_live_copy_has_no_committee_release(self):
+        items = unpress.parse((FIX / "un_press.xml").read_bytes())
+        self.assertEqual(len(items), 10)
+        import gzip
+        self.assertEqual(unpress.parse(gzip.compress((FIX / "un_press.xml").read_bytes())), items)   # as the UN sends it
+        self.assertEqual([r for r in map(unpress.committee_release, items) if r], [])
+
+    def test_committee_release(self):
+        items = unpress.parse((FIX / "un_press_2026-07-02.xml").read_bytes())
+        found = [r for r in map(unpress.committee_release, items) if r]
+        self.assertEqual([r["id"] for r in found], ["SC/16404"])
+        self.assertEqual(found[0]["url"], "https://press.un.org/en/2026/sc16404.doc.htm")
+        self.assertEqual(sorted(found[0]), ["id", "published", "url"])                 # no title is kept
+
+    def test_which_titles_count(self):
+        def one(title, link="https://press.un.org/en/2026/sc16488.doc.htm"):
+            return unpress.committee_release({"title": title, "link": link, "published": "2026-10-26T20:00:00Z"})
+        self.assertIsNotNone(one("Security Council ISIL (Da'esh) and Al-Qaida Sanctions Committee Removes Three Entries"))
+        self.assertIsNotNone(one("Security Council Committee Established Pursuant to Resolution 1718 (2006) Adds One Entry"))
+        self.assertIsNone(one("Security Council Committee Established Pursuant to Resolution 1540 (2004) Holds Meeting"))
+        self.assertIsNone(one("Security Council Extends Mandate of Sanctions Panel"))
+        self.assertIsNone(one("Sanctions Committee Chair Briefs", link="https://press.un.org/en/2026/sgsm23373.doc.htm"))
+
+    def test_coverage_and_merge(self):
+        items = unpress.parse((FIX / "un_press.xml").read_bytes())
+        c = unpress.coverage(items, "2026-11-13T12:00:00Z", "2026-11-14T00:00:00Z")
+        self.assertEqual((c["oldest"], c["may_have_missed"]), ("2026-11-13T16:42:12Z", True))
+        self.assertFalse(unpress.coverage(items, "2026-11-13T17:00:00Z", "2026-11-14T00:00:00Z")["may_have_missed"])
+        self.assertFalse(unpress.coverage(items, None, "2026-11-14T00:00:00Z")["may_have_missed"])
+        r = {"id": "SC/16404", "published": "2026-07-01T20:00:00Z", "url": "u"}
+        kept = unpress.merge([], [r], "2026-07-02T00:00:00Z")
+        self.assertEqual(unpress.merge(kept, [r], "2026-07-03T00:00:00Z"), kept)          # seen once
+        self.assertEqual(unpress.merge(kept, [], "2026-09-15T00:00:00Z"), [])              # gone after 60 days
+        with self.assertRaises(ValueError):
+            unpress.parse(b"<html><title>Client Challenge</title></html>")
+
+    def test_feed_item(self):
+        items = unpress.parse((FIX / "un_press_2026-07-02.xml").read_bytes())
+        rel = unpress.merge([], [r for r in map(unpress.committee_release, items) if r], "2026-07-02T09:31:52Z")
+        snap = {"generated_at": "2026-07-05T00:00:00Z", "un_committee_releases": rel, "lanes": {}}
+        f = feed.unpress_features(snap, snap["generated_at"], "2026-07-07T00:00:00Z")
+        self.assertEqual([x["properties"]["id"] for x in f], ["headwind:unpress:sc16404"])
+        p = f[0]["properties"]
+        self.assertTrue(p["title"].startswith("UN Security Council sanctions committee press release SC/16404 (2026-07-0"))
+        self.assertNotIn("2745", p["title"] + p["summary"])                                # nothing of the release's words
+        self.assertEqual(lint({"features": f}), [])
+        self.assertEqual(feed.unpress_features({**snap, "generated_at": "2026-07-30T00:00:00Z"}, "2026-07-30T00:00:00Z",
+                                               "2026-08-01T00:00:00Z"), [])
 
 
 class TestTrade(unittest.TestCase):
@@ -1225,7 +1359,7 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual(snap["sanctions"], [])                 # the first run only sets the baseline
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
                              [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11),
-                              ("france-gels", 20)])
+                              ("france-gels", 20), ("canada-sema", 24)])
             self.assertTrue(list((tmp / "data" / "raw" / "eu-fsf").glob("*.xml.gz")))
             # 5 rules and 3 USTR notices (one left out); tariff actions of the last 60 days come on top, so how many
             # depends on the day the test runs.

@@ -225,12 +225,13 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | `wfp` | `food.py` | WFP prices by market from HDX, for the countries in `config/wfp_countries.json` | 18 of 19 countries; Cuba has no file, Venezuela's newest month is May 2025 |
 | `baseline` | `baseline.py` | World Bank WDI API, six indicators | 213 countries. The API timed out twice earlier the same evening |
 | `calendar` | `releases.py` | Federal Reserve and ECB schedule pages; FAO release dates | 9 events in the next 180 days |
-| `sanctions` | `sanctions.py` | OFAC `sdn.csv` (5.8 MB), the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML, 26 MB), the UK Sanctions List (XML, 22 MB) and France's Registre national des gels (JSON, 15 MB, list id `france-gels`, source id `dgtresor-gels`) | 14 Nov, 2:57 PM CST: 19,565 OFAC (1,570 vessels), 1,007 UN, 6,269 EU, 6,440 UK (694 ships). 15 Nov, 11:36 PM CST: France 8,226 (39 ships), file dated 6 Nov; the whole lane took 3 min 39 s. The EU download takes 30 s to 2 min |
+| `sanctions` | `sanctions.py` | OFAC `sdn.csv` (5.8 MB), the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML, 26 MB), the UK Sanctions List (XML, 22 MB) France's Registre national des gels (JSON, 15 MB, list id `france-gels`, source id `dgtresor-gels`) and Canada's consolidated list (XML, 2.9 MB, list id `canada-sema`, source id `gac-sema`) | 14 Nov, 2:57 PM CST: 19,565 OFAC (1,570 vessels), 1,007 UN, 6,269 EU, 6,440 UK (694 ships). 15 Nov, 11:36 PM CST: France 8,226 (39 ships), file dated 6 Nov; the whole lane took 3 min 39 s. 16 Nov, 12:05 AM CST: Canada 5,781 (731 ships). The EU download takes 30 s to 2 min |
 | `screening` | `screening.py` | trade.gov Consolidated Screening List (one 34 MB JSON), every list but the SDN list | 13 Nov, 8:46 AM CST: 12 lists, 6,702 entries (Entity List 3,419). First reading, so no change to report yet. The download took 4 s |
 | `controls` | `controls.py` | Federal Register API: BIS, OFAC and USTR rules and proposed rules and USTR notices, last 60 days; the same agencies' documents of the last 800 days for the register of scheduled dates; since `headwind-1.7` presidential documents that are tariff actions and BIS's and ITA's Section 232 notices (800 days; texts of the presidential ones read once for their dates) | 13 Nov: 25 rules; 2 future dates for Verdict (3 Dec polysilicon rule ends, 10 Jan 2027 affiliates-rule stay ends). 15 Nov: 34 rules and USTR notices, 18 scheduled dates |
 | `inspection` | `inspection.py` | Office of the Federal Register, public inspection: the issues of the last 5 days (30 on a first run or after a gap), BIS, OFAC and USTR filings, and each rule's or USTR notice's text | 15 Nov: 30 days read, 26 filings (17 notices counted only); HW-IND-2 met by BIS 2026-22793 and USTR 2026-22925 and 2026-22867 |
 | `trade` | `trade.py` | Census Bureau international trade API, imports by HS code and country, 24 codes. **Needs a free Census key** | 15 Nov: 24 codes, newest month Sep 2026 |
 | `tariffs` | `tariffs.py` | USITC Harmonized Tariff Schedule release list (JSON); White House presidential actions (RSS) | 15 Nov: 186 revisions (23 in 2026), 3 tariff actions signed in 30 days, all in the Federal Register. Both lanes with texts took 6 s |
+| `unpress` | `unpress.py` | The UN's Meetings Coverage and Press Releases RSS (gzip even unasked), Security Council sanctions committee releases, number, date and link only | 16 Nov, 12:08 AM CST: 10 items back to 13 Nov 4:42 PM UTC, no committee release |
 | `minerals` | `minerals.py` | USGS Mineral Commodity Summaries 2026 data release on ScienceBase (item JSON, then two CSVs) | 13 Nov: 68 commodities with net import reliance, 47 with import shares by country |
 
 The sanctions lane was read three times on 13 Nov (to about 9 AM CST) and both files were byte-for-byte the same as
@@ -611,6 +612,29 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   `.claude/cut_france.py` (git-ignored) from the live file and the 7 Aug Wayback copy: people keep `IdRegistre`,
   Nature and legal bases, `Nom` becomes `PERSON-<sha1[:10]>`; organizations keep their name; ships keep name, IMO
   and legal bases (owner, aliases and narrative dropped). Tests in `TestFrance`.
+
+## Canada's list and UN committee releases (plan item 3, built 16 Nov 2026, `headwind-1.8`)
+- See doctrine/method.md "Canada's consolidated list" and "UN sanctions committee press releases".
+- **Canada** (`parse_canada_xml`, `canada_key`, `canada_renumbered`, `apply_renumbering`): key regime|schedule|item.
+  Five copies tested (Wayback 30 Aug, 6 Oct, 24 Oct, 8 Nov and the 10 Nov file, script
+  `scratchpad/ca_stability.py`, not kept): no key ever changed its name; 8 to 10 Nov four records were renumbered
+  (items 1700-1703 to 1620-1623), so the lane keeps `names` (12-hex hashes, `screening.name_key`) in
+  `sanctions_index.json` for Canada only and pairs renumbered records before the delta (`renumbered` on it). The
+  first run under this code keeps hashes and pairs nothing. Fixtures `canada_sema.xml` (24 records) and
+  `canada_renumber_2026-11-0{8,10}.xml` (the four real pairs plus three unmoved), cut redacted by
+  `.claude/cut_item3.py` and `.claude/cut_canada_renumber.py`. Canada's file has no date of its own;
+  `QUIET_SEEN_DAYS["gac-sema"]` 45. Canada's "Ukraine" regime is placed on Russia only, as the EU's UKR (Tom's yes to the
+  item 3 commit, 16 Nov 2026, with this placement stated).
+- **Ships across four lists** (live 16 Nov, 12:05 AM CST): 1,995 IMO numbers, 742 on two or more, Canada only 49;
+  682 of Canada's 731 are also on OFAC's or the UK's list. Wake's `live/ais` needs `canada-sema` credited too.
+- **UN releases** (`unpress.py`, lane `unpress`, snapshot `un_committee_releases` kept 60 days and `un_press`, the
+  feed's reach): feed items `headwind:unpress:sc<n>` for 14 days, no countries, linked to the release. The feed
+  holds 10 items and **can drop releases** (SC/16488 of 26 Oct was gone by the 27 Oct copy); `may_have_missed` puts
+  a warning on the `un-press` health entry and a line on the page. Walking release numbers was ruled out: the
+  pages answer with a bot challenge. Fixtures `un_press.xml` (13 Nov) and `un_press_2026-07-02.xml` (Wayback, with
+  SC/16404), titles kept only on Security Council items.
+- **Fixed in passing:** item 2 had defined France's source record as a second `SRC_FR` in `feed.py`, the name of the
+  Federal Register's record; items were right because `LIST_SOURCE` was built in between. Renamed `SRC_FRANCE`.
 
 ## Tariff actions (plan item 1, built 15 Nov 2026, `headwind-1.7`, committed `5a26fa4`)
 - See doctrine/method.md "Tariff actions and the tariff schedule". Snapshot: `tariff_pace` (controls lane),

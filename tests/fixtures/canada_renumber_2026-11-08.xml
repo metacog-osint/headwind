@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<data-set>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>1</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-03-17</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-d31c7b8d32</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>10</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-03-19</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-8f04560d4e</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>100</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2019-03-15</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-6393bfd7df</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>1700</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2026-09-04</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-c441f0f853</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>1701</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2026-09-04</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-21eac588ae</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>1702</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2026-09-04</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-f4a95c7723</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>1703</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2026-09-04</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-2235813b10</LastName-NomDeFamille>
+	</record>
+</data-set>

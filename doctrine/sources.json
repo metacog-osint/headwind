@@ -48,6 +48,24 @@
       "independence_group": "fr-dgtresor-gels"
     },
     {
+      "id": "gac-sema",
+      "name": "Global Affairs Canada: Consolidated Canadian Autonomous Sanctions List (XML)",
+      "url": "https://www.international.gc.ca/world-monde/international_relations-relations_internationales/sanctions/consolidated-consolide.aspx?lang=eng",
+      "licence": "Canada.ca terms of use, read 15 Nov 2026: reproduction in whole or in part for non-commercial purposes; no Open Government Licence statement on the list page",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "ca-gac-sanctions"
+    },
+    {
+      "id": "un-press",
+      "name": "United Nations Meetings Coverage and Press Releases (RSS, press.un.org/en/rss.xml): Security Council sanctions committee releases",
+      "url": "https://press.un.org/en",
+      "licence": "UN website terms of use (personal, non-commercial use; no redistribution). Headwind publishes document number, date and link only",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "un-security-council"
+    },
+    {
       "id": "trade-gov-csl",
       "name": "US International Trade Administration: Consolidated Screening List (JSON; BIS, State and Treasury lists)",
       "url": "https://www.trade.gov/consolidated-screening-list",
