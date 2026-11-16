@@ -39,16 +39,17 @@ WINDOWS = {"ecb-eurofxref": (4, 8), "eia-spot": (7, 14), "fao-ffpi": (40, 70), "
 # France publishes its register as measures are taken (6 Nov 2026 was the latest on 15 Nov).
 QUIET_DAYS = {"un-sc-consolidated": 3, "eu-fsf": 30, "uk-sanctions-list": 30, "dgtresor-gels": 30}
 # OFAC's file carries no date of its own, so its note uses the last change Headwind itself saw.
-QUIET_SEEN_DAYS = {"ofac-sdn": 21}
+# Canada's file carries no date either; it changes every few weeks (Last-Modified 10 Nov 2026 on 16 Nov).
+QUIET_SEEN_DAYS = {"ofac-sdn": 21, "gac-sema": 45}
 
 LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", "fao-ffpi": "fao", "wfp-food-prices-hdx": "wfp",
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
-           "dgtresor-gels": "sanctions",
+           "dgtresor-gels": "sanctions", "gac-sema": "sanctions", "un-press": "unpress",
            "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
            "usgs-mcs": "minerals", "census-trade": "trade", "usitc-hts": "tariffs", "whitehouse-actions": "tariffs"}
 LIST_KEY = {"ofac-sdn": "ofac-sdn", "un-consolidated": "un-sc-consolidated", "eu-fsf": "eu-fsf",
-            "uk-sanctions": "uk-sanctions-list", "france-gels": "dgtresor-gels"}
+            "uk-sanctions": "uk-sanctions-list", "france-gels": "dgtresor-gels", "canada-sema": "gac-sema"}
 
 
 def _day(s: str | None) -> date | None:
@@ -88,6 +89,8 @@ DRIFT = {
     "tariffs": ("usitc-hts", "HTS revisions listed", False),
     # Warn only: the lane has written its index by the time this runs, and it has its own guard against a short file.
     "screening": ("trade-gov-csl", "entries", False),
+    # Warn only: the feed always holds about ten items; fewer than three already fails in unpress.parse.
+    "unpress": ("un-press", "items in the UN press feed", False),
 }
 
 
@@ -115,6 +118,8 @@ def sizes(lane: str, result: dict) -> dict[str, int]:
         return {"trade": sum(1 for c in (result.get("mineral_trade") or {}).get("codes") or [] if c.get("newest_month"))}
     if lane == "tariffs":
         return {"tariffs": (result.get("hts_releases") or {}).get("total") or 0}
+    if lane == "unpress":
+        return {"unpress": (result.get("un_press") or {}).get("items") or 0}
     if lane == "screening":
         return {"screening": sum(l.get("total") or 0 for l in result.get("screening_lists") or [])}
     return {}
@@ -260,6 +265,16 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
         detail=f"{len(signed)} tariff actions in the last 30 days, {sum(1 for s in signed if not s.get('fr_document'))} "
                f"not yet in the Federal Register",
         error=snap.get("signed_error") or err("tariffs"), warnings=notes.get("whitehouse-actions"))
+    up = snap.get("un_press") or {}
+    rel = snap.get("un_committee_releases") or []
+    if up or lanes.get("unpress"):
+        gap = ([f"the feed's {up.get('items')} items reached back only to {up.get('oldest')}, after the reading of "
+                f"{up.get('previous_read')}: a committee release in between may be missed"] if up.get("may_have_missed") else [])
+        out["un-press"] = _entry("un-press", ok=lane_ok("unpress"), now=now, prev=prev,
+                                 newest=_day(up.get("newest")), today=today,
+                                 detail=f"{up.get('items') or 0} items in the feed, {len(rel)} sanctions committee "
+                                        f"releases kept from the last 60 days",
+                                 error=err("unpress"), warnings=(notes.get("un-press") or []) + gap or None)
     watch = minerals.watch_notes(snap.get("minerals") or {})
     if watch:
         out["usgs-mcs"]["warnings"] = list(out["usgs-mcs"].get("warnings") or []) + watch
@@ -277,7 +292,7 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
         out[key]["lane"] = "sanctions"
     # A list that has never been read on this snapshot (no status row) is still owed an entry when the lane failed.
     if lane.get("status") == "failed":
-        for key in ("ofac-sdn", "un-sc-consolidated", "eu-fsf", "uk-sanctions-list", "dgtresor-gels"):
+        for key in ("ofac-sdn", "un-sc-consolidated", "eu-fsf", "uk-sanctions-list", "dgtresor-gels", "gac-sema"):
             out.setdefault(key, _entry(key, ok=False, now=now, prev=prev, newest=None, today=today,
                                        detail="not read", error=lane.get("error")))
     return dict(sorted(out.items()))

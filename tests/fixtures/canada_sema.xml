@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<data-set>
+	<record>
+		<Country-Pays>Belarus / Bélarus</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Belaeronavigatsia Republican Unitary Air Navigation Services Enterprise</EntityOrShip-EntiteOuNavire>
+		<Schedule-Annexe>1, Part 2</Schedule-Annexe>
+		<Item-NumeroDarticle>1</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2021-06-17</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Belarus / Bélarus</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Belarusski Avtomobilnyi Zavod BelAZ (Belarusian Automobile Plant)</EntityOrShip-EntiteOuNavire>
+		<Schedule-Annexe>1, Part 2</Schedule-Annexe>
+		<Item-NumeroDarticle>2</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2021-06-17</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Hamas Terrorist Attacks / Attaques terroristes du Hamas</Country-Pays>
+		<Schedule-Annexe>Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>1</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2024-02-02</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-5f67cac84f</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Iran</Country-Pays>
+		<Schedule-Annexe>1, Part 2</Schedule-Annexe>
+		<Item-NumeroDarticle>1</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2016-02-05</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-eb84eb8588</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Iran</Country-Pays>
+		<Schedule-Annexe>1, Part 2</Schedule-Annexe>
+		<Item-NumeroDarticle>2</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2016-02-05</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-6213689c99</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>1</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-03-17</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-d31c7b8d32</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>2</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-03-17</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-e3917aa51b</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>3</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-03-17</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-9605b0ee3f</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>4</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-03-17</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-ba65f2b340</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Aktsionerny Bank Russian Federation</EntityOrShip-EntiteOuNavire>
+		<Schedule-Annexe>1, Part 2</Schedule-Annexe>
+		<Item-NumeroDarticle>1</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-03-21</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Aquanika</EntityOrShip-EntiteOuNavire>
+		<Schedule-Annexe>1, Part 2</Schedule-Annexe>
+		<Item-NumeroDarticle>4</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-05-04</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Avia Group LLC</EntityOrShip-EntiteOuNavire>
+		<Schedule-Annexe>1, Part 2</Schedule-Annexe>
+		<Item-NumeroDarticle>5</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-05-04</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Balitiyskiy III</EntityOrShip-EntiteOuNavire>
+		<TitleOrShipType-TitreOuTypeDeNavire>General Cargo/Multi Purpose | Cargo classique/navire polyvalent</TitleOrShipType-TitreOuTypeDeNavire>
+		<ShipIMONumber-NumeroOMIDuNavire>7612448</ShipIMONumber-NumeroOMIDuNavire>
+		<Schedule-Annexe>1.1</Schedule-Annexe>
+		<Item-NumeroDarticle>1</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2025-02-21</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>M/V Maria </EntityOrShip-EntiteOuNavire>
+		<TitleOrShipType-TitreOuTypeDeNavire>General Cargo | Cargo classique</TitleOrShipType-TitreOuTypeDeNavire>
+		<ShipIMONumber-NumeroOMIDuNavire>8517839</ShipIMONumber-NumeroOMIDuNavire>
+		<Schedule-Annexe>1.1</Schedule-Annexe>
+		<Item-NumeroDarticle>2</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2025-06-13</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Musa Jalil</EntityOrShip-EntiteOuNavire>
+		<TitleOrShipType-TitreOuTypeDeNavire>General Cargo/Multi Purpose | Cargo classique/navire polyvalent</TitleOrShipType-TitreOuTypeDeNavire>
+		<ShipIMONumber-NumeroOMIDuNavire>8846814</ShipIMONumber-NumeroOMIDuNavire>
+		<Schedule-Annexe>1.1</Schedule-Annexe>
+		<Item-NumeroDarticle>3</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2025-02-21</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Sudan / Soudan</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Al Junaid Multi Activities Co. Ltd.</EntityOrShip-EntiteOuNavire>
+		<Schedule-Annexe>Part 2</Schedule-Annexe>
+		<Item-NumeroDarticle>1</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2024-04-12</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Ukraine</Country-Pays>
+		<Schedule-Annexe>Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>1</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-03-17</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-a6866eaca7</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Ukraine</Country-Pays>
+		<Schedule-Annexe>Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>2</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2014-03-17</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-72038c57bf</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Moldova </Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Public Association – Association of People with Epaulettes “Scutul Poporului”</EntityOrShip-EntiteOuNavire>
+		<Schedule-Annexe>Part 2</Schedule-Annexe>
+		<Item-NumeroDarticle>9</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2025-08-26</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Belarus / Bélarus</Country-Pays>
+		<EntityOrShip-EntiteOuNavire>Open Joint Stock Company "Minsk Electrotechnical Plant named after V.I. Kozlov"</EntityOrShip-EntiteOuNavire>
+		<Schedule-Annexe>1,Part 3</Schedule-Annexe>
+		<Item-NumeroDarticle>2</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2024-08-08</DateOfListing-DateDinscription>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>121</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2022-02-24</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-db70b142ca</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>122</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2022-02-24</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-2b32ef0ee6</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>123</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2022-02-24</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-75be5b58f8</LastName-NomDeFamille>
+	</record>
+	<record>
+		<Country-Pays>Russia / Russie</Country-Pays>
+		<Schedule-Annexe>1, Part 1</Schedule-Annexe>
+		<Item-NumeroDarticle>124</Item-NumeroDarticle>
+		<DateOfListing-DateDinscription>2022-02-24</DateOfListing-DateDinscription>
+		<LastName-NomDeFamille>PERSON-b1bce033ee</LastName-NomDeFamille>
+	</record>
+</data-set>

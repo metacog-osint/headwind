@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      markets, minerals, releases, sanctions, screening, tariffs, trade)
+                      markets, minerals, releases, sanctions, screening, tariffs, trade, unpress)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -41,13 +41,14 @@ LANE_FIELDS = {
     "minerals": ["minerals"],
     "trade": ["mineral_trade"],
     "tariffs": ["hts_releases", "hts_pace", "signed_actions", "signed_error"],
+    "unpress": ["un_committee_releases", "un_press"],
 }
 EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
          "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
          "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
          "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
          "minerals": {}, "mineral_trade": {}, "tariff_pace": {}, "hts_releases": {}, "hts_pace": {},
-         "signed_actions": [], "signed_error": None}
+         "signed_actions": [], "signed_error": None, "un_committee_releases": [], "un_press": {}}
 
 
 def _lane_fx(raw_dir, prev, getter):
@@ -231,6 +232,9 @@ def _lane_calendar(raw_dir, prev, getter):
     return {"fomc_dates": fomc, "ecb_dates": ecb}, [rec1, rec2]
 
 
+_CA_NAMES: dict = {}       # Canada's name hashes from the last read, for its renumbering guard (private state only)
+
+
 def _read_list(list_id, raw_dir, getter):
     """Fetch and parse one sanctions list: (index, the publisher's generation date, fetch record, designation dates).
     OFAC's file has no designation dates (None)."""
@@ -255,6 +259,11 @@ def _read_list(list_id, raw_dir, getter):
         body, rec = fetch.fetch("dgtresor-gels", sanctions.FR_JSON, raw_dir, "json", timeout=180, getter=getter, gz=True)
         generated, index = sanctions.parse_fr_json(body)
         return index, generated, rec, None
+    if list_id == "canada-sema":
+        body, rec = fetch.fetch("gac-sema", sanctions.CA_XML, raw_dir, "xml", timeout=120, getter=getter)
+        _CA_NAMES.clear()
+        generated, index = sanctions.parse_canada_xml(body, dates, _CA_NAMES)
+        return index, generated, rec, dates
     raise ValueError(f"unknown list {list_id}")
 
 
@@ -284,6 +293,12 @@ def _lane_sanctions(raw_dir, prev, getter):
         last_change = old.get("last_change_at")
         history = old.get("added_history") or []
         form = sanctions.VESSEL_FORMAT.get(list_id, 1)
+        names = dict(_CA_NAMES) if list_id == "canada-sema" else None
+        renumbered = []
+        if old.get("index") and names is not None:
+            renumbered = sanctions.canada_renumbered(old["index"], index, old.get("names"), names)
+            if renumbered:
+                old = {**old, "index": sanctions.apply_renumbering(old["index"], renumbered)}
         if old.get("index"):
             same_form = old.get("vessel_format", 1) == form
             if not same_form:
@@ -291,6 +306,8 @@ def _lane_sanctions(raw_dir, prev, getter):
                       file=sys.stderr)
             d = sanctions.delta(list_id, old["index"], index, now, old.get("checked_at"), compare_vessels=same_form,
                                 dates=dates, added_history=history)
+            if d and renumbered:
+                d["renumbered"] = len(renumbered)
             if d:
                 deltas.append(d)
                 last_change = now
@@ -299,6 +316,8 @@ def _lane_sanctions(raw_dir, prev, getter):
         baseline_set = old.get("baseline_set_at") or now
         new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "last_change_at": last_change,
                               "vessel_format": form, "added_history": history, "index": index}
+        if names is not None:
+            new_state[list_id]["names"] = names
         lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated, last_change))
     if not recs:
         raise RuntimeError("no sanctions list could be read: " + "; ".join(errors))
@@ -405,6 +424,19 @@ def _lane_tariffs(raw_dir, prev, getter):
     return out, recs
 
 
+def _lane_unpress(raw_dir, prev, getter):
+    """UN Security Council sanctions committee press releases from the UN's press feed: document number, date and
+    link, kept 60 days. The feed holds the 10 newest releases of every UN body, so each reading also says whether
+    it reached back to the reading before (`may_have_missed`)."""
+    now = fetch.now_utc()
+    body, rec = fetch.fetch("un-press", unpress.FEED, raw_dir, "xml", getter=getter)
+    items = unpress.parse(body)
+    found = [r for r in (unpress.committee_release(i) for i in items) if r]
+    last = (prev.get("un_press") or {}).get("checked_at")
+    return {"un_committee_releases": unpress.merge(prev.get("un_committee_releases") or [], found, now),
+            "un_press": unpress.coverage(items, last, now)}, [rec]
+
+
 def _lane_inspection(raw_dir, prev, getter):
     """Filings on public inspection by BIS, OFAC and USTR: the issues of the last few days, kept 30 days, and the
     text of each rule, proposed rule and USTR notice (read once per PDF). A text that cannot be read is noted on
@@ -476,7 +508,7 @@ def _minerals_watch(raw_dir, getter, recs) -> dict:
 LANES = {"fx": _lane_fx, "gem": _lane_gem, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
          "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
          "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals,
-         "trade": _lane_trade, "tariffs": _lane_tariffs}
+         "trade": _lane_trade, "tariffs": _lane_tariffs, "unpress": _lane_unpress}
 
 
 def finish_snapshot(snap: dict, today: date) -> dict:
@@ -605,7 +637,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                      "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
                                      "screening_lists", "controls", "inspection", "inspection_issues", "minerals",
                                      "question_drafts", "vessel_crosslist", "mineral_trade", "tariff_pace",
-                                     "hts_releases", "hts_pace", "signed_actions", "signed_error")}
+                                     "hts_releases", "hts_pace", "signed_actions", "signed_error",
+                                     "un_committee_releases", "un_press")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
     # Counted-only filings as they may be published, whatever snapshot this is built from (a failed inspection
@@ -632,7 +665,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                               **(snap.get("mineral_trade") or {})}}),
         "data/vessels.json": dump({
             "generated_at": snap["generated_at"],
-            "note": ("Ships on the OFAC SDN list, the UK Sanctions List and France's asset-freeze register, matched by IMO "
+            "note": ("Ships on the OFAC SDN list, the UK Sanctions List, France's asset-freeze register and Canada's "
+                     "consolidated list, matched by IMO "
                      "number. Each list's own "
                      "entry ids, name and flag. Owners are not given. Ships without an IMO number are counted only."),
             "sources": {l: {"name": sanctions.LISTS[l]["name"], "url": sanctions.LISTS[l]["url"]}
