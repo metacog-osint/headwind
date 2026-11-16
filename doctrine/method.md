@@ -144,8 +144,8 @@ by sanctions program. Headwind does not republish the names of people or organiz
   on the list ever pointed to a different name. Canada does renumber: between 8 and 10 Nov four records listed on
   4 Sep 2026 moved from items 1700-1703 to 1620-1623 (Russia, Schedule 1, Part 1). So a key that goes while a record
   of the same type and name comes under a new item number in the same regime and schedule is counted once, as
-  renumbered, not as a removal and an addition. The name is kept only as a 12-character hash in Headwind's private
-  state, never published. The first reading under this rule has no hashes from before and pairs nothing.
+  renumbered, not as a removal and an addition. The name is kept only as a 12-character hash in Headwind's run
+  state (public with the repository; the hash, not the name). The first reading under this rule has no hashes from before and pairs nothing.
 - **Measured** like the EU and UK lists: counts by type and regime, ships named (name, IMO number, type; the list
   gives no flag), designation batches from the dates of listing. Countries come from the regime; the Ukraine
   regulations are placed on Russia only, as the EU's Ukraine regime is; JVCFOR (corrupt foreign officials), Hamas
@@ -263,7 +263,7 @@ for each entry and, where the list has them, by program.
   changes when a publisher edits an entry has not been observed either way. Since `headwind-1.4` an id
   that goes and an id that comes on the same list, with the same name and type and no other entry of
   that name going or coming, are counted once, as re-keyed, and compared as one entry. The name is kept
-  only as a short hash in Headwind's private state; it is never published.
+  only as a short hash in Headwind's run state (public with the repository; the hash, not the name).
 - **Edits** (an entry whose type, programs or address countries changed) are counted, with the programs
   gained and lost.
 - **A list that loses more than half its entries** (lists of 20 or more) fails the lane and is not

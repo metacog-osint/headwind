@@ -6,12 +6,12 @@ name: update
 #
 # State: Headwind reports list changes as the difference between two of its own readings, and a failed lane keeps
 # its last good copy. Both need the run before: data/snapshot.json and the two list indexes in data/state/. They
-# are kept in the Actions cache, which is private to this repository, and not on the public site, because the
-# indexes hold the publishers' entry ids for people and Headwind publishes people as counts only (13 Nov 2026).
-# Each run saves a new cache entry and the next run restores the newest. GitHub drops an entry nobody has read
-# for 7 days. A second copy goes to this repository's release `state` as assets (14 Nov 2026): headwind-state.tar.gz,
-# the newest, and one per UTC day for 14 days. Release assets do not expire, and they are as private as the
-# repository: if it is ever made public, delete the release first, because the indexes hold people's entry ids. A
+# are kept in the Actions cache and not on the site. Each run saves a new cache entry and the next run restores the
+# newest. GitHub drops an entry nobody has read for 7 days. A second copy goes to this repository's release `state`
+# as assets (14 Nov 2026): headwind-state.tar.gz, the newest, and one per UTC day for 14 days. Release assets do not
+# expire. The repository is public (since 15 Nov 2026), so the release is public and the cache is to be treated as
+# public too: nothing goes into the state that may not be published. The indexes hold the publishers' own entry
+# ids, types and programs, taken from public lists, and short name hashes; never UN list text. A
 # run restores the cache first and the release asset when the cache has nothing. With neither the run fails, so a
 # lost state is an alarm and not a silent first reading; start a deliberate first reading by hand with
 # first_reading ticked. State is saved after the feed check and before the deploy, so a failed deploy does not
@@ -129,16 +129,19 @@ jobs:
           npx --yes wrangler@4.151.3 pages deploy site --project-name headwind --branch main \
             --commit-hash "$GITHUB_SHA" --commit-message "update $GITHUB_SHA" --commit-dirty=true
       # After the deploy, so a failed upload never holds the site back; it still fails the run, which mails the owner.
-      - name: Second copy of the state in the release (private, like the repository)
+      - name: Second copy of the state in the release (public, like the repository)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tar -czf headwind-state.tar.gz data/snapshot.json data/state
           day="headwind-state-$(date -u +%Y-%m-%d).tar.gz"
           cp headwind-state.tar.gz "$day"
-          notes="Headwind's run state: the last good snapshot and the list indexes, which hold the publishers' entry ids for people. Kept for the workflow to restore. Delete this release before the repository is ever made public."
+          title="Run state"
+          notes="Headwind's run state: the last good snapshot and the list indexes (the publishers' own entry ids, types and programs, from public lists, and short name hashes). Kept for the workflow to restore. Public with the repository, so nothing goes into it that may not be published."
           if ! gh release view state >/dev/null 2>&1; then
-            gh release create state --prerelease --latest=false --title "Run state (private)" --notes "$notes"
+            gh release create state --prerelease --latest=false --title "$title" --notes "$notes"
+          else
+            gh release edit state --title "$title" --notes "$notes" >/dev/null
           fi
           gh release upload state headwind-state.tar.gz "$day" --clobber
           # Keep the newest and 14 daily copies.
