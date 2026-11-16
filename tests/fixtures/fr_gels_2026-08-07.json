@@ -1,0 +1,375 @@
+{
+ "Publications": {
+  "DatePublication": "2026-08-07T18:25:20.4994344+02:00",
+  "PublicationDetail": [
+   {
+    "IdRegistre": 1001,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-510f058a48",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 347,
+        "FondementJuridiqueLabel": "(UE) 2018/1929 du 10/12/2018 (UE Ukraine intégrité territoriale - R (UE) 269/2014)"
+       },
+       {
+        "FondementJuridique": 352,
+        "FondementJuridiqueLabel": "(UE) 2020/398 du 13/03/2020 (UE Ukraine intégrité territoriale - R (UE) 269/2014)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 1002,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-b6363efb97",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 128,
+        "FondementJuridiqueLabel": "(UE) 101/2011 du 04/02/2011 (UE Tunisie - R (UE) 101/2011)"
+       },
+       {
+        "FondementJuridique": 132,
+        "FondementJuridiqueLabel": "(UE) 2016/111 du 28/01/2016 (UE Tunisie - R (UE) 101/2011)"
+       },
+       {
+        "FondementJuridique": 135,
+        "FondementJuridiqueLabel": "(UE) 2020/115 du 27/01/2020 (UE Tunisie - R (UE) 101/2011)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 1003,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-f2b70fabda",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 303,
+        "FondementJuridiqueLabel": "(UE) 1151/2011 du 14/11/2011 (UE Syrie - R (UE) 36/2012 )"
+       },
+       {
+        "FondementJuridique": 176,
+        "FondementJuridiqueLabel": "(UE) 2016/1735 du 29/09/2016 (UE Syrie - R (UE) 36/2012 )"
+       },
+       {
+        "FondementJuridique": 184,
+        "FondementJuridiqueLabel": "(UE) 2018/282 du 26/02/2018 (UE Syrie - R (UE) 36/2012 )"
+       },
+       {
+        "FondementJuridique": 191,
+        "FondementJuridiqueLabel": "(UE) 2020/716 du 28/05/2020 (UE Syrie - R (UE) 36/2012 )"
+       },
+       {
+        "FondementJuridique": 3930,
+        "FondementJuridiqueLabel": "(UE) 2025/1094 du 27/05/2025 (UE Syrie - R (UE) 36/2012 )"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 1004,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-dbb840357f",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 171,
+        "FondementJuridiqueLabel": "(UE) 1105/2014 du 20/10/2014 (UE Syrie - R (UE) 36/2012 )"
+       },
+       {
+        "FondementJuridique": 180,
+        "FondementJuridiqueLabel": "(UE) 2017/907 du 29/05/2017 (UE Syrie - R (UE) 36/2012 )"
+       },
+       {
+        "FondementJuridique": 191,
+        "FondementJuridiqueLabel": "(UE) 2020/716 du 28/05/2020 (UE Syrie - R (UE) 36/2012 )"
+       },
+       {
+        "FondementJuridique": 3930,
+        "FondementJuridiqueLabel": "(UE) 2025/1094 du 27/05/2025 (UE Syrie - R (UE) 36/2012 )"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 1006,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-fcd44c566e",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 978,
+        "FondementJuridiqueLabel": "décision du comité des sanctions des Nations unies du 26/02/2021 (ONU Somalie - RCSNU 751 (1992) et R (UE) 356/2010)"
+       },
+       {
+        "FondementJuridique": 1043,
+        "FondementJuridiqueLabel": "(UE) 2021/559 du 06/04/2021 (ONU Somalie - RCSNU 751 (1992) et R (UE) 356/2010)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 1021,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-8e5c8c69e1",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 247,
+        "FondementJuridiqueLabel": "décision du comité des sanctions des Nations unies du 18/04/2012 (ONU Iran prolifération - RCSNU 1737 (2006) et R (UE) 267/2012)"
+       },
+       {
+        "FondementJuridique": 1005,
+        "FondementJuridiqueLabel": "(UE) 1245/2011 du 01/12/2011 (ONU Iran prolifération - RCSNU 1737 (2006) et R (UE) 267/2012)"
+       },
+       {
+        "FondementJuridique": 3639,
+        "FondementJuridiqueLabel": "(UE) 2023/2196 du 16/10/2023 (UE Iran prolifération - R (UE) 267/2012)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 1031,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-89d4e860c2",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 978,
+        "FondementJuridiqueLabel": "décision du comité des sanctions des Nations unies du 26/02/2021 (ONU Somalie - RCSNU 751 (1992) et R (UE) 356/2010)"
+       },
+       {
+        "FondementJuridique": 1043,
+        "FondementJuridiqueLabel": "(UE) 2021/559 du 06/04/2021 (ONU Somalie - RCSNU 751 (1992) et R (UE) 356/2010)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 1121,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-2fe2e2d3a9",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 4183,
+        "FondementJuridiqueLabel": "ECOT2618223A du 06/07/2026 (Dispositif national de gel des avoirs - art L. 562-3 du code monétaire et financier)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 1259,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-884683e3b7",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 4146,
+        "FondementJuridiqueLabel": "ECOT2611058A du 06/05/2026 (Dispositif national de gel des avoirs - art L. 562-3 du code monétaire et financier)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 1776,
+    "Nature": "Personne morale",
+    "Nom": "TECHNOLAB",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 4147,
+        "FondementJuridiqueLabel": "ECOT2611061A du 06/05/2026 (Dispositif national de gel des avoirs - art L. 562-3 du code monétaire et financier)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 2205,
+    "Nature": "Navire",
+    "Nom": "AN SAN 1",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "NUMERO_OMI",
+      "Valeur": [
+       {
+        "NumeroOMI": "7303803"
+       }
+      ]
+     },
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 411,
+        "FondementJuridiqueLabel": "décision du comité des sanctions des Nations unies du 30/03/2018 (ONU Corée du Nord - RCSNU 1718 (2006) et R (UE) 2017/1509)"
+       },
+       {
+        "FondementJuridique": 427,
+        "FondementJuridiqueLabel": "(UE) 2018/548 du 06/04/2018 (ONU Corée du Nord - RCSNU 1718 (2006) et R (UE) 2017/1509)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 2216,
+    "Nature": "Navire",
+    "Nom": "Ocean Maritime Management Company, Limited - navire HOE RYONG",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "NUMERO_OMI",
+      "Valeur": [
+       {
+        "NumeroOMI": "9041552"
+       }
+      ]
+     },
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 364,
+        "FondementJuridiqueLabel": "Décision du comité de sanction des Nations unies du 02/03/2016 (ONU Corée du Nord - RCSNU 1718 (2006) et R (UE) 2017/1509)"
+       },
+       {
+        "FondementJuridique": 421,
+        "FondementJuridiqueLabel": "(UE) 2017/1509 du 30/08/2017 (ONU Corée du Nord - RCSNU 1718 (2006) et R (UE) 2017/1509)"
+       },
+       {
+        "FondementJuridique": 2433,
+        "FondementJuridiqueLabel": "(UE) 2022/1503 du 09/09/2022 (ONU Corée du Nord - RCSNU 1718 (2006) et R (UE) 2017/1509)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 2218,
+    "Nature": "Navire",
+    "Nom": "Ocean Maritime Management Company, Limited - navire HUI CHON",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "NUMERO_OMI",
+      "Valeur": [
+       {
+        "NumeroOMI": "8405270"
+       }
+      ]
+     },
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 364,
+        "FondementJuridiqueLabel": "Décision du comité de sanction des Nations unies du 02/03/2016 (ONU Corée du Nord - RCSNU 1718 (2006) et R (UE) 2017/1509)"
+       },
+       {
+        "FondementJuridique": 421,
+        "FondementJuridiqueLabel": "(UE) 2017/1509 du 30/08/2017 (ONU Corée du Nord - RCSNU 1718 (2006) et R (UE) 2017/1509)"
+       },
+       {
+        "FondementJuridique": 2433,
+        "FondementJuridiqueLabel": "(UE) 2022/1503 du 09/09/2022 (ONU Corée du Nord - RCSNU 1718 (2006) et R (UE) 2017/1509)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 2889,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-305b0c5744",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 806,
+        "FondementJuridiqueLabel": "décision du comité des sanctions des Nations unies du 22/02/2017 (ONU Al Qaeda Etat - Islamique - RCSNU 1267 (1999) et R (UE) 881/2002 )"
+       },
+       {
+        "FondementJuridique": 815,
+        "FondementJuridiqueLabel": "(UE) 2017/326 du 24/02/2017 (ONU Al Qaeda Etat - Islamique - RCSNU 1267 (1999) et R (UE) 881/2002 )"
+       },
+       {
+        "FondementJuridique": 3542,
+        "FondementJuridiqueLabel": "décision du comité des sanctions des Nations unies du 15/03/2023 (ONU Al Qaeda Etat - Islamique - RCSNU 1267 (1999) et R (UE) 881/2002 )"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 4003,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-498c2f6943",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 2326,
+        "FondementJuridiqueLabel": "(UE) 2022/261 du 23/02/2022 (UE Ukraine intégrité territoriale - R (UE) 269/2014)"
+       },
+       {
+        "FondementJuridique": 2437,
+        "FondementJuridiqueLabel": "(UE) 2022/1529 du 14/09/2022 (UE Ukraine intégrité territoriale - R (UE) 269/2014)"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "IdRegistre": 6429,
+    "Nature": "Personne physique",
+    "Nom": "PERSON-f96d7afeed",
+    "RegistreDetail": [
+     {
+      "TypeChamp": "FONDEMENT_JURIDIQUE",
+      "Valeur": [
+       {
+        "FondementJuridique": 4097,
+        "FondementJuridiqueLabel": "ECOT2603811A du 20/02/2026 (Dispositif national de gel des avoirs - art L. 562-2 du code monétaire et financier)"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

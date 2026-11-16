@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import csv
 import io
+import json
 import re
 import xml.etree.ElementTree as ET
 from collections import Counter
@@ -34,6 +35,10 @@ EU_PAGE = ("https://data.europa.eu/data/datasets/"
 # The UK Sanctions List (FCDO), the only UK list since OFSI's Consolidated List closed on 28 Jan 2026.
 UK_XML = "https://sanctionslist.fcdo.gov.uk/docs/UK-Sanctions-List.xml"
 UK_PAGE = "https://www.gov.uk/government/publications/the-uk-sanctions-list"
+# France's Registre national des gels (Direction générale du Trésor): the JSON its public API gives, about 15 MB.
+# A HEAD request answers 405; GET works. Licence Ouverte 2.0 (the data.gouv.fr record, read 15 Nov 2026).
+FR_JSON = "https://gels-avoirs.dgtresor.gouv.fr/ApiPublic/api/v1/publication/derniere-publication-fichier-json"
+FR_PAGE = "https://gels-avoirs.dgtresor.gouv.fr/"
 
 LISTS = {
     "ofac-sdn": {"name": "OFAC SDN list", "publisher": "US Treasury (OFAC)", "url": OFAC_RECENT, "min_entries": 5000},
@@ -43,6 +48,8 @@ LISTS = {
                "url": EU_PAGE, "min_entries": 3000},
     "uk-sanctions": {"name": "UK Sanctions List", "publisher": "UK Foreign, Commonwealth and Development Office",
                      "url": UK_PAGE, "min_entries": 3000},
+    "france-gels": {"name": "France's asset-freeze register (Registre national des gels)",
+                "publisher": "French Treasury (Direction générale du Trésor)", "url": FR_PAGE, "min_entries": 3000},
 }
 
 # EU programme codes, as the Financial Sanctions Files give them, that name a country. Read against the
@@ -103,6 +110,11 @@ PROGRAM_COUNTRY = {
 
 
 def countries_for(groups, list_id: str | None = None) -> list[str]:
+    if list_id == "france-gels":
+        # France's national freezes are conduct measures (the Code monétaire et financier's articles L. 562-2 and
+        # following), and its EU and UN entries restate measures Headwind reads on those lists (Tom, 15 Nov 2026:
+        # no countries from restatements). So a change on the French register places no country.
+        return []
     out = set()
     for g in groups:
         if list_id in LIST_COUNTRY:
@@ -117,6 +129,8 @@ def countries_for(groups, list_id: str | None = None) -> list[str]:
 def unknown_programs(list_id: str, index: dict) -> list[str]:
     """Programs on an EU or UK list that are neither placed on a country nor left unplaced on purpose:
     a new regime, to be read and added to the maps above."""
+    if list_id == "france-gels":
+        return sorted({g for e in index.values() for g in e[1] if fr_origin(g) == "unknown"})
     if list_id not in LIST_COUNTRY:
         return []
     placed, unplaced = LIST_COUNTRY[list_id]
@@ -288,6 +302,72 @@ def parse_un_xml(body: bytes, dates: dict | None = None) -> tuple[str | None, di
     return root.get("dateGenerated"), index
 
 
+FR_TYPE = {"Personne physique": "individual", "Personne morale": "entity", "Navire": "vessel"}
+FR_NATIONAL = "FR national"
+# A legal basis reads "<act> du <date> (<regime>)", the regime in the last brackets, which may hold brackets of its
+# own: "(UE) 2022/332 du 25/02/2022 (UE Ukraine intégrité territoriale - R (UE) 269/2014)".
+_FR_REGIME = re.compile(r"\(([^()]*(?:\([^()]*\)[^()]*)*)\)\s*$")
+_FR_ARTICLE = re.compile(r"art\.?\s*(L\.?\s*\d[\d-]*)")
+
+
+def fr_regime(label: str | None) -> str:
+    """The group a French legal basis counts under: the regime as printed, up to its first " - ", so
+    'UE Ukraine intégrité territoriale' or 'ONU Corée du Nord'; a French national freeze is 'FR national, art
+    L. 562-2' (the regime 'Dispositif national de gel des avoirs - art L. 562-2 du code monétaire et financier')."""
+    m = _FR_REGIME.search((label or "").strip())
+    reg = " ".join(m.group(1).split()) if m else ""
+    if reg.startswith("Dispositif national"):
+        art = _FR_ARTICLE.search(reg)
+        return f"{FR_NATIONAL}, art {' '.join(art.group(1).split())}" if art else FR_NATIONAL
+    return re.split(r"\s+-\s+", reg, maxsplit=1)[0].strip() or "none stated"
+
+
+def fr_origin(group: str) -> str:
+    """national, EU or UN: who took the measure a French group stands for. Checked 15 Nov 2026 on the 6 Nov file:
+    every one of its 1,107 legal bases is one of the three."""
+    if group.startswith(FR_NATIONAL):
+        return "national"
+    if group.startswith("UE ") or group == "UE":
+        return "EU"
+    if group.startswith("ONU ") or group == "ONU":
+        return "UN"
+    return "unknown"
+
+
+def is_fr_national(entry: list) -> bool:
+    return any(fr_origin(g) == "national" for g in entry[1])
+
+
+def fr_ship_name(nom: str | None) -> str | None:
+    """A ship's name on the French register. Copies to Aug 2026 named North Korea's ships after their owner,
+    '<company> - navire HUI CHON'; the owner is cut (owners are never carried) and the ship's name kept."""
+    n = " ".join((nom or "").split())
+    m = re.search(r"\s-\s+navire\s+(.+)$", n, re.IGNORECASE)
+    return (m.group(1).strip() if m else n) or None
+
+
+def parse_fr_json(body: bytes) -> tuple[str | None, dict[str, list]]:
+    """France's register, keyed on IdRegistre: [type, groups] with the groups from each legal basis (fr_regime).
+    Ships carry their name and IMO number (NUMERO_OMI); the register gives no flag, type or MMSI. Names of people
+    and organizations are not kept. The file carries no designation date (only the date of each act in its label)."""
+    pub = json.loads(body.decode("utf-8-sig"))["Publications"]
+    index = {}
+    for r in pub.get("PublicationDetail") or []:
+        rid = str(r.get("IdRegistre") or "").strip()
+        if not rid:
+            continue
+        kind = FR_TYPE.get((r.get("Nature") or "").strip(), "unknown")
+        fields = {c.get("TypeChamp"): c.get("Valeur") or [] for c in r.get("RegistreDetail") or []}
+        groups = sorted({fr_regime(v.get("FondementJuridiqueLabel")) for v in fields.get("FONDEMENT_JURIDIQUE", [])})
+        entry = [kind, groups or ["none stated"]]
+        if kind == "vessel":
+            imo = next((str(v.get("NumeroOMI") or "").strip() for v in fields.get("NUMERO_OMI", [])), "")
+            entry.append({"name": fr_ship_name(r.get("Nom")), "imo": imo if re.fullmatch(r"\d{7}", imo) else None,
+                          "mmsi": None, "flag": None, "vessel_type": None})
+        index[rid] = entry
+    return pub.get("DatePublication"), index
+
+
 def check_size(list_id: str, index: dict, prev_index: dict | None) -> None:
     if len(index) < LISTS[list_id]["min_entries"]:
         raise ValueError(f"{list_id}: only {len(index)} entries parsed; the download looks cut short")
@@ -368,13 +448,35 @@ def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True)
             "retyped": dict(retyped), "vessels_changed": sorted(vessels, key=lambda v: v["name"] or "")}
 
 
+SPLIT_KEYS = ("added", "removed", "changed", "added_by_type", "added_by_program", "removed_by_type",
+              "removed_by_program", "changed_by_type", "programs_gained", "programs_lost", "retyped")
+
+
+def _fr_split(out: dict, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None,
+              compare_vessels: bool, added_history: list | None) -> dict:
+    """France's register restates EU and UN measures that Headwind reads on those lists, beside France's own
+    national freezes (Tom, 15 Nov 2026: count the national ones apart). `national` is the change among entries
+    that carry a national legal basis on either reading, scored by the observed-batch rule; `restated` is the
+    rest, counted only: never scored and placing no country, so an EU package is not counted twice."""
+    nat = {i for idx in (prev_index, index) for i, e in idx.items() if is_fr_national(e)}
+    sub = delta("france-gels", {k: v for k, v in prev_index.items() if k in nat}, {k: v for k, v in index.items() if k in nat},
+                detected_at, prior_checked_at, compare_vessels, None, added_history, split=False) or {}
+    out["national"] = {k: sub.get(k, {} if k not in ("added", "removed", "changed") else 0) for k in SPLIT_KEYS}
+    out["restated"] = {k: out[k] - out["national"][k] for k in ("added", "removed", "changed")}
+    out["batches"] = sub.get("batches") or []
+    out["anomaly"] = bool(sub.get("anomaly"))
+    return out
+
+
 def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None,
-          compare_vessels: bool = True, dates: dict | None = None, added_history: list | None = None) -> dict | None:
+          compare_vessels: bool = True, dates: dict | None = None, added_history: list | None = None,
+          split: bool = True) -> dict | None:
     """The difference between two readings of one list, or None when nothing changed.
 
     Additions and removals are ids that appear or go; a change is an id on both readings whose type or
     programs moved (or, for a vessel, its name, IMO, MMSI, flag or type). A vessel that went and came back
-    under a new id with the same IMO number is counted once, as re-keyed, not as a removal and an addition."""
+    under a new id with the same IMO number is counted once, as re-keyed, not as a removal and an addition.
+    France's register is split into its national freezes and its restatements (`_fr_split`)."""
     added = sorted(set(index) - set(prev_index))
     removed = sorted(set(prev_index) - set(index))
     pairs = rekeyed_vessels(prev_index, index, added, removed)
@@ -389,7 +491,7 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
     a_type, a_group = _tally(index, added)
     r_type, r_group = _tally(prev_index, removed)
     stamp = detected_at.replace("-", "").replace(":", "")[:13]
-    return {
+    out = {
         "id": f"{list_id}:{stamp}", "list": list_id, "list_name": LISTS[list_id]["name"],
         "publisher": LISTS[list_id]["publisher"], "url": LISTS[list_id]["url"],
         "detected_at": detected_at, "prior_checked_at": prior_checked_at,
@@ -403,10 +505,14 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
         "countries": countries_for(list(a_group) + list(r_group) + list(ed["programs_gained"])
                                    + list(ed["programs_lost"]), list_id),
     }
+    if list_id == "france-gels" and split:
+        return _fr_split(out, prev_index, index, detected_at, prior_checked_at, compare_vessels, added_history)
+    return out
 
 
 # The lists that carry ships. The UN file has none; EU vessel measures sit in regulation annexes, not in its file.
-VESSEL_LISTS = ("ofac-sdn", "uk-sanctions")
+# France's register names 39 ships (North Korea, UN measures restated; 6 Nov 2026), each with an IMO number.
+VESSEL_LISTS = ("ofac-sdn", "uk-sanctions", "france-gels")
 
 
 def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict, list[dict]]:
@@ -430,8 +536,11 @@ def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict,
             rec = on.setdefault(list_id, {"ids": [], "name": det.get("name"), "flag": det.get("flag")})
             rec["ids"].append(i)
     combos: Counter = Counter("+".join(sorted(r["on"])) for r in by_imo.values())
-    both = "+".join(sorted(VESSEL_LISTS))
-    summary = {"lists": list(VESSEL_LISTS), "imo_numbers": len(by_imo), "on_both": combos.get(both, 0),
+    # on_both keeps its meaning from before France was added (Wake reads it): on the OFAC and UK lists, whatever else.
+    summary = {"lists": list(VESSEL_LISTS), "imo_numbers": len(by_imo),
+               "on_both": sum(1 for r in by_imo.values() if {"ofac-sdn", "uk-sanctions"} <= set(r["on"])),
+               "on_two_or_more": sum(1 for r in by_imo.values() if len(r["on"]) > 1),
+               "combos": dict(sorted(combos.items())),
                "only": {l: combos.get(l, 0) for l in VESSEL_LISTS},
                "without_imo": {l: no_imo.get(l, 0) for l in VESSEL_LISTS},
                "read": {l: bool(indexes.get(l)) for l in VESSEL_LISTS}, "from_earlier_run": sorted(stale)}

@@ -36,17 +36,19 @@ WINDOWS = {"ecb-eurofxref": (4, 8), "eia-spot": (7, 14), "fao-ffpi": (40, 70), "
 
 # A publisher date that has not moved for this many days is noted (not a failure: an unchanged list is still a
 # reading). The UN regenerates its file every day, so two quiet days is already unusual.
-QUIET_DAYS = {"un-sc-consolidated": 3, "eu-fsf": 30, "uk-sanctions-list": 30}
+# France publishes its register as measures are taken (6 Nov 2026 was the latest on 15 Nov).
+QUIET_DAYS = {"un-sc-consolidated": 3, "eu-fsf": 30, "uk-sanctions-list": 30, "dgtresor-gels": 30}
 # OFAC's file carries no date of its own, so its note uses the last change Headwind itself saw.
 QUIET_SEEN_DAYS = {"ofac-sdn": 21}
 
 LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", "fao-ffpi": "fao", "wfp-food-prices-hdx": "wfp",
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
+           "dgtresor-gels": "sanctions",
            "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
            "usgs-mcs": "minerals", "census-trade": "trade", "usitc-hts": "tariffs", "whitehouse-actions": "tariffs"}
 LIST_KEY = {"ofac-sdn": "ofac-sdn", "un-consolidated": "un-sc-consolidated", "eu-fsf": "eu-fsf",
-            "uk-sanctions": "uk-sanctions-list"}
+            "uk-sanctions": "uk-sanctions-list", "france-gels": "dgtresor-gels"}
 
 
 def _day(s: str | None) -> date | None:
@@ -275,7 +277,7 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
         out[key]["lane"] = "sanctions"
     # A list that has never been read on this snapshot (no status row) is still owed an entry when the lane failed.
     if lane.get("status") == "failed":
-        for key in ("ofac-sdn", "un-sc-consolidated", "eu-fsf", "uk-sanctions-list"):
+        for key in ("ofac-sdn", "un-sc-consolidated", "eu-fsf", "uk-sanctions-list", "dgtresor-gels"):
             out.setdefault(key, _entry(key, ok=False, now=now, prev=prev, newest=None, today=today,
                                        detail="not read", error=lane.get("error")))
     return dict(sorted(out.items()))

@@ -20,7 +20,7 @@ from tic_doctrine import CONTRACT, geo  # noqa: E402
 from . import batches, controls, food, inspection, markets, stats, tariffs  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
-METHOD = "headwind-1.7"
+METHOD = "headwind-1.8"
 DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
 RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
@@ -75,7 +75,21 @@ SRC_UK = {
     "descriptor": "Every person, entity and ship designated under UK sanctions regulations.",
 }
 
-LIST_SOURCE = {"ofac-sdn": SRC_OFAC, "un-consolidated": SRC_UN, "eu-fsf": SRC_EU, "uk-sanctions": SRC_UK}
+SRC_FR = {
+    "id": "dgtresor-gels",
+    "publisher": "French Treasury (Direction générale du Trésor)",
+    "title": "Registre national des gels (France's national asset-freeze register)",
+    "url": "https://gels-avoirs.dgtresor.gouv.fr/",
+    "licence": "Licence Ouverte / Open Licence 2.0",
+    "grade": "A1",
+    "independence_group": "fr-dgtresor-gels",
+    "source_type": "official or market data",
+    "descriptor": ("Every person, entity and ship whose assets are frozen in France: France's own national freezes and "
+                   "the EU and UN measures it applies."),
+}
+
+LIST_SOURCE = {"ofac-sdn": SRC_OFAC, "un-consolidated": SRC_UN, "eu-fsf": SRC_EU, "uk-sanctions": SRC_UK,
+               "france-gels": SRC_FR}
 
 SRC_CSL = {
     "id": "trade-gov-csl",
@@ -320,7 +334,8 @@ def _batch_ref(s: dict) -> dict | None:
 
 
 VESSELS_IN_TEXT = 25
-ALSO_ON = {"ofac-sdn": "the OFAC SDN list", "uk-sanctions": "the UK Sanctions List"}
+ALSO_ON = {"ofac-sdn": "the OFAC SDN list", "uk-sanctions": "the UK Sanctions List",
+           "france-gels": "France's asset-freeze register"}
 
 
 def _vessel_text(word: str, vessels: list[dict]) -> str:
@@ -370,6 +385,15 @@ def _edit_text(s: dict) -> str:
     return "; ".join(bits) + "."
 
 
+def _restated_text(rest: dict) -> str:
+    """France's register: the entries that restate EU and UN measures, one count line, never scored."""
+    if not (rest["added"] or rest["removed"] or rest["changed"]):
+        return "No change among the entries that restate EU and UN measures."
+    return (f"Entries restating EU and UN measures, which Headwind also reads on the EU's and the UN Security Council's "
+            f"own lists, so they are counted here but not scored and place no country: {rest['added']} added, "
+            f"{rest['removed']} removed, {rest['changed']} changed.")
+
+
 def _renamed_text(vessels: list[dict], limit: int = 25) -> str:
     """Vessels that stayed listed and changed a public detail (name, IMO, MMSI, flag or type): before and after."""
     if not vessels:
@@ -393,18 +417,26 @@ def list_features(snapshot: dict) -> list[dict]:
     for s in snapshot.get("sanctions") or []:
         if s["detected_at"] < cutoff:
             continue
+        nat, rest = s.get("national"), s.get("restated")
+        base = nat if nat is not None else s
         parts = []
-        if s["added"]:
-            parts.append(f"Added {s['added']}: by type, {_counts(s['added_by_type'])}; by program, "
-                         f"{_counts(s['added_by_program'])}.")
-        if s["removed"]:
-            parts.append(f"Removed {s['removed']}: by type, {_counts(s['removed_by_type'])}; by program, "
-                         f"{_counts(s['removed_by_program'])}.")
-        parts.append(_edit_text(s))
+        if base["added"]:
+            parts.append(f"Added {base['added']}{' national' if nat is not None else ''}: by type, "
+                         f"{_counts(base['added_by_type'])}; by program, {_counts(base['added_by_program'])}.")
+        if base["removed"]:
+            parts.append(f"Removed {base['removed']}{' national' if nat is not None else ''}: by type, "
+                         f"{_counts(base['removed_by_type'])}; by program, {_counts(base['removed_by_program'])}.")
+        parts.append(_edit_text(base))
+        if nat is not None:
+            parts.append(_restated_text(rest))
         since = f" since Headwind's reading of {s['prior_checked_at'][:10]}" if s.get("prior_checked_at") else ""
+        title = (f"{s['list_name']}: {s['added']} added, {s['removed']} removed{_changed_title(s)}" if nat is None else
+                 f"{s['list_name']}: {nat['added']} national freezes added, {nat['removed']} removed"
+                 f"{', ' + str(nat['changed']) + ' changed' if nat.get('changed') else ''}; {rest['added']} added and "
+                 f"{rest['removed']} removed restating EU and UN measures")
         feats.append(_official(
             f"headwind:sanctions:{s['id']}",
-            f"{s['list_name']}: {s['added']} added, {s['removed']} removed{_changed_title(s)}",
+            title,
             f"{' '.join(x for x in parts if x)} The list now holds {s['total']} entries. This is the difference between two of "
             f"Headwind's readings{since}, seen on {s['detected_at'][:10]}; the dates of the designations are in "
             f"the publisher's own notices.{_vessel_text('added', s.get('vessels_added') or [])}"
@@ -418,6 +450,8 @@ def list_features(snapshot: dict) -> list[dict]:
             measures={"added": s["added"], "removed": s["removed"], "total": s["total"],
                       "changed": s.get("changed", 0), "vessels_added": s["added_by_type"].get("vessel", 0),
                       "vessels_changed": len(s.get("vessels_changed") or []), "rekeyed": s.get("rekeyed", 0),
+                      **({"national_added": nat["added"], "national_removed": nat["removed"],
+                          "restated_added": rest["added"], "restated_removed": rest["removed"]} if nat is not None else {}),
                       **_batch_measures(s)},
             visual={"type": "page", "url": f"{SITE}/#sanctions"},
             source=LIST_SOURCE[s["list"]],
@@ -886,11 +920,12 @@ def build_feed(snapshot: dict) -> dict:
                     "FAO CC BY 4.0; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
                     "Federal Register and its public inspection US public domain; USITC tariff schedule releases and White House presidential actions US government works; UN Security Council list, no "
                     "licence stated; EU financial "
-                    "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0"),
+                    "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0; "
+                    "France's Registre national des gels, Licence Ouverte 2.0"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; World Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
-                        "and Development Office; US International Trade Administration; "
+                        "and Development Office; French Treasury (Direction générale du Trésor); US International Trade Administration; "
                         "US Federal Register and the Office of the Federal Register; US International Trade Commission; The White House."),
         "language_key": LANGUAGE_KEY,
         # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read
