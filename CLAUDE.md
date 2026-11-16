@@ -6,6 +6,22 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 16 Nov 2026, about 9:00 AM CST: `headwind-1.8` live; the repository is public.** Items 1 to 4 of the
+coverage plan (US tariff actions, France's Registre national des gels, Canada's consolidated list and UN sanctions
+committee releases, the US Supreme Court) are on `main` and `live/first-slice` as `bce460a`; run 43885261338 (8:23
+to 8:30 AM CST) passed every step and deployed: all 16 lanes ok, 131 feed items. The first run on the runner set
+France's and Canada's baselines, so their first change items come from the next runs; Canada's renumbering guard
+works from the second run. The repository has been public since 15 Nov, about 11:45 PM CST (Tom's "Yes, make
+public"; fork pull requests need approval for all outside contributors; secrets intact; Actions minutes free). Its
+history was rewritten at 16 Nov 12:10 AM CST by the hub session's kit rewrite (one line of
+`doctrine/kit/vocab/programs.json`); local work was rebased onto it, so local and GitHub agree. The redacted-history
+swap below is void. 100 of 101 tests pass (the kit-copy test, kit 0.5.2 against `../tic-doctrine` 0.5.5). **Next:
+publish names** (Tom, 15 Nov 2026, about 11:30 PM CST: "get rid of all of this redaction nonsense now. we will
+publish everything we are allowed to do"): only licence terms limit what is published; "people and organizations
+are counts only" below is superseded and holds only until the names build replaces it. Wake's `wake/listed.py` (on
+branch `claude/wake-lanes-f92722`, wake-2.2, not on `live/ais` as written below; checked 16 Nov) must
+credit `france-gels` and `canada-sema` before it merges. The paragraph below is the state before this.
+
 **State, 16 Nov 2026, about 1:00 AM CST: items 1 to 4 of the coverage plan built, nothing pushed.** On Tom's yes:
 `5a26fa4` (item 1, tariffs, `headwind-1.7`), `765df50` (item 2, France), `474894c` (item 3, Canada and UN
 committee releases) and the item 4 commit (US Supreme Court; Tom accepted its `us_person_data` test). Items 2 to 4
@@ -149,8 +165,8 @@ removed and added. See "UK ships and step 6" below. 41 tests pass. `ce7f31b` (EU
 
 **State, 14 Nov 2026, 7:30 PM CST: `headwind-1.4` live** (Tom's "Build items 1-5", then yes to commit and to push).
 Source health in the feed and on the page, one fetch retry, drift checks, edits to entries that stay on a list
-(and re-keyed trade.gov entries), kit 0.5.2 with a kit test, and a second private copy of the run state in the
-release `state`. See "Source health and state (`headwind-1.4`)" below. `6865f16` is on `main` and
+(and re-keyed trade.gov entries), kit 0.5.2 with a kit test, and a second copy of the run state in the
+release `state` (public with the repository since 15 Nov). See "Source health and state (`headwind-1.4`)" below. `6865f16` is on `main` and
 `live/first-slice`; run 43662609087 (7:20 PM CST) passed every step and deployed: 60 items, 13 health entries
 (4 fresh, 9 read), state restored from the cache, and the `state` prerelease created with `headwind-state.tar.gz`
 and `headwind-state-2026-11-15.tar.gz` (468 KB each). 38 tests pass. Drift checks start after three readings. Still
@@ -448,7 +464,7 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   another 4xx. Prompted by EIA's timeouts on 13 and 14 Nov.
 - **Edits**: `sanctions.edits` counts ids on both readings whose type or programs changed (programs gained and lost)
   and names vessels whose name, IMO, MMSI, flag or type changed, before and after. `screening` keeps a 12-character
-  SHA-1 of each entry's normalised name as a fourth index field (private state only) and pairs a removed and an
+  SHA-1 of each entry's normalised name as a fourth index field (run state, public with the repository; a hash, not the name) and pairs a removed and an
   added id with the same name and type as one re-keyed entry (`rekeyed`), then compares them as one. An index
   written before this has no name keys: no pairing that run, and no false edits (only the first three fields are
   compared). Checked 13-14 Nov: trade.gov rewrote the `ids` field of 620 SDN entries with no change of
@@ -458,10 +474,13 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   the kit repo is private). Note: `tic-doctrine/tools/sync.py` takes its first argument as the target, so
   `sync.py --help` copies the kit into a folder named `--help` (happened once on 14 Nov; removed).
 - **Second copy of the state** (workflow, needs `contents: write`): after the deploy, `data/snapshot.json` and
-  `data/state/` go as `headwind-state.tar.gz` and a dated daily copy (14 kept) to the prerelease `state` in this
-  private repository. A run restores the Actions cache first, then that asset; with neither it fails (`::error::`)
-  unless run by hand with `first_reading` ticked. **Delete the release before the repository is ever made public**:
-  the indexes hold the publishers' entry ids for people. Not yet run on GitHub.
+  `data/state/` go as `headwind-state.tar.gz` and a dated daily copy (14 kept) to the prerelease `state`. A run
+  restores the Actions cache first, then that asset; with neither it fails (`::error::`) unless run by hand with
+  `first_reading` ticked. **The state is public with the repository** (public since 15 Nov 2026): the `state`
+  release is public, and the Actions cache is treated as public too. So nothing goes into the state that may not be
+  published. The indexes hold the publishers' own entry ids, types and programs, taken from public lists, and
+  12-character name hashes; UN list text (names included) never goes into the state or the release. The release
+  can stay (Tom, 15 Nov 2026); since 16 Nov each run also rewrites its title and notes to say this.
 
 ## History log and COP (plan steps 14 and 15, built 15 Nov 2026)
 - **History log** (the kit's `tic-history/1`, `doctrine/kit/docs/history-log.md`): the workflow's step "History"
@@ -602,7 +621,7 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   UN only 1,022 (all 39 ships), both 161, national 80 (58 individuals, 22 entities).
 - **Ships across three lists:** `VESSEL_LISTS` now has France; `vessel_crosslist`'s `on_both` keeps its old meaning
   (on OFAC and UK, whatever else) and gains `on_two_or_more` and `combos`. Live 15 Nov, 11:36 PM CST: 1,946 IMO
-  numbers, 304 on OFAC and UK, 326 on two or more, France only 2, all three 15. **Wake's `live/ais` branch**
+  numbers, 304 on OFAC and UK, 326 on two or more, France only 2, all three 15. **Wake's `claude/wake-lanes-f92722` branch** (not `live/ais`)
   (`wake/listed.py`, not on Wake's main) refuses a `vessels.json` that names a list it does not credit, so it needs
   `france-gels` added to its `LISTS` before it merges, or its lane fails once this is deployed.
 - **Ids:** `IdRegistre` held across the 17 Jul and 7 Aug Wayback copies (first 5 MiB only, the archive's cut) and
@@ -652,7 +671,7 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   `QUIET_SEEN_DAYS["gac-sema"]` 45. Canada's "Ukraine" regime is placed on Russia only, as the EU's UKR (Tom's yes to the
   item 3 commit, 16 Nov 2026, with this placement stated).
 - **Ships across four lists** (live 16 Nov, 12:05 AM CST): 1,995 IMO numbers, 742 on two or more, Canada only 49;
-  682 of Canada's 731 are also on OFAC's or the UK's list. Wake's `live/ais` needs `canada-sema` credited too.
+  682 of Canada's 731 are also on OFAC's or the UK's list. Wake's `claude/wake-lanes-f92722` needs `canada-sema` credited too.
 - **UN releases** (`unpress.py`, lane `unpress`, snapshot `un_committee_releases` kept 60 days and `un_press`, the
   feed's reach): feed items `headwind:unpress:sc<n>` for 14 days, no countries, linked to the release. The feed
   holds 10 items and **can drop releases** (SC/16488 of 26 Oct was gone by the 27 Oct copy); `may_have_missed` puts
@@ -678,11 +697,11 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   the notice the Census API terms require (missing since step 16).
 
 ## New coverage plan (15 Nov 2026; items 1 to 4 built 15-16 Nov, items 5 to 12 not built)
-Full source register, terms read 15 Nov, build order and the minutes estimate: `[local path]`. **Tom, 15 Nov 2026: build US tariff actions, France's register, UN sanctions committee releases with Canada's list, and the US Supreme Court, in that order; ICC and court items carry the court's own case title and number (us_person_data set when a US person is named); courts, ICC and tariff litigation live inside Headwind, not a new program; Actions minutes left as they are.** Making the repository public is not decided (it is private; see the state release under Source health).
+Full source register, terms read 15 Nov, build order and the minutes estimate: `[local path]`. **Tom, 15 Nov 2026: build US tariff actions, France's register, UN sanctions committee releases with Canada's list, and the US Supreme Court, in that order; ICC and court items carry the court's own case title and number (us_person_data set when a US person is named); courts, ICC and tariff litigation live inside Headwind, not a new program; Actions minutes left as they are.** The repository is public since 15 Nov 2026 (see the state release under Source health).
 - **Headwind gets:** US tariff actions (FR presidential documents with tariff terms, 24 in 2026 to 15 Nov and 36 in 2025, counted on the fixture; whitehouse.gov presidential-actions RSS for signing dates, "not copyright protected"; BIS and ITA Section 232 and inclusion-window notices; the USITC HTS release list, 200 JSON keyless, 23 revisions in 2026; all dates into the register). CBP CSMS has no keyless feed. More sanctions lists: France's Registre national des gels (Licence Ouverte 2.0, JSON 15 MB, stable `IdRegistre`, 39 vessels with IMO), Canada's consolidated list (XML 2.9 MB, `DateOfListing` on all 5,781 records, 731 ships with IMO; reproduction allowed for non-commercial purposes; no entry id, key on Schedule + Item), Switzerland (SECO XML 43 MB; reproduction needs SECO's written consent), Japan, New Zealand, Australia (terms unread; dfat.gov.au timed out). UN sanctions committee press releases (press.un.org RSS, about 10 items, count and link only). IMF Board actions only with the IMF's permission (its terms bar systematic or automated download of Content). Stock indices monthly only (OECD SDMX answers keyless, terms unread; GEM `DSTKMKTXN` is built on Datastream, the Pink Sheet question; STOXX's terms bar derivative works, so publishing only changes and z does not help).
 - **Courts in Headwind** (Tom, 15 Nov): ICC, the US Supreme Court and other highest courts, and tariff litigation become Headwind lanes; BRICS membership goes to Readout as a hand-kept table.
 - **Checked 15 Nov:** the Supreme Court's docket for 24-1287 gives the 20 Feb 2026 judgment (24-1287 vacated and remanded to dismiss for lack of jurisdiction, 25-250 affirmed). OFAC's 9 Oct 2026 recent actions add the International Criminal Court to the SDN list as an entity under `ICC-EO14203`; Headwind counts it as one entity in a conduct program.
-- **Names in court items** (Tom, 15 Nov): the court's own case title and number as the court publishes it; `us_person_data` says when a US person is named. Sanctions and screening lists stay counts only.
+- **Names in court items** (Tom, 15 Nov): the court's own case title and number as the court publishes it; `us_person_data` says when a US person is named. Sanctions and screening lists stay counts only (superseded the same night: names are published where the licence allows; see the top state paragraph).
 
 ## Not done
 - **Planned and not built:** the World Bank Pink Sheet (step 12, held on its licence). Census trade data for
@@ -710,15 +729,16 @@ Full source register, terms read 15 Nov, build order and the minutes estimate: `
   names and trade.gov's entry ids are still untested. `check` PASS, all ten lanes ok. UK vessel naming was tested
   on 14 Nov against Wayback copies (see "UK ships and step 6"); OFAC's and trade.gov's are still untested.
 - **The workflow** (`.github/workflows/update.yml`) follows Blackout's: tests, state from the Actions cache,
-  `collect`, `build`, `check`, state saved, then `wrangler pages deploy`. **It does not publish state** (Tom, 13
-  Nov: go with the recommendation): the list indexes hold the publishers' entry ids for people, and people are
-  counts only, so `data/snapshot.json` and `data/state/` are kept in the repository's Actions cache
+  `collect`, `build`, `check`, state saved, then `wrangler pages deploy`. **It does not put state on the site**
+  (Tom, 13 Nov: go with the recommendation): `data/snapshot.json` and `data/state/` are kept in the repository's
+  Actions cache
   (`actions/cache/restore` and `save` v6, key `headwind-state-<run id>`, newest entry restored). GitHub drops an
   entry unread for 7 days; with none, a run is a first reading and says so in a warning. State is saved before the
   deploy, so a failed deploy does not lose a change. `restore --from` and `build --publish-state` stay in the CLI,
   unused by the workflow; `restore` exits 1 when a site cannot be reached, and a missing file (404, or a page in
-  place of JSON) is a first reading. The repo is private, so runs use Actions minutes (a run takes about 1 min
-  15 s). `site_src/_headers` carries the CSP and CORS on `/data/*`.
+  place of JSON) is a first reading. The repository is public since 15 Nov 2026, so its Actions minutes are free
+  (a run took about 1 min 15 s on 13 Nov, 6 min 44 s on 16 Nov with the first France, Canada and Supreme Court
+  readings). The cache and the `state` release are public with it (see Source health and state). `site_src/_headers` carries the CSP and CORS on `/data/*`.
 - `tic-time.js` v1.3 is on the page since 13 Nov, copied from the hub's `site/shared/`: times show in the viewer's
   zone with the zone named, and data dates as dates.
 - US inflation and jobs dates: bls.gov refused automated requests (403). IMF's data API also refused (403).
