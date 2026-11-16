@@ -46,6 +46,7 @@ LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", 
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
            "dgtresor-gels": "sanctions", "gac-sema": "sanctions", "un-press": "unpress",
+           "supremecourt-gov": "scotus",
            "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
            "usgs-mcs": "minerals", "census-trade": "trade", "usitc-hts": "tariffs", "whitehouse-actions": "tariffs"}
 LIST_KEY = {"ofac-sdn": "ofac-sdn", "un-consolidated": "un-sc-consolidated", "eu-fsf": "eu-fsf",
@@ -91,6 +92,8 @@ DRIFT = {
     "screening": ("trade-gov-csl", "entries", False),
     # Warn only: the feed always holds about ten items; fewer than three already fails in unpress.parse.
     "unpress": ("un-press", "items in the UN press feed", False),
+    # Warn only: a new term's feed starts empty in October.
+    "scotus": ("supremecourt-gov", "opinions in the two terms' feeds", False),
 }
 
 
@@ -118,6 +121,8 @@ def sizes(lane: str, result: dict) -> dict[str, int]:
         return {"trade": sum(1 for c in (result.get("mineral_trade") or {}).get("codes") or [] if c.get("newest_month"))}
     if lane == "tariffs":
         return {"tariffs": (result.get("hts_releases") or {}).get("total") or 0}
+    if lane == "scotus":
+        return {"scotus": len(result.get("scotus_opinions") or [])}
     if lane == "unpress":
         return {"unpress": (result.get("un_press") or {}).get("items") or 0}
     if lane == "screening":
@@ -275,6 +280,15 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
                                  detail=f"{up.get('items') or 0} items in the feed, {len(rel)} sanctions committee "
                                         f"releases kept from the last 60 days",
                                  error=err("unpress"), warnings=(notes.get("un-press") or []) + gap or None)
+    ops = snap.get("scotus_opinions") or []
+    if ops or lanes.get("scotus"):
+        decided = [o.get("decided") for o in ops if o.get("decided")]
+        errs = snap.get("scotus_errors") or []
+        out["supremecourt-gov"] = _entry(
+            "supremecourt-gov", ok=lane_ok("scotus"), now=now, prev=prev, newest=_newest(decided), today=today,
+            detail=f"{len(ops)} opinions in the two terms read, newest decided {max(decided) if decided else 'none'}; "
+                   f"{len(snap.get('scotus_tracked') or [])} tariff-authority dockets tracked",
+            error=err("scotus"), warnings=(notes.get("supremecourt-gov") or []) + [f"not read: {e}" for e in errs] or None)
     watch = minerals.watch_notes(snap.get("minerals") or {})
     if watch:
         out["usgs-mcs"]["warnings"] = list(out["usgs-mcs"].get("warnings") or []) + watch

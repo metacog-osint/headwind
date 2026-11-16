@@ -6,9 +6,11 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
-**State, 16 Nov 2026: items 2 to 4 under way in session `local_d0822275`, nothing pushed.** Item 1 committed on
-Tom's yes as `5a26fa4`. Item 2 (France's register, `headwind-1.8`) built and checked; see "France's asset-freeze
-register" below. **Do not push Headwind** until Tom has decided the redacted-history swap
+**State, 16 Nov 2026, about 1:00 AM CST: items 1 to 4 of the coverage plan built, nothing pushed.** On Tom's yes:
+`5a26fa4` (item 1, tariffs, `headwind-1.7`), `765df50` (item 2, France), `474894c` (item 3, Canada and UN
+committee releases) and the item 4 commit (US Supreme Court; Tom accepted its `us_person_data` test). Items 2 to 4
+share the method bump `headwind-1.8`. 101 tests (the kit-copy test fails, as before), check PASS. Wake's
+`live/ais` branch must credit `france-gels` and `canada-sema` before it merges (see France below). **Do not push Headwind** until Tom has decided the redacted-history swap
 (`[local path]`): its history is to be rewritten
 and local commits rebased onto it with the commit map. New fixtures are cut redacted (people: ids, type and legal
 basis only; ships: name and IMO, no owner; UN content: ids, numbers, dates and links only). The paragraph below is
@@ -231,6 +233,7 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | `inspection` | `inspection.py` | Office of the Federal Register, public inspection: the issues of the last 5 days (30 on a first run or after a gap), BIS, OFAC and USTR filings, and each rule's or USTR notice's text | 15 Nov: 30 days read, 26 filings (17 notices counted only); HW-IND-2 met by BIS 2026-22793 and USTR 2026-22925 and 2026-22867 |
 | `trade` | `trade.py` | Census Bureau international trade API, imports by HS code and country, 24 codes. **Needs a free Census key** | 15 Nov: 24 codes, newest month Sep 2026 |
 | `tariffs` | `tariffs.py` | USITC Harmonized Tariff Schedule release list (JSON); White House presidential actions (RSS) | 15 Nov: 186 revisions (23 in 2026), 3 tariff actions signed in 30 days, all in the Federal Register. Both lanes with texts took 6 s |
+| `scotus` | `scotus.py` | supremecourt.gov slip opinion RSS (`TYear=` this term and last) and docket JSON (`/RSS/Cases/JSON/<docket>.json`) | 16 Nov, 12:37 AM CST: 75 opinions (56 signed, 19 per curiam), all 75 dated from their dockets; first run 2 min 56 s (75 dockets), later runs read only the two feeds, the tracked dockets and any undated case |
 | `unpress` | `unpress.py` | The UN's Meetings Coverage and Press Releases RSS (gzip even unasked), Security Council sanctions committee releases, number, date and link only | 16 Nov, 12:08 AM CST: 10 items back to 13 Nov 4:42 PM UTC, no committee release |
 | `minerals` | `minerals.py` | USGS Mineral Commodity Summaries 2026 data release on ScienceBase (item JSON, then two CSVs) | 13 Nov: 68 commodities with net import reliance, 47 with import shares by country |
 
@@ -613,6 +616,29 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   Nature and legal bases, `Nom` becomes `PERSON-<sha1[:10]>`; organizations keep their name; ships keep name, IMO
   and legal bases (owner, aliases and narrative dropped). Tests in `TestFrance`.
 
+## US Supreme Court (plan item 4, built 16 Nov 2026, `headwind-1.8`)
+- See doctrine/method.md "The US Supreme Court". `scotus.py`: `parse_feed`, `parse_docket` (decision date from the
+  entry linking the opinion, else the one saying who delivered it; `judgment()` keeps the judgment without the
+  authorship), `party_kind` / `us_person_data`, `merge` (keyed by docket; a second opinion under one docket in the
+  feeds is not kept), `TARIFF_DOCKETS` (24-1287, 25-250; related dockets followed). Lane `_lane_scotus` reads at most
+  100 dockets a run. Snapshot `scotus_opinions`, `scotus_tracked`, `scotus_errors`; page section `#courts`; feed
+  items `headwind:scotus:<docket>` (14 days from the decision, requirement HW-REQ-1, NCF `operate_government`,
+  countries US) and `headwind:scotusdocket:<docket>:<date>` (HW-PIR-2, `us_person_data` individuals because docket
+  text can name people). Source and health id `supremecourt-gov`.
+- **`us_person_data` test** (Tom accepted it, 16 Nov 2026, "Accept, commit item 4"): individuals when either side of the
+  title reads as a person, organizations when a side is a non-government organization, none when every side is a
+  government. Live 16 Nov: 64 individuals, 11 organizations.
+- **Bugs found while building, fixed:** titles ending "- (per curiam)" were dropped (the greedy title pattern took
+  "per curiam" as the docket; 3 opinions); "Bd." never matched the government words; 25A312's docket names the
+  opinion without linking it.
+- Fixtures `scotus_feed_25.xml` and `scotus_feed_26.xml` (nine items, syllabus text dropped) and seven
+  `scotus_docket_*.json` (titles, lower court, related dockets, the opinion entry and the newest entry only), cut by
+  `.claude/cut_scotus.py`.
+- **D: drive:** writes to `[local path]` failed now and then on 16 Nov with `OSError: [Errno 22] Invalid
+  argument` on open (feed.py, test_headwind.py, site/data/snapshot.json), then worked on retry. The patch scripts
+  retry and read back; a patch script that stops part-way must not be rerun blind (an insertion's anchor survives
+  it, so a rerun inserts twice: happened once, undone with `git checkout` of the six files).
+
 ## Canada's list and UN committee releases (plan item 3, built 16 Nov 2026, `headwind-1.8`)
 - See doctrine/method.md "Canada's consolidated list" and "UN sanctions committee press releases".
 - **Canada** (`parse_canada_xml`, `canada_key`, `canada_renumbered`, `apply_renumbering`): key regime|schedule|item.
@@ -651,7 +677,7 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
 - The page footer now names every publisher (EU, UK, USITC, White House and Census were missing) and carries
   the notice the Census API terms require (missing since step 16).
 
-## New coverage plan (15 Nov 2026, planned, not built)
+## New coverage plan (15 Nov 2026; items 1 to 4 built 15-16 Nov, items 5 to 12 not built)
 Full source register, terms read 15 Nov, build order and the minutes estimate: `[local path]`. **Tom, 15 Nov 2026: build US tariff actions, France's register, UN sanctions committee releases with Canada's list, and the US Supreme Court, in that order; ICC and court items carry the court's own case title and number (us_person_data set when a US person is named); courts, ICC and tariff litigation live inside Headwind, not a new program; Actions minutes left as they are.** Making the repository public is not decided (it is private; see the state release under Source health).
 - **Headwind gets:** US tariff actions (FR presidential documents with tariff terms, 24 in 2026 to 15 Nov and 36 in 2025, counted on the fixture; whitehouse.gov presidential-actions RSS for signing dates, "not copyright protected"; BIS and ITA Section 232 and inclusion-window notices; the USITC HTS release list, 200 JSON keyless, 23 revisions in 2026; all dates into the register). CBP CSMS has no keyless feed. More sanctions lists: France's Registre national des gels (Licence Ouverte 2.0, JSON 15 MB, stable `IdRegistre`, 39 vessels with IMO), Canada's consolidated list (XML 2.9 MB, `DateOfListing` on all 5,781 records, 731 ships with IMO; reproduction allowed for non-commercial purposes; no entry id, key on Schedule + Item), Switzerland (SECO XML 43 MB; reproduction needs SECO's written consent), Japan, New Zealand, Australia (terms unread; dfat.gov.au timed out). UN sanctions committee press releases (press.un.org RSS, about 10 items, count and link only). IMF Board actions only with the IMF's permission (its terms bar systematic or automated download of Content). Stock indices monthly only (OECD SDMX answers keyless, terms unread; GEM `DSTKMKTXN` is built on Datastream, the Pink Sheet question; STOXX's terms bar derivative works, so publishing only changes and z does not help).
 - **Courts in Headwind** (Tom, 15 Nov): ICC, the US Supreme Court and other highest courts, and tariff litigation become Headwind lanes; BRICS membership goes to Readout as a hand-kept table.

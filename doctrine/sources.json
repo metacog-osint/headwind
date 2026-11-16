@@ -57,6 +57,15 @@
       "independence_group": "ca-gac-sanctions"
     },
     {
+      "id": "supremecourt-gov",
+      "name": "Supreme Court of the United States: slip opinion RSS feeds (slipopinion_rss.aspx?TYear=) and docket JSON (/RSS/Cases/JSON/<docket>.json)",
+      "url": "https://www.supremecourt.gov/opinions/opinions.aspx",
+      "licence": "US government work (17 USC 105, stated from memory); the Court's site policies give no reuse statement",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "us-supreme-court"
+    },
+    {
       "id": "un-press",
       "name": "United Nations Meetings Coverage and Press Releases (RSS, press.un.org/en/rss.xml): Security Council sanctions committee releases",
       "url": "https://press.un.org/en",

@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      markets, minerals, releases, sanctions, screening, tariffs, trade, unpress)
+                      markets, minerals, releases, sanctions, scotus, screening, tariffs, trade, unpress)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -42,13 +42,15 @@ LANE_FIELDS = {
     "trade": ["mineral_trade"],
     "tariffs": ["hts_releases", "hts_pace", "signed_actions", "signed_error"],
     "unpress": ["un_committee_releases", "un_press"],
+    "scotus": ["scotus_opinions", "scotus_tracked", "scotus_errors"],
 }
 EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
          "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
          "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
          "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
          "minerals": {}, "mineral_trade": {}, "tariff_pace": {}, "hts_releases": {}, "hts_pace": {},
-         "signed_actions": [], "signed_error": None, "un_committee_releases": [], "un_press": {}}
+         "signed_actions": [], "signed_error": None, "un_committee_releases": [], "un_press": {},
+         "scotus_opinions": [], "scotus_tracked": [], "scotus_errors": []}
 
 
 def _lane_fx(raw_dir, prev, getter):
@@ -437,6 +439,58 @@ def _lane_unpress(raw_dir, prev, getter):
             "un_press": unpress.coverage(items, last, now)}, [rec]
 
 
+SCOTUS_DOCKETS_PER_RUN = 100   # dockets read for decision dates in one run (the first run reads about 75)
+
+
+def _lane_scotus(raw_dir, prev, getter):
+    """The Supreme Court's opinions of this term and the last (slip opinion feeds), each case's decision date from
+    its docket (read once), and the tariff-authority dockets, read every run. A docket that cannot be read is noted
+    in `scotus_errors`; the opinion stays listed with its posting date. The lane fails only when no feed is read."""
+    now = fetch.now_utc()
+    found, recs, errors = [], [], []
+    for yy in scotus.term_years(date.today()):
+        try:
+            body, rec = fetch.fetch("supremecourt-gov", scotus.FEED.format(yy=yy), raw_dir, "xml", getter=getter)
+            found += scotus.parse_feed(body, yy)
+            recs.append(rec)
+        except Exception as exc:  # noqa: BLE001 - one term's feed failing is noted
+            errors.append(f"term {yy:02d} feed: {type(exc).__name__}: {exc}"[:200])
+    if not recs:
+        raise RuntimeError("no Supreme Court feed could be read: " + "; ".join(errors))
+    known = {o["docket"]: o for o in prev.get("scotus_opinions") or []}
+
+    def docket(d):
+        body, rec = fetch.fetch("supremecourt-gov-docket", scotus.DOCKET_JSON.format(docket=d), raw_dir, "json",
+                                getter=getter)
+        recs.append(rec)
+        return scotus.parse_docket(body)
+
+    dockets = {}
+    for d in [f["docket"] for f in found if not known.get(f["docket"], {}).get("decided")][:SCOTUS_DOCKETS_PER_RUN]:
+        try:
+            dockets[d] = docket(d)
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"docket {d}: {type(exc).__name__}: {exc}"[:200])
+    tracked, todo, seen = [], list(scotus.TARIFF_DOCKETS), set()
+    while todo:
+        d = todo.pop(0)
+        if d in seen:
+            continue
+        seen.add(d)
+        try:
+            t = dockets.get(d) or docket(d)
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"tracked docket {d}: {type(exc).__name__}: {exc}"[:200])
+            t = next((x for x in prev.get("scotus_tracked") or [] if x["docket"] == d), None)
+            if t:
+                tracked.append({**t, "error": errors[-1]})
+            continue
+        tracked.append({**t, "url": scotus.DOCKET_PAGE.format(docket=d), "checked_at": now})
+        todo += [r for r in t.get("related") or [] if r not in seen]
+    return {"scotus_opinions": scotus.merge(prev.get("scotus_opinions") or [], found, dockets, now),
+            "scotus_tracked": tracked, "scotus_errors": errors}, recs
+
+
 def _lane_inspection(raw_dir, prev, getter):
     """Filings on public inspection by BIS, OFAC and USTR: the issues of the last few days, kept 30 days, and the
     text of each rule, proposed rule and USTR notice (read once per PDF). A text that cannot be read is noted on
@@ -508,7 +562,8 @@ def _minerals_watch(raw_dir, getter, recs) -> dict:
 LANES = {"fx": _lane_fx, "gem": _lane_gem, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
          "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
          "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals,
-         "trade": _lane_trade, "tariffs": _lane_tariffs, "unpress": _lane_unpress}
+         "trade": _lane_trade, "tariffs": _lane_tariffs, "unpress": _lane_unpress,
+         "scotus": _lane_scotus}
 
 
 def finish_snapshot(snap: dict, today: date) -> dict:
@@ -638,7 +693,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                      "screening_lists", "controls", "inspection", "inspection_issues", "minerals",
                                      "question_drafts", "vessel_crosslist", "mineral_trade", "tariff_pace",
                                      "hts_releases", "hts_pace", "signed_actions", "signed_error",
-                                     "un_committee_releases", "un_press")}
+                                     "un_committee_releases", "un_press", "scotus_opinions", "scotus_tracked",
+                                     "scotus_errors")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
     # Counted-only filings as they may be published, whatever snapshot this is built from (a failed inspection
