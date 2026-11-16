@@ -1,4 +1,4 @@
-# Headwind method (`headwind-1.8`)
+# Headwind method (`headwind-1.9`)
 
 ## Purpose
 Headwind measures economic stress: currencies, energy and food prices that move outside their own
@@ -78,7 +78,9 @@ An anomaly carries `baseline_ref` in the kit's form: `id` (the lane's rule, such
 ## Sanctions lists and rules
 A list change is the difference between two of Headwind's own readings of an official list, matched on
 the publisher's entry id. It is reported as counts by type (individual, entity, vessel, aircraft) and
-by sanctions program. Headwind does not republish the names of people or organizations; the item links to the official list. Vessels are named, with IMO number, MMSI, flag and type as the list gives them, because a vessel is not a person and the IMO number is how a vessel is matched elsewhere.
+by sanctions program. Since `headwind-1.9` the people and organizations added, changed and removed are named on
+every list but the UN's (see Names on list changes). Vessels are named, with IMO number, MMSI, flag and type as the
+list gives them, because the IMO number is how a vessel is matched elsewhere.
 
 - **The date is the date Headwind saw the change**, not the date of the designation. A change made
   and reversed between two readings is not seen at all.
@@ -92,8 +94,8 @@ by sanctions program. Headwind does not republish the names of people or organiz
   not say what a rule means or whether a stay will be extended.
 - **Rules have no anomaly rule** and are tier `routine`. A list change is tier `anomaly` only when one of
   its designation batches is (see Designation batches, since `headwind-1.6`); otherwise `routine`.
-- **Edits are seen (`headwind-1.4`).** An entry on both readings whose type or programs changed is
-  counted as changed, with the programs gained and lost across those entries. A listed vessel whose
+- **Edits are seen (`headwind-1.4`).** An entry on both readings whose type or programs changed (since
+  `headwind-1.9` also its name) is counted as changed, with the programs gained and lost across those entries. A listed vessel whose
   name, IMO number, MMSI, flag or type changed is named, before and after.
 - **A ship remade under a new id is one entry (`headwind-1.5`).** A vessel that goes and a vessel that
   comes on the same list with the same IMO number, and no other vessel with that number going or coming,
@@ -194,6 +196,36 @@ by sanctions program. Headwind does not republish the names of people or organiz
 - **Licence.** Opinions and dockets are US government works (17 USC 105, stated from memory; the Court's site gives
   no reuse statement).
 
+## Names on list changes (`headwind-1.9`, 16 Nov 2026)
+- **What is named.** People, organizations and ships added, changed and removed on every list Headwind reads but the
+  UN Security Council's: OFAC's SDN list, the EU's, the UK's, France's and Canada's lists, and trade.gov's screening
+  lists. Each named entry carries its name as the publisher prints it ("LAST, First" on OFAC's list, "Nom, Prénom" on
+  France's), its type, its programs, the countries of its addresses and nationality as printed, and the listing date
+  where the list gives one. Birth dates, identity documents, street addresses, statements of reasons, aliases and
+  contact details are not carried. OFAC's countries come from its own address file (`add.csv`); Canada's list prints
+  no address or nationality.
+- **Why these lists and not the UN's.** Tom, 15 Nov 2026: publish what the licences allow. OFAC's and trade.gov's
+  lists are US government works. Canada allows non-commercial reproduction. France's Licence Ouverte 2.0 and the EU's
+  reuse decision (2011/833/EU) allow reuse of personal data within data-protection law; the UK's Open Government
+  Licence v3.0 does not cover personal data, which leaves the question to data-protection law too (all read 16 Nov
+  2026). Headwind carries the least that identifies an entry, shows a removal as a removal, and takes down on request
+  the name of someone no longer listed (support@theintelligence.company). The UN's terms of use bar redistributing its
+  content, so its list stays counts, ids, types and dates.
+- **Where.** A feed item names up to 25 entries: those added, those changed, and organizations removed. The page
+  names every entry of a change, removed people included, and `data/list-changes.json` holds them all, for the 30
+  days a change is kept. A person removed from a list is counted in the feed item, not named: feed text goes into
+  the history log for good, and someone no longer listed should not stay named there.
+- **Removed and changed.** A removed entry reads "no longer on the list", with the reading that saw it go. An entry
+  that stays and changes its name, type or programs is named as changed, with its name before; spelling corrections
+  therefore show as changes. Addresses and other details are not compared.
+- **The first reading under this rule.** Indexes kept before 16 Nov 2026 hold no names, so the first change after the
+  deploy counts its removals without naming them and compares no names; from the next reading all of it works. A
+  later change in how a name is read (`name_format`) is handled the same way, never reported as renames.
+- **`us_person_data`.** `individuals` when a named person, or an entry of unstated type (trade.gov gives no type for
+  the Entity List and the Denied Persons List), has a US address or nationality; `organizations` when only
+  organizations do; otherwise `none`. Entries of Canada's list, which prints no address, cannot set it. The label is
+  for consumers bound by US-person rules; it never keeps an item out.
+
 ## USTR, public inspection and HW-IND-2 (`headwind-1.6`)
 - **USTR.** The rules lane reads USTR's rules and its notices (Section 301 actions, exclusions and their
   extensions) beside BIS's and OFAC's rules, in the same form. USTR notices about the office itself
@@ -208,11 +240,11 @@ by sanctions program. Headwind does not republish the names of people or organiz
   it is to be published. The text of each rule, proposed rule and USTR notice is read once for its action
   line, RINs, docket numbers, the first sentence of its summary and each date it says was already
   scheduled ("was set to end", "scheduled to expire": the first date after the phrase). The text itself
-  is not kept. OFAC's and BIS's notices (sanctions actions, denial orders) are counted, not titled,
-  because their titles and texts can name people and companies. Such a filing keeps only its document
-  number and the register's short address for it (`federalregister.gov/d/<number>`): the register's own
-  addresses carry the title as a slug, and its editorial notes can quote the title, so neither is kept. A
-  filing stays in the feed 7 days.
+  is not kept. OFAC's and BIS's notices (sanctions actions, denial orders) were counted, not titled, until
+  `headwind-1.9`; since then they carry their titles and the register's own address, as every filing does (Federal
+  Register documents may be reproduced without restriction). Their texts are still not read, and HW-IND-2 is not
+  measured on them. A BIS order names its party in its title, often a US person, so such an item carries
+  `us_person_data` `individuals`. A filing stays in the feed 7 days.
 - **HW-IND-2 is measured, not judged.** A BIS or USTR filing meets it when (1) its title, action line or
   summary's first sentence makes it a stay, suspension, extension or Entity List filing (not a comment
   period or information collection), and (2) a scheduled date falls on the day it was filed or within 14
@@ -255,7 +287,8 @@ attached.
 ## Screening lists
 The same measure, applied to each list in the US International Trade Administration's Consolidated
 Screening List. One item per list that changed, with counts by the address country the list gives
-for each entry and, where the list has them, by program.
+for each entry and, where the list has them, by program, and since `headwind-1.9` the entries added, changed and
+removed named (see Names on list changes).
 
 - **Address country is where the list places the entry**, not a finding about who controls it. An entry
   with addresses in three countries is counted under each.
@@ -263,9 +296,9 @@ for each entry and, where the list has them, by program.
   changes when a publisher edits an entry has not been observed either way. Since `headwind-1.4` an id
   that goes and an id that comes on the same list, with the same name and type and no other entry of
   that name going or coming, are counted once, as re-keyed, and compared as one entry. The name is kept
-  only as a short hash in Headwind's run state (public with the repository; the hash, not the name).
-- **Edits** (an entry whose type, programs or address countries changed) are counted, with the programs
-  gained and lost.
+  as a short hash in Headwind's run state for this pairing (the name itself is kept beside it since `headwind-1.9`).
+- **Edits** (an entry whose type, programs, address countries or, since `headwind-1.9`, name changed) are counted
+  and named, with the programs gained and lost.
 - **A list that loses more than half its entries** (lists of 20 or more) fails the lane and is not
   reported as delistings.
 

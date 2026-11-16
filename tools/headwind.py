@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      markets, minerals, releases, sanctions, scotus, screening, tariffs, trade, unpress)
+                      markets, minerals, names, releases, sanctions, scotus, screening, tariffs, trade, unpress)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -237,13 +237,41 @@ def _lane_calendar(raw_dir, prev, getter):
 _CA_NAMES: dict = {}       # Canada's name hashes from the last read, for its renumbering guard (private state only)
 
 
+LIST_CHANGE_KEYS = ("id", "list", "list_name", "publisher", "url", "detected_at", "prior_checked_at", "us_person_data",
+                    "added", "removed", "changed", "named_added", "named_changed", "named_removed", "unnamed_removed",
+                    "vessels_added", "vessels_removed", "vessels_rekeyed", "vessels_changed")
+
+
+def list_changes(snap: dict) -> dict:
+    """Every named entry of the list changes kept in the snapshot (30 days): data/list-changes.json."""
+    def slim(d, kind):
+        return {"kind": kind, **{k: d[k] for k in LIST_CHANGE_KEYS if k in d}}
+    return {"generated_at": snap["generated_at"], "method_version": snap.get("method_version"),
+            "note": ("People, organizations and ships added, changed and removed on official sanctions and US screening "
+                     "lists, as the publishers print their names, between two of Headwind's readings; kept 30 days. "
+                     "A removed entry is no longer on the list. The UN Security Council's list is counted only (its "
+                     "terms bar redistribution). Birth dates, identity documents, street addresses and reasons are "
+                     "not carried. Corrections and take-down requests for names no longer listed: "
+                     "support@theintelligence.company."),
+            "changes": [slim(d, "sanctions") for d in snap.get("sanctions") or []]
+            + [slim(d, "screening") for d in snap.get("screening") or []]}
+
+
 def _read_list(list_id, raw_dir, getter):
     """Fetch and parse one sanctions list: (index, the publisher's generation date, fetch record, designation dates).
     OFAC's file has no designation dates (None)."""
     dates: dict = {}
     if list_id == "ofac-sdn":
         body, rec = fetch.fetch("ofac-sdn", sanctions.OFAC_SDN_CSV, raw_dir, "csv", timeout=180, getter=getter)
-        return sanctions.parse_sdn_csv(body.decode("utf-8", errors="replace")), None, rec, None
+        addresses = None
+        try:
+            # The address file gives each entry's countries, which set us_person_data on a change. Without it the
+            # list is still read; its people and organizations then carry no country.
+            abody, _ = fetch.fetch("ofac-sdn-add", sanctions.OFAC_ADD_CSV, raw_dir, "csv", timeout=180, getter=getter)
+            addresses = sanctions.parse_add_csv(abody.decode("utf-8", errors="replace"))
+        except Exception as exc:  # noqa: BLE001 - the list itself was read
+            print(f"  sanctions: ofac-sdn: address file not read ({exc}); no countries this run", file=sys.stderr)
+        return sanctions.parse_sdn_csv(body.decode("utf-8", errors="replace"), addresses), None, rec, None
     if list_id == "un-consolidated":
         body, rec = fetch.fetch("un-sc-consolidated", sanctions.UN_XML, raw_dir, "xml", timeout=120, getter=getter)
         generated, index = sanctions.parse_un_xml(body, dates)
@@ -295,10 +323,10 @@ def _lane_sanctions(raw_dir, prev, getter):
         last_change = old.get("last_change_at")
         history = old.get("added_history") or []
         form = sanctions.VESSEL_FORMAT.get(list_id, 1)
-        names = dict(_CA_NAMES) if list_id == "canada-sema" else None
+        ca_names = dict(_CA_NAMES) if list_id == "canada-sema" else None
         renumbered = []
-        if old.get("index") and names is not None:
-            renumbered = sanctions.canada_renumbered(old["index"], index, old.get("names"), names)
+        if old.get("index") and ca_names is not None:
+            renumbered = sanctions.canada_renumbered(old["index"], index, old.get("names"), ca_names)
             if renumbered:
                 old = {**old, "index": sanctions.apply_renumbering(old["index"], renumbered)}
         if old.get("index"):
@@ -306,8 +334,12 @@ def _lane_sanctions(raw_dir, prev, getter):
             if not same_form:
                 print(f"  sanctions: {list_id}: vessel details were kept in an older form; not compared this run",
                       file=sys.stderr)
+            same_names = old.get("name_format") == names.NAME_FORMAT
+            if not same_names and list_id in sanctions.NAMED_LISTS:
+                print(f"  sanctions: {list_id}: the reading before kept no names in this form; removals are counted, "
+                      f"not named, and names are not compared this run", file=sys.stderr)
             d = sanctions.delta(list_id, old["index"], index, now, old.get("checked_at"), compare_vessels=same_form,
-                                dates=dates, added_history=history)
+                                dates=dates, added_history=history, compare_names=same_names)
             if d and renumbered:
                 d["renumbered"] = len(renumbered)
             if d:
@@ -317,9 +349,10 @@ def _lane_sanctions(raw_dir, prev, getter):
                 history = batches.remember(history, (d.get("national") or d)["added"])
         baseline_set = old.get("baseline_set_at") or now
         new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "last_change_at": last_change,
-                              "vessel_format": form, "added_history": history, "index": index}
-        if names is not None:
-            new_state[list_id]["names"] = names
+                              "vessel_format": form, "name_format": names.NAME_FORMAT, "added_history": history,
+                              "index": index}
+        if ca_names is not None:
+            new_state[list_id]["names"] = ca_names
         lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated, last_change))
     if not recs:
         raise RuntimeError("no sanctions list could be read: " + "; ".join(errors))
@@ -729,6 +762,7 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                         for l in sanctions.VESSEL_LISTS},
             "summary": snap.get("vessel_crosslist") or {},
             "vessels": snap.get("vessel_table") or []}),
+        "data/list-changes.json": dump(list_changes(snap)),
         "data/question_drafts.json": dump({"note": "Drafts only. Nothing here is registered in Verdict.",
                                            "drafts": snap.get("question_drafts") or []}),
     }

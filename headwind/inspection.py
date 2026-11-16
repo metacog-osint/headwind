@@ -11,8 +11,10 @@ filing made within WINDOW_DAYS before a scheduled date. A scheduled date is one 
 register in controls.scheduled(), matched on RIN, docket number or, for USTR, the investigation its title names)
 or one the filing itself says was scheduled ("The suspension was set to end November 9, 2026.").
 
-OFAC's and BIS's notices (sanctions actions, denial orders) are counted, not titled: their titles and texts can
-name people and companies.
+OFAC's and BIS's notices (sanctions actions, denial orders) carry their titles since `headwind-1.9` (Tom, 15 Nov
+2026: publish what the licences allow; Federal Register documents may be reproduced without restriction). A BIS
+order names its party in the title, so such a filing carries us_person_data `individuals` (`person_label`).
+Filings kept from before as counted only (no title) age out within 30 days.
 """
 from __future__ import annotations
 
@@ -87,7 +89,7 @@ def parse_issue(body: bytes | str, day: str) -> list[dict]:
         kind = (r.get("type") or "").strip()
         if agency == "USTR" and kind == "Notice" and controls.ADMIN_TITLE.search(title):
             continue
-        counted_only = kind == "Notice" and agency in ("BIS", "OFAC")
+        counted_only = False            # headwind-1.9: every filing is titled; the key stays for kept records
         note = " ".join((r.get("editorial_note") or "").split())
         out.append(public_form({
             "id": r["document_number"], "agency": agency, "type": kind or "Unknown",
@@ -115,8 +117,27 @@ def public_form(rec: dict) -> dict:
             "dockets": []}
 
 
+# A BIS notice that names a party: denial orders, orders and their renewals or modifications.
+_BIS_PARTY = re.compile(r"\b(denial|denying|order|in the matter of|temporary denial)\b", re.I)
+
+
+def person_label(rec: dict) -> str:
+    """us_person_data for a filing item. A BIS order names its party in the title, and parties are often in the US
+    (export violators convicted in US courts), so it is `individuals` (cautious: it never keeps an item out). OFAC's
+    notice titles are generic ("Notice of OFAC Sanctions Actions") and USTR's and the rules name no person: none."""
+    if rec.get("agency") == "BIS" and rec.get("type") == "Notice" and _BIS_PARTY.search(rec.get("title") or ""):
+        return "individuals"
+    return "none"
+
+
+def party_notice(rec: dict) -> bool:
+    """OFAC's and BIS's notices (sanctions actions, denial orders): titled since headwind-1.9, but their texts are
+    not read and HW-IND-2 is not measured on them, as before."""
+    return rec.get("type") == "Notice" and rec.get("agency") in ("BIS", "OFAC")
+
+
 def wants_text(rec: dict) -> bool:
-    return not rec.get("counted_only") and bool(rec.get("raw_text_url"))
+    return not rec.get("counted_only") and not party_notice(rec) and bool(rec.get("raw_text_url"))
 
 
 def sentences(flat: str) -> list[str]:
@@ -199,7 +220,7 @@ def match(records: list[dict], register: list[dict]) -> list[dict]:
     for r in records:
         for k in ("matches", "days_to_deadline", "kind", "indicator_state"):
             r.pop(k, None)
-        if r.get("counted_only"):
+        if r.get("counted_only") or party_notice(r):
             continue
         filed = date.fromisoformat(r["filed_on"])
         lo, hi = filed.isoformat(), (filed + timedelta(days=WINDOW_DAYS)).isoformat()

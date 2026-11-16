@@ -20,7 +20,7 @@ from tic_doctrine import CONTRACT, geo  # noqa: E402
 from . import batches, controls, food, inspection, markets, scotus, stats, tariffs, unpress  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
-METHOD = "headwind-1.8"
+METHOD = "headwind-1.9"
 DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
 RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
@@ -444,6 +444,63 @@ def _renamed_text(vessels: list[dict], limit: int = 25) -> str:
     return f" Vessels still listed whose details changed ({len(vessels)}): {'; '.join(rows)}{more}."
 
 
+NAMES_IN_TEXT = 25
+NAMES_NOTE = ("Names as the publisher prints them, with type, programs and the countries of the entry's addresses and "
+              "nationality; birth dates, identity documents, street addresses and reasons are not carried. To report an "
+              "error, or to ask that the name of someone no longer listed be taken down: support@theintelligence.company.")
+
+
+def _who(r: dict) -> str:
+    bits = [r.get("type") or "", "; ".join(r.get("programs") or [])]
+    return f"{r['name']} ({', '.join(b for b in bits if b)})"
+
+
+def _names_text(s: dict, un: bool = False) -> str:
+    """People and organizations a change names (headwind-1.9): those added and those that changed, then
+    organizations removed, up to NAMES_IN_TEXT; the rest are on the page and in data/list-changes.json. Individuals
+    removed are counted here and named on the page only, which keeps them for 30 days: the feed's text goes into
+    the history log for good, and a person no longer listed should not stay named there."""
+    if un:
+        return (" People and organizations on the UN list are counts only (the UN's terms of use bar redistributing "
+                "its content); their names are on the UN's list.")
+    added, changed = s.get("named_added") or [], s.get("named_changed") or []
+    removed = s.get("named_removed") or []
+    orgs_removed = [r for r in removed if r.get("type") != "individual"]
+    people_removed = len(removed) - len(orgs_removed)
+    rows: list[tuple[str, str]] = []
+    rows += [("Added", _who(r) + (f", listed {r['listed']}" if r.get("listed") else "")) for r in added]
+    for r in changed:
+        what = []
+        if r.get("name_before"):
+            what.append(f"was {r['name_before']}")
+        if r.get("type_before"):
+            what.append(f"was a{'n' if r['type_before'][:1] in 'aeiou' else ''} {r['type_before']}")
+        if r.get("gained"):
+            what.append("programs gained " + ", ".join(r["gained"]))
+        if r.get("lost"):
+            what.append("programs lost " + ", ".join(r["lost"]))
+        if r.get("countries_before") is not None:
+            what.append("address countries were " + (", ".join(r["countries_before"]) or "none"))
+        rows.append(("Changed", f"{r['name']} ({r.get('type')}; {'; '.join(what) or 'details changed'})"))
+    rows += [("Removed, no longer on the list", _who(r)) for r in orgs_removed]
+    out, last = [], None
+    for word, text in rows[:NAMES_IN_TEXT]:
+        out.append(("; " if word == last else (". " if out else " ") + f"{word}: ") + text)
+        last = word
+    more = len(rows) - NAMES_IN_TEXT
+    text = ("".join(out) + "." if out else "") + (f" And {more} more named on the page." if more > 0 else "")
+    if people_removed:
+        text += (f" {people_removed} individual{'s' if people_removed != 1 else ''} removed, no longer on the list: "
+                 f"named on the page for 30 days, not here.")
+    if s.get("unnamed_removed"):
+        text += (f" {s['unnamed_removed']} removed from a reading kept before names were carried: counted only.")
+    return text + " " + NAMES_NOTE
+
+
+def _named_count(s: dict) -> int:
+    return len(s.get("named_added") or []) + len(s.get("named_changed") or []) + len(s.get("named_removed") or [])
+
+
 def list_features(snapshot: dict) -> list[dict]:
     """Sanctions-list changes and Federal Register rules. Counts and published facts; tier routine."""
     generated = snapshot["generated_at"]
@@ -483,8 +540,7 @@ def list_features(snapshot: dict) -> list[dict]:
             f"the publisher's own notices.{_vessel_text('added', s.get('vessels_added') or [])}"
             f"{_vessel_text('removed', s.get('vessels_removed') or [])}{_rekeyed_text(s.get('vessels_rekeyed') or [])}"
             f"{_renamed_text(s.get('vessels_changed') or [])}{batches.text(s.get('batches') or [])}"
-            f" People and organizations are counts "
-            f"only; their names are on the official list.",
+            f"{_names_text(s, s['list'] == 'un-consolidated')}",
             data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
             pmesii=["economic", "political"], ascope=["organizations"],
             ncf=["maintain_supply_chains", "provide_funding_liquidity"], requirement_ids=["HW-PIR-1"],
@@ -493,10 +549,11 @@ def list_features(snapshot: dict) -> list[dict]:
                       "vessels_changed": len(s.get("vessels_changed") or []), "rekeyed": s.get("rekeyed", 0),
                       **({"national_added": nat["added"], "national_removed": nat["removed"],
                           "restated_added": rest["added"], "restated_removed": rest["removed"]} if nat is not None else {}),
-                      **_batch_measures(s)},
+                      "named": _named_count(s), **_batch_measures(s)},
             visual={"type": "page", "url": f"{SITE}/#sanctions"},
             source=LIST_SOURCE[s["list"]],
             accessed=(lanes.get("sanctions") or {}).get("fetched_at"), anomaly_ref=_batch_ref(s)))
+        feats[-1]["properties"]["us_person_data"] = s.get("us_person_data") or "none"
 
     for s in snapshot.get("screening") or []:
         if s["detected_at"] < cutoff:
@@ -517,16 +574,18 @@ def list_features(snapshot: dict) -> list[dict]:
             f"{s['list_name']} ({s['publisher']}): {s['added']} added, {s['removed']} removed{_changed_title(s)}",
             f"{' '.join(x for x in parts if x)} The list now holds {s['total']} entries. This is the difference between two of "
             f"Headwind's readings of the Consolidated Screening List{since}, seen on {s['detected_at'][:10]}; the "
-            f"dates of the listings are in the publisher's own notices.{batches.text(s.get('batches') or [])} Counts "
-            f"only; names are on the official list.",
+            f"dates of the listings are in the publisher's own notices.{batches.text(s.get('batches') or [])}"
+            f"{_names_text(s)}",
             data_as_of=s["detected_at"], generated=generated, valid_until=valid_until, countries=s["countries"],
             pmesii=["economic", "political"], ascope=["organizations"],
             ncf=["maintain_supply_chains", "manufacture_equipment"], requirement_ids=["HW-PIR-1"],
             measures={"added": s["added"], "removed": s["removed"], "total": s["total"],
-                      "changed": s.get("changed", 0), "rekeyed": s.get("rekeyed", 0), **_batch_measures(s)},
+                      "changed": s.get("changed", 0), "rekeyed": s.get("rekeyed", 0), "named": _named_count(s),
+                      **_batch_measures(s)},
             visual={"type": "page", "url": f"{SITE}/#screening"},
             source={**SRC_CSL, "url": s.get("url") or SRC_CSL["url"]},
             accessed=(lanes.get("screening") or {}).get("fetched_at"), anomaly_ref=_batch_ref(s)))
+        feats[-1]["properties"]["us_person_data"] = s.get("us_person_data") or "none"
 
     for r in controls.recent(snapshot.get("controls") or [], generated, RULE_DAYS):
         if r["agency"] == "President":
@@ -745,7 +804,8 @@ def _match_text(m: dict) -> str:
 
 def inspection_features(snapshot: dict, generated: str, valid_until: str, accessed: str | None) -> list[dict]:
     """Filings on public inspection by BIS, OFAC and USTR, from the day filed for FEED_DAYS. Published facts and the
-    dates they line up with; HW-IND-2's state on BIS and USTR filings. Notices counted only are not items."""
+    dates they line up with; HW-IND-2's state on BIS and USTR filings. Filings kept from before headwind-1.9 as
+    counted only (no title) are not items."""
     cutoff = _plus_hours(generated, -24 * inspection.FEED_DAYS)[:10]
     out = []
     for r in snapshot.get("inspection") or []:
@@ -808,6 +868,7 @@ def inspection_features(snapshot: dict, generated: str, valid_until: str, access
                       "pages": r.get("pages")},
             visual={"type": "page", "url": r["url"]}, source={**SRC_PI, "url": r["url"]},
             accessed=accessed, extra=extra))
+        out[-1]["properties"]["us_person_data"] = inspection.person_label(r)
     return out
 
 

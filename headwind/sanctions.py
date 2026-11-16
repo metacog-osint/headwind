@@ -1,12 +1,16 @@
 """Sanctions lists: what was added or removed since Headwind last looked.
 
-Four official lists, all keyless: the US Treasury's SDN list (OFAC, sdn.csv), the UN Security
-Council consolidated list (XML), the EU's Financial Sanctions Files (XML) and the UK Sanctions List
-(FCDO, XML). Each run reduces a list to an index of entry id -> [type, groups],
-compares it with the index kept from the run before, and reports the difference as counts by type
-and by sanctions program. Headwind publishes counts and a link to the official list. People and
-organizations are counts only. Vessels are the exception (Tom, 13 Nov 2026): a vessel is not a
-person, so its name, IMO number, MMSI, flag and type are carried, which is what Wake needs to match.
+Six official lists, all keyless: the US Treasury's SDN list (OFAC, sdn.csv, with its address file add.csv),
+the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML), the UK Sanctions List
+(FCDO, XML), France's Registre national des gels (JSON) and Canada's consolidated list (XML). Each run reduces a
+list to an index of entry id -> [type, groups, details], compares it with the index kept from the run before, and
+reports the difference by type and by sanctions program, naming what changed.
+
+Names (`headwind-1.9`, Tom, 15-16 Nov 2026: publish what the licences allow): people and organizations on every
+list but the UN's carry their name as the publisher prints it and the countries of their addresses and
+nationality (`names.py`); vessels carry name, IMO number, MMSI, flag and type, as since 13 Nov 2026. Owners, birth
+dates, identity documents, street addresses and reasons are never carried. The UN list stays [type, list type]:
+its terms bar redistribution, so no UN text goes into the index, the state or the page.
 
 What a delta means: the change between two of Headwind's own readings. The date on it is when
 Headwind saw the change, not the date of the designation.
@@ -22,8 +26,10 @@ from collections import Counter
 from datetime import datetime, timedelta
 
 from . import batches, screening
+from . import names as nm
 
 OFAC_SDN_CSV = "https://www.treasury.gov/ofac/downloads/sdn.csv"
+OFAC_ADD_CSV = "https://www.treasury.gov/ofac/downloads/add.csv"     # addresses: only the country is kept
 UN_XML = "https://scsanctions.un.org/resources/xml/en/consolidated.xml"
 OFAC_RECENT = "https://ofac.treasury.gov/recent-actions"
 UN_PAGE = "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list"
@@ -185,10 +191,19 @@ def parse_eu_xml(body: bytes, dates: dict | None = None) -> tuple[str | None, di
         st = e.find("e:subjectType", EU_NS)
         code = st.get("code") if st is not None else None
         programmes = sorted({r.get("programme") for r in e.findall("e:regulation", EU_NS) if r.get("programme")})
-        index[lid] = [EU_TYPE.get(code, code or "unknown"), programmes]
+        index[lid] = [EU_TYPE.get(code, code or "unknown"), programmes, _eu_details(e)]
         if dates is not None:
             dates[lid] = _iso_day(e.get("designationDate"))
     return root.get("generationDate"), index
+
+
+def _eu_details(e) -> dict:
+    """The name the EU marks strong (else the first given) and the country codes of the entry's citizenships and
+    addresses. Birth dates, functions, identity documents and remarks are not carried."""
+    aliases = [a for a in e.findall("e:nameAlias", EU_NS) if nm.clean(a.get("wholeName"))]
+    pick = next((a for a in aliases if a.get("strong") == "true"), aliases[0] if aliases else None)
+    cs = [x.get("countryIso2Code") for tag in ("e:citizenship", "e:address") for x in e.findall(tag, EU_NS)]
+    return nm.details(pick.get("wholeName") if pick is not None else None, [c for c in cs if c and c != "00"])
 
 
 def _iso_day(text: str | None) -> str | None:
@@ -226,10 +241,8 @@ def uk_ship_name(primary: str | None, aliases: list[str]) -> tuple[str | None, b
     return None, False
 
 
-def _uk_ship(d) -> dict:
-    """The public fields of a UK ship designation: name, IMO number, flag and type. Owners and operators
-    are left out, as for OFAC: they can name a person. `name_is_alias` marks a name FCDO gives only as an
-    alias, the entry itself being named by IMO number."""
+def _uk_names(d) -> tuple[str | None, list[str]]:
+    """The primary name (Name1 to Name6 joined, as FCDO prints them) and the aliases of a UK designation."""
     primary, aliases = None, []
     for n in d.findall("Names/Name"):
         kind = (n.findtext("NameType") or "").strip().lower()                    # the file has both cases
@@ -238,6 +251,22 @@ def _uk_ship(d) -> dict:
             primary = text or None
         elif kind == "alias" and text:
             aliases.append(text)
+    return primary, aliases
+
+
+def _uk_details(d) -> dict:
+    """A UK person or organization: primary name, and the countries of its addresses and nationalities as
+    printed. Birth details, identifiers, statements of reasons, phones, emails and street addresses are not carried."""
+    cs = [x.text for x in d.findall("Addresses/Address/AddressCountry")] + \
+        [x.text for x in d.findall("IndividualDetails/Individual/Nationalities/Nationality")]
+    return nm.details(_uk_names(d)[0], cs)
+
+
+def _uk_ship(d) -> dict:
+    """The public fields of a UK ship designation: name, IMO number, flag and type. Owners and operators
+    are left out, as for OFAC. `name_is_alias` marks a name FCDO gives only as an alias, the entry itself being
+    named by IMO number."""
+    primary, aliases = _uk_names(d)
     name, from_alias = uk_ship_name(primary, aliases)
     imo = (d.findtext("ShipDetails/Ship/IMONumbers/IMONumber") or "").strip()
     imo = re.sub(r"^IMO\s*", "", imo)
@@ -260,16 +289,27 @@ def parse_uk_xml(body: bytes, dates: dict | None = None) -> tuple[str | None, di
             continue
         kind = UK_TYPE.get((d.findtext("IndividualEntityShip") or "").strip(), "unknown")
         entry = [kind, [uk_regime(d.findtext("RegimeName"))]]
-        if kind == "vessel":
-            entry.append(_uk_ship(d))
+        entry.append(_uk_ship(d) if kind == "vessel" else _uk_details(d))
         index[uid] = entry
         if dates is not None:
             dates[uid] = _uk_date(d.findtext("DateDesignated"))
     return _uk_date(root.findtext("DateGenerated")), index
 
 
-def parse_sdn_csv(text: str) -> dict[str, list]:
-    """sdn.csv has no header: uid, name, type, programs, ... A blank type ("-0-") is an entity."""
+def parse_add_csv(text: str) -> dict[str, list[str]]:
+    """OFAC's address file (add.csv, no header: uid, address number, street, city, country, remarks): the
+    countries of each entry's addresses. Only the country is kept."""
+    out: dict[str, set] = {}
+    for row in csv.reader(io.StringIO(text)):
+        if len(row) > 4 and row[0].strip().isdigit() and _blank(row[4]):
+            out.setdefault(row[0].strip(), set()).add(row[4].strip())
+    return {k: sorted(v) for k, v in out.items()}
+
+
+def parse_sdn_csv(text: str, addresses: dict | None = None) -> dict[str, list]:
+    """sdn.csv has no header: uid, name, type, programs, ... A blank type ("-0-") is an entity. A person or
+    organization carries its name as printed ("LAST, First" for people) and, from `addresses` (parse_add_csv),
+    the countries of its addresses."""
     index = {}
     for row in csv.reader(io.StringIO(text)):
         if len(row) < 4 or not row[0].strip().isdigit():
@@ -277,9 +317,9 @@ def parse_sdn_csv(text: str) -> dict[str, list]:
         kind = row[2].strip()
         programs = [p.strip() for p in re.split(r"\]\s*\[", row[3].strip().strip("[]")) if p.strip() and p.strip() != "-0-"]
         entry = ["entity" if kind in ("", "-0-") else kind, sorted(programs)]
-        if kind == "vessel":
-            entry.append(_vessel(row))
-        index[row[0].strip()] = entry
+        uid = row[0].strip()
+        entry.append(_vessel(row) if kind == "vessel" else nm.details(_blank(row[1]), (addresses or {}).get(uid)))
+        index[uid] = entry
     return index
 
 
@@ -370,8 +410,10 @@ def fr_ship_name(nom: str | None) -> str | None:
 
 def parse_fr_json(body: bytes) -> tuple[str | None, dict[str, list]]:
     """France's register, keyed on IdRegistre: [type, groups] with the groups from each legal basis (fr_regime).
-    Ships carry their name and IMO number (NUMERO_OMI); the register gives no flag, type or MMSI. Names of people
-    and organizations are not kept. The file carries no designation date (only the date of each act in its label)."""
+    Ships carry their name and IMO number (NUMERO_OMI); the register gives no flag, type or MMSI. People and
+    organizations carry their name ("Nom, Prénom" for people) and the countries of their nationality and addresses
+    as printed; birth dates, passports, identification, reasons and contact details are not carried. The file
+    carries no designation date (only the date of each act in its label)."""
     pub = json.loads(body.decode("utf-8-sig"))["Publications"]
     index = {}
     for r in pub.get("PublicationDetail") or []:
@@ -386,6 +428,11 @@ def parse_fr_json(body: bytes) -> tuple[str | None, dict[str, list]]:
             imo = next((str(v.get("NumeroOMI") or "").strip() for v in fields.get("NUMERO_OMI", [])), "")
             entry.append({"name": fr_ship_name(r.get("Nom")), "imo": imo if re.fullmatch(r"\d{7}", imo) else None,
                           "mmsi": None, "flag": None, "vessel_type": None})
+        else:
+            first = nm.clean(next((v.get("Prenom") for v in fields.get("PRENOM", []) if v.get("Prenom")), None))
+            nom = nm.clean(r.get("Nom"))
+            cs = [v.get("Pays") for t in ("NATIONALITE", "ADRESSE_PP", "ADRESSE_PM") for v in fields.get(t, [])]
+            entry.append(nm.details(f"{nom}, {first}" if nom and first else nom or first, cs))
         index[rid] = entry
     return pub.get("DatePublication"), index
 
@@ -411,9 +458,10 @@ def canada_key(rec) -> str:
 def parse_canada_xml(body: bytes, dates: dict | None = None,
                      names: dict | None = None) -> tuple[str | None, dict[str, list]]:
     """Canada's consolidated list: [type, [regime]] per record, keyed by canada_key. A ship (one with an IMO number)
-    carries its name, IMO number and type; the list gives no flag. A record with a person's name is an individual,
-    any other an entity. Names of people are never kept. `dates`, when given, is filled with each DateOfListing;
-    `names` with a 12-character hash of each record's name (screening.name_key), for the private state only."""
+    carries its name, IMO number and type; the list gives no flag. A record with a person's name is an individual
+    ("Last, Given"), any other an entity, with its name. The list prints no address or nationality. `dates`, when
+    given, is filled with each DateOfListing; `names` with a 12-character hash of each record's name
+    (screening.name_key), for the renumbering guard."""
     root = ET.fromstring(body)
     recs = root.findall("record")
     if recs and not any(r.find("Country-Pays") is not None for r in recs):
@@ -436,6 +484,11 @@ def parse_canada_xml(body: bytes, dates: dict | None = None,
             entry.append({"name": " ".join((r.findtext("EntityOrShip-EntiteOuNavire") or "").split()) or None,
                           "imo": imo if re.fullmatch(r"\d{7}", imo) else None, "mmsi": None, "flag": None,
                           "vessel_type": vtype or None})
+        elif kind == "individual":
+            last, given = nm.clean(r.findtext("LastName-NomDeFamille")), nm.clean(r.findtext("GivenName-Prenom"))
+            entry.append(nm.details(f"{last}, {given}" if last and given else last or given))
+        else:
+            entry.append(nm.details(r.findtext("EntityOrShip-EntiteOuNavire")))
         if key in index:
             raise ValueError(f"canada-sema: two records share the key {key}")
         index[key] = entry
@@ -529,22 +582,33 @@ def rekeyed_vessels(prev_index: dict, index: dict, added: list, removed: list) -
     return sorted((gone[k], came[k]) for k in set(gone) & set(came))
 
 
-def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True) -> dict:
-    """Entries on both readings whose type or programs changed, and vessels whose public details changed.
+def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True, compare_names: bool = True) -> dict:
+    """Entries on both readings whose type, programs or (people and organizations) name changed, and vessels
+    whose public details changed.
 
-    Returns counts only for people and organizations: how many entries changed, and which programs were
-    gained and lost across them. Vessels are named, as on additions: before and after for each field that moved.
-    `pairs` are (old id, new id) for one entry under a new id, compared as one. An index written before vessel
-    details were kept, or kept in an older form (`compare_vessels` False), gives no vessel comparison."""
-    changed, gained, lost, retyped, vessels = [], Counter(), Counter(), Counter(), []
+    Counts: how many entries changed, and which programs were gained and lost across them. Named: each person or
+    organization that changed (`named_changed`, with the programs it gained and lost and, when renamed, its name
+    before), and each vessel, before and after for each field that moved. `pairs` are (old id, new id) for one entry
+    under a new id, compared as one. An index written before vessel details or names were kept, or kept in an older
+    form (`compare_vessels`, `compare_names` False), gives no such comparison."""
+    changed, gained, lost, retyped, vessels, named_changed = [], Counter(), Counter(), Counter(), [], []
     for old_id, new_id in [(i, i) for i in sorted(set(index) & set(prev_index))] + list(pairs):
         old, new = prev_index[old_id], index[new_id]
-        if old[0] != new[0] or sorted(old[1]) != sorted(new[1]):
+        before, after = nm.entry(prev_index, old_id), nm.entry(index, new_id)
+        renamed = bool(compare_names and before and after and before["name"] != after["name"])
+        if old[0] != new[0] or sorted(old[1]) != sorted(new[1]) or renamed:
             changed.append(new_id)
             gained.update(set(new[1]) - set(old[1]))
             lost.update(set(old[1]) - set(new[1]))
             if old[0] != new[0]:
                 retyped[f"{old[0]} to {new[0]}"] += 1
+            if after:
+                rec = {**after, "gained": sorted(set(new[1]) - set(old[1])), "lost": sorted(set(old[1]) - set(new[1]))}
+                if renamed:
+                    rec["name_before"] = before["name"]
+                if old[0] != new[0]:
+                    rec["type_before"] = old[0]
+                named_changed.append(rec)
         if compare_vessels and new[0] == "vessel" and len(old) > 2 and len(new) > 2:
             moved = {f: [old[2].get(f), new[2].get(f)] for f in VESSEL_FIELDS if old[2].get(f) != new[2].get(f)}
             if moved:
@@ -553,7 +617,9 @@ def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True)
     by_type = Counter(index[i][0] for i in changed)
     return {"changed": len(changed), "changed_by_type": dict(sorted(by_type.items())),
             "programs_gained": dict(gained.most_common()), "programs_lost": dict(lost.most_common()),
-            "retyped": dict(retyped), "vessels_changed": sorted(vessels, key=lambda v: v["name"] or "")}
+            "retyped": dict(retyped), "vessels_changed": sorted(vessels, key=lambda v: v["name"] or ""),
+            "named_changed": sorted(named_changed, key=nm.sort_key),
+            "renamed": sum(1 for r in named_changed if "name_before" in r)}
 
 
 SPLIT_KEYS = ("added", "removed", "changed", "added_by_type", "added_by_program", "removed_by_type",
@@ -561,14 +627,15 @@ SPLIT_KEYS = ("added", "removed", "changed", "added_by_type", "added_by_program"
 
 
 def _fr_split(out: dict, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None,
-              compare_vessels: bool, added_history: list | None) -> dict:
+              compare_vessels: bool, added_history: list | None, compare_names: bool = True) -> dict:
     """France's register restates EU and UN measures that Headwind reads on those lists, beside France's own
     national freezes (Tom, 15 Nov 2026: count the national ones apart). `national` is the change among entries
     that carry a national legal basis on either reading, scored by the observed-batch rule; `restated` is the
     rest, counted only: never scored and placing no country, so an EU package is not counted twice."""
     nat = {i for idx in (prev_index, index) for i, e in idx.items() if is_fr_national(e)}
     sub = delta("france-gels", {k: v for k, v in prev_index.items() if k in nat}, {k: v for k, v in index.items() if k in nat},
-                detected_at, prior_checked_at, compare_vessels, None, added_history, split=False) or {}
+                detected_at, prior_checked_at, compare_vessels, None, added_history, split=False,
+                compare_names=compare_names) or {}
     out["national"] = {k: sub.get(k, {} if k not in ("added", "removed", "changed") else 0) for k in SPLIT_KEYS}
     out["restated"] = {k: out[k] - out["national"][k] for k in ("added", "removed", "changed")}
     out["batches"] = sub.get("batches") or []
@@ -578,21 +645,26 @@ def _fr_split(out: dict, prev_index: dict, index: dict, detected_at: str, prior_
 
 def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None,
           compare_vessels: bool = True, dates: dict | None = None, added_history: list | None = None,
-          split: bool = True) -> dict | None:
+          split: bool = True, compare_names: bool = True) -> dict | None:
     """The difference between two readings of one list, or None when nothing changed.
 
-    Additions and removals are ids that appear or go; a change is an id on both readings whose type or
-    programs moved (or, for a vessel, its name, IMO, MMSI, flag or type). A vessel that went and came back
-    under a new id with the same IMO number is counted once, as re-keyed, not as a removal and an addition.
-    France's register is split into its national freezes and its restatements (`_fr_split`)."""
+    Additions and removals are ids that appear or go; a change is an id on both readings whose type, programs or
+    name moved (or, for a vessel, its name, IMO, MMSI, flag or type). A vessel that went and came back under a new
+    id with the same IMO number is counted once, as re-keyed, not as a removal and an addition. People and
+    organizations added, removed and changed are named (`named_added`, `named_removed`, `named_changed`) on every
+    list that carries names; a removal from an index kept before names were carried is counted only
+    (`unnamed_removed`). France's register is split into its national freezes and its restatements (`_fr_split`)."""
     added = sorted(set(index) - set(prev_index))
     removed = sorted(set(prev_index) - set(index))
     pairs = rekeyed_vessels(prev_index, index, added, removed)
     added = sorted(set(added) - {n for _, n in pairs})
     removed = sorted(set(removed) - {o for o, _ in pairs})
-    ed = edits(prev_index, index, pairs, compare_vessels)
+    ed = edits(prev_index, index, pairs, compare_vessels, compare_names)
     if not added and not removed and not pairs and not ed["changed"] and not ed["vessels_changed"]:
         return None
+    named_added = sorted(filter(None, (nm.entry(index, i, dates) for i in added)), key=nm.sort_key)
+    named_removed = sorted(filter(None, (nm.entry(prev_index, i) for i in removed)), key=nm.sort_key)
+    people_removed = sum(1 for i in removed if prev_index[i][0] != "vessel")
     rekeyed = sorted(({**v, "old_id": o} for o, n in pairs for v in _vessels(index, [n])),
                      key=lambda v: (v["name"] or "", v["imo"] or ""))
     batch = batches.measure(added, dates, added_history, detected_at)
@@ -613,9 +685,20 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
         "countries": countries_for(list(a_group) + list(r_group) + list(ed["programs_gained"])
                                    + list(ed["programs_lost"]), list_id),
     }
+    if list_id in NAMED_LISTS:
+        out.update({"named_added": named_added, "named_removed": named_removed,
+                    "unnamed_removed": people_removed - len(named_removed),
+                    "us_person_data": nm.person_data(named_added, named_removed, ed["named_changed"])})
+    else:
+        out.update({"named_changed": [], "renamed": 0, "us_person_data": "none"})
     if list_id == "france-gels" and split:
-        return _fr_split(out, prev_index, index, detected_at, prior_checked_at, compare_vessels, added_history)
+        return _fr_split(out, prev_index, index, detected_at, prior_checked_at, compare_vessels, added_history,
+                         compare_names)
     return out
+
+
+# The lists whose people and organizations are named. The UN's terms bar redistribution of its content.
+NAMED_LISTS = ("ofac-sdn", "eu-fsf", "uk-sanctions", "france-gels", "canada-sema")
 
 
 # The lists that carry ships. The UN file has none; EU vessel measures sit in regulation annexes, not in its file.

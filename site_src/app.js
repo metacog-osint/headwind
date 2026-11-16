@@ -129,6 +129,36 @@
           : x.added + " added at once (" + z + " against " + x.baseline_n + " earlier changes Headwind saw" + (x.anomaly ? ", unusual" : "") + ")";
       }).join("; ") + ".");
     }
+    // headwind-1.9: people and organizations named, as the publisher prints them. A removed entry is no longer on
+    // the list; it is shown for the 30 days a change is kept, then goes.
+    var NAMES_SHOWN = 40;
+    function who(r) {
+      var bits = [r.type, (r.programs || []).join("; ")].filter(Boolean);
+      if ((r.countries || []).length) { bits.push((r.countries || []).join(", ")); }
+      if (r.listed) { bits.push("listed " + r.listed); }
+      return r.name + " (" + bits.join(", ") + ")";
+    }
+    function changedWho(r) {
+      var what = [];
+      if (r.name_before) { what.push("was " + r.name_before); }
+      if (r.type_before) { what.push("was " + r.type_before); }
+      if ((r.gained || []).length) { what.push("programs gained " + r.gained.join(", ")); }
+      if ((r.lost || []).length) { what.push("programs lost " + r.lost.join(", ")); }
+      if (r.countries_before) { what.push("address countries were " + (r.countries_before.join(", ") || "none")); }
+      return r.name + " (" + r.type + "; " + (what.join("; ") || "details changed") + ")";
+    }
+    function named(d) {
+      var groups = [["Named, added", (d.named_added || []).map(who)],
+        ["Named, changed", (d.named_changed || []).map(changedWho)],
+        ["Removed, no longer on the list (seen " + when(d.detected_at) + ")", (d.named_removed || []).map(who)]];
+      var html = groups.filter(function (g) { return g[1].length; }).map(function (g) {
+        var shown = g[1].slice(0, NAMES_SHOWN), more = g[1].length - shown.length;
+        return '<div class="small">' + esc(g[0] + ": " + shown.join("; ") + ".") +
+          (more > 0 ? ' <a href="data/list-changes.json">' + esc(more + " more in the data file") + "</a>" : "") + "</div>";
+      }).join("");
+      if (d.unnamed_removed) { html += '<div class="small muted">' + esc(d.unnamed_removed + " removed from a reading kept before names were carried: counted only.") + "</div>"; }
+      return html;
+    }
     function edited(lines, d) {
       if (!d.changed) { return; }
       var bits = ["Changed " + d.changed + " that stayed on the list"];
@@ -164,7 +194,7 @@
       batchLine(lines, d);
       var head = nat ? d.list_name + ": " + nat.added + " national freezes added, " + nat.removed + " removed" + (nat.changed ? ", " + nat.changed + " changed" : "") + "; " + rest.added + " added and " + rest.removed + " removed restating EU and UN measures"
         : d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "");
-      return '<div class="row"><div class="row-title"><span>' + esc(head) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div></div>";
+      return '<div class="row"><div class="row-title"><span>' + esc(head) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(lines.join(" ")) + "</div>" + named(d) + "</div>";
     }).join("") || (lists.length ? '<p class="small muted">No change seen in the last 30 days of readings.</p>' : "");
 
     var up = s.un_press || {}, ur = s.un_committee_releases || [];
@@ -213,7 +243,7 @@
       edited(lines, d);
       if (d.rekeyed) { lines.push(d.rekeyed + " came back under a new id with the same name and type, counted as the same entry."); }
       batchLine(lines, d);
-      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(d.publisher + ". " + lines.join(" ")) + "</div></div>";
+      return '<div class="row"><div class="row-title"><span>' + esc(d.list_name + ": " + d.added + " added, " + d.removed + " removed" + (d.changed ? ", " + d.changed + " changed" : "") + (d.rekeyed ? ", " + d.rekeyed + " under a new id" : "")) + flag(d.anomaly) + '</span><span class="badge">seen ' + esc(when(d.detected_at)) + '</span></div><div class="small muted">' + esc(d.publisher + ". " + lines.join(" ")) + "</div>" + named(d) + "</div>";
     }).join("") || (sl.length ? '<p class="small muted">No change seen in the last 30 days of readings. Compared since ' + esc(when(sl[0].baseline_set_at)) + ".</p>" : "");
     table("screening-table", ["List", "Publisher", "Entries", "Publisher's last update"], sl.map(function (l) {
       return ['<a href="' + esc(l.url) + '" rel="noopener">' + esc(l.name) + "</a>", esc(l.publisher), esc(Number(l.total).toLocaleString()), esc(day(l.source_last_updated))];
@@ -299,7 +329,7 @@
     document.getElementById("inspection-list").innerHTML = (piRows.length ? piRows.join("")
       : '<p class="small muted">' + (piLane.status === "ok" ? "No BIS, OFAC or USTR rule, and no USTR notice, on public inspection in the last 30 days."
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
-      + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, counted only because their titles can name people and companies: notices, ' + esc(countedText) + ".</p>" : "");
+      + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, kept from before titles were published (counted only until they age out): notices, ' + esc(countedText) + ".</p>" : "");
 
     var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada)", unpress: "UN sanctions committee press releases", scotus: "US Supreme Court opinions and dockets", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
