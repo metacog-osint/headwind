@@ -11,7 +11,8 @@ name: update
 # as assets (14 Nov 2026): headwind-state.tar.gz, the newest, and one per UTC day for 14 days. Release assets do not
 # expire. The repository is public (since 15 Nov 2026), so the release is public and the cache is to be treated as
 # public too: nothing goes into the state that may not be published. The indexes hold the publishers' own entry
-# ids, types and programs, taken from public lists, and short name hashes; never UN list text. A
+# ids, types and programs, taken from public lists, and since headwind-1.9 the names and address countries Headwind
+# publishes (every list but the UN's), and short name hashes; never UN list text. A
 # run restores the cache first and the release asset when the cache has nothing. With neither the run fails, so a
 # lost state is an alarm and not a silent first reading; start a deliberate first reading by hand with
 # first_reading ticked. State is saved after the feed check and before the deploy, so a failed deploy does not
@@ -137,7 +138,7 @@ jobs:
           day="headwind-state-$(date -u +%Y-%m-%d).tar.gz"
           cp headwind-state.tar.gz "$day"
           title="Run state"
-          notes="Headwind's run state: the last good snapshot and the list indexes (the publishers' own entry ids, types and programs, from public lists, and short name hashes). Kept for the workflow to restore. Public with the repository, so nothing goes into it that may not be published."
+          notes="Headwind's run state: the last good snapshot and the list indexes (the publishers' own entry ids, types and programs, from public lists; names and address countries as Headwind publishes them, for every list but the UN Security Council's; short name hashes). Kept for the workflow to restore. Public with the repository, so nothing goes into it that may not be published."
           if ! gh release view state >/dev/null 2>&1; then
             gh release create state --prerelease --latest=false --title "$title" --notes "$notes"
           else

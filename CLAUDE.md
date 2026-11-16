@@ -6,6 +6,21 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 16 Nov 2026, about 11:30 AM CST: `headwind-1.9` (names on list changes) built and tested, NOT
+committed.** Tom chose option (b) with guardrails ("Yes, build (b)"; design and licence reading in
+`D:\Projects\_ideas\drafts\2026-11-16-headwind-names-design.md`): people, organizations and ships named on every
+list but the UN's, with name, type, programs, address and nationality countries and listing date only; the feed names
+up to 25 per change (added, changed, organizations removed) and counts removed people, whom the page and
+`data/list-changes.json` name for the 30 days a change is kept; take-down address support@theintelligence.company;
+`us_person_data` from address countries (OFAC's own `add.csv`, new); OFAC and BIS notices on public inspection titled.
+New module `headwind/names.py`; `name_format` in each list's state (the first run after the deploy counts removals
+unnamed and compares no names). 107 of 108 tests (the kit-copy test only), check PASS on a local build. Checked on
+real data: OFAC's 12 and 14 Nov files give "Added: LOS LORENZANAS (entity, FTO; SDGT); LOS MENDOZA DRUG TRAFFICKING
+ORGANIZATION (...). Changed: LOS HUISTAS DRUG TRAFFICKING ORGANIZATION (entity; programs gained SDGT)", and the page
+shows them (screenshot taken, then `site/` restored). Earlier the same day: notes commit `ff7c9c7` pushed as
+`23489f4`, run 43904238843 passed (10:08 to 10:12 AM CST). Wake's credit fix is metacog-osint/wake PR 2, open. The
+paragraph below is the state before this.
+
 **State, 16 Nov 2026, about 9:00 AM CST: `headwind-1.8` live; the repository is public.** Items 1 to 4 of the
 coverage plan (US tariff actions, France's Registre national des gels, Canada's consolidated list and UN sanctions
 committee releases, the US Supreme Court) are on `main` and `live/first-slice` as `bce460a`; run 43885261338 (8:23
@@ -303,7 +318,9 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   `entry id -> [type, programs]`, compares it with `data/state/sanctions_index.json` from the run before, and
   reports counts by type and program. The date on a change is when Headwind saw it, not the designation date.
   The first run only sets the baseline. A change stays in the snapshot 30 days and in the feed 7.
-- **People and organizations are counts only. Vessels are named** (Tom, 13 Nov 2026): an OFAC vessel entry
+- **Names since `headwind-1.9`** (16 Nov 2026): people and organizations are named on every list but the UN's; see
+  doctrine/method.md "Names on list changes", `headwind/names.py`, and the state paragraph at the top. The rule below
+  ("counts only") is the one before it. **People and organizations were counts only. Vessels are named** (Tom, 13 Nov 2026): an OFAC vessel entry
   carries its name, IMO number, MMSI, flag and type in the index, the snapshot (`vessels_added`,
   `vessels_removed`), the feed summary (first 25) and the page. The owner column is not carried because it can name
   a person, and `us_person_data` stays `none`. On 13 Nov, 1,555 of 1,570 listed vessels had an IMO number. A vessel
@@ -478,8 +495,9 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   restores the Actions cache first, then that asset; with neither it fails (`::error::`) unless run by hand with
   `first_reading` ticked. **The state is public with the repository** (public since 15 Nov 2026): the `state`
   release is public, and the Actions cache is treated as public too. So nothing goes into the state that may not be
-  published. The indexes hold the publishers' own entry ids, types and programs, taken from public lists, and
-  12-character name hashes; UN list text (names included) never goes into the state or the release. The release
+  published. The indexes hold the publishers' own entry ids, types and programs, taken from public lists,
+  12-character name hashes and, since `headwind-1.9`, the names and address countries Headwind publishes (every list
+  but the UN's); UN list text (names included) never goes into the state or the release. The release
   can stay (Tom, 15 Nov 2026); since 16 Nov each run also rewrites its title and notes to say this.
 
 ## History log and COP (plan steps 14 and 15, built 15 Nov 2026)
@@ -532,8 +550,9 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   first entry is seen as an addition. A list of 20 or more that loses over half its entries fails the lane.
 - **The raw copy is stored gzipped** (2.8 MB against 34 MB). trade.gov re-imports hourly and stamps the file, so every
   run stores a new copy.
-- **US persons:** the Denied Persons List is mostly US addresses (1,106 of its address records). Counts only is why
-  `us_person_data` stays `none`; publishing names would change that.
+- **US persons:** the Denied Persons List is mostly US addresses (1,106 of its address records). Since `headwind-1.9`
+  names are published and `us_person_data` is set from the address countries; trade.gov gives no type for the Entity
+  List and the DPL, so a US address there reads as `individuals` (cautious).
 
 ## Census trade data for minerals (plan step 16, built 15 Nov 2026, lane `trade`)
 - **Source:** the Census Bureau's international trade API, `timeseries/intltrade/imports/hs`, general imports
@@ -776,7 +795,15 @@ Full source register, terms read 15 Nov, build order and the minutes estimate: `
   European Commission reuse notice (Decision 2011/833/EU) for the XML and CSV files, and CC BY 4.0 for one CSV.
   The decision allows reuse with the source acknowledged. Headwind publishes counts and a link.
 - UK Sanctions List: GOV.UK's page for it, read 14 Nov 2026, says all content is under the Open Government Licence
-  v3.0 except where otherwise stated. Headwind publishes counts, ship names and a link.
+  v3.0 except where otherwise stated. OGL v3.0 itself (nationalarchives.gov.uk, read 16 Nov 2026): "This licence does
+  not cover: personal data in the Information". Since `headwind-1.9` names are published anyway (Tom's option (b),
+  16 Nov 2026), with the least that identifies an entry and take-down on request.
+- EU reuse decision 2011/833/EU (Publications Office text, read 16 Nov 2026): personal data is not excluded from its
+  scope (Art. 2(2)); it "shall be implemented in full respect of the rules on the protection of individuals with
+  regard to the processing of personal data" (Art. 4). Licence Ouverte 2.0 (Etalab PDF, read 16 Nov 2026): personal
+  data may be reused provided the legal framework on its protection is respected.
+- OFAC's address file `add.csv` (treasury.gov, redirects to a signed S3 address; 1.7 MB, 25,261 rows on 16 Nov 2026):
+  only the country column is kept. A US government work, stated from memory.
 - France's Registre national des gels: Licence Ouverte / Open Licence 2.0, from the data.gouv.fr record
   "Registre national des gels" (API licence field `lov2`, record updated 11 Nov 2026), read 15 Nov 2026.
   Headwind publishes counts, ship names and a link.

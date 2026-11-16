@@ -95,11 +95,16 @@
         <p class="muted small">What changed between Headwind's own readings of six official lists: the US Treasury's
           SDN list, the UN Security Council's consolidated list, the EU's financial sanctions list, the UK
           Sanctions List, France's asset-freeze register and Canada's consolidated autonomous sanctions list. Most of France's entries restate EU and UN measures;
-          its own national freezes are counted and scored apart, and its restatements are counted only. A list read for the first time sets its baseline; changes are counted from then. People and
-          organizations are counts only; their names are on the publisher's list. Vessels are named, with their IMO
-          numbers. An entry that stays on a list and changes its programs or type is counted as changed, and a
-          listed vessel whose name, IMO, MMSI, flag or type changes is named before and after. The date is when Headwind saw the change, not the date of the
-          designation.</p></div>
+          its own national freezes are counted and scored apart, and its restatements are counted only. A list read for the first time sets its baseline; changes are counted from then. People,
+          organizations and vessels added, changed and removed are named as the publisher prints them, with type,
+          programs and the countries of their addresses and nationality (vessels with their IMO numbers); birth dates,
+          identity documents, street addresses and reasons are not carried. The UN Security Council's list is counted
+          only: its terms bar redistributing its content. A removed entry is no longer on the list; it is shown for the
+          30 days a change is kept, then goes. An entry that stays on a list and changes its name, programs or type is
+          named as changed, and a listed vessel whose name, IMO, MMSI, flag or type changes is named before and after.
+          The date is when Headwind saw the change, not the date of the designation. Every name of the last 30 days:
+          <a href="data/list-changes.json">data file</a>. To report an error, or to ask that the name of someone no
+          longer listed be taken down: <a href="mailto:support@theintelligence.company">support@theintelligence.company</a>.</p></div>
       <div id="sanction-lists"></div>
       <div id="vessel-cross"></div>
       <div id="sanction-deltas"></div>
@@ -133,8 +138,9 @@
     <div class="card-head"><h2 id="sc-h">US export-control and screening lists</h2>
       <p class="muted small">The Entity List and the other US Commerce, State and Treasury lists, read from
         trade.gov's Consolidated Screening List. What changed between Headwind's own readings, as counts by the
-        address country each list gives. Counts only; the names are on the publishers' lists. An entry that stays on a
-        list and changes its programs, type or address country is counted as changed. trade.gov assigns the ids of
+        address country each list gives, with the entries added, changed and removed named as the publisher prints
+        them (US government lists). An entry that stays on a list and changes its name, programs, type or address
+        country is named as changed. trade.gov assigns the ids of
         the BIS and State lists itself; an entry that comes back under a new id with the same name and type is
         counted once, as the same entry.</p></div>
     <div id="screening-deltas"></div>

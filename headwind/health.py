@@ -245,8 +245,10 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
     days = snap.get("inspection_issues") or []
     unread = sum(1 for r in pi if r.get("text_error"))
     add("fr-public-inspection", "inspection", _newest(r.get("issue") for r in pi) if pi else None,
-        f"{len(pi)} BIS, OFAC and USTR filings in the last 30 days ({sum(1 for r in pi if r.get('counted_only'))} "
-        f"counted only), {sum(1 for d in days if d.get('total'))} of {len(days)} days with an issue"
+        f"{len(pi)} BIS, OFAC and USTR filings in the last 30 days"
+        + (f" ({sum(1 for r in pi if r.get('counted_only'))} kept from before titles were published, counted only)"
+           if any(r.get("counted_only") for r in pi) else "")
+        + f", {sum(1 for d in days if d.get('total'))} of {len(days)} days with an issue"
         + (f"; {unread} filing texts could not be read" if unread else ""))
     add("usgs-mcs", "minerals", None,
         f"{len((snap.get('minerals') or {}).get('reliance') or [])} commodities with net import reliance")

@@ -1,0 +1,64 @@
+{
+ "total": 3,
+ "sources_used": [
+  {
+   "last_imported": "2026-11-15T18:15:00.037531+00:00",
+   "source_last_updated": "2026-04-28T12:39:28+00:00",
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "import_rate": "Hourly"
+  },
+  {
+   "last_imported": "2026-11-15T18:15:00.037531+00:00",
+   "source_last_updated": "2026-08-21T20:19:33+00:00",
+   "source": "Entity List (EL) - Bureau of Industry and Security",
+   "import_rate": "Hourly"
+  }
+ ],
+ "results": [
+  {
+   "id": "808de622c89fcefa5aa5fef3f15d08a596307661fef2a0caab654337",
+   "name": "A.C. International",
+   "type": null,
+   "programs": null,
+   "source": "Entity List (EL) - Bureau of Industry and Security",
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-4-744",
+   "start_date": "2008-09-22",
+   "federal_register_notice": "73 FR 54504",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "id": "2411abca205b008c869c919c36e8bbe82e516eca98588c2631adea0b",
+   "name": "Asia International Trading Company",
+   "type": null,
+   "programs": null,
+   "source": "Entity List (EL) - Bureau of Industry and Security",
+   "source_list_url": "https://www.bis.gov/regulations/ear/744#supplement-4-744",
+   "start_date": "2008-09-22",
+   "federal_register_notice": "73 FR 54504",
+   "addresses": [
+    {
+     "country": "CN"
+    }
+   ]
+  },
+  {
+   "id": "90729d02383bde55720b948c17f28f4c8123dc2c70f8def687d8632a",
+   "name": "KAL TEK LABS",
+   "type": null,
+   "programs": null,
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "source_list_url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl",
+   "start_date": "1988-08-26",
+   "federal_register_notice": "65 FR 42664 7/11/00",
+   "addresses": [
+    {
+     "country": "US"
+    }
+   ]
+  }
+ ]
+}

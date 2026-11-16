@@ -479,8 +479,9 @@ class TestFrance(unittest.TestCase):
         self.assertEqual(sanctions.unknown_programs("france-gels", new), [])
         self.assertEqual(sanctions.unknown_programs("france-gels", {"1": ["entity", ["Dispositif inconnu"]]}),
                          ["Dispositif inconnu"])
-        # No name of a person is kept: the index holds type and groups only, ships their public fields.
-        self.assertTrue(all(len(e) == 2 for e in new.values() if e[0] != "vessel"))
+        # headwind-1.9: people and organizations carry a name and countries only, ships their public fields.
+        self.assertTrue(all(len(e) == 3 and sorted(e[2]) == ["countries", "name"] and e[2]["name"]
+                            for e in new.values() if e[0] != "vessel"))
 
     def test_regime_labels(self):
         self.assertEqual(sanctions.fr_regime("(UE) 2022/332 du 25/02/2022 (UE Ukraine intégrité territoriale - "
@@ -561,7 +562,8 @@ class TestCanada(unittest.TestCase):
         self.assertTrue(any("|1, Part 3|" in k for k in idx))               # "1,Part 3" in the file
         self.assertTrue(all(dates[k] for k in idx))
         self.assertTrue(all(re.fullmatch(r"[0-9a-f]{12}", names[k]) for k in idx))
-        self.assertTrue(all(len(e) == 2 for e in idx.values() if e[0] != "vessel"))
+        self.assertTrue(all(len(e) == 3 and e[2]["name"] and e[2]["countries"] == []    # Canada prints no address
+                            for e in idx.values() if e[0] != "vessel"))
         ship = next(e[2] for e in idx.values() if e[0] == "vessel")
         self.assertEqual(sorted(ship), ["flag", "imo", "mmsi", "name", "vessel_type"])
         self.assertTrue(re.fullmatch(r"\d{7}", ship["imo"]) and ship["vessel_type"] and ship["name"])
@@ -1036,11 +1038,13 @@ class TestListParsers(unittest.TestCase):
     def test_sdn(self):
         idx = sanctions.parse_sdn_csv(text("ofac_sdn.csv"))
         self.assertEqual(len(idx), 36)
-        self.assertEqual(idx["36"], ["entity", ["CUBA"]])           # a blank type is an entity
+        self.assertEqual(idx["36"][:2], ["entity", ["CUBA"]])       # a blank type is an entity
         ships = {k: v[2] for k, v in idx.items() if v[0] == "vessel"}
         self.assertEqual(ships["15042"]["imo"] and len(ships["15042"]["imo"]), 7)
         self.assertTrue(all(s["name"] for s in ships.values()))
-        self.assertTrue(all(len(v) == 2 for v in idx.values() if v[0] != "vessel"))   # no names for anyone else
+        # headwind-1.9: people and organizations carry a name and countries, nothing more (this fixture was cut with
+        # names blanked, so they read as no name).
+        self.assertTrue(all(len(v) == 3 and sorted(v[2]) == ["countries", "name"] for v in idx.values() if v[0] != "vessel"))
         kinds = {v[0] for v in idx.values()}
         self.assertEqual(kinds, {"entity", "individual", "vessel", "aircraft"})
         self.assertTrue(any(len(v[1]) > 1 for v in idx.values()))   # "[A] [B]" splits into two programs
@@ -1057,7 +1061,8 @@ class TestListParsers(unittest.TestCase):
         self.assertEqual(generated[:10], "2026-10-23")
         self.assertEqual(len(idx), 9)
         self.assertEqual({v[0] for v in idx.values()}, {"individual", "entity"})
-        self.assertTrue(all(len(v) == 2 for v in idx.values()))     # counts only: no names carried
+        self.assertTrue(all(len(v) == 3 and sorted(v[2]) == ["countries", "name"] for v in idx.values() if v[0] != "vessel"))
+        self.assertTrue(all(v[2]["name"] for v in idx.values()))
         self.assertEqual(sanctions.countries_for(["UKR", "TAQA", "IRN"], "eu-fsf"), ["IR", "RU"])
         self.assertEqual(sanctions.countries_for(["SDNZ"], "eu-fsf"), ["SD"])   # Tom, 14 Nov 2026
         self.assertEqual(sanctions.countries_for(["SDN"], "eu-fsf"), ["SD"])   # the EU's Sudan code, not OFAC's list
@@ -1072,7 +1077,8 @@ class TestListParsers(unittest.TestCase):
         self.assertEqual(len(ships), 2)
         self.assertTrue(all(v[2]["name"] and len(v[2]["imo"]) == 7 for v in ships))   # "Primary Name" and "Primary name"
         self.assertTrue(all("owner" not in json.dumps(v[2]).lower() for v in ships))
-        self.assertTrue(all(len(v) == 2 for v in idx.values() if v[0] != "vessel"))
+        self.assertTrue(all(len(v) == 3 and sorted(v[2]) == ["countries", "name"] for v in idx.values() if v[0] != "vessel"))
+        self.assertTrue(all(v[2]["name"] for v in idx.values()))
         self.assertEqual(sanctions.uk_regime("The Iran (Sanctions) (Nuclear) (EU Exit) Regulations 2019"), "Iran (Nuclear)")
         self.assertEqual(sanctions.uk_regime("The Global Human Rights Sanctions Regulations 2020"), "Global Human Rights")
         self.assertEqual(sanctions.unknown_programs("uk-sanctions", idx), [])
@@ -1194,18 +1200,18 @@ class TestInspection(unittest.TestCase):
 
     def test_issue_and_text(self):
         five = inspection.parse_issue(text("fr_pi_2026-11-05.json"), "2026-11-05")
+        # headwind-1.9: every filing is titled, OFAC's and BIS's notices too, with the register's own address.
         self.assertEqual([(r["id"], r["counted_only"]) for r in five],
-                         [("2026-22725", True), ("2026-22726", True), ("2026-22793", False)])
+                         [("2026-22725", False), ("2026-22726", False), ("2026-22793", False)])
         stay = five[2]
         self.assertEqual((stay["filed_at_utc"], stay["filed_on"], stay["publication_date"]),
                          ("2026-11-05T21:15:00Z", "2026-11-05", "2026-11-09"))
-        self.assertTrue(all(r["title"] is None for r in five if r["counted_only"]))   # notices are counts only
-        counted = [r for r in five if r["counted_only"]]
-        self.assertEqual([r["url"] for r in counted], ["https://www.federalregister.gov/d/2026-22725",
-                                                       "https://www.federalregister.gov/d/2026-22726"])
-        self.assertTrue(all(r["raw_text_url"] is None and r["note"] is None for r in counted))
+        self.assertTrue(all(r["title"] for r in five))
+        self.assertTrue(five[0]["title"].startswith("Agency Information Collection Activities"))
         self.assertIn("/public-inspection/2026-22793/extension-of-the-suspension", stay["url"])   # titled: as given
-        # And a build from a snapshot that predates the fix publishes the same short form.
+        self.assertFalse(inspection.wants_text(five[0]))      # a party notice's text is still not read
+        self.assertTrue(inspection.wants_text(stay))
+        # A filing kept from before headwind-1.9 as counted only keeps the short form until it ages out.
         self.assertEqual(inspection.public_form({"id": "2026-22598", "counted_only": True, "note": "x",
                                                  "url": "https://www.federalregister.gov/public-inspection/"
                                                         "2026-22598/denial-of-export-privileges-y"})["url"],
@@ -1244,8 +1250,9 @@ class TestInspection(unittest.TestCase):
             self.assertEqual((r["indicator_state"], r["days_to_deadline"], r["matches"][0]["basis"], r["matches"][0]["doc"]),
                              ("present", 0, "same investigation", earlier))
         self.assertEqual((recs["2026-22868"]["indicator_state"], recs["2026-22868"]["matches"]), ("absent", []))
-        self.assertEqual(inspection.counted(list(recs.values())), {"BIS": 2, "OFAC": 2})
+        self.assertEqual(inspection.counted(list(recs.values())), {})
         self.assertNotIn("indicator_state", recs["2026-22861"])
+        self.assertNotIn("indicator_state", recs["2026-22725"])   # HW-IND-2 is not measured on party notices
 
     def test_a_filing_without_text_is_no_data_unless_matched(self):
         recs = _pi_records()
@@ -1273,8 +1280,15 @@ class TestInspection(unittest.TestCase):
         fc = {"features": feed.inspection_features(snap, "2026-11-10T12:00:00Z", "2026-11-12T12:00:00Z", None)}
         self.assertEqual(lint(fc), [])
         props = {f["properties"]["id"]: f["properties"] for f in fc["features"]}
-        self.assertEqual(sorted(props), ["headwind:inspection:2026-22793", "headwind:inspection:2026-22867",
+        self.assertEqual(sorted(props), ["headwind:inspection:2026-22725", "headwind:inspection:2026-22726",
+                                         "headwind:inspection:2026-22793", "headwind:inspection:2026-22802",
+                                         "headwind:inspection:2026-22861", "headwind:inspection:2026-22867",
                                          "headwind:inspection:2026-22868", "headwind:inspection:2026-22925"])
+        self.assertEqual({p["us_person_data"] for p in props.values()}, {"none"})
+        self.assertEqual(inspection.person_label({"agency": "BIS", "type": "Notice",
+                                                  "title": "Order Denying Export Privileges"}), "individuals")
+        self.assertEqual(inspection.person_label({"agency": "OFAC", "type": "Notice", "title": "Sanctions Action"}),
+                         "none")
         p = props["headwind:inspection:2026-22793"]
         self.assertEqual((p["kind"], p["tier"], p["indicator_id"], p["hypothesis_id"], p["direction"], p["indicator_state"]),
                          ("observation", "routine", "HW-IND-2", "HW-H-1B", "supports", "present"))
@@ -1283,7 +1297,7 @@ class TestInspection(unittest.TestCase):
         self.assertIn("filed 4 days before a date that document 2025-19846 (same RIN 0694-AK34) set", p["summary"])
         self.assertEqual(props["headwind:inspection:2026-22868"]["direction"], "neutral")
         self.assertEqual(props["headwind:inspection:2026-22925"]["countries"], ["CN"])
-        self.assertNotIn("Sanctions Action", json.dumps(fc))          # OFAC and BIS notices are not items
+        self.assertTrue(props["headwind:inspection:2026-22861"]["title"].endswith(": Sanctions Action"))   # titled since headwind-1.9
         later = feed.inspection_features(dict(snap, generated_at="2026-11-20T12:00:00Z"), "2026-11-20T12:00:00Z",
                                          "2026-11-22T12:00:00Z", None)
         self.assertEqual(later, [])                                     # in the feed 7 days from filing
@@ -1315,7 +1329,7 @@ class TestInspection(unittest.TestCase):
                 h = health.build({"generated_at": "2026-11-09T15:00:00Z", "lanes": {"inspection": {"status": "ok"}},
                                   **again}, {}, date(2026, 11, 9))["fr-public-inspection"]
                 self.assertEqual((h["state"], h["lane"]), ("up", "inspection"))
-                self.assertIn("8 BIS, OFAC and USTR filings in the last 30 days (4 counted only), 2 of 5 days",
+                self.assertIn("8 BIS, OFAC and USTR filings in the last 30 days, 2 of 5 days",
                               h["detail"])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
@@ -1548,6 +1562,108 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual(feed.build_feed(snap)["features"], [])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
+
+
+class TestNames(unittest.TestCase):
+    """headwind-1.9: names on list changes (Tom, 15-16 Nov 2026: publish what the licences allow). Fixtures cut from
+    OFAC's sdn.csv and add.csv of 12 Nov 2026 and trade.gov's file of 15 Nov 2026, as published (street addresses
+    and remarks dropped from the trade.gov cut)."""
+
+    def ofac(self):
+        return sanctions.parse_sdn_csv(text("ofac_sdn_names.csv"), sanctions.parse_add_csv(text("ofac_add_names.csv")))
+
+    def test_ofac_names_and_countries(self):
+        idx = self.ofac()
+        self.assertEqual(idx["36"], ["entity", ["CUBA"], {"name": "AEROCARIBBEAN AIRLINES", "countries": ["Cuba"]}])
+        self.assertIn("United States", idx["7116"][2]["countries"])
+        self.assertEqual(idx["2677"][:2], ["individual", ["SDGT"]])
+        self.assertEqual(idx["2677"][2], {"name": "AL-ZOMOR, Abboud Abdul Latif Hassan", "countries": ["Egypt"]})
+        self.assertEqual(idx["15042"][2]["name"], "DIAMOND II")               # a vessel keeps its own record
+        self.assertNotIn("DOB", json.dumps(idx))                              # remarks are never carried
+        # Without the address file the list is still read, with no countries.
+        self.assertEqual(sanctions.parse_sdn_csv(text("ofac_sdn_names.csv"))["36"][2]["countries"], [])
+
+    def change(self):
+        new = self.ofac()
+        prev = {k: [v[0], list(v[1]), dict(v[2])] for k, v in new.items() if k != "7116"}   # 7116 is added
+        prev["36"][1] = []                                                    # 36 gains CUBA
+        prev["15042"] = new["15042"]
+        new = {k: v for k, v in new.items() if k != "2677"}                   # 2677 is removed
+        return sanctions.delta("ofac-sdn", prev, new, "2026-11-16T18:00:00Z", "2026-11-16T12:00:00Z")
+
+    def test_delta_names_what_changed(self):
+        d = self.change()
+        self.assertEqual([r["name"] for r in d["named_added"]], ["HOLY LAND FOUNDATION FOR RELIEF AND DEVELOPMENT"])
+        self.assertEqual([(r["name"], r["gained"]) for r in d["named_changed"]], [("AEROCARIBBEAN AIRLINES", ["CUBA"])])
+        self.assertEqual([(r["name"], r["type"]) for r in d["named_removed"]],
+                         [("AL-ZOMOR, Abboud Abdul Latif Hassan", "individual")])
+        self.assertEqual((d["unnamed_removed"], d["us_person_data"]), (0, "organizations"))   # US addresses of 7116
+
+    def test_feed_names_people_removed_on_the_page_only(self):
+        d = self.change()
+        snap = {"generated_at": "2026-11-16T18:00:00Z", "lanes": {}, "sanctions": [d]}
+        fs = [f for f in feed.list_features(snap) if f["properties"]["id"].startswith("headwind:sanctions:")]
+        self.assertEqual(lint({"features": fs}), [])
+        p = fs[0]["properties"]
+        self.assertIn("Added: HOLY LAND FOUNDATION FOR RELIEF AND DEVELOPMENT (entity, SDGT)", p["summary"])
+        self.assertIn("Changed: AEROCARIBBEAN AIRLINES (entity; programs gained CUBA)", p["summary"])
+        # The feed goes into the history log for good: a person no longer listed is counted there, named on the page.
+        self.assertNotIn("AL-ZOMOR", p["summary"])
+        self.assertIn("1 individual removed, no longer on the list: named on the page for 30 days", p["summary"])
+        self.assertIn("support@theintelligence.company", p["summary"])
+        self.assertEqual((p["us_person_data"], p["measures"]["named"]), ("organizations", 3))
+
+    def test_renames_and_the_name_form_guard(self):
+        prev = {"1": ["entity", ["X"], {"name": "OLD NAME", "countries": []}]}
+        new = {"1": ["entity", ["X"], {"name": "NEW NAME", "countries": []}]}
+        d = sanctions.delta("uk-sanctions", prev, new, "2026-11-16T18:00:00Z", None)
+        self.assertEqual((d["changed"], d["renamed"], d["named_changed"][0]["name_before"]), (1, 1, "OLD NAME"))
+        self.assertIsNone(sanctions.delta("uk-sanctions", prev, new, "2026-11-16T18:00:00Z", None, compare_names=False))
+        # A reading kept before names were carried: removals are counted, not named; nothing is compared by name.
+        old = {"1": ["entity", ["X"]], "2": ["individual", ["X"]]}
+        d = sanctions.delta("eu-fsf", old, {"1": new["1"]}, "2026-11-16T18:00:00Z", None)
+        self.assertEqual((d["removed"], d["named_removed"], d["unnamed_removed"], d["changed"]), (1, [], 1, 0))
+
+    def test_the_un_list_is_never_named(self):
+        _, idx = sanctions.parse_un_xml((FIX / "un_consolidated.xml").read_bytes())
+        self.assertTrue(all(len(v) == 2 for v in idx.values()))
+        prev = dict(idx)
+        gone = next(iter(idx))
+        del idx[gone]
+        d = sanctions.delta("un-consolidated", prev, idx, "2026-11-16T18:00:00Z", None)
+        self.assertNotIn("named_added", d)
+        self.assertEqual((d["named_changed"], d["us_person_data"]), ([], "none"))
+        s = feed._names_text(d, True)
+        self.assertIn("counts only (the UN's terms of use bar redistributing its content)", s)
+
+    def test_person_label(self):
+        from headwind import names
+        self.assertTrue(all(names.is_us(c) for c in ("US", "United States", "ETATS-UNIS", "États-Unis", "U.S.A.")))
+        self.assertFalse(names.is_us("Russia"))
+        us_person = [{"type": "individual", "countries": ["United States"]}]
+        us_org = [{"type": "entity", "countries": ["US"]}]
+        unstated = [{"type": "not stated", "countries": ["US"]}]          # trade.gov's Entity List and DPL
+        self.assertEqual(names.person_data(us_org, us_person), "individuals")
+        self.assertEqual(names.person_data(us_org), "organizations")
+        self.assertEqual(names.person_data(unstated), "individuals")
+        self.assertEqual(names.person_data([{"type": "individual", "countries": ["Egypt"]}]), "none")
+
+    def test_screening_names(self):
+        lists = screening.parse(text("trade_gov_csl_names.json"))
+        self.assertEqual([v[4] for v in lists["DPL"]["index"].values()], ["KAL TEK LABS"])
+        el = lists["EL"]
+        prev = {k: v[:4] for k, v in el["index"].items()}                    # a reading kept before names
+        first = screening.delta("EL", el, prev, "2026-11-16T18:00:00Z", None)
+        self.assertIsNone(first)                                             # no name comparison against it
+        gone = next(iter(el["index"]))
+        later = {"name": el["name"], "publisher": el["publisher"], "url": el["url"], "dates": el["dates"],
+                 "index": {k: v for k, v in el["index"].items() if k != gone}}
+        d = screening.delta("EL", later, el["index"], "2026-11-16T18:00:00Z", None)
+        self.assertEqual([r["name"] for r in d["named_removed"]], [el["index"][gone][4]])
+        dpl = lists["DPL"]
+        d = screening.delta("DPL", dpl, {}, "2026-11-16T18:00:00Z", None)
+        self.assertEqual((d["named_added"][0]["name"], d["named_added"][0]["listed"], d["us_person_data"]),
+                         ("KAL TEK LABS", "1988-08-26", "individuals"))         # unstated type with a US address
 
 
 if __name__ == "__main__":
