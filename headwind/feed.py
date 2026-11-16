@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, geo  # noqa: E402
 
-from . import batches, controls, food, inspection, markets, stats, tariffs, unpress  # noqa: E402
+from . import batches, controls, food, inspection, markets, scotus, stats, tariffs, unpress  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
 METHOD = "headwind-1.8"
@@ -112,6 +112,18 @@ SRC_UNPRESS = {
     "independence_group": "un-security-council",
     "source_type": "official or market data",
     "descriptor": "The UN's own press releases, among them those of the Security Council's sanctions committees.",
+}
+
+SRC_SCOTUS = {
+    "id": "supremecourt-gov",
+    "publisher": "Supreme Court of the United States",
+    "title": "Opinions of the Court (slip opinions) and docket",
+    "url": "https://www.supremecourt.gov/opinions/opinions.aspx",
+    "licence": "US government work (17 USC 105, stated from memory; the Court's site gives no reuse statement)",
+    "grade": "A1",
+    "independence_group": "us-supreme-court",
+    "source_type": "official or market data",
+    "descriptor": "The Court's own opinions and dockets, as it publishes them.",
 }
 
 LIST_SOURCE = {"ofac-sdn": SRC_OFAC, "un-consolidated": SRC_UN, "eu-fsf": SRC_EU, "uk-sanctions": SRC_UK,
@@ -543,6 +555,7 @@ def list_features(snapshot: dict) -> list[dict]:
     feats += inspection_features(snapshot, generated, valid_until, (lanes.get("inspection") or {}).get("fetched_at"))
     feats += tariff_features(snapshot, generated, valid_until)
     feats += unpress_features(snapshot, generated, valid_until)
+    feats += scotus_features(snapshot, generated, valid_until)
     return feats
 
 
@@ -589,6 +602,54 @@ def _pace_text(p: dict, noun: str) -> str:
     return (f"{p['count']} {noun} from {p['from']} to {p['to']}; the median of the {p['baseline_windows']} "
             f"{p['window_days']}-day windows before was {p.get('median')}, {z}"
             + (f", flag rate {p['flag_rate']}" if p.get("flag_rate") is not None else "") + ".")
+
+
+def scotus_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
+    """Supreme Court opinions decided in the last two weeks, and new entries on the tariff-authority dockets. The
+    Court's own case title and docket number (Tom, 15 Nov 2026); us_person_data from scotus.us_person_data. Nothing
+    is summarized: the opinion and the docket are at the links."""
+    lanes = snapshot.get("lanes") or {}
+    accessed = (lanes.get("scotus") or {}).get("fetched_at")
+    cutoff = _plus_hours(generated, -24 * scotus.FEED_DAYS)[:10]
+    feats = []
+    for o in snapshot.get("scotus_opinions") or []:
+        day = o.get("decided") or (o.get("posted") or "")[:10]
+        if not day or day < cutoff:
+            continue
+        who = (f"an opinion of the Court delivered by {o['author']}" if o["kind"] == "signed" and o.get("author")
+               else "a per curiam opinion")
+        when = f"on {day}" if o.get("decided") else f"(posted {day}; the decision date was not read from the docket)"
+        f = _official(
+            f"headwind:scotus:{o['docket']}",
+            f"Supreme Court of the United States: {o['title']}, No. {o['docket']} ({day})",
+            f"The Supreme Court of the United States issued {who} in {o['title']}, No. {o['docket']}, {when}. The "
+            f"opinion and the docket are at the links; Headwind does not summarize or characterize them. The case "
+            f"title is the Court's own.",
+            data_as_of=f"{day}T00:00:00Z", generated=generated, valid_until=valid_until, countries=["US"],
+            pmesii=["political"], ascope=["organizations"], ncf=["operate_government"], requirement_ids=["HW-REQ-1"],
+            measures={}, visual={"type": "page", "url": o["link"]},
+            source={**SRC_SCOTUS, "url": o["link"]}, accessed=accessed)
+        f["properties"]["us_person_data"] = o.get("us_person_data") or scotus.us_person_data(o["title"])
+        f["properties"]["docket_url"] = o.get("docket_url")
+        feats.append(f)
+    for t in snapshot.get("scotus_tracked") or []:
+        last = t.get("last_entry") or {}
+        if not last.get("date") or last["date"] < cutoff:
+            continue
+        title = f"{t.get('petitioner')} v. {t.get('respondent')}"
+        f = _official(
+            f"headwind:scotusdocket:{t['docket']}:{last['date']}",
+            f"Supreme Court docket No. {t['docket']} (tariff authority): new entry {last['date']}",
+            f"A new entry on the Supreme Court's docket No. {t['docket']}, {title}, dated {last['date']}: "
+            f"\"{last.get('text', '')[:300]}\" (the Court's docket text). Headwind tracks this docket because the "
+            f"case concerns the authority for US tariffs.",
+            data_as_of=f"{last['date']}T00:00:00Z", generated=generated, valid_until=valid_until, countries=["US"],
+            pmesii=["political", "economic"], ascope=["organizations"], ncf=["operate_government"],
+            requirement_ids=["HW-PIR-2"], measures={}, visual={"type": "page", "url": t.get("url")},
+            source={**SRC_SCOTUS, "url": t.get("url")}, accessed=accessed)
+        f["properties"]["us_person_data"] = "individuals"      # docket text and titles can name people
+        feats.append(f)
+    return feats
 
 
 def unpress_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
@@ -976,11 +1037,12 @@ def build_feed(snapshot: dict) -> dict:
                     "licence stated; EU financial "
                     "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0; "
                     "France's Registre national des gels, Licence Ouverte 2.0; Canada's consolidated autonomous "
-                    "sanctions list, non-commercial reproduction (Canada.ca terms); UN press releases, linked only"),
+                    "sanctions list, non-commercial reproduction (Canada.ca terms); UN press releases, linked only; "
+                    "Supreme Court of the United States opinions and dockets, US government works"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; World Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
-                        "and Development Office; French Treasury (Direction générale du Trésor); Global Affairs Canada; US International Trade Administration; "
+                        "and Development Office; French Treasury (Direction générale du Trésor); Global Affairs Canada; Supreme Court of the United States; US International Trade Administration; "
                         "US Federal Register and the Office of the Federal Register; US International Trade Commission; The White House."),
         "language_key": LANGUAGE_KEY,
         # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read

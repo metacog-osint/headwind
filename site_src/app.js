@@ -174,6 +174,22 @@
       '<p class="small muted">' + esc("Document number, date and link only (UN terms of use). The UN's press feed holds its ten newest releases of every kind, so a release can come and go between two of Headwind's readings" +
       (up.checked_at ? "; on the last reading (" + when(up.checked_at) + ") the feed reached back to " + when(up.oldest) + (!up.previous_read ? " (the first reading, so nothing to compare)." : up.may_have_missed ? ", after the reading before it (" + when(up.previous_read) + "): a release in between may be missed." : ", which covers the time since the reading before.") : ".")) + "</p>";
 
+    var so = s.scotus_opinions || [], st = s.scotus_tracked || [];
+    document.getElementById("scotus-tracked").innerHTML = st.map(function (t) {
+      var last = t.last_entry || {};
+      return '<div class="row"><div class="row-title"><span><a href="' + esc(t.url || "") + '" rel="noopener">No. ' + esc(t.docket) + "</a>: " + esc((t.petitioner || "") + " v. " + (t.respondent || "")) + '</span><span class="badge">tariff authority</span></div><div class="small muted">' +
+        esc((t.decided ? "Decided " + t.decided + ": " + (t.decision || "") + " " : "Not decided. ") + (last.date ? "Newest docket entry " + last.date + ": " + last.text : "") + (t.error ? " Not read on the last run: " + t.error : "")) + "</div></div>";
+    }).join("");
+    var soShown = 12;
+    function soRow(o) {
+      return '<div class="row"><div class="row-title"><span><a href="' + esc(o.link) + '" rel="noopener">' + esc(o.title) + "</a>, No. " + esc(o.docket) + '</span><span class="badge">' + esc(o.decided || ("posted " + String(o.posted || "").slice(0, 10))) + '</span></div><div class="small muted">' +
+        esc((o.kind === "signed" ? (o.author || "Signed opinion") : "Per curiam") + "; term 20" + o.term + ". ") + '<a href="' + esc(o.docket_url) + '" rel="noopener">Docket</a></div></div>';
+    }
+    document.getElementById("scotus-opinions").innerHTML = so.length ? so.slice(0, soShown).map(soRow).join("") +
+      (so.length > soShown ? '<details><summary class="small">All ' + so.length + " opinions</summary>" + so.slice(soShown).map(soRow).join("") + "</details>" : "") +
+      ((s.scotus_errors || []).length ? '<p class="small muted">' + esc("Not read on the last run: " + s.scotus_errors.join("; ")) + "</p>" : "")
+      : '<p class="small muted">No opinion read yet.</p>';
+
     var tr = s.mineral_trade || {};
     function usd(v) { return v === null || v === undefined ? "" : "$" + (v >= 1e9 ? (v / 1e9).toFixed(2) + " bn" : v >= 1e6 ? (v / 1e6).toFixed(1) + " m" : Math.round(v).toLocaleString()); }
     if ((tr.codes || []).length) {
@@ -285,7 +301,7 @@
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, counted only because their titles can name people and companies: notices, ' + esc(countedText) + ".</p>" : "");
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada)", unpress: "UN sanctions committee press releases", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada)", unpress: "UN sanctions committee press releases", scotus: "US Supreme Court opinions and dockets", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {

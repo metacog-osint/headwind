@@ -26,7 +26,7 @@ FIX = ROOT / "tests" / "fixtures"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import unpress  # noqa: E402
+from headwind import scotus, unpress  # noqa: E402
 from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
                       sanctions, screening, stats, tariffs, trade)
 from tic_doctrine import contract, registers  # noqa: E402
@@ -91,6 +91,14 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         code = re.search(r"I_COMMODITY=(\d+)", url).group(1)
         f = FIX / f"census_{code}.json"
         return f.read_bytes() if f.exists() else b""         # Census answers 204, no body, for a code with no rows
+    if "slipopinion_rss.aspx" in url:
+        f = FIX / f"scotus_feed_{re.search(r'TYear=(\d+)', url).group(1)}.xml"
+        return (f if f.exists() else FIX / "scotus_feed_26.xml").read_bytes()
+    if "supremecourt.gov/RSS/Cases/JSON/" in url:
+        f = FIX / f"scotus_docket_{url.rsplit('/', 1)[1][:-5]}.json"
+        if not f.exists():
+            raise OSError(f"no fixture for {url}")         # the lane notes it and goes on
+        return f.read_bytes()
     if "api.worldbank.org" in url and "source=15" in url:
         return (FIX / "worldbank_gem.json").read_bytes()
     table = [("petroleum/pri/spt", "eia_petroleum.json"), ("natural-gas/pri/fut", "eia_natural_gas.json"),
@@ -664,6 +672,89 @@ class TestUnPress(unittest.TestCase):
         self.assertEqual(lint({"features": f}), [])
         self.assertEqual(feed.unpress_features({**snap, "generated_at": "2026-07-30T00:00:00Z"}, "2026-07-30T00:00:00Z",
                                                "2026-08-01T00:00:00Z"), [])
+
+
+class TestScotus(unittest.TestCase):
+    """The Supreme Court's slip opinion feeds (2025 and 2026 terms, read 16 Nov 2026, cut to nine items with the
+    syllabus text dropped) and seven dockets (titles, lower court, related dockets, the opinion entry and the newest
+    entry only; attorneys and contact details dropped)."""
+
+    def feeds(self):
+        return (scotus.parse_feed((FIX / "scotus_feed_25.xml").read_bytes(), 25)
+                + scotus.parse_feed((FIX / "scotus_feed_26.xml").read_bytes(), 26))
+
+    def dockets(self):
+        return {p.stem[len("scotus_docket_"):]: scotus.parse_docket(p.read_bytes())
+                for p in FIX.glob("scotus_docket_*.json")}
+
+    def test_terms(self):
+        self.assertEqual(scotus.term_years(date(2026, 11, 16)), (26, 25))
+        self.assertEqual(scotus.term_years(date(2026, 9, 30)), (25, 24))
+
+    def test_feed(self):
+        ops = self.feeds()
+        self.assertEqual(len(ops), 8)                                      # the decree in 141, Orig. is not an opinion
+        lr = next(o for o in ops if o["docket"] == "24-1287")
+        self.assertEqual((lr["title"], lr["kind"], lr["author"], lr["term"]),
+                         ("Learning Resources, Inc. v. Trump", "signed", "Chief Justice John G. Roberts, Jr.", "25"))
+        self.assertTrue(lr["link"].startswith("https://www.supremecourt.gov/opinions/"))
+        self.assertEqual(next(o["title"] for o in ops if o["docket"] == "24-699"),
+                         "Exxon Mobil Corp. v. Corporaci\u00f3n Cimex, S. A. (Cuba)")
+        self.assertEqual({o["kind"] for o in ops if o["docket"] in ("26A124", "26A476", "26A560")}, {"per curiam"})
+
+    def test_docket(self):
+        d = self.dockets()["24-1287"]
+        self.assertEqual((d["decided"], d["related"], d["last_entry"]),
+                         ("2026-02-20", ["25-250"], {"date": "2026-03-24", "text": "Judgment Issued."}))
+        self.assertEqual(d["decision"], "Judgment in No. 24-1287 is VACATED and case REMANDED with instructions to "
+                                        "dismiss for lack of jurisdiction; the judgment in No. 25-250 is AFFIRMED.")
+        self.assertEqual(self.dockets()["25-250"]["decision"], "Adjudged to be AFFIRMED. Judgment in No. 24-1287 is "
+                         "VACATED and case REMANDED with instructions to dismiss for lack of jurisdiction.")
+        self.assertEqual(d["petitioner"], "Learning Resources, Inc., et al., Petitioners")
+        self.assertEqual(self.dockets()["26A476"]["decided"], "2026-10-14")
+        # 25A312's opinion entry (29 Jun 2026) names the opinion without linking it.
+        bare = {"CaseNumber": "25A312", "ProceedingsandOrder": [
+            {"Date": "Jan 21 2026", "Text": "Argued."},
+            {"Date": "Jun 29 2026", "Text": "Application (25A312) denied by the Court.  Roberts, C. J., delivered the "
+                                            "opinion of the Court."}]}
+        self.assertEqual(scotus.parse_docket(json.dumps(bare).encode())["decided"], "2026-06-29")
+
+    def test_us_person_data(self):
+        self.assertEqual(scotus.us_person_data("Learning Resources, Inc. v. Trump"), "individuals")
+        self.assertEqual(scotus.us_person_data("Exxon Mobil Corp. v. Corporaci\u00f3n Cimex, S. A. (Cuba)"), "organizations")
+        self.assertEqual(scotus.us_person_data("FCC v. AT&T"), "organizations")
+        self.assertEqual(scotus.us_person_data("Texas v. New Mexico"), "none")
+        self.assertEqual(scotus.us_person_data("West Virginia v. B. P. J."), "individuals")
+        self.assertEqual(scotus.party_kind("Illinois Bd. of Elections"), "government")
+        self.assertEqual(scotus.party_kind("Mullin"), "person")            # an official named in office is a person
+
+    def test_merge_and_features(self):
+        ops = scotus.merge([], self.feeds(), self.dockets(), "2026-11-16T06:00:00Z")
+        self.assertEqual(ops[0]["docket"], "26A560")                       # no docket read: sorted by its posting day
+        self.assertEqual(next(o for o in ops if o["docket"] == "24-1287")["decided"], "2026-02-20")
+        again = scotus.merge(ops, self.feeds(), {}, "2026-11-17T06:00:00Z")
+        self.assertEqual(next(o for o in again if o["docket"] == "24-1287")["first_seen"], "2026-11-16T06:00:00Z")
+        self.assertEqual(scotus.needs_docket(ops), ["26A560", "24-699"])
+        snap = {"generated_at": "2026-11-16T06:00:00Z", "scotus_opinions": ops, "lanes": {}}
+        f = feed.scotus_features(snap, snap["generated_at"], "2026-11-18T06:00:00Z")
+        self.assertEqual([x["properties"]["id"] for x in f], ["headwind:scotus:26A560"])
+        self.assertIn("the decision date was not read from the docket", f[0]["properties"]["summary"])
+        snap = {"generated_at": "2026-02-25T06:00:00Z", "scotus_opinions": ops, "lanes": {}}
+        f = feed.scotus_features(snap, snap["generated_at"], "2026-02-27T06:00:00Z")
+        p = next(x["properties"] for x in f if x["properties"]["id"] == "headwind:scotus:24-1287")
+        self.assertEqual(p["title"], "Supreme Court of the United States: Learning Resources, Inc. v. Trump, No. 24-1287 "
+                                     "(2026-02-20)")
+        self.assertIn("an opinion of the Court delivered by Chief Justice John G. Roberts, Jr.", p["summary"])
+        self.assertEqual((p["us_person_data"], p["countries"]), ("individuals", ["US"]))
+        self.assertEqual(lint({"features": f}), [])
+
+    def test_tracked_docket_item(self):
+        t = {**self.dockets()["24-1287"], "url": scotus.DOCKET_PAGE.format(docket="24-1287")}
+        snap = {"generated_at": "2026-03-30T06:00:00Z", "scotus_tracked": [t], "lanes": {}}
+        f = feed.scotus_features(snap, snap["generated_at"], "2026-04-01T06:00:00Z")
+        self.assertEqual([x["properties"]["id"] for x in f], ["headwind:scotusdocket:24-1287:2026-03-24"])
+        self.assertIn('"Judgment Issued."', f[0]["properties"]["summary"])
+        self.assertEqual(lint({"features": f}), [])
 
 
 class TestTrade(unittest.TestCase):
@@ -1357,6 +1448,8 @@ class TestEndToEnd(unittest.TestCase):
             self.assertTrue(any(m["reason"].startswith("no WFP") for m in snap["local_food_missing"]))
             self.assertTrue((tmp / "data" / "raw" / "index.jsonl").exists())
             self.assertEqual(snap["sanctions"], [])                 # the first run only sets the baseline
+            self.assertEqual([t["docket"] for t in snap["scotus_tracked"]], ["24-1287", "25-250"])
+            self.assertIn("supremecourt-gov", snap["health"])
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
                              [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11),
                               ("france-gels", 20), ("canada-sema", 24)])

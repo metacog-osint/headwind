@@ -3,7 +3,9 @@
 ## Purpose
 Headwind measures economic stress: currencies, energy and food prices that move outside their own
 normal range, changes to official sanctions and US screening lists, new export-control and sanctions
-rules, US tariff actions and revisions of the US tariff schedule, US import reliance for mineral commodities, and the scheduled dates on which economic decisions and figures are published.
+rules, US tariff actions and revisions of the US tariff schedule, the US Supreme Court's opinions and the
+tariff-authority cases, US import reliance for mineral commodities, and the scheduled dates on which economic
+decisions and figures are published.
 It reports measurements. It states no probability and gives no investment advice.
 
 ## Live lanes (15 Nov 2026)
@@ -19,6 +21,7 @@ It reports measurements. It states no probability and gives no investment advice
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
 | Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
+| US Supreme Court (since 16 Nov 2026) | The Court's slip opinion feeds (this term and the last) and its dockets (JSON) | As the Court publishes | Every signed and per curiam opinion, with the Court's case title, docket number and decision date; the tariff-authority dockets tracked; no anomaly test |
 | UN sanctions committee releases (since 16 Nov 2026) | The UN's Meetings Coverage and Press Releases feed (RSS) | As the UN publishes | Security Council sanctions committees' press releases: document number, date and link only; no anomaly test |
 | Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country; scored by designation batches where the list gives dates |
 | Minerals | USGS Mineral Commodity Summaries data release (net import reliance; import shares by country) | Annual | No anomaly test; context only, in `data/minerals.json` |
@@ -163,6 +166,34 @@ by sanctions program. Headwind does not republish the names of people or organiz
   have been missed. Release pages and listings sit behind a bot challenge, so Headwind does not walk the numbers.
   The committees' changes to the UN list itself are read from the list, not from this feed.
 
+## The US Supreme Court (`headwind-1.8`, 16 Nov 2026)
+- **What is covered.** Every opinion in the Court's slip opinion feeds for the current term and the one before
+  (a term starts in October): signed opinions of the Court and per curiam opinions, including those on applications
+  (the emergency docket) that the Court lists there. Decrees in original cases are not opinions and are left out.
+  Not covered: orders lists (the Court publishes no feed of them), opinions relating to orders and in-chambers
+  opinions (other pages, not read). On 16 Nov 2026: 75 opinions (56 signed, 19 per curiam).
+- **What an item says.** That the Court issued an opinion in a case on a date, by whom (or per curiam), with the
+  Court's own case title and docket number as the Court publishes them (Tom, 15 Nov 2026), the link to the opinion
+  and to the docket. Headwind does not summarize, characterize or score a decision. An opinion is in the feed for 14
+  days from its decision date; the page lists both terms.
+- **The decision date** comes from the docket: the entry that links the opinion, or, where the entry names it
+  without a link, the entry saying who delivered the opinion. The feed's own date is when the PDF was last posted,
+  which moves when the reporter version replaces the slip opinion (West Virginia v. B. P. J., decided 30 Jun 2026,
+  was posted again on 28 Oct 2026). Each docket is read once.
+- **`us_person_data`.** A case title does not say whether a party is a US person, so the label is cautious:
+  `individuals` when either side reads as a person (a name with no mark of a government or an organization; an
+  official named in office is a person), else `organizations` when a side is an organization that is not a
+  government, else `none` (governments on every side). On the 75 opinions of 16 Nov 2026: 64 individuals, 11
+  organizations, none `none`. A mistake goes toward `individuals` (Al Otro Lado, an organization, reads as a person);
+  the other way, a person whose surname is an organization word (Church, Bank) would read as an organization. The
+  label is for consumers bound by US-person rules; it never keeps a case out.
+- **Tariff authority.** Dockets 24-1287 (Learning Resources, Inc. v. Trump) and 25-250 (Trump v. V.O.S.
+  Selections, Inc.) are read every run, with any docket they name as related: the judgment (20 Feb 2026: 24-1287
+  vacated and remanded with instructions to dismiss for lack of jurisdiction; 25-250 affirmed), the newest docket
+  entry, and a feed item for a new entry within 14 days. A later tariff case is added by hand.
+- **Licence.** Opinions and dockets are US government works (17 USC 105, stated from memory; the Court's site gives
+  no reuse statement).
+
 ## USTR, public inspection and HW-IND-2 (`headwind-1.6`)
 - **USTR.** The rules lane reads USTR's rules and its notices (Section 301 actions, exclusions and their
   extensions) beside BIS's and OFAC's rules, in the same form. USTR notices about the office itself
@@ -287,7 +318,8 @@ mineral, and ores, metals and compounds are separate codes, so a code's figures 
   whose title (case and punctuation aside) is not yet a Federal Register presidential document is listed as
   signed, not yet published, for 30 days. Page only, not a feed item.
 - **Not read:** CBP's Cargo Systems Messaging Service (no keyless feed), what each HTS revision changed (the
-  release list gives none), and court rulings on tariff authority (planned with the court lanes).
+  release list gives none). Court rulings on tariff authority are read since `headwind-1.8` (see the US Supreme
+  Court); other courts' tariff cases (the Court of International Trade, the Federal Circuit) are not.
 
 ## Not live
 The World Bank Pink Sheet (fertilizer and metal prices): held on its licence.
