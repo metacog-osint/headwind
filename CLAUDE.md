@@ -272,6 +272,7 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | `gem` | `markets.py` | World Bank Global Economic Monitor (WDI API source 15, `DPANUSSPB`), official rate per US dollar, monthly average, the 19 watched countries in one request | 15 Nov: 16 countries with a rate (5 with old data: IR Jan 2026, MM Mar 2024, SD Oct 2024, SO Jun 2018, VE Nov 2025), CU, PS, SS none; World Bank updated 8 Sep 2026, newest month Aug 2026 |
 | `energy` | `markets.py` | EIA's own API v2 (Brent `RBRTE`, WTI `RWTC`, Henry Hub `RNGWHHD`). **Needs a free EIA key** | 13 Nov, 9:35 AM CST: 3 series to 11 Nov (Brent 92.14, WTI 89.62, Henry Hub 3.00), the same prices FRED gave |
 | `fao` | `food.py` | FAO Food Price Index CSV; the link is read from FAO's page because it changes | 6 indices |
+| `pinksheet` | `pinksheet.py` | World Bank Commodity Price Data (the Pink Sheet), `CMO-Historical-Data-Monthly.xlsx` (590 KB); the link is read from the Commodity Markets page because it changes yearly | 16 Nov, 9:42 PM CST: 13 series to Oct 2026, file updated 3 Nov |
 | `wfp` | `food.py` | WFP prices by market from HDX, for the countries in `config/wfp_countries.json` | 18 of 19 countries; Cuba has no file, Venezuela's newest month is May 2025 |
 | `baseline` | `baseline.py` | World Bank WDI API, six indicators | 213 countries. The API timed out twice earlier the same evening |
 | `calendar` | `releases.py` | Federal Reserve and ECB schedule pages; FAO release dates | 9 events in the next 180 days |
@@ -646,6 +647,22 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   invented test records (`MADE_UP`); both are removed. `commodities.py` (the old IGC lane) is unused.
 - A rate decision is exported to Verdict as kind `rule_date`, the nearest kind Verdict accepts.
 
+## World Bank Pink Sheet (plan step 12, built 16 Nov 2026, `headwind-1.10`)
+- See doctrine/method.md "Fertilizers and critical-list metals". Lane `pinksheet` (`headwind/pinksheet.py`), source
+  and health id `worldbank-pinksheet` (window 40/70 days after the month's end), snapshot `pinksheet` and
+  `pinksheet_updated`, feed items `headwind:pinksheet:<series>:<month>` (requirement HW-PIR-6, new in register 1.2;
+  no indicator), page section `#pinksheet`. The workbook is read with `zipfile` and ElementTree (standard library).
+- **Licence settled 16 Nov 2026** (Tom: "work on step 12"): the data catalog record the API had refused, read in the
+  browser, is dataset 0038238 "Commodity Prices - History and Projections", CC BY 4.0, describing the monthly
+  prices ("updated in the second business day of the month"). The vendor names on the Description sheet stay a
+  note in method.md; the World Bank licenses the compiled prices.
+- **Series:** phosphate rock, DAP, TSP, urea, potassium chloride; aluminum, copper, lead, tin, nickel, zinc,
+  platinum, silver (the eight file metals on the 2025 list; phosphate and potash are on it too; iron ore and gold
+  are not read). Floor 3%, phosphate rock 10% (`FLOORS`; 27.5% flag rate at 3%). Live 16 Nov: no anomaly; the
+  largest moves silver -11.8% (z -2.1), platinum -9.1%, aluminum -6.8% (z -2.1).
+- Fixtures `pinksheet_monthly.xlsx` (first six rows and last 140 months, 17 columns, values as published, written
+  with inline strings by `scratchpad/cut_pink.py`, not kept) and `worldbank_commodity_markets.html` (the link).
+
 ## France's asset-freeze register (plan item 2, built 16 Nov 2026, `headwind-1.8`)
 - See doctrine/method.md "France's asset-freeze register". List id `france-gels` (not `fr-`: in Headwind that prefix
   means the Federal Register), source and health id `dgtresor-gels`, `sanctions.parse_fr_json`, `fr_regime`,
@@ -740,7 +757,7 @@ Full source register, terms read 15 Nov, build order and the minutes estimate: `
 - **Names in court items** (Tom, 15 Nov): the court's own case title and number as the court publishes it; `us_person_data` says when a US person is named. Sanctions and screening lists stay counts only (superseded the same night: names are published where the licence allows; see the top state paragraph).
 
 ## Not done
-- **Planned and not built:** the World Bank Pink Sheet (step 12, held on its licence). Census trade data for
+- **Planned and not built:** nothing from the 16-step plan (the Pink Sheet was built 16 Nov 2026). Census trade data for
   minerals (step 16), USTR notices and Federal Register public inspection (step 10) are built.
 - **Edits to entries that stay on a list** are reported since `headwind-1.4` (see Source health and state).
 - `HW-EEI-1` (vessel matches in Wake) is unmet. Headwind now carries the IMO numbers it needs; the match itself
@@ -795,6 +812,8 @@ Full source register, terms read 15 Nov, build order and the minutes estimate: `
 - ECB: its disclaimer page, read 13 Nov 2026, allows free use with the ECB cited as the source, and says a change
   to the figures must be stated. Headwind restates the rates per US dollar; the page footer says so (13 Nov).
 - World Bank: CC BY 4.0 is the default for its own datasets (licence page read 13 Nov 2026; it does not name WDI).
+- World Bank Pink Sheet: CC BY 4.0 on its own data catalog record (dataset 0038238, "Commodity Prices - History and
+  Projections", metadata updated 14 May 2025), read 16 Nov 2026 in a browser.
 - Federal Reserve: its disclaimer page, read 13 Nov 2026, says website information is in the public domain unless
   marked otherwise and asks that the Board be cited.
 - Federal Register: the National Archives' page about it, read 13 Nov 2026, says everything that appears in the

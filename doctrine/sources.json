@@ -111,6 +111,15 @@
       "independence_group": "fao"
     },
     {
+      "id": "worldbank-pinksheet",
+      "name": "World Bank Commodity Price Data (The Pink Sheet), monthly prices (CMO-Historical-Data-Monthly.xlsx); fertilizers and the metals on the US Final 2025 List of Critical Minerals",
+      "url": "https://www.worldbank.org/en/research/commodity-markets",
+      "licence": "CC BY 4.0 (World Bank data catalog, dataset 0038238, read 16 Nov 2026)",
+      "use": "ingest",
+      "grade": "A2",
+      "independence_group": "world-bank"
+    },
+    {
       "id": "ecb-eurofxref",
       "name": "European Central Bank euro foreign exchange reference rates",
       "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",

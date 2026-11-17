@@ -17,10 +17,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, geo  # noqa: E402
 
-from . import batches, controls, food, inspection, markets, scotus, stats, tariffs, unpress  # noqa: E402
+from . import batches, controls, food, inspection, markets, pinksheet, scotus, stats, tariffs, unpress  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
-METHOD = "headwind-1.9"
+METHOD = "headwind-1.10"
 DELTA_DAYS = 7       # a list change stays in the feed this long after Headwind saw it
 RULE_DAYS = 14       # a Federal Register document stays in the feed this long after publication
 LANGUAGE_KEY = "https://github.com/metacog-osint/tic-doctrine/blob/main/docs/language-key.md"
@@ -188,6 +188,22 @@ SRC_FAO = {
     "source_type": "official or market data",
     "descriptor": "Monthly global food commodity price index across cereals, vegetable oils, dairy, meat, and sugar.",
 }
+
+SRC_PINKSHEET = {
+    "id": "worldbank-pinksheet",
+    "publisher": "World Bank (Commodity Price Data, the Pink Sheet)",
+    "title": "World Bank Commodity Price Data (The Pink Sheet), monthly prices in nominal US dollars",
+    "url": "https://www.worldbank.org/en/research/commodity-markets",
+    "licence": "CC BY 4.0 (World Bank data catalog, dataset 0038238)",
+    "grade": "A2",
+    "independence_group": "world-bank",
+    "source_type": "official or market data",
+    "descriptor": "Monthly average prices of fertilizers and metals compiled by the World Bank from exchanges and "
+                  "market reporters.",
+}
+
+PINK_NCF = {"fertilizer": ["provide_agricultural_products", "produce_chemicals"],
+            "metal": ["provide_metals_materials", "maintain_supply_chains"]}
 
 SRC_ECB = {
     "id": "ecb-eurofxref",
@@ -985,6 +1001,25 @@ def live_features(snapshot: dict) -> list[dict]:
             baseline_ref=f"rolling: the index's own {food.FAO_WINDOW} prior monthly changes; anomaly at "
                          f"|z| >= {stats.Z_ANOMALY:g} and a move of at least {food.FAO_FLOOR:g}%",
             coverage=1.0, lane_accessed=accessed("fao"), ascope=["events"]))
+
+    for c in snapshot.get("pinksheet") or []:
+        crit = (f" On the US Final 2025 List of Critical Minerals as {c['critical_list_name']}."
+                if c.get("critical_list_name") else "")
+        feats.append(_observation(
+            f"headwind:pinksheet:{c['id']}:{c['period']}",
+            f"{c['name']} ({c['period']}): {c['value']:g} {c['unit']}, {c['change_pct']:+.1f}% on the month "
+            f"({_z_text(c['z'])})",
+            f"{c['value']:g} {c['unit']} for {c['period']}, against {c['prior_value']:g} for {c['prior_period']}; "
+            f"monthly average in nominal US dollars from the World Bank's Pink Sheet.{crit}",
+            anomaly=c["anomaly"], data_as_of=_month_end(c["period"]), generated=generated, valid_until=valid_until,
+            countries=[], ncf=PINK_NCF.get(c.get("group"), ["maintain_supply_chains"]),
+            requirement_ids=["HW-PIR-6"],
+            measures={"price": c["value"], "change_pct": c["change_pct"], "z": c["z"],
+                      "baseline_n": c["baseline_n"], "flag_rate": c.get("flag_rate")},
+            anchor="pinksheet", source=SRC_PINKSHEET, indicator_id=None,
+            baseline_ref=f"rolling: the series' own {pinksheet.WINDOW} prior monthly changes; anomaly at "
+                         f"|z| >= {stats.Z_ANOMALY:g} and a move of at least {c.get('floor_pct', pinksheet.FLOOR):g}%",
+            coverage=1.0, lane_accessed=accessed("pinksheet"), ascope=["events"]))
 
     for w in snapshot.get("local_food") or []:
         if w.get("stale"):

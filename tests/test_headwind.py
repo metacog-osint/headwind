@@ -26,7 +26,7 @@ FIX = ROOT / "tests" / "fixtures"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import scotus, unpress  # noqa: E402
+from headwind import pinksheet, scotus, unpress  # noqa: E402
 from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
                       sanctions, screening, stats, tariffs, trade)
 from tic_doctrine import contract, registers  # noqa: E402
@@ -51,6 +51,10 @@ def text(name: str) -> str:
 
 def fake_getter(url: str, timeout: int = 60) -> bytes:
     """Serve fixtures in place of the network."""
+    if "worldbank.org/en/research/commodity-markets" in url:
+        return (FIX / "worldbank_commodity_markets.html").read_bytes()
+    if "CMO-Historical-Data-Monthly.xlsx" in url:
+        return (FIX / "pinksheet_monthly.xlsx").read_bytes()
     if "list+of+critical+minerals" in url:
         return (FIX / "fr_critical_minerals_lists.json").read_bytes()
     if "sciencebase.gov/catalog/items?" in url:
@@ -1442,6 +1446,64 @@ class TestTariffs(unittest.TestCase):
         item = pres["headwind:control:2026-22385"]
         self.assertTrue(item["title"].startswith("President, proclamation (2026-11-02): Adjusting Imports of Robotics"))
         self.assertIn("signed 2026-10-28", item["summary"])
+
+
+class TestPinkSheet(unittest.TestCase):
+    """World Bank Commodity Price Data (the Pink Sheet), CC BY 4.0: pinksheet_monthly.xlsx is the 3 Nov 2026 monthly
+    file cut to its first six rows and last 140 months, columns A, B and the 15 named below, values as published;
+    worldbank_commodity_markets.html is the page's link to it (16 Nov 2026)."""
+
+    def parsed(self):
+        return pinksheet.parse((FIX / "pinksheet_monthly.xlsx").read_bytes())
+
+    def test_parse_reads_the_thirteen_series_and_the_update_date(self):
+        d = self.parsed()
+        self.assertEqual(d["updated"], "2026-11-03")
+        self.assertEqual(set(d["series"]), {v[0] for v in pinksheet.SERIES.values()})   # not iron ore or gold
+        self.assertEqual((d["units"]["urea"], d["units"]["silver"]), ("$/mt", "$/troy oz"))
+        self.assertEqual(d["series"]["copper"][-1], ("2026-10", 14508.0))
+
+    def test_measure_as_published(self):
+        m = {x["id"]: x for x in pinksheet.measure(self.parsed())}
+        s = m["silver"]
+        self.assertEqual((s["period"], s["value"], s["prior_period"], s["change_pct"], s["z"], s["baseline_n"]),
+                         ("2026-10", 57.0, "2026-09", -11.76, -2.07, 120))
+        self.assertFalse(any(x["anomaly"] for x in m.values()))
+        self.assertEqual((m["potash"]["critical_list_name"], m["urea"]["critical_list_name"]), ("potash", None))
+        # Phosphate rock steps rather than drifts: its own floor keeps its usual flag rate near the others'.
+        self.assertEqual((m["phosphate-rock"]["floor_pct"], m["phosphate-rock"]["flag_rate"]), (10.0, 0.058))
+        self.assertEqual(m["dap"]["floor_pct"], pinksheet.FLOOR)
+
+    def test_critical_names_are_on_the_2025_list(self):
+        for _sid, _name, _group, crit in pinksheet.SERIES.values():
+            if crit:
+                self.assertIn(crit, minerals.CRITICAL_2025)
+
+    def test_layout_changes_fail(self):
+        with self.assertRaises(ValueError):
+            pinksheet.file_url("<a href=\"https://thedocs.worldbank.org/x/CMO-Pink-Sheet-November-2026.pdf\">")
+        buf = io.BytesIO()
+        src = zipfile.ZipFile(io.BytesIO((FIX / "pinksheet_monthly.xlsx").read_bytes()))
+        with zipfile.ZipFile(buf, "w") as out:
+            for n in src.namelist():
+                body = src.read(n)
+                if n.endswith("sheet2.xml"):
+                    for word in (b"Copper", b"Zinc", b"Lead", b"Tin"):
+                        body = body.replace(b"<t>" + word + b"</t>", b"<t>Renamed</t>", 1)
+                out.writestr(n, body)
+        with self.assertRaises(ValueError):          # 9 of 13 columns left
+            pinksheet.parse(buf.getvalue())
+
+    def test_feed_items_and_health(self):
+        snap = {"generated_at": "2026-11-16T12:00:00Z", "pinksheet": pinksheet.measure(self.parsed()),
+                "pinksheet_updated": "2026-11-03", "lanes": {"pinksheet": {"status": "ok"}}}
+        items = [f["properties"] for f in feed.build_feed(snap)["features"]
+                 if f["properties"]["id"].startswith("headwind:pinksheet:")]
+        self.assertEqual(len(items), 13)
+        u = next(i for i in items if i["id"] == "headwind:pinksheet:urea:2026-10")
+        self.assertEqual((u["requirement_ids"], u["sources"][0]["id"]), (["HW-PIR-6"], "worldbank-pinksheet"))
+        self.assertIn("420 $/mt", u["title"])
+        self.assertIn("critical minerals as potash", next(i for i in items if ":potash:" in i["id"])["summary"].lower())
 
 
 class TestEndToEnd(unittest.TestCase):
