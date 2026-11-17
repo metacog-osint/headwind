@@ -106,7 +106,8 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
              ("food_price_indices_data.csv", "fao.csv"), ("package_search", "hdx.json"),
              ("wfp_food_prices_sdn.csv", "wfp_sdn.csv"), ("api.worldbank.org", "worldbank.json"),
              ("fomccalendars", "fomc.html"), ("calendars/mgcgc", "ecb_calendar.html"),
-             ("ofac/downloads/sdn.csv", "ofac_sdn.csv"), ("scsanctions.un.org", "un_consolidated.xml"),
+             ("ofac/downloads/sdn.csv", "ofac_sdn.csv"), ("ofac/downloads/add.csv", "ofac_add.csv"),
+             ("scsanctions.un.org", "un_consolidated.xml"),
              ("fsd/fsf/public/files/xmlFullSanctionsList_1_1", "eu_fsf.xml"),
              ("sanctionslist.fcdo.gov.uk", "uk_sanctions.xml"), ("gels-avoirs.dgtresor.gouv.fr", "fr_gels.json"),
              ("sanctions/sema-lmes.xml", "canada_sema.xml"), ("press.un.org/en/rss.xml", "un_press.xml"),
@@ -1523,6 +1524,7 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual((eu["total"], "EU server down" in eu["error"]), (9, True))
             kept = json.loads((tmp / "data" / "state" / "sanctions_index.json").read_text(encoding="utf-8"))
             self.assertEqual(len(kept["eu-fsf"]["index"]), 9)       # the EU baseline survives the failed read
+            self.assertIn("United States", kept["ofac-sdn"]["index"]["8129"][2]["countries"])   # add.csv read too
 
             # A list that changes between runs is reported once, as counts.
             def changed(url, timeout=60):
