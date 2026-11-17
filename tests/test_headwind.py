@@ -1158,6 +1158,25 @@ class TestListParsers(unittest.TestCase):
         with self.assertRaises(ValueError):                         # a truncated page is not passed off as complete
             controls.parse_fr(json.dumps({"count": 9, "results": json.loads(text("federal_register.json"))["results"]}))
 
+    def test_rule_titles_place_each_country_once(self):
+        # A name inside a longer one does not count again (15 Nov 2026 suite review: the OFAC DRC rule carried CG).
+        cases = {
+            "Democratic Republic of the Congo Sanctions Regulations": ["CD"],
+            "Republic of the Congo": ["CG"],
+            "South Sudan Sanctions Regulations": ["SS"],
+            "Sudan Sanctions Regulations": ["SD"],
+            "Guinea-Bissau": ["GW"],
+            "Papua New Guinea": ["PG"],
+            "Equatorial Guinea and Guinea": ["GN", "GQ"],
+            "Niger and Nigeria": ["NE", "NG"],
+            "Burma Sanctions Regulations": ["MM"],
+            "Darfur Sanctions Regulations": ["SD"],
+            "Iran-Related Sanctions; Iranian Transactions": ["IR"],
+            "Publication of Inflation Adjustment Rule": [],
+        }
+        for title, want in cases.items():
+            self.assertEqual(controls.countries_in(title), want, title)
+
 
 class FixedDate(date):
     """date.today() on 9 Nov 2026, the day USTR filed its two China notices, for the lanes that read by date."""
