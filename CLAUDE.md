@@ -503,7 +503,7 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   written before this has no name keys: no pairing that run, and no false edits (only the first three fields are
   compared). Checked 13-14 Nov: trade.gov rewrote the `ids` field of 620 SDN entries with no change of
   substance, which is why only type, programs and address countries are compared.
-- **Kit 0.5.2** synced 14 Nov. `tests/test_robustness.py` checks that nothing in `doctrine/kit/` was edited (works on
+- **Kit 0.5.10** synced 16 Nov 2026, about 9:35 PM CST (0.5.2 from 14 Nov until then; 108 of 108 tests, check PASS). `tests/test_robustness.py` checks that nothing in `doctrine/kit/` was edited (works on
   the runner) and, when `../tic-doctrine` sits beside the checkout, that the copy is current (skipped on the runner:
   the kit repo is private). Note: `tic-doctrine/tools/sync.py` takes its first argument as the target, so
   `sync.py --help` copies the kit into a folder named `--help` (happened once on 14 Nov; removed).
