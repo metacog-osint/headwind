@@ -69,7 +69,10 @@ _MONTHS = {m: i for i, m in enumerate(
 _DATE_RE = re.compile(r"\b(" + "|".join(_MONTHS) + r")\s+(\d{1,2}),\s+(\d{4})\b")
 _ADJECTIVES = {"Iranian": "IR", "Iran-Related": "IR", "Russian": "RU", "Cuban": "CU", "Venezuelan": "VE",
                "Syrian": "SY", "Chinese": "CN", "North Korea": "KP", "Belarus": "BY", "Burmese": "MM",
-               "Democratic Republic of the Congo": "CD"}
+               "Democratic Republic of the Congo": "CD",
+               # Names OFAC's titles use that the kit's list does not: "Burma Sanctions Regulations",
+               # "Darfur Sanctions Regulations" (Darfur is a region of Sudan).
+               "Burma": "MM", "Darfur": "SD"}
 
 
 def _url(agencies, types, since: str, per_page: int, fields) -> str:
@@ -149,12 +152,22 @@ def named_dates(text: str | None, after: str) -> list[str]:
 
 
 def countries_in(title: str) -> list[str]:
-    """Countries a title names outright. A rule that names none stays unplaced."""
-    out = {cc for word, cc in _ADJECTIVES.items() if re.search(rf"\b{re.escape(word)}\b", title)}
+    """Countries a title names outright. A rule that names none stays unplaced.
+
+    Longest name first, and each match is blanked before shorter names are tried, so a name inside a longer one
+    does not count again: "Democratic Republic of the Congo" is CD only (not also "Republic of the Congo", CG),
+    "South Sudan" SS only, "Guinea-Bissau" GW only (15 Nov 2026 suite review)."""
+    names = dict(_ADJECTIVES)
     for c in geo._countries():                      # the kit's own list of names
         name = c.get("name") or ""
-        if len(name) >= 4 and c["cc"] != "US" and re.search(rf"\b{re.escape(name)}\b", title):
-            out.add(c["cc"])
+        if len(name) >= 4 and c["cc"] != "US":
+            names.setdefault(name, c["cc"])
+    out, text = set(), title or ""
+    for name in sorted(names, key=len, reverse=True):
+        pat = re.compile(rf"\b{re.escape(name)}\b")
+        if pat.search(text):
+            out.add(names[name])
+            text = pat.sub(lambda m: "\x00" * len(m.group(0)), text)
     return sorted(out)
 
 
