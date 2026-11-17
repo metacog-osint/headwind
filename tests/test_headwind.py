@@ -255,10 +255,24 @@ class TestParsers(unittest.TestCase):
         m = food.measure_wfp(text("wfp_sdn.csv"), "2026-11")
         self.assertEqual(m["period"], "2026-09")
         self.assertAlmostEqual(m["median_change_pct"], 50.0, places=1)    # 50.1 with the exchange rate in
+        # z is +2.6, under 3.5; eight rises in a row flag it (headwind-1.10, the 15 Nov review's Sudan case).
+        self.assertLess(m["z"], 3.5)
+        self.assertEqual((m["rules"], m["rise_run"], m["anomaly"]), (["run"], 8, True))
         self.assertGreaterEqual(m["series"], food.WFP_MIN_SERIES)
         self.assertFalse(m["stale"])
         self.assertTrue(food.measure_wfp(text("wfp_sdn.csv"), "2027-06")["stale"])
         self.assertIsNone(food.measure_wfp("date,price\n", "2026-11"))
+
+    def test_rank_and_run_rules(self):
+        base = [0.01 * (i % 7) for i in range(60)]                      # 0% to 6%, a quiet history
+        self.assertEqual(stats.rank_run(0.065, base, base + [0.065], 0.1)["rank"], False)  # top, but under the floor
+        rr = stats.rank_run(0.20, base, base + [0.20], 0.1)
+        self.assertTrue(rr["rank"])
+        self.assertEqual(rr["rank_share_above"], 0.0)
+        hist = base + [0.07, 0.08, 0.09, 0.10, 0.11, 0.12]
+        rr = stats.rank_run(0.12, base, hist, 0.1)
+        self.assertEqual((rr["rise_run"], rr["run"]), (9, True))       # 0.00 -> 0.03 at the end of base counts too
+        self.assertEqual(stats.rank_run(0.05, [0.05] * 30, [0.05] * 31, 0.01)["flag_rate_rules"], 0.0)  # ties never rank
 
     def test_wfp_market_exchange_rate(self):
         # Sudan's file has Khartoum's unofficial rate; it is read on its own and kept out of the food median.

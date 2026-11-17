@@ -82,6 +82,11 @@ def parse_fao_csv(text: str) -> dict[str, list[tuple[str, float]]]:
     return out
 
 
+def _rules(z_anomaly: bool, rr: dict) -> list[str]:
+    """Which rules fired: "z", "rank" (top 5% of its own history), "run" (six or more rises in a row)."""
+    return [r for r, hit in (("z", z_anomaly), ("rank", rr["rank"]), ("run", rr["run"])) if hit]
+
+
 def measure_fao(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
     out = []
     for col, (sid, name) in FAO_COLUMNS.items():
@@ -89,11 +94,18 @@ def measure_fao(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
         m = stats.measure(pts, FAO_HORIZON, FAO_WINDOW, FAO_FLOOR)
         if not m:
             continue
+        ch = [c for c in stats.changes([v for _, v in pts], FAO_HORIZON) if c is not None]
+        base = ch[max(0, len(ch) - FAO_HORIZON - FAO_WINDOW): len(ch) - FAO_HORIZON]
+        rr = stats.rank_run(ch[-1], base, ch, FAO_FLOOR / 100.0)
         ups = [1 for a, b in zip(pts[-121:-1], pts[-120:]) if b[1] > a[1]]
         out.append({
             "id": sid, "name": name, "period": m["date"], "value": m["value"], "prior_period": m["prior_date"],
             "prior_value": m["prior_value"],
-            **{k: m[k] for k in ("change_pct", "z", "baseline_n", "flag_rate", "anomaly")},
+            **{k: m[k] for k in ("change_pct", "z", "baseline_n")},
+            "flag_rate": rr["flag_rate_rules"] if rr["flag_rate_rules"] is not None else m["flag_rate"],
+            "rules": _rules(m["anomaly"], rr), "rise_run": rr["rise_run"],
+            "rank_share_above": rr["rank_share_above"],
+            "anomaly": bool(m["anomaly"] or rr["rank"] or rr["run"]),
             "rose_share_120m": round(len(ups) / max(1, min(120, len(pts) - 1)), 3),
             "as_issued": [{"period": d, "value": v} for d, v in pts[-12:]],
         })
@@ -158,7 +170,8 @@ def _monthly(csv_text: str, keep) -> tuple[dict, set, set]:
     return monthly, markets, names
 
 
-def _median_reading(monthly: dict, horizon: int, window: int, floor_pct: float, min_series: int):
+def _median_reading(monthly: dict, horizon: int, window: int, floor_pct: float, min_series: int,
+                    rank_run: bool = False):
     """The latest month's median change across series, scored against the country's own earlier medians:
     (period, median, series, share rising, score) or None."""
     periods = sorted({d for m in monthly.values() for d in m})
@@ -174,7 +187,14 @@ def _median_reading(monthly: dict, horizon: int, window: int, floor_pct: float, 
     # Baseline: the country's own medians, ending `horizon` months before the latest, so none overlaps it.
     cutoff = _shift(period, horizon)
     base = [m for p, m, _, _ in medians if p <= cutoff][-window:]
-    return period, med, n, up_share, stats.score(med, base, floor_pct / 100.0)
+    sc = stats.score(med, base, floor_pct / 100.0)
+    if rank_run:  # food only: a rank and a run-length rule beside z (stats.rank_run)
+        rr = stats.rank_run(med, base, [m for _, m, _, _ in medians], floor_pct / 100.0)
+        sc = {**sc, "rules": _rules(sc["anomaly"], rr), "rise_run": rr["rise_run"],
+              "rank_share_above": rr["rank_share_above"],
+              "flag_rate": rr["flag_rate_rules"] if rr["flag_rate_rules"] is not None else sc["flag_rate"],
+              "anomaly": bool(sc["anomaly"] or rr["rank"] or rr["run"])}
+    return period, med, n, up_share, sc
 
 
 def measure_wfp(csv_text: str, today_period: str) -> dict | None:
@@ -183,7 +203,7 @@ def measure_wfp(csv_text: str, today_period: str) -> dict | None:
     monthly, markets, _ = _monthly(csv_text, lambda r: not is_fx_row(r))
     if not monthly:
         return None
-    got = _median_reading(monthly, WFP_HORIZON, WFP_WINDOW, WFP_FLOOR, WFP_MIN_SERIES)
+    got = _median_reading(monthly, WFP_HORIZON, WFP_WINDOW, WFP_FLOOR, WFP_MIN_SERIES, rank_run=True)
     if not got:
         return None
     period, med, n, up_share, sc = got
@@ -194,6 +214,7 @@ def measure_wfp(csv_text: str, today_period: str) -> dict | None:
         "period": period, "median_change_pct": round(pct, 1), "series": n, "markets": len(markets),
         "share_rising": round(up_share, 2), "z": sc["z"], "baseline_n": sc["baseline_n"],
         "flag_rate": sc["flag_rate"], "months_old": months_old, "stale": stale,
+        "rules": sc.get("rules", []), "rise_run": sc.get("rise_run"), "rank_share_above": sc.get("rank_share_above"),
         "anomaly": bool(sc["anomaly"] and not stale),
     }
 
