@@ -54,6 +54,25 @@ feed as `data/ended.geojson`. Format and adoption steps: `docs/history-log.md`. 
 `state`, when it gives one, must be fresh, late or up for its items to end (Cordon withholds a stale source's items).
 0.5.2 (14 Nov 2026): Headwind's entry adds the EU and UK sanctions lists to its `owns`, and their licences and USGS's
 (CC0 1.0) to its `terms`.
+0.5.3 (14 Nov 2026): Undertow is live (influence operations, family Information, prefix `UT-WP`), with its
+events and STIX files in `extra`.
+0.5.4 (15 Nov 2026): Wake's entry, still planned, describes its rebuilt PortWatch lane: status note, terms, `owns`,
+and freshness windows of 240 and 408 hours on its items' `data_as_of`, because PortWatch publishes weekly with a
+lag of 2 to 9 days (Wake's own source health: fresh to 10 days, late to 17).
+0.5.5 (15 Nov 2026): Wake is live (vessel transits through 28 chokepoints, family Maritime, prefix `WK-WP`) at wake.theintelligence.company,
+read and deployed by hand once a week until the IMF permits automated pulls.
+0.5.6 (15 Nov 2026): optional `data_as_of_precision` (`day` or `month`) for sources that give no time, with the
+linter's midnight-UTC check and `asOfDateLabel()` in the browser module, so a date-only item is shown as a date and
+not as the evening before; Undertow's `terms` now say what it quotes with credit (Meta, OpenAI, TikTok, EEAS).
+0.5.7 (15 Nov 2026): optional item field `subdivisions` (ISO 3166-2 codes such as `US-HI`, each one's country also
+in `countries`), so a consumer can tell a notice in Hawaii from one for all of the United States (Tom, 15 Nov 2026);
+`geo.subdivision_at(lat, lon)` and `geo.subdivisions_for_geometry(geom)` name the US state from Natural Earth's 1:10m
+outlines (`geo/subdivisions.json`, built by `tools/build_subdivisions.py`; right to about 1 km at a state line).
+0.5.8 (15 Nov 2026): the registry names Launch's history source as Launch's charted notices, not a person.
+0.5.9 (16 Nov 2026): Relief is live (humanitarian response: IFRC GO appeals and WHO Disease Outbreak News, family
+Society, prefix `RL-WP`) at relief.theintelligence.company; the planned `humanitarian` entry is renamed `relief`.
+0.5.10 (16 Nov 2026): Launch's registry row names the history sources it ingests: NotamForChina (Apache-2.0),
+Joey0609/notams (MIT), and Internet Archive copies of FAA TFRs and NGA warnings (US Government works), with GCAT.
 
 **Tests:** `python tests/test_kit.py`, `python tests/test_history.py` and `node tests/test_js.mjs`.
 
