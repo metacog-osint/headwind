@@ -44,6 +44,16 @@ past spike inflates a standard deviation enough to hide the next. An item is tie
 scale in the formula is never allowed below floor / 3.5, so a nearly constant history cannot
 produce a z in the hundreds.
 
+**Food lanes, two more rules beside z (`headwind-1.10`, 16 Nov 2026, Tom's yes, from the 15 Nov suite review).**
+Local food (WFP) and the FAO indices are also an anomaly when the latest reading is a rise above the 95th percentile
+of the same baseline (`rank`), or when the reading has risen six or more months in a row (`run`), in both cases with
+a move of at least the lane's floor (`stats.rank_run`). Why: Sudan's food prices rose a median 50% in three months to
+September 2026, the seventh straight monthly rise and the third-highest reading in five years, and z could not flag
+it (z +2.4; the trending, fat-tailed baseline put the line at +67.6%); six of 17 countries and three FAO indices had
+never tripped z in their baselines. Currencies and energy keep z alone. Items carry `rules` (which fired) and
+`rise_run`, and `flag_rate` counts all three rules on the baseline's own readings (5% to 20% on the 16 Nov files).
+Checked on the local WFP files of 16 Nov: only Sudan flags (+55.9% to October 2026, rank and run, nine rises).
+
 Every item scored by an anomaly rule carries `flag_rate`: the share of the baseline's own changes that
 the same rule would have flagged. It says how often that series trips the rule in ordinary times. A list
 change carries the flag rate of its highest-scoring designation batch. Rules, public-inspection filings and

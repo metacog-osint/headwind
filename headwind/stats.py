@@ -54,6 +54,52 @@ def score(value: float, base: list[float], floor: float) -> dict:
     }
 
 
+RANK_TOP = 0.05      # food lanes: a rise in the top 5% of the series' own baseline
+RUN_MIN = 6          # food lanes: the reading has risen this many months in a row
+
+
+def rank_run(value: float, base: list[float], history: list[float], floor: float) -> dict:
+    """Two rules beside z for the food lanes (Tom's yes, 16 Nov 2026, from the 15 Nov suite review: Sudan's food
+    prices rose a median 50% in three months, the seventh straight monthly rise and the third-highest reading in five
+    years, and z could not flag it because the baseline itself trends and has fat tails).
+
+    rank: value is above the 95th percentile of `base` and a rise of at least `floor`.
+    run:  `history` (the readings in time order, ending with `value`) rose RUN_MIN or more times in a row, and value
+          is a rise of at least `floor`.
+    flag_rate_rules is how often z, rank or run would have fired on the baseline's own readings (rank judged against
+    the same baseline)."""
+    out = {"rank_share_above": None, "rank": False, "rise_run": 0, "run": False, "flag_rate_rules": None}
+    run = 0
+    for a, b in zip(reversed(history[:-1]), reversed(history)):
+        if b > a:
+            run += 1
+        else:
+            break
+    out["rise_run"] = run
+    out["run"] = bool(run >= RUN_MIN and value >= floor)
+    if len(base) >= MIN_BASELINE:
+        cut = statistics.quantiles(base, n=20)[-1]
+        out["rank_share_above"] = round(sum(1 for b in base if b > value) / len(base), 3)
+        out["rank"] = bool(value > cut and value >= floor)
+        med = statistics.median(base)
+        scale = max(1.4826 * statistics.median(abs(b - med) for b in base), floor / Z_ANOMALY)
+        # Where the baseline sits in history (a contiguous stretch), so each baseline reading's own run is known.
+        start = next((i for i in range(len(history) - len(base), -1, -1) if history[i:i + len(base)] == base), None)
+        fired = 0
+        for j, b in enumerate(base):
+            z_hit = scale > 0 and abs((b - med) / scale) >= Z_ANOMALY and abs(b) >= floor
+            r_hit = b > cut and b >= floor
+            n_hit = False
+            if start is not None:
+                k, r = start + j, 0
+                while k - r - 1 >= 0 and history[k - r] > history[k - r - 1]:
+                    r += 1
+                n_hit = r >= RUN_MIN and b >= floor
+            fired += 1 if (z_hit or r_hit or n_hit) else 0
+        out["flag_rate_rules"] = round(fired / len(base), 3)
+    return out
+
+
 def measure(points: list[tuple[str, float]], horizon: int, window: int, floor_pct: float) -> dict | None:
     """Latest change, its robust z-score against the rolling baseline, and whether it counts as an anomaly."""
     if len(points) <= horizon:

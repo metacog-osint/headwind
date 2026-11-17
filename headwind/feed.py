@@ -264,6 +264,19 @@ def _month_end(period: str) -> str:
     return f"{y:04d}-{m:02d}-{calendar.monthrange(y, m)[1]:02d}T00:00:00Z"
 
 
+FOOD_RULES = {"z": "|z| >= 3.5", "rank": "a rise in the top 5% of its own history",
+              "run": "risen six or more months in a row"}
+
+
+def _rules_text(x: dict) -> str:
+    """" Flagged by ..." for a food reading, naming the rules that fired (headwind-1.10), else ""."""
+    rules = [FOOD_RULES[r] for r in x.get("rules") or [] if r in FOOD_RULES]
+    if not rules:
+        return ""
+    run = f" ({x['rise_run']} rises in a row)" if "run" in (x.get("rules") or []) else ""
+    return f" Flagged by {' and '.join(rules)}{run}."
+
+
 def _month_end_by(period: str, generated: str) -> str:
     """The month's end, or the collection time for a month still under way: never dated in the future."""
     return min(_month_end(period), generated)
@@ -991,15 +1004,18 @@ def live_features(snapshot: dict) -> list[dict]:
             f"headwind:food:{c['id']}:{c['period']}",
             f"{c['name']} ({c['period']}): {c['value']:g}, {c['change_pct']:+.1f}% on the month ({_z_text(c['z'])})",
             f"{c['value']:g} for {c['period']}, against {c['prior_value']:g} for {c['prior_period']} "
-            f"(2014-2016 = 100). FAO revises earlier months; these are the values as published today.",
+            f"(2014-2016 = 100). FAO revises earlier months; these are the values as published today."
+            f"{_rules_text(c)}",
             anomaly=c["anomaly"], data_as_of=_month_end(c["period"]), generated=generated, valid_until=valid_until,
             countries=[], ncf=["provide_food_products", "provide_agricultural_products", "maintain_supply_chains"],
             requirement_ids=["HW-PIR-3"],
             measures={"index_value": c["value"], "change_pct": c["change_pct"], "z": c["z"],
-                      "baseline_n": c["baseline_n"], "flag_rate": c.get("flag_rate")},
+                      "baseline_n": c["baseline_n"], "flag_rate": c.get("flag_rate"), "rules": c.get("rules", []),
+                      "rise_run": c.get("rise_run")},
             anchor="food", source=SRC_FAO, indicator_id="HW-IND-3",
             baseline_ref=f"rolling: the index's own {food.FAO_WINDOW} prior monthly changes; anomaly at "
-                         f"|z| >= {stats.Z_ANOMALY:g} and a move of at least {food.FAO_FLOOR:g}%",
+                         f"|z| >= {stats.Z_ANOMALY:g}, a rise in the top 5% of them, or six or more rises in a row, "
+                         f"with a move of at least {food.FAO_FLOOR:g}%",
             coverage=1.0, lane_accessed=accessed("fao"), ascope=["events"]))
 
     for c in snapshot.get("pinksheet") or []:
@@ -1032,16 +1048,18 @@ def live_features(snapshot: dict) -> list[dict]:
             f"{w['series']} price series ({_z_text(w['z'])})",
             f"Median {food.WFP_HORIZON}-month change to {w['period']} across {w['series']} market-and-commodity "
             f"series in {w['markets']} markets; {round(w['share_rising'] * 100)}% of series rose. Nominal prices in "
-            f"local currency, judged against the country's own {w['baseline_n']} earlier medians.",
+            f"local currency, judged against the country's own {w['baseline_n']} earlier medians.{_rules_text(w)}",
             anomaly=w["anomaly"], data_as_of=_month_end_by(w["period"], generated), generated=generated,
             valid_until=valid_until, countries=[cc], ncf=["provide_food_products", "provide_agricultural_products"],
             requirement_ids=["HW-PIR-5"],
             measures={"median_change_pct": w["median_change_pct"], "series": w["series"], "markets": w["markets"],
-                      "share_rising": w["share_rising"], "z": w["z"], "baseline_n": w["baseline_n"], "flag_rate": w.get("flag_rate")},
+                      "share_rising": w["share_rising"], "z": w["z"], "baseline_n": w["baseline_n"], "flag_rate": w.get("flag_rate"),
+                      "rules": w.get("rules", []), "rise_run": w.get("rise_run")},
             anchor="local-food", source={**SRC_WFP, "url": w.get("dataset") or SRC_WFP["url"]},
             indicator_id="HW-IND-6",
             baseline_ref=f"rolling: the country's own {food.WFP_WINDOW} prior monthly medians; anomaly at "
-                         f"|z| >= {stats.Z_ANOMALY:g} and a median move of at least {food.WFP_FLOOR:g}%",
+                         f"|z| >= {stats.Z_ANOMALY:g}, a rise in the top 5% of them, or six or more rises in a row, "
+                         f"with a median move of at least {food.WFP_FLOOR:g}%",
             coverage=1.0, lane_accessed=accessed("wfp"), ascope=["events", "people"],
             hypothesis_id="HW-H-2A" if cc in WATCHED else None))
     return feats

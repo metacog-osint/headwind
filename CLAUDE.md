@@ -6,6 +6,8 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 16 Nov 2026, about 10:30 PM CST: `headwind-1.10` (food rank and run rules) built and tested in worktree `D:\Projects\_worktrees\headwind-food-rules` (branch `method/food-rank-run`), not committed; waits for Tom's yes.** Local food and the FAO indices flag also on a rise above the 95th percentile of their own baseline (`rank`) or six or more rises in a row (`run`), with the lane's floor (`stats.rank_run`; doctrine/method.md, The anomaly rule). On the 16 Nov WFP files only Sudan flags (+55.9% to Oct 2026, rank and run). Also live since `3c43759` (9:42 PM CST): rule titles place each country once (DRC no longer tags CG; Burma, Darfur) and the OGL v3.0 statement in the footer. 110 tests, check PASS.
+
 **State, 16 Nov 2026, about 9:20 PM CST: `headwind-1.9` (names on list changes) live.** `65a62f2` merged as
 `c8c38bf`, on `main` and `live/first-slice`; run 43915430504 (11:09 to 11:12 AM CST) passed every step and deployed:
 16 lanes ok, 133 feed items, `data/list-changes.json` served. That run restored state from the `state` release (the
