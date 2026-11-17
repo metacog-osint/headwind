@@ -1,4 +1,4 @@
-# Headwind method (`headwind-1.9`)
+# Headwind method (`headwind-1.10`)
 
 ## Purpose
 Headwind measures economic stress: currencies, energy and food prices that move outside their own
@@ -17,6 +17,7 @@ It reports measurements. It states no probability and gives no investment advice
 | Market exchange rates (since 15 Nov 2026) | The exchange-rate rows in WFP's price files (many marked unofficial) | Monthly, one to three months late | Median 1-month change across a country's markets, against its own 60 prior medians, 5% floor |
 | Energy | EIA spot prices for Brent, WTI and Henry Hub, from EIA's own API | Trading days, a day or two late | Same, with a 5% floor |
 | Food indices | FAO Food Price Index and five sub-indices | Monthly | 1-month change against 120 prior monthly changes |
+| Fertilizers and critical-list metals (since 16 Nov 2026, `headwind-1.10`) | World Bank Commodity Price Data (the Pink Sheet), monthly prices in nominal US dollars: phosphate rock, DAP, TSP, urea, potassium chloride; aluminum, copper, lead, tin, nickel, zinc, platinum, silver | Monthly, on the second business day of the next month | 1-month change against the series' own 120 prior monthly changes, 3% floor (phosphate rock 10%) |
 | Local food prices | WFP prices by market, from the Humanitarian Data Exchange | Monthly, one to three months late | Median 3-month change across a country's price series, against its own 60 prior medians |
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
@@ -39,7 +40,7 @@ For each series, the latest change is compared with the same series' earlier cha
 The median and the median absolute deviation are used because price changes have fat tails; one
 past spike inflates a standard deviation enough to hide the next. An item is tier `anomaly` when
 |z| >= 3.5 and the move is at least the lane's floor (1% currencies, 5% energy, 2% FAO indices,
-10% local food). The floor keeps pegged currencies from being flagged for trivial moves, and the
+3% Pink Sheet prices, 10% for phosphate rock, 10% local food). The floor keeps pegged currencies from being flagged for trivial moves, and the
 scale in the formula is never allowed below floor / 3.5, so a nearly constant history cannot
 produce a z in the hundreds.
 
@@ -354,8 +355,26 @@ mineral, and ores, metals and compounds are separate codes, so a code's figures 
   release list gives none). Court rulings on tariff authority are read since `headwind-1.8` (see the US Supreme
   Court); other courts' tariff cases (the Court of International Trade, the Federal Circuit) are not.
 
+## Fertilizers and critical-list metals (`headwind-1.10`, 16 Nov 2026)
+- **Source.** The World Bank's Commodity Price Data (the Pink Sheet), monthly file `CMO-Historical-Data-Monthly.xlsx`,
+  linked from the Commodity Markets page; the address changes each year, so it is read from the page each run. The
+  World Bank's data catalog lists the data as "Commodity Prices - History and Projections" (dataset 0038238, read 16
+  Nov 2026: "Commodity prices are updated in the second business day of the month"; licence Creative Commons
+  Attribution 4.0). The file's Description sheet names the market reporters behind each price (Bloomberg, Platts,
+  S&P Global, Green Markets and others); the World Bank publishes the compiled prices under CC BY 4.0.
+- **Series.** The five fertilizers and the eight metals in the file that are on the US Final 2025 List of Critical
+  Minerals (phosphate rock and potash are on the list too). Iron ore and gold are in the file and not on the list, so
+  they are not read. Each is a monthly average in nominal US dollars, in the file's unit.
+- **Measure.** As FAO's indices: the latest month's change against the series' own 120 prior monthly changes, robust
+  z, anomaly at |z| >= 3.5 and a move of at least 3%. Phosphate rock is flat for months and then steps; at 3% the rule
+  would trip on 27.5% of its last 120 months, so its floor is 10% (5.8%, about TSP's rate). Measured on the 3 Nov
+  2026 file. No indicator in the register; items answer HW-PIR-6 (register 1.2).
+- **Failure.** A page without the link, a workbook without the "Monthly Prices" sheet or with fewer than 10 of the
+  13 columns fails the lane, which keeps its last good copy.
+
 ## Not live
-The World Bank Pink Sheet (fertilizer and metal prices): held on its licence.
+Nothing planned is held. Later sources (more courts and sanctions lists, stock indices) are still being read for
+their terms.
 
 ## Verdict
 `data/question_drafts.json` holds draft questions on the next FAO release with a climatology

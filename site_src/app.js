@@ -30,7 +30,7 @@
   function render(s) {
     var names = s.country_names || {};
     var fx = (s.fx || []).slice().sort(function (a, b) { return Math.abs(b.z || 0) - Math.abs(a.z || 0); });
-    var en = s.energy || [], fao = s.fao || [], lf = s.local_food || [];
+    var en = s.energy || [], fao = s.fao || [], ps = s.pinksheet || [], lf = s.local_food || [];
     var fresh = lf.filter(function (w) { return !w.stale; });
 
     document.getElementById("asof").textContent = "Collected " + when(s.generated_at) + ". Method " + (s.method_version || "") + ".";
@@ -39,6 +39,7 @@
     fx.forEach(function (f) { if (f.anomaly) { an.push((names[f.country] || f.currency) + " (" + f.currency + "): " + Math.abs(f.change_pct).toFixed(1) + "% " + f.direction + " against the US dollar in 5 business days, z " + zText(f.z)); } });
     en.forEach(function (e) { if (e.anomaly) { an.push(e.name + ": " + pct(e.change_pct) + " in 5 trading days, z " + zText(e.z)); } });
     fao.forEach(function (c) { if (c.anomaly) { an.push(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z)); } });
+    ps.forEach(function (c) { if (c.anomaly) { an.push(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z)); } });
     (s.sanctions || []).concat(s.screening || []).forEach(function (d) { if (d.anomaly) { an.push(d.list_name + ": a designation batch larger than the list's usual (" + (d.national ? d.national.added + " national" : d.added) + " added, seen " + String(d.detected_at).slice(0, 10) + ")"); } });
     fresh.forEach(function (w) { if (w.anomaly) { an.push((names[w.country] || w.country) + ": local food prices " + pct(w.median_change_pct) + " in 3 months, z " + zText(w.z)); } });
     (s.fx_official || []).forEach(function (o) { if (o.anomaly) { an.push((names[o.country] || o.country) + ": official exchange rate " + Math.abs(o.change_pct).toFixed(1) + "% " + o.direction + " against the US dollar in " + o.period + ", z " + zText(o.z)); } });
@@ -48,7 +49,7 @@
       : '<p class="small muted">Nothing is outside its normal range in this collection.</p>';
 
     document.getElementById("tiles").innerHTML = [
-      ["Unusual now", an.length], ["Currencies", fx.length], ["Energy and food series", en.length + fao.length],
+      ["Unusual now", an.length], ["Currencies", fx.length], ["Energy, food and commodity series", en.length + fao.length + ps.length],
       ["Countries with local prices", fresh.length]
     ].map(function (t) { return '<div class="tile"><span class="k">' + esc(t[0]) + '</span><span class="v">' + esc(t[1]) + "</span></div>"; }).join("");
 
@@ -62,6 +63,12 @@
     table("fao-table", ["Index", "Value", "On the month", "z", "Month"], fao.map(function (c) {
       return [esc(c.name) + flag(c.anomaly), esc(Number(c.value).toFixed(1)), esc(pct(c.change_pct)), esc(zText(c.z)), esc(c.period)];
     }));
+    table("pinksheet-table", ["Commodity", "Price", "On the month", "z", "Usual flag rate", "Month"], ps.map(function (c) {
+      return [esc(c.name) + flag(c.anomaly) + (c.critical_list_name ? ' <span class="small muted">critical list</span>' : ""),
+        esc(Number(c.value).toLocaleString(undefined, { maximumSignificantDigits: 6 }) + " " + c.unit), esc(pct(c.change_pct)),
+        esc(zText(c.z)), esc(rate(c.flag_rate)), esc(c.period)];
+    }));
+    if (s.pinksheet_updated) { document.getElementById("ps-note").textContent += " The World Bank updated the file on " + s.pinksheet_updated + "."; }
     table("wfp-table", ["Country", "3-month median change", "z", "Series rising", "Price series", "Markets", "Month"],
       fresh.slice().sort(function (a, b) { return b.median_change_pct - a.median_change_pct; }).map(function (w) {
         return [esc(names[w.country] || w.country) + flag(w.anomaly), esc(pct(w.median_change_pct)), esc(zText(w.z)),
@@ -331,7 +338,7 @@
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, kept from before titles were published (counted only until they age out): notices, ' + esc(countedText) + ".</p>" : "");
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada)", unpress: "UN sanctions committee press releases", scotus: "US Supreme Court opinions and dockets", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada)", unpress: "UN sanctions committee press releases", scotus: "US Supreme Court opinions and dockets", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", pinksheet: "Fertilizer and metal prices (World Bank Pink Sheet)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {

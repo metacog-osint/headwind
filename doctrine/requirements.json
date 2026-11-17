@@ -1,6 +1,6 @@
 {
   "program": "headwind",
-  "version": "1.1",
+  "version": "1.2",
   "review_by": "2027-02-01",
   "requirements": [
     {
@@ -71,6 +71,15 @@
       "question": "In which watched countries are local market food prices rising or falling outside the country's own range of three-month changes?",
       "series": [
         "wfp_local_food"
+      ]
+    },
+    {
+      "id": "HW-PIR-6",
+      "type": "pir",
+      "parent": "HW-REQ-1",
+      "question": "Are fertilizer prices, or the prices of metals on the US critical minerals list, moving outside their own range of monthly changes?",
+      "series": [
+        "worldbank_pinksheet"
       ]
     }
   ]

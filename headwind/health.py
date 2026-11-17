@@ -31,6 +31,8 @@ WARN_SHARE = 0.8        # under this share, a warning
 # GEM is monthly too; the World Bank updated it on 8 Sep 2026 with August's rates, so it runs further behind.
 WINDOWS = {"ecb-eurofxref": (4, 8), "eia-spot": (7, 14), "fao-ffpi": (40, 70), "wfp-food-prices-hdx": (75, 135),
            "worldbank-gem": (100, 160),
+           # The Pink Sheet is updated on the second business day of the month with the month before.
+           "worldbank-pinksheet": (40, 70),
            # The Census Bureau publishes a month's trade about five weeks after it ends.
            "census-trade": (70, 100)}
 
@@ -43,6 +45,7 @@ QUIET_DAYS = {"un-sc-consolidated": 3, "eu-fsf": 30, "uk-sanctions-list": 30, "d
 QUIET_SEEN_DAYS = {"ofac-sdn": 21, "gac-sema": 45}
 
 LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", "fao-ffpi": "fao", "wfp-food-prices-hdx": "wfp",
+           "worldbank-pinksheet": "pinksheet",
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
            "dgtresor-gels": "sanctions", "gac-sema": "sanctions", "un-press": "unpress",
@@ -79,6 +82,7 @@ DRIFT = {
     "energy": ("eia-spot", "series", True),
     "fao": ("fao-ffpi", "indices", True),
     "fao_release_dates": ("fao-ffpi", "release dates on FAO's page", False),
+    "pinksheet": ("worldbank-pinksheet", "series", True),
     "wfp": ("wfp-food-prices-hdx", "countries", False),
     "baseline": ("worldbank-wdi", "countries", True),
     "fomc": ("release-calendars", "FOMC dates", True),
@@ -107,6 +111,8 @@ def sizes(lane: str, result: dict) -> dict[str, int]:
         return {"energy": len(result.get("energy") or [])}
     if lane == "fao":
         return {"fao": len(result.get("fao") or []), "fao_release_dates": len(result.get("fao_release_dates") or [])}
+    if lane == "pinksheet":
+        return {"pinksheet": len(result.get("pinksheet") or [])}
     if lane == "wfp":
         return {"wfp": len(result.get("local_food") or [])}
     if lane == "baseline":
@@ -225,6 +231,11 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
     periods = [m["period"] for m in fao if m.get("period")]
     add("fao-ffpi", "fao", min(_month_end(max(periods)), today) if periods else None,
         f"{len(fao)} indices, newest {max(periods) if periods else 'none'}")
+    ps = snap.get("pinksheet") or []
+    pp = [m["period"] for m in ps if m.get("period")]
+    add("worldbank-pinksheet", "pinksheet", min(_month_end(max(pp)), today) if pp else None,
+        f"{len(ps)} series, newest {max(pp) if pp else 'none'}; the World Bank updated the file "
+        f"{snap.get('pinksheet_updated') or 'on a date it does not give'}")
     lf = snap.get("local_food") or []
     wp = [w["period"] for w in lf if w.get("period")]
     stale = sum(1 for w in lf if w.get("stale"))

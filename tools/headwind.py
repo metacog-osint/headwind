@@ -23,7 +23,8 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      markets, minerals, names, releases, sanctions, scotus, screening, tariffs, trade, unpress)
+                      markets, minerals, names, pinksheet, releases, sanctions, scotus, screening, tariffs, trade,
+                      unpress)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -31,6 +32,7 @@ LANE_FIELDS = {
     "gem": ["fx_official", "fx_official_missing", "fx_official_updated"],
     "energy": ["energy"],
     "fao": ["fao", "fao_release_dates"],
+    "pinksheet": ["pinksheet", "pinksheet_updated"],
     "wfp": ["local_food", "local_food_missing", "market_fx"],
     "baseline": ["baseline"],
     "calendar": ["fomc_dates", "ecb_dates"],
@@ -45,7 +47,8 @@ LANE_FIELDS = {
     "scotus": ["scotus_opinions", "scotus_tracked", "scotus_errors"],
 }
 EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
-         "energy": [], "fao": [], "fao_release_dates": [], "local_food": [], "local_food_missing": [],
+         "energy": [], "fao": [], "fao_release_dates": [], "pinksheet": [], "pinksheet_updated": None,
+         "local_food": [], "local_food_missing": [],
          "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
          "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
          "minerals": {}, "mineral_trade": {}, "tariff_pace": {}, "hts_releases": {}, "hts_pace": {},
@@ -163,6 +166,16 @@ def _lane_fao(raw_dir, prev, getter):
     body, rec2 = fetch.fetch("fao-ffpi", food.fao_csv_url(html), raw_dir, "csv", getter=getter)
     series = food.parse_fao_csv(body.decode("utf-8-sig"))
     return {"fao": food.measure_fao(series), "fao_release_dates": food.fao_release_dates(html)}, [rec1, rec2]
+
+
+def _lane_pinksheet(raw_dir, prev, getter):
+    """World Bank Commodity Price Data (the Pink Sheet), monthly: fertilizers and critical-list metals. The file
+    moves to a new address each year, so the address is read from the Commodity Markets page first."""
+    page, rec1 = fetch.fetch("worldbank-pinksheet-page", pinksheet.PAGE, raw_dir, "html", getter=getter)
+    url = pinksheet.file_url(page.decode("utf-8", errors="replace"))
+    body, rec2 = fetch.fetch("worldbank-pinksheet", url, raw_dir, "xlsx", timeout=120, getter=getter)
+    parsed = pinksheet.parse(body)
+    return {"pinksheet": pinksheet.measure(parsed), "pinksheet_updated": parsed["updated"]}, [rec1, rec2]
 
 
 def _lane_wfp(raw_dir, prev, getter):
@@ -592,7 +605,8 @@ def _minerals_watch(raw_dir, getter, recs) -> dict:
     return watch
 
 
-LANES = {"fx": _lane_fx, "gem": _lane_gem, "energy": _lane_energy, "fao": _lane_fao, "wfp": _lane_wfp, "baseline": _lane_baseline,
+LANES = {"fx": _lane_fx, "gem": _lane_gem, "energy": _lane_energy, "fao": _lane_fao, "pinksheet": _lane_pinksheet,
+         "wfp": _lane_wfp, "baseline": _lane_baseline,
          "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
          "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals,
          "trade": _lane_trade, "tariffs": _lane_tariffs, "unpress": _lane_unpress,
@@ -721,7 +735,7 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
     names.update({c: geo.name(c) for c in feed.WATCHED})
     page = {k: snap.get(k) for k in ("generated_at", "method_version", "lanes", "health", "fx", "fx_official",
                                      "fx_official_missing", "fx_official_updated", "market_fx", "country_view",
-                                     "energy", "fao",
+                                     "energy", "fao", "pinksheet", "pinksheet_updated",
                                      "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
                                      "screening_lists", "controls", "inspection", "inspection_issues", "minerals",
                                      "question_drafts", "vessel_crosslist", "mineral_trade", "tariff_pace",
@@ -827,11 +841,12 @@ def main(argv=None) -> int:
                 line = f"{key}: data of {h.get('data_as_of')} is {h['state']}"
                 print(f"::warning::{line}" if gh else f"  warning {line}")
         print("  health: " + ", ".join(f"{n} {s}" for s, n in health.summary(snap.get("health") or {}).items()))
-        anomalies = sum(1 for k in ("fx", "fx_official", "market_fx", "energy", "fao", "local_food", "sanctions",
+        anomalies = sum(1 for k in ("fx", "fx_official", "market_fx", "energy", "fao", "pinksheet", "local_food", "sanctions",
                                     "screening")
                         for x in snap.get(k) or [] if x.get("anomaly"))
         print(f"Collected {len(snap['fx'])} currencies, {len(snap['energy'])} energy series, {len(snap['fao'])} FAO "
-              f"indices, {len(snap['local_food'])} countries' local food prices, {len(snap['baseline'])} country "
+              f"indices, {len(snap.get('pinksheet') or [])} Pink Sheet prices, "
+              f"{len(snap['local_food'])} countries' local food prices, {len(snap['baseline'])} country "
               f"baselines, {len(snap['events']['events'])} events; {anomalies} anomalies. Sanctions lists: "
               f"{len(snap['sanctions_lists'])} read, {len(snap['sanctions'])} changes kept; screening lists: "
               f"{len(snap['screening_lists'])} read, {len(snap['screening'])} changes kept; "
