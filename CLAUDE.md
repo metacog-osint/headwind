@@ -6,6 +6,23 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 16 Nov 2026, about 9:20 PM CST: `headwind-1.9` (names on list changes) live.** `65a62f2` merged as
+`c8c38bf`, on `main` and `live/first-slice`; run 43915430504 (11:09 to 11:12 AM CST) passed every step and deployed:
+16 lanes ok, 133 feed items, `data/list-changes.json` served. That run restored state from the `state` release (the
+Actions cache had no entry) and logged for all five named lists "the reading before kept no names in this form", so it
+compared no names; from the next run on names work fully. Every run since passed: 43918316460 (11:26 AM) and
+43924504327 (12:01 PM, hub pushes: shared headers, house bar v2.1), 43964080928 (3:50 PM, by hand) and 43999036676
+(7:54 PM CST, scheduled: 130 items, every source fresh or up, 6 sanctions and 12 screening lists read, 0 changes kept).
+**No list change yet under 1.9** (`list-changes.json` empty). Watch the first one: feed text, `list-changes.json`, the
+page section and `us_person_data`; UK "variations" and "corrections" now show as renames (count how many a typical FCDO
+notice gives and tell Tom if it is noisy); trade.gov re-keying (same name and type) must still pair. Test fix: OFAC's
+address file has a fixture, `tests/fixtures/ofac_add.csv` (70 rows for the lane fixture's ids, cut from `add.csv` as
+published on 16 Nov 2026, street and city blanked to `-0-`), so the lane test reads countries and the runner's test
+step no longer prints "address file not read"; 107 of 108 tests (the kit-copy test only). Wake: PRs 3 and 4 open and
+CLEAN, Tom's call (merge 3 first); the old branch `claude/wake-lanes-f92722` and its worktree are gone (the Wake
+session deleted them), and so is `D:\Projects\_worktrees\headwind-nav20`. The paragraph below is the state before
+this.
+
 **State, 16 Nov 2026, about 11:30 AM CST: `headwind-1.9` (names on list changes) built and tested, NOT
 committed.** Tom chose option (b) with guardrails ("Yes, build (b)"; design and licence reading in
 `D:\Projects\_ideas\drafts\2026-11-16-headwind-names-design.md`): people, organizations and ships named on every
