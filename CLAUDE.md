@@ -6,6 +6,12 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
+**State, 18 Nov 2026: WFP cache fix built in worktree `[local path]` (branch
+`fix/wfp-cache-rules`), not committed.** `headwind-1.10` went live, but the WFP lane reuses a country's kept reading
+while HDX's `last_modified` is unchanged, and readings kept from before 1.10 have no `rules`: the live Sudan item
+(18 Nov 09:50 UTC run, file dated 15 Nov) showed `rules: []`, `rise_run: null`, tier routine. `_lane_wfp` now reads a
+file again once when its kept reading has no `rules` (tests `TestWfpCache`; 117 tests OK, 1 skipped).
+
 **State, 16 Nov 2026, about 10:30 PM CST: `headwind-1.10` (food rank and run rules) built and tested in worktree `[local path]` (branch `method/food-rank-run`), not committed; waits for Tom's yes.** Local food and the FAO indices flag also on a rise above the 95th percentile of their own baseline (`rank`) or six or more rises in a row (`run`), with the lane's floor (`stats.rank_run`; doctrine/method.md, The anomaly rule). On the 16 Nov WFP files only Sudan flags (+55.9% to Oct 2026, rank and run). Also live since `3c43759` (9:42 PM CST): rule titles place each country once (DRC no longer tags CG; Burma, Darfur) and the OGL v3.0 statement in the footer. 110 tests, check PASS.
 
 **State, 16 Nov 2026, about 9:20 PM CST: `headwind-1.9` (names on list changes) live.** `65a62f2` merged as
