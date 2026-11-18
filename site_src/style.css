@@ -81,6 +81,7 @@ tr:last-child td { border-bottom: none; }
 .top-nav a:first-child { margin-left: 0; }
 main a { color: var(--link); text-decoration: none; }
 main a:hover, main a:focus { text-decoration: underline; }
+main .tic-rel a { text-decoration: underline; } /* Elsewhere today: its links sit in text (WCAG 1.4.1) */
 details.more > summary { cursor: pointer; padding: 10px 0; color: var(--link); font-size: 0.88rem; }
 details.more[open] > summary { border-bottom: 1px solid var(--border); }
 .row-title > span:first-child { min-width: 0; overflow-wrap: anywhere; }

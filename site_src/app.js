@@ -27,6 +27,25 @@
       "</tr></thead><tbody>" + rows.map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + c + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody>";
   }
 
+  // Elsewhere today: the watched countries, strongest first (readings outside the normal range and HW-WP-2
+  // indicators first, then the largest |z| of a current reading).
+  function relatedCountries(view, names) {
+    var box = document.getElementById("tic-related");
+    if (!box || !window.TicRelated || !view.length) { return; }
+    function strength(r) {
+      var flags = (r.indicators_present || []).length, z = 0;
+      [r.daily, r.official, r.market, r.local_food].forEach(function (x) {
+        if (!x || x.stale) { return; }
+        if (x.anomaly) { flags += 1; }
+        if (typeof x.z === "number") { z = Math.max(z, Math.abs(x.z)); }
+      });
+      return [flags, z];
+    }
+    var ranked = view.map(function (r, i) { return { cc: r.country, s: strength(r), i: i }; }).filter(function (r) { return r.cc; });
+    ranked.sort(function (a, b) { return (b.s[0] - a.s[0]) || (b.s[1] - a.s[1]) || (a.i - b.i); });
+    TicRelated.render(box, { countries: ranked.map(function (r) { return r.cc; }), here: "headwind", names: names, level: 2 });
+  }
+
   function render(s) {
     var names = s.country_names || {};
     var fx = (s.fx || []).slice().sort(function (a, b) { return Math.abs(b.z || 0) - Math.abs(a.z || 0); });
@@ -94,6 +113,7 @@
       }));
     document.getElementById("country-note").textContent = "No official monthly rate: " + ((s.fx_official_missing || []).map(function (m) { return names[m.country] || m.country; }).join(", ") || "none") +
       ". A badge names the HW-WP-2 indicators present (HW-IND-4 a currency, HW-IND-6 local food). The World Bank last updated its monthly rates " + (s.fx_official_updated || "on a date it does not give") + ".";
+    relatedCountries(s.country_view || [], names);
     var gone = lf.filter(function (w) { return w.stale; }).map(function (w) { return (names[w.country] || w.country) + " (newest month " + w.period + ")"; })
       .concat((s.local_food_missing || []).map(function (m) { return (names[m.country] || m.country) + " (" + m.reason + ")"; }));
     document.getElementById("wfp-missing").textContent = gone.length ? "No recent data: " + gone.join("; ") + "." : "";
