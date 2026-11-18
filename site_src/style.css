@@ -81,6 +81,17 @@ tr:last-child td { border-bottom: none; }
 .top-nav a:first-child { margin-left: 0; }
 main a { color: var(--link); text-decoration: none; }
 main a:hover, main a:focus { text-decoration: underline; }
+/* Long lists and tables on a phone: the first entries and a "Show all" button (app.js folds()). */
+.fold-more { display: none; }
+@media (max-width: 760px) {
+  .fold-box:not(.open) .fold { display: none; }
+  .fold-more { display: inline-block; margin: 8px 0 2px; min-height: 44px; padding: 8px 14px; font: inherit; font-size: 14px;
+    font-weight: 600; color: var(--link); background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    cursor: pointer; }
+  .fold-more:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+}
+@media print { .fold-box:not(.open) .fold { display: revert; } .fold-more { display: none; } }
+main .tic-rel a { text-decoration: underline; } /* Elsewhere today: its links sit in text (WCAG 1.4.1) */
 details.more > summary { cursor: pointer; padding: 10px 0; color: var(--link); font-size: 0.88rem; }
 details.more[open] > summary { border-bottom: 1px solid var(--border); }
 .row-title > span:first-child { min-width: 0; overflow-wrap: anywhere; }
