@@ -292,9 +292,18 @@ def _rules_text(x: dict) -> str:
     return f" Flagged by {' and '.join(rules)}{run}."
 
 
-def _month_end_by(period: str, generated: str) -> str:
-    """The month's end, or the collection time for a month still under way: never dated in the future."""
-    return min(_month_end(period), generated)
+def _month_end_by(period: str, generated: str, published: str | None = None) -> str:
+    """The month's end. For a month still under way, the publisher's last update (`published`, such as HDX's
+    last_modified, read as UTC) when it falls in that month and before this run, so the reading's date does not move
+    from run to run (18 Nov 2026: it was the collection time, and each run logged a change); else the collection
+    time. Never dated in the future."""
+    end = _month_end(period)
+    if end <= generated:
+        return end
+    p = f"{published[:19]}Z" if published and len(published) >= 19 else None
+    if p and p[:7] >= period[:7] and p <= generated:
+        return p
+    return generated
 
 
 def _z_text(z) -> str:
@@ -1044,6 +1053,7 @@ def live_features(snapshot: dict) -> list[dict]:
             coverage=1.0, lane_accessed=accessed("gem"), ascope=["events"],
             hypothesis_id="HW-H-2A" if cc in WATCHED else None))
 
+    hdx_modified = {w["country"]: w.get("hdx_last_modified") for w in snapshot.get("local_food") or []}
     for w in snapshot.get("market_fx") or []:
         if w.get("stale"):
             continue
@@ -1060,7 +1070,8 @@ def live_features(snapshot: dict) -> list[dict]:
             f"Median one-month change to {w['period']} across {w['markets']} markets' exchange rates as WFP "
             f"collected them ({', '.join(w.get('labels') or [])}); {level}. Judged against the country's own "
             f"{w['baseline_n']} earlier medians.",
-            anomaly=w["anomaly"], data_as_of=_month_end_by(w["period"], generated), generated=generated,
+            anomaly=w["anomaly"], data_as_of=_month_end_by(w["period"], generated, hdx_modified.get(cc)),
+            generated=generated,
             valid_until=valid_until, countries=[cc], ncf=["provide_funding_liquidity", "provide_capital_markets"],
             requirement_ids=["HW-PIR-4"],
             measures={"median_change_pct": w["median_change_pct"], "markets": w["markets"],
@@ -1138,7 +1149,8 @@ def live_features(snapshot: dict) -> list[dict]:
             f"Median {food.WFP_HORIZON}-month change to {w['period']} across {w['series']} market-and-commodity "
             f"series in {w['markets']} markets; {round(w['share_rising'] * 100)}% of series rose. Nominal prices in "
             f"local currency, judged against the country's own {w['baseline_n']} earlier medians.{_rules_text(w)}",
-            anomaly=w["anomaly"], data_as_of=_month_end_by(w["period"], generated), generated=generated,
+            anomaly=w["anomaly"], data_as_of=_month_end_by(w["period"], generated, w.get("hdx_last_modified")),
+            generated=generated,
             valid_until=valid_until, countries=[cc], ncf=["provide_food_products", "provide_agricultural_products"],
             requirement_ids=["HW-PIR-5"],
             measures={"median_change_pct": w["median_change_pct"], "series": w["series"], "markets": w["markets"],
