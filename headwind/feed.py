@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, geo  # noqa: E402
 
-from . import batches, controls, food, inspection, markets, pinksheet, scotus, stats, tariffs, unpress  # noqa: E402
+from . import batches, controls, food, inspection, markets, pinksheet, scotus, stats, tariffs, uksc, unpress  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
 METHOD = "headwind-1.10"
@@ -124,6 +124,21 @@ SRC_SCOTUS = {
     "independence_group": "us-supreme-court",
     "source_type": "official or market data",
     "descriptor": "The Court's own opinions and dockets, as it publishes them.",
+}
+
+OGL = "Contains public sector information licensed under the Open Government Licence v3.0."
+
+SRC_UKSC = {
+    "id": "supremecourt-uk",
+    "publisher": "The Supreme Court of the United Kingdom",
+    "title": "Decided cases: case pages and judgments",
+    "url": uksc.CASES_PAGE,
+    "licence": "Crown copyright, Open Government Licence v3.0 (the Court's terms and conditions, read 18 Nov 2026: "
+               "reuse \"provided it is reproduced accurately and not in a misleading context\"). " + OGL,
+    "grade": "A1",
+    "independence_group": "uk-supreme-court",
+    "source_type": "official or market data",
+    "descriptor": "The Court's own case pages and judgments, as it publishes them.",
 }
 
 LIST_SOURCE = {"ofac-sdn": SRC_OFAC, "un-consolidated": SRC_UN, "eu-fsf": SRC_EU, "uk-sanctions": SRC_UK,
@@ -684,6 +699,7 @@ def list_features(snapshot: dict) -> list[dict]:
     feats += tariff_features(snapshot, generated, valid_until)
     feats += unpress_features(snapshot, generated, valid_until)
     feats += scotus_features(snapshot, generated, valid_until)
+    feats += uksc_features(snapshot, generated, valid_until)
     return feats
 
 
@@ -776,6 +792,39 @@ def scotus_features(snapshot: dict, generated: str, valid_until: str) -> list[di
             requirement_ids=["HW-PIR-2"], measures={}, visual={"type": "page", "url": t.get("url")},
             source={**SRC_SCOTUS, "url": t.get("url")}, accessed=accessed)
         f["properties"]["us_person_data"] = "individuals"      # docket text and titles can name people
+        feats.append(f)
+    return feats
+
+
+def uksc_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
+    """UK Supreme Court judgments handed down in the last two weeks: the Court's own case titles, case ids and neutral
+    citation (Tom, 15 Nov 2026), the judgment date and the links. One item per judgment; joined appeals decided in
+    one judgment are listed together. No judgment text; us_person_data from uksc.us_person_data."""
+    lanes = snapshot.get("lanes") or {}
+    accessed = (lanes.get("uksc") or {}).get("fetched_at")
+    cutoff = _plus_hours(generated, -24 * uksc.FEED_DAYS)[:10]
+    feats = []
+    for j in snapshot.get("uksc_judgments") or []:
+        cases = j.get("cases") or []
+        if not cases or (j.get("judgment_date") or "") < cutoff:
+            continue
+        day, first = j["judgment_date"], cases[0]
+        more = f" and {len(cases) - 1} joined case{'s' if len(cases) > 2 else ''}" if len(cases) > 1 else ""
+        listed = "; ".join(f"{c['title']} ({c['case_id']})" for c in cases)
+        f = _official(
+            f"headwind:uksc:{j['year']}-{j['number']}",
+            f"UK Supreme Court: {first['title']}{more}, {j['citation']} ({day})",
+            f"The Supreme Court of the United Kingdom handed down judgment {j['citation']} on {day} in "
+            f"{'the case' if len(cases) == 1 else 'the cases'} {listed}. The judgment and the case "
+            f"page{'s are' if len(cases) > 1 else ' is'} at the links; Headwind does not summarize or characterize "
+            f"them. The case titles, case ids and neutral citation are the Court's own. {OGL}",
+            data_as_of=f"{day}T00:00:00Z", generated=generated, valid_until=valid_until, countries=["GB"],
+            pmesii=["political"], ascope=["organizations"], ncf=["operate_government"], requirement_ids=["HW-REQ-1"],
+            measures={}, visual={"type": "page", "url": first["url"]},
+            source={**SRC_UKSC, "url": j.get("judgment_pdf") or first["url"]}, accessed=accessed)
+        f["properties"]["us_person_data"] = j.get("us_person_data") or "individuals"
+        f["properties"]["neutral_citation"] = j["citation"]
+        f["properties"]["case_urls"] = [c["url"] for c in cases]
         feats.append(f)
     return feats
 

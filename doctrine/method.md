@@ -207,6 +207,49 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - **Licence.** Opinions and dockets are US government works (17 USC 105, stated from memory; the Court's site gives
   no reuse statement).
 
+## The UK Supreme Court (18 Nov 2026)
+- **What is covered.** Every judgment the Supreme Court of the United Kingdom has handed down this calendar year and
+  the last (a neutral citation, `[2026] UKSC 36`, is numbered by calendar year). One item per judgment: appeals
+  decided together in one judgment (six cases under `[2025] UKSC 48`) are listed together. Not covered: permission to
+  appeal decisions, the Judicial Committee of the Privy Council, hearings and their video.
+- **Source: the Court's own site** (supremecourt.uk; Tom chose it on 18 Nov 2026 over The National Archives' Find
+  Case Law, whose Open Justice Licence excludes computational analysis without a separate licence). The site has no
+  feed, and its case list filters only through a Next.js server action (`updateCases`) whose id changes with every
+  build of the site; fetched as a page, `/cases?cs=Judgment+given` ignores the filter and shows the newest 15 cases of
+  1,607. Headwind uses the sitemap instead: it lists every case page and, for every case with a judgment, a judgment
+  page `/cases/judgments/<case>` with the time it last changed. Checked on 18 Nov 2026 by reading all 160: the 159
+  real judgment pages (the 160th, `mock-case-id2`, is a test page that answers 404) cover `[2024] UKSC 1` to `43`,
+  `[2025] UKSC 1` to `49` and `[2026] UKSC 1` to `36` with no gap, and none last changed before its hand-down.
+- **What is read.** The sitemap and the latest-judgments page every run. Each case page with a judgment page in the
+  window is read once (again only if its judgment page changes): the Court's case id, case title, judgment date,
+  neutral citation and the links to the Court's PDF and the National Archives' copy. A judgment page last changed
+  before 1 January of last year cannot hold a judgment in the window and is not read. A case named on the
+  latest-judgments page that the sitemap does not list yet is read too (a cross-check; the sitemap had the newest
+  hand-down on 18 Nov 2026). At most 120 case pages and two minutes of reading a run (the workflow job has 15
+  minutes); pages left over are read on the next run, newest first, and the page says how many are left. The first
+  reading on 18 Nov 2026 read the window's 108 case pages in one go (the whole lane took 1 min 35 s). No judgment
+  text, issue, facts, parties' details or written arguments are read.
+- **What an item says.** That the Court handed down a judgment, with its neutral citation, on a date, in a case
+  or cases named by the Court's own case title and case id (Tom, 15 Nov 2026, for court items), and the links: the
+  Court's PDF and the case page. Headwind does not summarize, characterize or score a judgment. A judgment is in the
+  feed for 14 days from its judgment date; the page lists the window. Titles are kept exactly as the Court publishes
+  them, including a few where the Court's own text has the replacement character U+FFFD in place of an apostrophe
+  (in "His Majesty's Revenue and Customs"), because the licence asks for accurate reproduction.
+- **`us_person_data`.** The US Supreme Court's test (individuals when either side reads as a person, organizations
+  when a side is a non-government organization, none when every side is a government), after a UK clean-up: role
+  tags ("(Appellant)"), "R (on the application of X)" (X is the party), "In the matter of", "and others", "No 2". "R"
+  alone is the Crown. Company suffixes (Ltd, Limited, Plc, LLP, Inc) are read first and outside brackets, then UK and
+  US government words (Secretary of State, His Majesty's Revenue and Customs, Council, Kingdom, Court, and the
+  rest), then the organization words. Initials ("BDN", "CHK", "X and Y") are anonymised people, so a side in
+  capitals reads as a person, where the US test reads it as an organization. On the 85 judgments of 18 Nov 2026: 50
+  individuals, 32 organizations, 3 none. A mistake goes toward individuals (Oatly AB and King Crude Carriers SA read
+  as people). The label never keeps a case out.
+- **Licence.** The Court's terms and conditions (read 18 Nov 2026): Crown copyright material on the site, other than
+  the Royal Arms and departmental logos, may be re-used under the Open Government Licence v3.0 "provided it is
+  reproduced accurately and not in a misleading context"; video footage of proceedings is under the Open Supreme
+  Court Licence and is not used. Items and the page carry "Contains public sector information licensed under the
+  Open Government Licence v3.0." Linking needs no permission (same terms page).
+
 ## Names on list changes (`headwind-1.9`, 16 Nov 2026)
 - **What is named.** People, organizations and ships added, changed and removed on every list Headwind reads but the
   UN Security Council's: OFAC's SDN list, the EU's, the UK's, France's and Canada's lists, and trade.gov's screening

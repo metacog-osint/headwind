@@ -26,7 +26,7 @@ FIX = ROOT / "tests" / "fixtures"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import pinksheet, scotus, unpress  # noqa: E402
+from headwind import pinksheet, scotus, uksc, unpress  # noqa: E402
 from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
                       sanctions, screening, stats, tariffs, trade)
 from tic_doctrine import contract, registers  # noqa: E402
@@ -43,6 +43,7 @@ for _l in sanctions.LISTS.values():
     _l["min_entries"] = 5
 screening.MIN_ENTRIES = 5
 screening.SHRINK_FLOOR = 4
+uksc.MIN_JUDGMENT_PAGES = 5
 
 
 def text(name: str) -> str:
@@ -100,6 +101,15 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         return (f if f.exists() else FIX / "scotus_feed_26.xml").read_bytes()
     if "supremecourt.gov/RSS/Cases/JSON/" in url:
         f = FIX / f"scotus_docket_{url.rsplit('/', 1)[1][:-5]}.json"
+        if not f.exists():
+            raise OSError(f"no fixture for {url}")         # the lane notes it and goes on
+        return f.read_bytes()
+    if url == uksc.SITEMAP:
+        return (FIX / "uksc_sitemap.xml").read_bytes()
+    if url == uksc.LATEST:
+        return (FIX / "uksc_latest.html").read_bytes()
+    if url.startswith(uksc.BASE + "/cases/"):
+        f = FIX / f"uksc_case_{url.rsplit('/', 1)[1]}.html"
         if not f.exists():
             raise OSError(f"no fixture for {url}")         # the lane notes it and goes on
         return f.read_bytes()
@@ -775,6 +785,125 @@ class TestScotus(unittest.TestCase):
         f = feed.scotus_features(snap, snap["generated_at"], "2026-04-01T06:00:00Z")
         self.assertEqual([x["properties"]["id"] for x in f], ["headwind:scotusdocket:24-1287:2026-03-24"])
         self.assertIn('"Judgment Issued."', f[0]["properties"]["summary"])
+        self.assertEqual(lint({"features": f}), [])
+
+
+class TestUksc(unittest.TestCase):
+    """supremecourt.uk, read 18 Nov 2026: the sitemap cut to its home page, the case list, two case pages and eight
+    judgment pages (among them the 404 test page "mock-case-id2" and uksc-2025-0058's second judgment page); six case
+    pages cut to the elements uksc.parse_case reads, verbatim; the latest-judgments page without its scripts."""
+
+    def page(self, slug):
+        return uksc.parse_case((FIX / f"uksc_case_{slug}.html").read_bytes(), slug)
+
+    def sitemap(self):
+        return uksc.parse_sitemap((FIX / "uksc_sitemap.xml").read_bytes())
+
+    def test_sitemap(self):
+        sm = self.sitemap()
+        self.assertEqual(sorted(sm["judgment_pages"]), ["uksc-2022-0015", "uksc-2025-0034", "uksc-2025-0058",
+                                                        "uksc-2025-0059", "uksc-2026-0074", "uksc-2026-0080"])
+        self.assertEqual(sm["judgment_pages"]["uksc-2025-0058"], "2026-08-07T15:41:01.591Z")   # the newer of its two
+        self.assertEqual((sm["other_judgment_pages"], sm["generated"]), (1, "2026-11-18T16:55:33.812Z"))
+        with mock.patch.object(uksc, "MIN_JUDGMENT_PAGES", 7):
+            with self.assertRaises(ValueError):
+                self.sitemap()
+
+    def test_case_page(self):
+        c = self.page("uksc-2025-0034")
+        self.assertEqual((c["case_id"], c["judgment_date"], c["citation"], c["url"]),
+                         ("UKSC/2025/0034", "2026-10-28", "[2026] UKSC 36", "https://supremecourt.uk/cases/uksc-2025-0034"))
+        self.assertEqual(c["title"], "The Kingdom of Spain and another (Respondents) v The London Steam-Ship Owners' "
+                                     "Mutual Insurance Association Limited (Appellant) No 2")
+        self.assertEqual(c["judgment_pdf"], "https://supremecourt.uk/uploads/uksc_2025_0034_judgment_3d8636752f.pdf")
+        self.assertEqual(c["tna_url"], "https://caselaw.nationalarchives.gov.uk/uksc/2026/36")
+        waiting = self.page("uksc-2026-0039")                   # awaiting judgment: no date, no citation
+        self.assertEqual(waiting["case_id"], "UKSC/2026/0039")
+        self.assertNotIn("citation", waiting)
+        self.assertEqual(uksc.parse_latest((FIX / "uksc_latest.html").read_bytes()), ["uksc-2025-0034"])
+
+    def test_to_read(self):
+        pages, today = self.sitemap()["judgment_pages"], date(2026, 11, 18)
+        todo = uksc.to_read(pages, {}, ["uksc-2026-0200"], today, 100)
+        # A case on the latest-judgments page that the sitemap does not list yet comes first; then newest first; the
+        # judgment page last changed in December 2024 cannot hold a 2025 or 2026 judgment and is not read.
+        self.assertEqual(todo, ["uksc-2026-0200", "uksc-2025-0034", "uksc-2026-0080", "uksc-2026-0074",
+                                "uksc-2025-0058", "uksc-2025-0059"])
+        read = dict(pages)
+        self.assertEqual(uksc.to_read(pages, read, ["uksc-2025-0034"], today, 100), [])
+        read["uksc-2025-0034"] = "2026-10-01T00:00:00Z"         # its judgment page changed since it was read
+        self.assertEqual(uksc.to_read(pages, read, [], today, 100), ["uksc-2025-0034"])
+        self.assertEqual(len(uksc.to_read(pages, {}, [], today, 2)), 2)
+        self.assertEqual(uksc.window_start(date(2027, 1, 4)), "2026-01-01")
+
+    def test_lane_reads_once_within_budget(self):
+        class Day(date):
+            @classmethod
+            def today(cls):
+                return date(2026, 11, 18)
+        with mock.patch.object(headwind_cli, "date", Day):
+            full, _ = headwind_cli._lane_uksc(None, {}, fake_getter)
+            with mock.patch.object(headwind_cli, "UKSC_SECONDS_PER_RUN", -1):
+                cut, _ = headwind_cli._lane_uksc(None, {}, fake_getter)
+            again, recs = headwind_cli._lane_uksc(None, full, fake_getter)
+        self.assertEqual([j["citation"] for j in full["uksc_judgments"]],
+                         ["[2026] UKSC 36", "[2026] UKSC 32", "[2026] UKSC 27", "[2026] UKSC 8"])
+        self.assertEqual((full["uksc_sitemap"]["read_this_run"], full["uksc_sitemap"]["pending"], full["uksc_errors"]),
+                         (5, 0, []))
+        self.assertEqual((cut["uksc_judgments"], cut["uksc_sitemap"]["pending"]), ([], 5))   # out of time: next run
+        self.assertEqual(len(recs), 2)              # the sitemap and the latest-judgments page; case pages read once
+        self.assertEqual(again["uksc_judgments"], full["uksc_judgments"])
+
+    def test_us_person_data(self):
+        u = uksc.us_person_data
+        self.assertEqual(u("R v BDN (Appellant)"), "individuals")       # the Crown and an anonymised person
+        self.assertEqual(u("The Kingdom of Spain and another (Respondents) v The London Steam-Ship Owners' Mutual "
+                           "Insurance Association Limited (Appellant) No 2"), "organizations")
+        self.assertEqual(u("Department for Business and Trade (Respondent) v The Information Commissioner (Appellant)"),
+                         "none")
+        self.assertEqual(u("R (on the application of CHK) (Appellant) v Secretary of State for the Home Department "
+                           "(Respondent)"), "individuals")
+        self.assertEqual(u("In the Petition of DM No 1"), "individuals")
+        self.assertEqual(u("Avon Freeholds Limited (Respondent) v Cresta Court E RTM Company Limited (Appellant)"),
+                         "organizations")
+        self.assertEqual(uksc.party_kind("Skatteforvaltningen (The Danish Customs and Tax Administration) (Appellant)"),
+                         "government")
+        self.assertEqual(uksc.party_kind("Mitchell and another (Joint Liquidators of MBI International & Partners Inc "
+                                         "(In Liquidation)) (Respondents)"), "person")
+        self.assertEqual(uksc.party_kind("Circuit Court in Lodz, Poland (Respondent)"), "government")
+
+    def test_merge_and_features(self):
+        slugs = ("uksc-2025-0034", "uksc-2026-0074", "uksc-2026-0080", "uksc-2025-0058", "uksc-2025-0059",
+                 "uksc-2026-0039")
+        today = date(2026, 11, 18)
+        js = uksc.merge([], [self.page(s) for s in slugs], today, "2026-11-18T17:00:00Z")
+        self.assertEqual([j["citation"] for j in js], ["[2026] UKSC 36", "[2026] UKSC 32", "[2026] UKSC 27",
+                                                       "[2026] UKSC 8"])
+        dm = js[1]
+        self.assertEqual(([c["case_id"] for c in dm["cases"]], dm["us_person_data"], dm["judgment_date"]),
+                         (["UKSC/2026/0074", "UKSC/2026/0080"], "individuals", "2026-09-09"))
+        self.assertEqual(js[0]["us_person_data"], "organizations")
+        again = uksc.merge(js, [self.page("uksc-2026-0080")], today, "2026-11-19T05:00:00Z")
+        self.assertEqual((again[1]["first_seen"], len(again[1]["cases"])), ("2026-11-18T17:00:00Z", 2))
+        self.assertEqual(uksc.merge(js, [], date(2028, 1, 3), "2028-01-03T05:00:00Z"), [])   # out of the window
+        snap = {"generated_at": "2026-11-01T06:00:00Z", "uksc_judgments": js, "lanes": {}}
+        f = feed.uksc_features(snap, snap["generated_at"], "2026-11-03T06:00:00Z")
+        self.assertEqual([x["properties"]["id"] for x in f], ["headwind:uksc:2026-36"])
+        p = f[0]["properties"]
+        self.assertEqual(p["title"], "UK Supreme Court: The Kingdom of Spain and another (Respondents) v The London "
+                                     "Steam-Ship Owners' Mutual Insurance Association Limited (Appellant) No 2, "
+                                     "[2026] UKSC 36 (2026-10-28)")
+        self.assertEqual((p["countries"], p["us_person_data"], p["neutral_citation"], p["sources"][0]["id"]),
+                         (["GB"], "organizations", "[2026] UKSC 36", "supremecourt-uk"))
+        self.assertIn("Open Government Licence v3.0", p["summary"])
+        self.assertEqual(lint({"features": f}), [])
+        snap = {"generated_at": "2026-09-15T06:00:00Z", "uksc_judgments": js[1:], "lanes": {}}
+        f = feed.uksc_features(snap, snap["generated_at"], "2026-09-17T06:00:00Z")
+        p = f[0]["properties"]
+        self.assertEqual(p["title"], "UK Supreme Court: In the Petition of DM No 1 and 1 joined case, [2026] UKSC 32 "
+                                     "(2026-09-09)")
+        self.assertIn("In the Petition of DM No 1 (UKSC/2026/0074); In the Petition of DM No 2 (UKSC/2026/0080)",
+                      p["summary"])
         self.assertEqual(lint({"features": f}), [])
 
 
@@ -1570,6 +1699,8 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual(snap["sanctions"], [])                 # the first run only sets the baseline
             self.assertEqual([t["docket"] for t in snap["scotus_tracked"]], ["24-1287", "25-250"])
             self.assertIn("supremecourt-gov", snap["health"])
+            self.assertIn("supremecourt-uk", snap["health"])
+            self.assertEqual((snap["uksc_errors"], snap["uksc_sitemap"]["judgment_pages"]), ([], 6))
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
                              [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11),
                               ("france-gels", 20), ("canada-sema", 24)])

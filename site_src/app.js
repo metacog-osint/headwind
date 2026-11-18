@@ -247,6 +247,19 @@
       ((s.scotus_errors || []).length ? '<p class="small muted">' + esc("Not read on the last run: " + s.scotus_errors.join("; ")) + "</p>" : "")
       : '<p class="small muted">No opinion read yet.</p>';
 
+    var uj = s.uksc_judgments || [], us = s.uksc_sitemap || {}, ujShown = 12;
+    function ujRow(j) {
+      var cs = j.cases || [], first = cs[0] || {};
+      return '<div class="row"><div class="row-title"><span><a href="' + esc(j.judgment_pdf || first.url || "") + '" rel="noopener">' + esc(j.citation) + "</a>: " +
+        cs.map(function (c) { return '<a href="' + esc(c.url) + '" rel="noopener">' + esc(c.title) + "</a> (" + esc(c.case_id) + ")"; }).join("; ") +
+        '</span><span class="badge">' + esc(j.judgment_date) + "</span></div></div>";
+    }
+    document.getElementById("uksc-judgments").innerHTML = (uj.length ? uj.slice(0, ujShown).map(ujRow).join("") +
+      (uj.length > ujShown ? '<details><summary class="small">All ' + uj.length + " judgments</summary>" + uj.slice(ujShown).map(ujRow).join("") + "</details>" : "")
+      : '<p class="small muted">No judgment read yet.</p>') +
+      (us.pending ? '<p class="small muted">' + esc(us.pending + " case pages are still to be read; the list fills in on the next runs.") + "</p>" : "") +
+      ((s.uksc_errors || []).length ? '<p class="small muted">' + esc("Not read on the last run: " + s.uksc_errors.join("; ")) + "</p>" : "");
+
     var tr = s.mineral_trade || {};
     function usd(v) { return v === null || v === undefined ? "" : "$" + (v >= 1e9 ? (v / 1e9).toFixed(2) + " bn" : v >= 1e6 ? (v / 1e6).toFixed(1) + " m" : Math.round(v).toLocaleString()); }
     if ((tr.codes || []).length) {
@@ -358,7 +371,7 @@
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, kept from before titles were published (counted only until they age out): notices, ' + esc(countedText) + ".</p>" : "");
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada)", unpress: "UN sanctions committee press releases", scotus: "US Supreme Court opinions and dockets", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", pinksheet: "Fertilizer and metal prices (World Bank Pink Sheet)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada)", unpress: "UN sanctions committee press releases", scotus: "US Supreme Court opinions and dockets", uksc: "UK Supreme Court judgments", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", pinksheet: "Fertilizer and metal prices (World Bank Pink Sheet)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {

@@ -66,6 +66,15 @@
       "independence_group": "us-supreme-court"
     },
     {
+      "id": "supremecourt-uk",
+      "name": "The Supreme Court of the United Kingdom: sitemap (judgment pages), latest-judgments page and case pages (supremecourt.uk)",
+      "url": "https://supremecourt.uk/cases",
+      "licence": "Crown copyright under the Open Government Licence v3.0, per the Court's terms and conditions (read 18 Nov 2026), provided it is reproduced accurately and not in a misleading context; video footage is under the separate Open Supreme Court Licence and is not used",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "uk-supreme-court"
+    },
+    {
       "id": "un-press",
       "name": "United Nations Meetings Coverage and Press Releases (RSS, press.un.org/en/rss.xml): Security Council sanctions committee releases",
       "url": "https://press.un.org/en",

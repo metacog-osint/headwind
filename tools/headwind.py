@@ -13,6 +13,7 @@ import argparse
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.parse
 from datetime import date, datetime, timedelta, timezone
@@ -24,7 +25,7 @@ sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
                       markets, minerals, names, pinksheet, releases, sanctions, scotus, screening, tariffs, trade,
-                      unpress)
+                      uksc, unpress)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -45,6 +46,7 @@ LANE_FIELDS = {
     "tariffs": ["hts_releases", "hts_pace", "signed_actions", "signed_error"],
     "unpress": ["un_committee_releases", "un_press"],
     "scotus": ["scotus_opinions", "scotus_tracked", "scotus_errors"],
+    "uksc": ["uksc_judgments", "uksc_read", "uksc_errors", "uksc_sitemap"],
 }
 EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
          "energy": [], "fao": [], "fao_release_dates": [], "pinksheet": [], "pinksheet_updated": None,
@@ -53,7 +55,8 @@ EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_up
          "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
          "minerals": {}, "mineral_trade": {}, "tariff_pace": {}, "hts_releases": {}, "hts_pace": {},
          "signed_actions": [], "signed_error": None, "un_committee_releases": [], "un_press": {},
-         "scotus_opinions": [], "scotus_tracked": [], "scotus_errors": []}
+         "scotus_opinions": [], "scotus_tracked": [], "scotus_errors": [],
+         "uksc_judgments": [], "uksc_read": {}, "uksc_errors": [], "uksc_sitemap": {}}
 
 
 def _lane_fx(raw_dir, prev, getter):
@@ -540,6 +543,51 @@ def _lane_scotus(raw_dir, prev, getter):
             "scotus_tracked": tracked, "scotus_errors": errors}, recs
 
 
+# Case pages read in one run, and the time they may take (the workflow job has 15 minutes). The first reading, 108
+# pages on 18 Nov 2026, took 1 min 35 s for the whole lane; pages left over are read on the next run, newest first.
+UKSC_PAGES_PER_RUN = 120
+UKSC_SECONDS_PER_RUN = 120
+
+
+def _lane_uksc(raw_dir, prev, getter):
+    """UK Supreme Court judgments of this calendar year and the last: the sitemap's judgment pages and the
+    latest-judgments page (both every run), and each judgment's case page, read once (again when its judgment page
+    changes). A case page that cannot be read is noted in `uksc_errors` and tried again on the next run. The lane
+    fails only when the sitemap cannot be read or lists far too few judgment pages."""
+    now, today = fetch.now_utc(), date.today()
+    body, rec = fetch.fetch("supremecourt-uk", uksc.SITEMAP, raw_dir, "xml", getter=getter, gz=True)
+    sm = uksc.parse_sitemap(body)
+    recs, errors, latest = [rec], [], []
+    try:
+        body, rec = fetch.fetch("supremecourt-uk", uksc.LATEST, raw_dir, "html", getter=getter)
+        latest = uksc.parse_latest(body)
+        recs.append(rec)
+    except Exception as exc:  # noqa: BLE001 - the cross-check failing is noted
+        errors.append(f"latest judgments page: {type(exc).__name__}: {exc}"[:200])
+    start = uksc.window_start(today)
+    read = {s: lm for s, lm in (prev.get("uksc_read") or {}).items() if lm[:10] >= start}
+    cases, began = [], time.monotonic()
+    for slug in uksc.to_read(sm["judgment_pages"], read, latest, today, UKSC_PAGES_PER_RUN):
+        if time.monotonic() - began > UKSC_SECONDS_PER_RUN:
+            break
+        try:
+            body, rec = fetch.fetch("supremecourt-uk-case", uksc.CASE_PAGE.format(slug=slug), raw_dir, "html",
+                                    timeout=30, getter=getter, gz=True)
+            recs.append(rec)
+            cases.append(uksc.parse_case(body, slug))
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"case page {slug}: {type(exc).__name__}: {exc}"[:200])
+            continue
+        # A case named on the latest-judgments page that the sitemap does not list yet is marked with the time it
+        # was read, so it is read once more when the sitemap lists its judgment page.
+        read[slug] = sm["judgment_pages"].get(slug) or now
+    pending = len(uksc.to_read(sm["judgment_pages"], read, latest, today, 10 ** 6))
+    return {"uksc_judgments": uksc.merge(prev.get("uksc_judgments") or [], cases, today, now), "uksc_read": read,
+            "uksc_errors": errors,
+            "uksc_sitemap": {"checked_at": now, "generated": sm["generated"], "judgment_pages": len(sm["judgment_pages"]),
+                             "read_this_run": len(cases), "pending": pending, "latest": latest}}, recs
+
+
 def _lane_inspection(raw_dir, prev, getter):
     """Filings on public inspection by BIS, OFAC and USTR: the issues of the last few days, kept 30 days, and the
     text of each rule, proposed rule and USTR notice (read once per PDF). A text that cannot be read is noted on
@@ -613,7 +661,7 @@ LANES = {"fx": _lane_fx, "gem": _lane_gem, "energy": _lane_energy, "fao": _lane_
          "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
          "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals,
          "trade": _lane_trade, "tariffs": _lane_tariffs, "unpress": _lane_unpress,
-         "scotus": _lane_scotus}
+         "scotus": _lane_scotus, "uksc": _lane_uksc}
 
 
 def finish_snapshot(snap: dict, today: date) -> dict:
@@ -744,7 +792,7 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                      "question_drafts", "vessel_crosslist", "mineral_trade", "tariff_pace",
                                      "hts_releases", "hts_pace", "signed_actions", "signed_error",
                                      "un_committee_releases", "un_press", "scotus_opinions", "scotus_tracked",
-                                     "scotus_errors")}
+                                     "scotus_errors", "uksc_judgments", "uksc_errors", "uksc_sitemap")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
     # Counted-only filings as they may be published, whatever snapshot this is built from (a failed inspection
