@@ -926,7 +926,7 @@ class TestFeed(unittest.TestCase):
         fc = feed.build_feed(self.snapshot())
         self.assertEqual(lint(fc), [])
         ids = [f["properties"]["id"] for f in fc["features"]]
-        self.assertNotIn("headwind:localfood:VE:2025-05", ids)      # stale data is not published as current
+        self.assertNotIn("headwind:localfood:VE", ids)      # stale data is not published as current
         self.assertEqual(len(ids), 5)
         for f in fc["features"]:
             p = f["properties"]
@@ -940,6 +940,16 @@ class TestFeed(unittest.TestCase):
         eur = next(f for f in fc["features"] if f["properties"]["id"].startswith("headwind:fx:EUR"))
         self.assertIsNone(eur["geometry"])
         self.assertEqual(eur["properties"]["precision_class"], "none")
+
+    def test_series_ids_carry_no_date(self):
+        # Tom, 18 Nov 2026: one id per series, so a new reading is the same item changed (the history log, with
+        # --reading-key data_as_of, logs it as changed), never the reading before ended.
+        ids = {f["properties"]["id"] for f in feed.build_feed(self.snapshot())["features"]}
+        self.assertTrue({"headwind:fx:TRY", "headwind:fx:EUR", "headwind:energy:brent", "headwind:food:cereals",
+                         "headwind:localfood:SD"} <= ids, ids)
+        later = self.snapshot()
+        later["fx"][0] = dict(later["fx"][0], date="2026-11-13", per_usd=46.5)
+        self.assertIn("headwind:fx:TRY", {f["properties"]["id"] for f in feed.build_feed(later)["features"]})
 
     def test_official_and_market_rates_and_the_country_view(self):
         snap = self.snapshot()
@@ -961,11 +971,11 @@ class TestFeed(unittest.TestCase):
         fc = feed.build_feed(snap)
         self.assertEqual(lint(fc), [])
         p = {f["properties"]["id"]: f["properties"] for f in fc["features"]}
-        ye = p["headwind:fxofficial:YE:2026-10"]
+        ye = p["headwind:fxofficial:YE"]
         self.assertEqual((ye["tier"], ye["indicator_id"], ye["hypothesis_id"]), ("anomaly", "HW-IND-4", "HW-H-2A"))
         self.assertEqual(ye["sources"][0]["id"], "worldbank-gem")
-        self.assertNotIn("headwind:fxofficial:SD:2024-10", p)       # stale official rate stays off the feed
-        mk = p["headwind:fxmarket:YE:2026-10"]
+        self.assertNotIn("headwind:fxofficial:SD", p)       # stale official rate stays off the feed
+        mk = p["headwind:fxmarket:YE"]
         self.assertEqual(mk["tier"], "routine")
         self.assertIn("unofficial market", mk["title"])
         view = {r["country"]: r for r in feed.country_view(snap)}
@@ -1533,10 +1543,10 @@ class TestPinkSheet(unittest.TestCase):
         items = [f["properties"] for f in feed.build_feed(snap)["features"]
                  if f["properties"]["id"].startswith("headwind:pinksheet:")]
         self.assertEqual(len(items), 13)
-        u = next(i for i in items if i["id"] == "headwind:pinksheet:urea:2026-10")
+        u = next(i for i in items if i["id"] == "headwind:pinksheet:urea")
         self.assertEqual((u["requirement_ids"], u["sources"][0]["id"]), (["HW-PIR-6"], "worldbank-pinksheet"))
         self.assertIn("420 $/mt", u["title"])
-        self.assertIn("critical minerals as potash", next(i for i in items if ":potash:" in i["id"])["summary"].lower())
+        self.assertIn("critical minerals as potash", next(i for i in items if i["id"].endswith(":potash"))["summary"].lower())
 
 
 class TestEndToEnd(unittest.TestCase):
@@ -1659,6 +1669,73 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual(feed.build_feed(snap)["features"], [])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
+
+
+class TestListIndicators(unittest.TestCase):
+    """Register 1.4 (Tom's yes, 18 Nov 2026): HW-IND-1 on OFAC changes, HW-IND-7 on changes made mostly of renames."""
+
+    def ship(self, n):
+        return ["vessel", ["RUSSIA-EO14024"], {"name": f"SHIP {n}", "imo": f"900000{n}", "mmsi": None, "flag": None,
+                                               "vessel_type": "Crude Oil Tanker"}]
+
+    def item(self, d):
+        key = "sanctions" if d["list"] in sanctions.LISTS else "screening"
+        snap = {"generated_at": "2026-11-18T18:00:00Z", "lanes": {}, key: [d]}
+        fs = [f for f in feed.list_features(snap) if f["properties"]["id"].startswith(("headwind:sanctions:",
+                                                                                         "headwind:screening:"))]
+        self.assertEqual(lint({"features": fs}), [])
+        return fs[0]["properties"]
+
+    def test_ofac_ships_meet_hw_ind_1(self):
+        prev = {"1": ["entity", ["SDGT"], {"name": "A CO", "countries": []}]}
+        new = {**prev, **{f"V{n}": self.ship(n) for n in range(1, 4)}}
+        p = self.item(sanctions.delta("ofac-sdn", prev, new, "2026-11-18T18:00:00Z", None))
+        self.assertEqual([p[k] for k in ("indicator_id", "hypothesis_id", "direction", "indicator_state")],
+                         ["HW-IND-1", "HW-H-1A", "supports", "present"])
+        self.assertEqual(p["measures"]["vessels_added_with_imo"], 3)
+        two = {**prev, **{f"V{n}": self.ship(n) for n in range(1, 3)}}
+        p = self.item(sanctions.delta("ofac-sdn", prev, two, "2026-11-18T18:00:00Z", None))
+        self.assertEqual((p["indicator_id"], p["indicator_state"], p["direction"]), ("HW-IND-1", "absent", "neutral"))
+
+    def test_renames_meet_hw_ind_7(self):
+        prev = {"1": ["entity", ["X"], {"name": "OLD NAME", "countries": []}],
+                "2": ["entity", ["X"], {"name": "SAME", "countries": []}]}
+        new = {"1": ["entity", ["X"], {"name": "NEW NAME", "countries": []}], **{"2": prev["2"]}}
+        p = self.item(sanctions.delta("uk-sanctions", prev, new, "2026-11-18T18:00:00Z", None))
+        self.assertEqual([p[k] for k in ("indicator_id", "hypothesis_id", "direction", "indicator_state")],
+                         ["HW-IND-7", "HW-H-1C", "supports", "present"])
+        self.assertEqual(p["measures"]["rename_share"], 1.0)
+        # One rename among two additions is not mostly renames: nothing is carried.
+        more = {**new, "3": ["entity", ["X"], {"name": "C", "countries": []}], "4": ["entity", ["X"], {"name": "D", "countries": []}]}
+        p = self.item(sanctions.delta("uk-sanctions", prev, more, "2026-11-18T18:00:00Z", None))
+        self.assertNotIn("indicator_id", p)
+        self.assertEqual(p["measures"]["rename_share"], 0.333)
+        # A ship whose name alone changed is a rename, counted once.
+        ships = sanctions.delta("uk-sanctions", {"V1": self.ship(1)}, {"V1": [*self.ship(1)[:2], {**self.ship(1)[2],
+                                "name": "SHIP RENAMED"}]}, "2026-11-18T18:00:00Z", None)
+        self.assertEqual(feed.list_indicator(ships)[0], {"renamed_or_rekeyed": 1, "rename_share": 1.0})
+
+    def test_screening_rekey_meets_hw_ind_7(self):
+        el = screening.parse(text("trade_gov_csl_names.json"))["EL"]
+        k = next(iter(el["index"]))
+        prev = dict(el["index"])
+        prev["OLD-" + k] = prev.pop(k)
+        d = screening.delta("EL", el, prev, "2026-11-18T18:00:00Z", None)
+        self.assertEqual((d["rekeyed"], d["added"], d["removed"]), (1, 0, 0))
+        p = self.item(d)
+        self.assertEqual((p["indicator_id"], p["hypothesis_id"]), ("HW-IND-7", "HW-H-1C"))
+
+    def test_register_1_4(self):
+        reg = json.loads((ROOT / "doctrine" / "indicators.json").read_text(encoding="utf-8"))
+        self.assertEqual(reg["version"], "1.4")
+        ind = {i["id"]: i for i in reg["indicators"]}
+        self.assertNotIn("dual_use", ind["HW-IND-1"]["rule"])
+        wp = next(w for w in reg["warning_problems"] if w["id"] == "HW-WP-1")
+        h = {x["id"]: x for x in wp["hypotheses"]}
+        self.assertEqual(h["HW-H-1C"]["emerging"], ["HW-IND-7"])
+        self.assertNotIn("truce", h["HW-H-1B"]["title"])
+        for x in wp["hypotheses"]:                                    # every id the hypotheses name is in the register
+            self.assertTrue(set(x["emerging"]) | set(x["not_emerging"]) <= set(ind))
 
 
 class TestNames(unittest.TestCase):

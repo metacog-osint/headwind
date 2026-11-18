@@ -272,6 +272,24 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   9 Nov, the day documents 2025-21671 and 2025-19873 had set). USTR's extension of its Vietnam
   investigation (same day) met no scheduled date in the register.
 
+## HW-WP-1: list changes, HW-IND-1 and HW-IND-7 (register 1.4, 18 Nov 2026)
+Tom's yes to the reworded HW-WP-1 (18 Nov 2026). The hypotheses now say what can be seen, not why: HW-H-1A "OFAC
+designates ships or a procurement network in one action", HW-H-1B "BIS or USTR extend stays or suspensions before a
+scheduled date", HW-H-1C an artefact (publication lag or an identifier correction). HW-IND-1 lost its dual-use network
+half, which is a judgment Headwind cannot measure, and HW-H-1C gained an emerging indicator, HW-IND-7.
+- **HW-IND-1** is met by an OFAC SDN list change that adds 3 or more ships with IMO numbers (re-keyed ships are not
+  additions). Every OFAC change item carries it: `indicator_state` present and `direction` supports, or absent and
+  neutral; the measure `vessels_added_with_imo` gives the count.
+- **HW-IND-7** is met by a sanctions or screening list change made mostly of renames or re-keyed entries: the entries
+  renamed (people, organizations and ships whose name changed), re-keyed (back under a new id with the same IMO
+  number, or the same name and type on trade.gov's lists) or renumbered (Canada) are more than half of the entries the
+  change touches (added, removed, changed, ships whose details alone changed, re-keyed and renumbered). The item then
+  carries HW-IND-7, HW-H-1C, supports and present; otherwise it carries nothing for it. Every list change has the
+  measures `renamed_or_rekeyed` and `rename_share`. An OFAC change that meets HW-IND-1 carries HW-IND-1 even when it
+  also meets HW-IND-7 (an item has one indicator).
+- Both are measurements. The tier stays `routine` (a designation batch can still make it `anomaly`), and which
+  hypothesis holds is not judged in the feed.
+
 ## HW-WP-2: economic stress in a watched country (15 Nov 2026)
 An anomaly for a watched country's currency (HW-IND-4) or local food prices (HW-IND-6), or for an energy
 benchmark (HW-IND-5), carries its indicator, the hypothesis it is emerging under (HW-H-2A, stress within the

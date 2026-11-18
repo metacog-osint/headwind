@@ -1,12 +1,12 @@
 {
   "program": "headwind",
-  "version": "1.3",
+  "version": "1.4",
   "indicators": [
     {
       "id": "HW-IND-1",
-      "text": "OFAC SDN delta batch designates >=3 shadow-fleet crude/product tankers (with IMO/MMSI) or a third-country dual-use procurement network.",
+      "text": "An OFAC SDN list change adds 3 or more ships with IMO numbers.",
       "series": "ofac_sdn_deltas",
-      "rule": "designated_vessels >= 3 or dual_use_network == true",
+      "rule": "vessels_added_with_imo >= 3",
       "gentry": {
         "predictive": true,
         "diagnostic": true,
@@ -73,6 +73,18 @@
         "unambiguous": true,
         "collectable": true
       }
+    },
+    {
+      "id": "HW-IND-7",
+      "text": "A sanctions or screening list change made mostly of renames or re-keyed entries: entries renamed, re-keyed or renumbered are more than half of the entries the change touches.",
+      "series": "list_deltas",
+      "rule": "(renamed + rekeyed + renumbered) / (added + removed + changed + vessel_details_only + rekeyed + renumbered) > 0.5",
+      "gentry": {
+        "predictive": false,
+        "diagnostic": true,
+        "unambiguous": true,
+        "collectable": true
+      }
     }
   ],
   "warning_problems": [
@@ -86,17 +98,18 @@
       "hypotheses": [
         {
           "id": "HW-H-1A",
-          "title": "Coordinated enforcement tightening against shadow-fleet energy revenue or dual-use transshipment",
+          "title": "OFAC designates ships or a procurement network in one action",
           "emerging": [
             "HW-IND-1"
           ],
           "not_emerging": [
-            "HW-IND-2"
+            "HW-IND-2",
+            "HW-IND-7"
           ]
         },
         {
           "id": "HW-H-1B",
-          "title": "Calibrated diplomatic truce extension via synchronized BIS/USTR administrative stays",
+          "title": "BIS or USTR extend stays or suspensions before a scheduled date",
           "emerging": [
             "HW-IND-2"
           ],
@@ -107,7 +120,9 @@
         {
           "id": "HW-H-1C",
           "title": "Administrative publication lag or technical identifier correction (artefact)",
-          "emerging": [],
+          "emerging": [
+            "HW-IND-7"
+          ],
           "not_emerging": [
             "HW-IND-1",
             "HW-IND-2"

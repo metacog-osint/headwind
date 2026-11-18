@@ -94,11 +94,14 @@ jobs:
       # triggered it, without the history commit the run before made. So history/ is taken from main's tip first,
       # and the commit is made on main's tip with only history/ staged (reset --mixed moves HEAD and the index,
       # never the working tree, which holds the build's site/ files). No rebase, so nothing unstaged can stop it.
+      # --reading-key data_as_of (kit 0.5.13, 18 Nov 2026): series ids carry no date, so a new reading is a
+      # changed line in the log, not the reading before ended.
       - name: History (history/, and site/data/ended.geojson)
         run: |
           git fetch -q --depth=1 origin main && git checkout -q FETCH_HEAD -- history 2>/dev/null \
             || echo "::warning::could not take history/ from main's tip; using this checkout's"
           python doctrine/kit/tic.py history site/data/feed.geojson --dir history --ended site/data/ended.geojson \
+            --reading-key data_as_of \
             || { echo "::warning::history step failed; this run is missing from history/"; exit 0; }
           git config user.name "headwind-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

@@ -619,7 +619,8 @@ def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True,
             "programs_gained": dict(gained.most_common()), "programs_lost": dict(lost.most_common()),
             "retyped": dict(retyped), "vessels_changed": sorted(vessels, key=lambda v: v["name"] or ""),
             "named_changed": sorted(named_changed, key=nm.sort_key),
-            "renamed": sum(1 for r in named_changed if "name_before" in r)}
+            "renamed": sum(1 for r in named_changed if "name_before" in r),
+            "vessel_details_only": sum(1 for v in vessels if v["list_id"] not in set(changed))}
 
 
 SPLIT_KEYS = ("added", "removed", "changed", "added_by_type", "added_by_program", "removed_by_type",

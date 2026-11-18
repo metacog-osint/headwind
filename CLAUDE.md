@@ -6,7 +6,63 @@ lists, export-control, sanctions and trade rules (BIS, OFAC, USTR) and their fil
 inspection, US import reliance for minerals, plus a calendar of dates for Verdict. Measurements only. No
 probabilities, no investment advice.
 
-**State, 16 Nov 2026, about 10:30 PM CST: `headwind-1.10` (food rank and run rules) built and tested in worktree `[local path]` (branch `method/food-rank-run`), not committed; waits for Tom's yes.** Local food and the FAO indices flag also on a rise above the 95th percentile of their own baseline (`rank`) or six or more rises in a row (`run`), with the lane's floor (`stats.rank_run`; doctrine/method.md, The anomaly rule). On the 16 Nov WFP files only Sudan flags (+55.9% to Oct 2026, rank and run). Also live since `3c43759` (9:42 PM CST): rule titles place each country once (DRC no longer tags CG; Burma, Darfur) and the OGL v3.0 statement in the footer. 110 tests, check PASS.
+**Light-page shell, 18 Nov 2026 (about 9:50 AM CST; Tom's "Yes, commit and push"):** `b705cbe` Elsewhere today (hub `tic-related.js`/.css v1.0) under "Watched countries side by side": the `country_view` countries, strongest first (current readings outside the normal range plus HW-WP-2 indicators, then the largest current |z|); card links underlined (`main .tic-rel a`). `42b3c5a` sections row (hub `tic-tabs.js`/.css v1.0): Unusual, Prices, Countries, Sanctions (sanctions and screening cards; the sanctions card left the `.two` grid), Rules and courts, Minerals, Dates and sources; phone folds in `app.js` `folds()`: lists and tables over 12 entries show 10 with "Show all N" (not `.scroll.tall` tables, not the Supreme Court opinions, which fold themselves); the court heading's id is `co-h` (it shared `ct-h`). Pushed by sha to `main`; update run 44339559592 passed (15:52 UTC). Live in headless Edge: phone page 31,586 px before; groups 1,721 / 3,259 / 3,093 / 9,470 / 6,944 / 3,338 / 4,586 (Sanctions grows with the names of list changes); no COP read at load, one without cookies near the card; no sideways scroll; axe only what was live before (links in text without underline, scroll boxes, two small header links). Shared files equal the hub's `e6bbec0` blobs. A site with a new card in a group: groups are `<div id=sec-* data-tab-label>` inside `<div data-tic-tabs>` in `index.html`.
+
+**State, 18 Nov 2026, about 10:05 AM CST: register 1.4 and stable series ids built and tested, NOT committed.**
+Local `live/first-slice` fast-forwarded to origin/main `6767a41` (it carries `6ec664b`, another session's food rank
+and run rules). Tom's answers this session: (1) **HW-H-1 wording adopted** ("Adopt as drafted"): register 1.4
+(`doctrine/indicators.json`), H-1A and H-1B retitled, HW-IND-1 cut to "an OFAC SDN list change adds 3 or more ships
+with IMO numbers", new HW-IND-7 (renamed, re-keyed or renumbered entries more than half of a change) emerging under
+H-1C; `feed.list_indicator` tags every list change (method.md "HW-WP-1: list changes"); `sanctions.edits` gains
+`vessel_details_only`. HW-WP-1's own `issue_on_change` still says "dual-use procurement ring" (frozen text, not
+changed). (2) **Stable per-series ids** ("Stable ids + kit option", after I corrected my earlier claim: the kit logs
+"changed" only on a tier move, so stable ids alone would have dropped every reading from the log): `headwind:fx:<cur>`,
+`fxofficial:<cc>`, `fxmarket:<cc>`, `energy:<id>`, `food:<id>`, `pinksheet:<series>`, `localfood:<cc>`, and the workflow's
+history step passes `--reading-key data_as_of`, new in **kit 0.5.13** (tic-doctrine branch `kit/history-readings`,
+worktree `[local path]`, on origin/main `546aaea`, the Blackout session's
+0.5.12; not committed; synced into `doctrine/kit/`). The runner uses the vendored copy, so Headwind works once pushed;
+tic-doctrine needs its own commit and push so the kit repo and the copy agree, and the local kit-copy test fails until
+`[local path]` is at 0.5.13. At the switch, one run ends every dated id and opens the stable ones; COP
+and Verdict key on none of these ids (checked). (3) **Wake tidy done** ("Remove them"): worktrees wake-merge, wake-sched, wake-ukmto and branches
+live/schedule, live/ukmto, replay/wake-lanes-on-main removed locally and on GitHub (all 0 ahead of main, line
+endings only). Wake's setup itself was already done 17 Nov (secrets, variable, `portwatch-state` release; runs pass).
+**First list changes under 1.9** (17 Nov): UK 9 added (GHR, all entities, 0 renames, so the FCDO noise question is
+still open), France 47 and 46 restated EU measures; feed text names them, `list-changes.json` holds three, the page
+script renders `named_added`; `us_person_data` none on all three. trade.gov re-keying not yet seen live.
+**UK Supreme Court (coverage plan, not built):** Find Case Law's Open Justice Licence v2.0 (read 18 Nov 2026) allows
+copy, publish and commercial use with the statement "Contains information licensed under the Open Justice Licence
+v2.0", but excludes "computational analysis", which its guidance defines as automated or algorithmic processing of
+large numbers of judgments (text mining, bulk extraction, automated classification) and licenses separately, free on
+application (caselawlicence@nationalarchives.gov.uk; "better to ask than to proceed"). Its terms of use bar external
+indexing. Reading the Atom feed for titles and citations is probably outside that, but it is automated, so ask TNA
+first or use the court's own site: supremecourt.uk's terms (read 18 Nov 2026) put its Crown copyright material under
+the OGL v3.0 "provided it is reproduced accurately and not in a misleading context". That site is a Next.js app:
+`/cases?cs=Judgment+given` ignores the filter server-side (6 cases, mixed statuses), `/news/latest-judgments` shows
+only the latest hand-down (28 Oct 2026, UKSC/2025/0034), and `/cases/uksc-YYYY-NNNN` pages exist; no feed found.
+Next step: read a case page for its neutral citation and judgment date, or ask TNA. The paragraph below is the state
+before this.
+
+**State, 16 Nov 2026, about 10:30 PM CST: `headwind-1.10` live (World Bank Pink Sheet, plan step 12); kit 0.5.10.**
+Tom: "yes to merge PRs, sync the kit, work on step 12, work on the wording, let's talk about the COP issue, then work on
+the rest of the coverage plan", then "yes push". Pushed `ba69f6b` (kit `657c3fe`, Pink Sheet `17451e3`, merge of
+origin/main with another session's `3c43759`, rule titles and OGL footer) to `main` and `live/first-slice`; run
+44016189990 (10:17 to 10:20 PM CST) passed: 114 tests, `pinksheet ok`, 143 feed items, 13 Pink Sheet items, health
+`worldbank-pinksheet` fresh, check PASS, deployed. Earlier: `ca60297` (notes, add.csv fixture) live by run 44009091942.
+Still no sanctions or screening list change under 1.9. **Waiting for Tom:** (1) **HW-H-1 wording** (draft, not in the
+register): H-1A "OFAC designates ships or a procurement network in one action"; H-1B "BIS or USTR extend stays or
+suspensions before a scheduled date"; H-1C stays artefact with a new HW-IND-7 "a list change made mostly of renames
+or re-keyed entries"; HW-IND-1 cut to "an OFAC change adds 3 or more ships with IMO numbers" (the dual-use network half
+is a judgment). With a yes: register 1.4 and wire HW-IND-1 and HW-IND-7 into the items. (2) **COP and superseded
+readings:** FX, GEM and WFP ids carry their date, so each new reading "ends" the last (29 fx items in the live
+`ended.geojson` over 7 days); COP only archives that list for base rates. Recommended: stable per-series ids in
+Headwind (a new reading logs as changed; one run of new and ended at the switch); alternatives a kit end reason
+"superseded" or a COP filter. (3) **Wake setup** after PRs 3 and 4 merged (`40e8215`, `362143e`): secrets
+`WAKE_AIS_TOKEN`, `CLOUDFLARE_PAGES_TOKEN`, variable `CLOUDFLARE_ACCOUNT_ID`, release `portwatch-state` with
+`[local path]`, then `gh workflow run update.yml`; every Wake run
+fails at "No portwatch-state release" until then. **Next:** the rest of the coverage plan (`[local path]`),
+not started this session (context past 300k, weekly usage 91%). The paragraph below is the state before this.
+
+**State, 16 Nov 2026, about 10:30 PM CST: `headwind-1.10` (food rank and run rules) pushed by another session as `6ec664b` (on `main` 16 Nov, 10:30 PM CST; it shares the method id with the Pink Sheet).** Local food and the FAO indices flag also on a rise above the 95th percentile of their own baseline (`rank`) or six or more rises in a row (`run`), with the lane's floor (`stats.rank_run`; doctrine/method.md, The anomaly rule). On the 16 Nov WFP files only Sudan flags (+55.9% to Oct 2026, rank and run). Also live since `3c43759` (9:42 PM CST): rule titles place each country once (DRC no longer tags CG; Burma, Darfur) and the OGL v3.0 statement in the footer. 110 tests, check PASS.
 
 **State, 16 Nov 2026, about 9:20 PM CST: `headwind-1.9` (names on list changes) live.** `65a62f2` merged as
 `c8c38bf`, on `main` and `live/first-slice`; run 43915430504 (11:09 to 11:12 AM CST) passed every step and deployed:
@@ -305,8 +361,8 @@ the page reads).
   then no level and no comparison. `unofficial` when WFP labels any series so.
 - **Exchange-rate rows left WFP's food median** (`food.is_fx_row`). Small moves on 15 Nov: SD 50.1 to 50.0, SO
   0.7 to 0.6, SS 1.1 to 0.0, YE 1.9 to 2.1, CD's series 1,307 to 1,249. Covered by the `headwind-1.6` bump.
-- **Feed items** `headwind:fxofficial:<cc>:<month>` (source `worldbank-gem`, new in `sources.json`) and
-  `headwind:fxmarket:<cc>:<month>` (WFP's dataset); both `HW-IND-4` and `HW-H-2A` when anomalous, anchor
+- **Feed items** `headwind:fxofficial:<cc>` (source `worldbank-gem`, new in `sources.json`) and
+  `headwind:fxmarket:<cc>` (WFP's dataset; both ids carried the month until 18 Nov 2026); both `HW-IND-4` and `HW-H-2A` when anomalous, anchor
   `#countries`. Month ends never date an item after the collection (`feed._month_end_by`, now used for local food
   too).
 - **Country view** (`feed.country_view`, snapshot `country_view`, page section `#countries`): per watched country
@@ -652,7 +708,7 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
 ## World Bank Pink Sheet (plan step 12, built 16 Nov 2026, `headwind-1.10`)
 - See doctrine/method.md "Fertilizers and critical-list metals". Lane `pinksheet` (`headwind/pinksheet.py`), source
   and health id `worldbank-pinksheet` (window 40/70 days after the month's end), snapshot `pinksheet` and
-  `pinksheet_updated`, feed items `headwind:pinksheet:<series>:<month>` (requirement HW-PIR-6, new in register 1.2;
+  `pinksheet_updated`, feed items `headwind:pinksheet:<series>` (requirement HW-PIR-6, new in register 1.2;
   no indicator), page section `#pinksheet`. The workbook is read with `zipfile` and ElementTree (standard library).
 - **Licence settled 16 Nov 2026** (Tom: "work on step 12"): the data catalog record the API had refused, read in the
   browser, is dataset 0038238 "Commodity Prices - History and Projections", CC BY 4.0, describing the monthly
