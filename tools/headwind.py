@@ -191,11 +191,14 @@ def _lane_wfp(raw_dir, prev, getter):
             missing.append({"country": cc, "reason": "no WFP price file on HDX"})
             continue
         cached = old.get(cc)
-        # A record kept from before headwind-1.6 has no market_fx, and one from before the month-by-month split
-        # test (15 Nov 2026) has no split_months: read the file again once.
+        # A record kept from before headwind-1.6 has no market_fx, one from before the month-by-month split
+        # test (15 Nov 2026) has no split_months, and one from before headwind-1.10 has no rank and run rules
+        # (Sudan's file, unchanged on HDX since 15 Nov, kept its old reading on the live feed until 18 Nov): read
+        # the file again once.
         fresh_fx = "market_fx" in cached and (not cached["market_fx"] or "split_months" in cached["market_fx"]) \
             if cached else False
-        if cached and cached.get("hdx_last_modified") == res["last_modified"] and fresh_fx:
+        fresh_rules = bool(cached) and "rules" in cached
+        if cached and cached.get("hdx_last_modified") == res["last_modified"] and fresh_fx and fresh_rules:
             m = {k: cached[k] for k in cached if k not in ("country", "iso3", "dataset", "hdx_last_modified")}
             for part in (m, m.get("market_fx")):
                 if not part:

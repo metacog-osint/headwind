@@ -272,6 +272,41 @@ class TestRetry(unittest.TestCase):
         self.assertEqual(len(calls), 1)
 
 
+class TestWfpCache(unittest.TestCase):
+    """A WFP file HDX has not changed is not read again, unless the kept reading predates a rule the lane now
+    applies (18 Nov 2026: Sudan's 15 Nov file kept its pre-headwind-1.10 reading, with no rank and run rules)."""
+
+    def _run(self, cached):
+        from headwind import food
+        res = food.hdx_resources(json.loads((FIX / "hdx.json").read_text(encoding="utf-8")))["SDN"]
+        prev = {"local_food": [dict(cached, country="SD", iso3="SDN", dataset="d",
+                                    hdx_last_modified=res["last_modified"])]}
+        asked = []
+
+        def getter(url, timeout):
+            asked.append(url)
+            return fake_getter(url, timeout)
+        with mock.patch.object(headwind_cli, "_watched", lambda: {"SD": "SDN"}):
+            out, _ = headwind_cli._lane_wfp(None, prev, getter)
+        return out["local_food"][0], [u for u in asked if "wfp_food_prices_sdn" in u]
+
+    def test_a_reading_from_before_the_rank_and_run_rules_is_read_again(self):
+        old = {"period": "2026-10", "median_change_pct": 55.9, "series": 153, "markets": 19, "share_rising": 0.89,
+               "z": 2.78, "baseline_n": 60, "flag_rate": 0.0, "months_old": 1, "stale": False, "anomaly": False,
+               "market_fx": None}
+        got, fetched = self._run(old)
+        self.assertEqual(len(fetched), 1)
+        self.assertIn("rules", got)
+        self.assertIn("rise_run", got)
+
+    def test_a_current_reading_is_kept(self):
+        kept = {"period": "2026-10", "median_change_pct": 1.0, "series": 3, "markets": 1, "share_rising": 0.5,
+                "z": 0.1, "baseline_n": 60, "flag_rate": 0.0, "months_old": 1, "stale": False, "anomaly": False,
+                "rules": [], "rise_run": 0, "rank_share_above": 0.5, "market_fx": None}
+        got, fetched = self._run(kept)
+        self.assertEqual((fetched, got["median_change_pct"]), ([], 1.0))
+
+
 class TestKitCopy(unittest.TestCase):
     def test_nothing_inside_doctrine_kit_was_edited(self):
         kit = ROOT / "doctrine" / "kit"
