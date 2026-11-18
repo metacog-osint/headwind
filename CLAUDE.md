@@ -2,9 +2,10 @@
 
 Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind`, prefix `HW`): currencies, energy
 and food prices against their own normal range; changes to official sanctions and US screening lists; export-control,
-sanctions and trade rules (BIS, OFAC, USTR) and their public-inspection filings; tariff actions; the US and UK
-Supreme Courts; US import reliance for minerals; a calendar of dates for Verdict. Measurements only: no probabilities,
-no investment advice. Live at https://headwind.theintelligence.company (Pages project `headwind`,
+sanctions and trade rules (BIS, OFAC, USTR) and their public-inspection filings; tariff actions; US import reliance
+for minerals; a calendar of dates for Verdict. Second strand, **legal events** (`HW-REQ-2`, 18 Nov 2026): highest
+and international courts' decisions as each court publishes them, no anomaly test; US and UK Supreme Courts live.
+Measurements only: no probabilities, no investment advice. Live at https://headwind.theintelligence.company (Pages project `headwind`,
 `headwind-2lx.pages.dev`). Repo `metacog-osint/headwind`, **public since 15 Nov 2026**.
 
 **Notes:** this file holds lasting facts only (12 KB cap). Current state and open items: `.claude/HANDOFF.md`.
@@ -70,7 +71,7 @@ says which. `build` refuses to run without a snapshot.
   support@theintelligence.company; `us_person_data` from address countries (OFAC `add.csv`). Ship owners never kept.
   OFAC and BIS notices on public inspection keep only `federalregister.gov/d/<number>`. USITC's `creator` never kept.
 - **Court items** carry the court's own case title and number; `us_person_data` by party test (Tom accepted, 16 Nov).
-  Courts, ICC and tariff litigation live inside Headwind, not a new program; BRICS membership goes to Readout.
+  Courts, ICC and tariff litigation live inside Headwind as the legal-events strand, not a new program; BRICS membership goes to Readout.
 - **Country placement** (Tom): `UKRAINE-EO13661/13662` Russia; `-EO13660/13685` Russia and Ukraine; `PAARSSR-EO13894`
   Syria; EU `UKR` and Canada's Ukraine regime Russia only; EU `SDNZ` Sudan; France: national entries apart,
   restatements counted only, no countries. Conduct programs stay unplaced; an unknown code shows as

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Headwind: economic stress</title>
-<meta name="description" content="Currencies, energy and food prices measured against their own normal range, changes to official sanctions lists, new export-control rules, and the dates of coming economic decisions. Measurements, not investment advice.">
+<meta name="description" content="Currencies, energy and food prices measured against their own normal range, changes to official sanctions lists, new export-control rules, the dates of coming economic decisions and, as a second strand, the decisions of the US and UK Supreme Courts. Measurements, not investment advice.">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="tic-time.css">
 <link rel="stylesheet" href="tic-nav.css">
@@ -34,7 +34,7 @@
     <h1>Economic stress, measured against its own normal.</h1>
     <p class="lede">Each currency, energy price and food price is compared with its own past changes. An item is marked
       unusual only when the move is far outside that range. These are measurements, not forecasts and not investment
-      advice.</p>
+      advice. A second strand lists the decisions of the US and UK Supreme Courts as the courts publish them.</p>
     <p class="small muted" id="asof" aria-live="polite">Loading…</p>
     <div class="tiles" id="tiles" aria-live="polite"></div>
   </section>
@@ -135,26 +135,7 @@
     <div class="scroll"><table id="screening-table"></table></div>
   </section>
   </div>
-  <div id="sec-rules" data-tab-label="Rules and courts">
-  <div class="two">
-    <section class="card" id="courts" aria-labelledby="co-h">
-      <div class="card-head"><h2 id="co-h">US Supreme Court</h2>
-        <p class="muted small">Every signed and per curiam opinion of this term and the last, as the Court lists them,
-          with the Court's own case title and docket number and the decision date from the docket. Headwind does not
-          summarize or characterize a decision; the opinion is at the link. The tariff-authority cases are tracked by
-          docket. Not covered: orders lists (the Court publishes no feed of them) and in-chambers opinions.</p></div>
-      <div id="scotus-tracked"></div>
-      <div id="scotus-opinions"></div>
-    </section>
-    <section class="card" id="uk-courts" aria-labelledby="uk-h">
-      <div class="card-head"><h2 id="uk-h">UK Supreme Court</h2>
-        <p class="muted small">Every judgment the Supreme Court of the United Kingdom has handed down this year and
-          last, read from the Court's own site, with the Court's own case title, case id and neutral citation and the
-          judgment date. Appeals decided together in one judgment are listed together. Headwind does not summarize or
-          characterize a judgment; it is at the link (the citation links the Court's PDF, the title the case page).
-          Contains public sector information licensed under the Open Government Licence v3.0.</p></div>
-      <div id="uksc-judgments"></div>
-    </section>
+  <div id="sec-rules" data-tab-label="Rules">
     <section class="card" id="rules" aria-labelledby="rl-h">
       <div class="card-head"><h2 id="rl-h">Export-control, sanctions and trade rules</h2>
         <p class="muted small">Rules and proposed rules published in the US Federal Register by BIS, OFAC and USTR,
@@ -177,7 +158,6 @@
       <div id="inspection-list"></div>
     </section>
   </div>
-  </div>
   <div id="sec-minerals" data-tab-label="Minerals">
   <section class="card" id="minerals" aria-labelledby="mn-h">
     <div class="card-head"><h2 id="mn-h">US import reliance for mineral commodities</h2>
@@ -191,6 +171,31 @@
     <div class="scroll tall"><table id="trade-table"></table></div>
   </section>
 
+  </div>
+  <div id="sec-courts" data-tab-label="Courts">
+  <p class="small muted strand-note">Legal events, Headwind's second strand: the decisions of highest courts,
+    listed as each court publishes them, with the court's own case title and number. They are not measured
+    against a normal range and not ranked by importance: every merits decision of these courts is listed.</p>
+  <div class="two">
+    <section class="card" id="courts" aria-labelledby="co-h">
+      <div class="card-head"><h2 id="co-h">US Supreme Court</h2>
+        <p class="muted small">Every signed and per curiam opinion of this term and the last, as the Court lists them,
+          with the Court's own case title and docket number and the decision date from the docket. Headwind does not
+          summarize or characterize a decision; the opinion is at the link. The tariff-authority cases are tracked by
+          docket. Not covered: orders lists (the Court publishes no feed of them) and in-chambers opinions.</p></div>
+      <div id="scotus-tracked"></div>
+      <div id="scotus-opinions"></div>
+    </section>
+    <section class="card" id="uk-courts" aria-labelledby="uk-h">
+      <div class="card-head"><h2 id="uk-h">UK Supreme Court</h2>
+        <p class="muted small">Every judgment the Supreme Court of the United Kingdom has handed down this year and
+          last, read from the Court's own site, with the Court's own case title, case id and neutral citation and the
+          judgment date. Appeals decided together in one judgment are listed together. Headwind does not summarize or
+          characterize a judgment; it is at the link (the citation links the Court's PDF, the title the case page).
+          Contains public sector information licensed under the Open Government Licence v3.0.</p></div>
+      <div id="uksc-judgments"></div>
+    </section>
+  </div>
   </div>
   <div id="sec-sources" data-tab-label="Dates and sources">
   <div class="two">

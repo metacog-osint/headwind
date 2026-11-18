@@ -770,7 +770,7 @@ def scotus_features(snapshot: dict, generated: str, valid_until: str) -> list[di
             f"opinion and the docket are at the links; Headwind does not summarize or characterize them. The case "
             f"title is the Court's own.",
             data_as_of=f"{day}T00:00:00Z", generated=generated, valid_until=valid_until, countries=["US"],
-            pmesii=["political"], ascope=["organizations"], ncf=["operate_government"], requirement_ids=["HW-REQ-1"],
+            pmesii=["political"], ascope=["organizations"], ncf=["operate_government"], requirement_ids=["HW-REQ-2"],
             measures={}, visual={"type": "page", "url": o["link"]},
             source={**SRC_SCOTUS, "url": o["link"]}, accessed=accessed)
         f["properties"]["us_person_data"] = o.get("us_person_data") or scotus.us_person_data(o["title"])
@@ -819,7 +819,7 @@ def uksc_features(snapshot: dict, generated: str, valid_until: str) -> list[dict
             f"page{'s are' if len(cases) > 1 else ' is'} at the links; Headwind does not summarize or characterize "
             f"them. The case titles, case ids and neutral citation are the Court's own. {OGL}",
             data_as_of=f"{day}T00:00:00Z", generated=generated, valid_until=valid_until, countries=["GB"],
-            pmesii=["political"], ascope=["organizations"], ncf=["operate_government"], requirement_ids=["HW-REQ-1"],
+            pmesii=["political"], ascope=["organizations"], ncf=["operate_government"], requirement_ids=["HW-REQ-2"],
             measures={}, visual={"type": "page", "url": first["url"]},
             source={**SRC_UKSC, "url": j.get("judgment_pdf") or first["url"]}, accessed=accessed)
         f["properties"]["us_person_data"] = j.get("us_person_data") or "individuals"

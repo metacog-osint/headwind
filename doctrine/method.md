@@ -1,12 +1,20 @@
 # Headwind method (`headwind-1.10`)
 
 ## Purpose
-Headwind measures economic stress: currencies, energy and food prices that move outside their own
-normal range, changes to official sanctions and US screening lists, new export-control and sanctions
-rules, US tariff actions and revisions of the US tariff schedule, the US Supreme Court's opinions and the
-tariff-authority cases, US import reliance for mineral commodities, and the scheduled dates on which economic
-decisions and figures are published.
-It reports measurements. It states no probability and gives no investment advice.
+Headwind has two strands.
+
+**Economic stress** (`HW-REQ-1`): currencies, energy and food prices that move outside their own normal range,
+changes to official sanctions and US screening lists, new export-control and sanctions rules, US tariff actions and
+revisions of the US tariff schedule, the tariff-authority cases, US import reliance for mineral commodities, and the
+scheduled dates on which economic decisions and figures are published.
+
+**Legal events** (`HW-REQ-2`, since 18 Nov 2026): the decisions of highest national courts and of international
+courts, listed as each court publishes them (below, "The legal events strand"). The US Supreme Court and the UK
+Supreme Court are live. Courts, the ICC and tariff litigation were placed in Headwind rather than in a program of
+their own (15 Nov 2026); they are a strand apart because they do not measure economic stress. The strands meet in the
+tariff-authority cases, which are tracked by docket under economic stress (`HW-PIR-2`).
+
+It reports measurements and records. It states no probability and gives no investment advice.
 
 ## Live lanes (15 Nov 2026)
 
@@ -178,6 +186,17 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   the feed reached back to the reading before; when it did not, the page and the source's health say a release may
   have been missed. Release pages and listings sit behind a bot challenge, so Headwind does not walk the numbers.
   The committees' changes to the UN list itself are read from the list, not from this feed.
+
+## The legal events strand (18 Nov 2026)
+- **What it lists.** A court's decisions as the court publishes them: the court's own case title and number, the
+  decision date and the links. Never a summary, a characterization or a score.
+- **Which decisions, without judgment.** At a court that decides few cases (the US and UK Supreme Courts, about 50 to
+  70 a year), every merits decision. Where the court itself selects (a press release, a decision type), the court's
+  own selection. Where neither holds, only a fixed and published text rule, marked as a text match. Never a reading
+  of importance or of subject.
+- **Not measured.** No anomaly test and no indicator: a court's pace says nothing measured about stress. Court items
+  are tier `routine` and carry `HW-REQ-2`. The strand has no warning problem; one would need its own hypotheses.
+- **One court at a time,** each after its licence and access are read and recorded here.
 
 ## The US Supreme Court (`headwind-1.8`, 16 Nov 2026)
 - **What is covered.** Every opinion in the Court's slip opinion feeds for the current term and the one before
