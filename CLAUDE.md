@@ -8,7 +8,7 @@ probabilities, no investment advice.
 
 **Light-page shell, 18 Nov 2026 (about 9:50 AM CST; Tom's "Yes, commit and push"):** `b705cbe` Elsewhere today (hub `tic-related.js`/.css v1.0) under "Watched countries side by side": the `country_view` countries, strongest first (current readings outside the normal range plus HW-WP-2 indicators, then the largest current |z|); card links underlined (`main .tic-rel a`). `42b3c5a` sections row (hub `tic-tabs.js`/.css v1.0): Unusual, Prices, Countries, Sanctions (sanctions and screening cards; the sanctions card left the `.two` grid), Rules and courts, Minerals, Dates and sources; phone folds in `app.js` `folds()`: lists and tables over 12 entries show 10 with "Show all N" (not `.scroll.tall` tables, not the Supreme Court opinions, which fold themselves); the court heading's id is `co-h` (it shared `ct-h`). Pushed by sha to `main`; update run 44339559592 passed (15:52 UTC). Live in headless Edge: phone page 31,586 px before; groups 1,721 / 3,259 / 3,093 / 9,470 / 6,944 / 3,338 / 4,586 (Sanctions grows with the names of list changes); no COP read at load, one without cookies near the card; no sideways scroll; axe only what was live before (links in text without underline, scroll boxes, two small header links). Shared files equal the hub's `e6bbec0` blobs. A site with a new card in a group: groups are `<div id=sec-* data-tab-label>` inside `<div data-tic-tabs>` in `index.html`.
 
-**State, 18 Nov 2026, about 10:05 AM CST: register 1.4 and stable series ids built and tested, NOT committed.**
+**State, 18 Nov 2026, about 10:05 AM CST: register 1.4 and stable series ids committed as `ae46a01` and pushed with the merge after it (Tom: "Yes, commit and push"); kit 0.5.13 is tic-doctrine `99ba2ef`.**
 Local `live/first-slice` fast-forwarded to origin/main `6767a41` (it carries `6ec664b`, another session's food rank
 and run rules). Tom's answers this session: (1) **HW-H-1 wording adopted** ("Adopt as drafted"): register 1.4
 (`doctrine/indicators.json`), H-1A and H-1B retitled, HW-IND-1 cut to "an OFAC SDN list change adds 3 or more ships
@@ -41,6 +41,12 @@ the OGL v3.0 "provided it is reproduced accurately and not in a misleading conte
 only the latest hand-down (28 Oct 2026, UKSC/2025/0034), and `/cases/uksc-YYYY-NNNN` pages exist; no feed found.
 Next step: read a case page for its neutral citation and judgment date, or ask TNA. The paragraph below is the state
 before this.
+
+**State, 18 Nov 2026: WFP cache fix built in worktree `D:\Projects\_worktrees\headwind-wfp-cache` (branch
+`fix/wfp-cache-rules`), pushed by another session as `639ba8b`.** `headwind-1.10` went live, but the WFP lane reuses a country's kept reading
+while HDX's `last_modified` is unchanged, and readings kept from before 1.10 have no `rules`: the live Sudan item
+(18 Nov 09:50 UTC run, file dated 15 Nov) showed `rules: []`, `rise_run: null`, tier routine. `_lane_wfp` now reads a
+file again once when its kept reading has no `rules` (tests `TestWfpCache`; 117 tests OK, 1 skipped).
 
 **State, 16 Nov 2026, about 10:30 PM CST: `headwind-1.10` live (World Bank Pink Sheet, plan step 12); kit 0.5.10.**
 Tom: "yes to merge PRs, sync the kit, work on step 12, work on the wording, let's talk about the COP issue, then work on
