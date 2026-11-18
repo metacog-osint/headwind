@@ -323,7 +323,7 @@ def _observation(item_id: str, title: str, summary: str, *, anomaly: bool, data_
     }
     if anomaly:
         # The kit's form (feed-contract-v2: id, window, type, version). The id names the lane's own rule, from
-        # the item id ("headwind:fxmarket:SD:2026-10" -> "headwind-fxmarket"); every series rule is rolling.
+        # the item id ("headwind:fxmarket:SD" -> "headwind-fxmarket"); every series rule is rolling.
         props["baseline_ref"] = {"id": f"headwind-{item_id.split(':')[1]}", "type": "rolling", "version": METHOD,
                                  "window": baseline_ref.removeprefix("rolling: ")}
         if hypothesis_id:
@@ -429,6 +429,44 @@ def _rekeyed_text(vessels: list[dict]) -> str:
     tail = f"; and {more} more on the page" if more > 0 else ""
     return (f" Vessels removed and listed again under a new entry id with the same IMO number, counted as the same "
             f"entry and not as removed and added ({len(vessels)}): {'; '.join(rows)}{tail}.")
+
+
+# HW-IND-1 and HW-IND-7 (doctrine/indicators.json, register 1.4, Tom's yes 18 Nov 2026), measured on each list change.
+IND1_SHIPS = 3          # an OFAC change that adds this many ships with IMO numbers meets HW-IND-1
+IND7_SHARE = 0.5        # renamed, re-keyed or renumbered entries above this share of a change meet HW-IND-7
+
+
+def list_indicator(s: dict) -> tuple[dict, dict]:
+    """(measures, indicator properties) for one sanctions or screening list change. A rename is a person or
+    organization whose name changed, or a vessel whose name changed; a re-keyed entry came back under a new id
+    (same IMO number, or same name and type); a renumbered one only moved on Canada's list. OFAC changes always
+    carry HW-IND-1 (present, or absent and neutral); any other change carries HW-IND-7 only when it is met."""
+    renamed = (s.get("renamed") or 0) + sum(1 for v in s.get("vessels_changed") or [] if "name" in (v.get("changed") or {}))
+    moved_ids = (s.get("rekeyed") or 0) + (s.get("renumbered") or 0)
+    vessel_only = s.get("vessel_details_only", len(s.get("vessels_changed") or []))
+    touched = s.get("added", 0) + s.get("removed", 0) + s.get("changed", 0) + vessel_only + moved_ids
+    share = round((renamed + moved_ids) / touched, 3) if touched else 0.0
+    measures = {"renamed_or_rekeyed": renamed + moved_ids, "rename_share": share}
+    ofac = s.get("list") == "ofac-sdn"
+    if ofac:
+        ships = sum(1 for v in s.get("vessels_added") or [] if v.get("imo"))
+        measures["vessels_added_with_imo"] = ships
+        if ships >= IND1_SHIPS:
+            return measures, {"indicator_id": "HW-IND-1", "hypothesis_id": "HW-H-1A", "direction": "supports",
+                              "indicator_state": "present"}
+    if share > IND7_SHARE:
+        return measures, {"indicator_id": "HW-IND-7", "hypothesis_id": "HW-H-1C", "direction": "supports",
+                          "indicator_state": "present"}
+    if ofac:
+        return measures, {"indicator_id": "HW-IND-1", "hypothesis_id": "HW-H-1A", "direction": "neutral",
+                          "indicator_state": "absent"}
+    return measures, {}
+
+
+def _tag_list_change(props: dict, s: dict) -> None:
+    measures, tags = list_indicator(s)
+    props["measures"].update(measures)
+    props.update(tags)
 
 
 def _changed_title(s: dict) -> str:
@@ -583,6 +621,7 @@ def list_features(snapshot: dict) -> list[dict]:
             source=LIST_SOURCE[s["list"]],
             accessed=(lanes.get("sanctions") or {}).get("fetched_at"), anomaly_ref=_batch_ref(s)))
         feats[-1]["properties"]["us_person_data"] = s.get("us_person_data") or "none"
+        _tag_list_change(feats[-1]["properties"], s)
 
     for s in snapshot.get("screening") or []:
         if s["detected_at"] < cutoff:
@@ -615,6 +654,7 @@ def list_features(snapshot: dict) -> list[dict]:
             source={**SRC_CSL, "url": s.get("url") or SRC_CSL["url"]},
             accessed=(lanes.get("screening") or {}).get("fetched_at"), anomaly_ref=_batch_ref(s)))
         feats[-1]["properties"]["us_person_data"] = s.get("us_person_data") or "none"
+        _tag_list_change(feats[-1]["properties"], s)
 
     for r in controls.recent(snapshot.get("controls") or [], generated, RULE_DAYS):
         if r["agency"] == "President":
@@ -915,7 +955,7 @@ def live_features(snapshot: dict) -> list[dict]:
         cc = f.get("country")
         name = (geo.name(cc) if cc else None) or ("Euro area" if f["currency"] == "EUR" else f["currency"])
         feats.append(_observation(
-            f"headwind:fx:{f['currency']}:{f['date']}",
+            f"headwind:fx:{f['currency']}",
             f"{name} ({f['currency']}): {abs(f['change_pct']):.1f}% {f['direction']} against the US dollar "
             f"in {markets.FX_HORIZON} business days ({_z_text(f['z'])})",
             f"{f['per_usd']:g} {f['currency']} per US dollar on {f['date']}, against {f['prior_per_usd']:g} on "
@@ -938,7 +978,7 @@ def live_features(snapshot: dict) -> list[dict]:
         cc = o["country"]
         name = geo.name(cc) or cc
         feats.append(_observation(
-            f"headwind:fxofficial:{cc}:{o['period']}",
+            f"headwind:fxofficial:{cc}",
             f"{name}: official exchange rate {abs(o['change_pct']):.1f}% {o['direction']} against the US dollar "
             f"in {o['period']} ({_z_text(o['z'])})",
             f"Monthly average official rate {o['per_usd']:g} per US dollar in {o['period']}, against "
@@ -964,7 +1004,7 @@ def live_features(snapshot: dict) -> list[dict]:
         level = (f"rates from {w['per_usd_low']:g} to {w['per_usd_high']:g} per US dollar, too far apart to be one "
                  f"market" if w.get("split") else f"median rate {w['per_usd_median']:g} per US dollar")
         feats.append(_observation(
-            f"headwind:fxmarket:{cc}:{w['period']}",
+            f"headwind:fxmarket:{cc}",
             f"{name}: {kind} exchange rate {abs(w['median_change_pct']):.1f}% {w['direction']} against the US dollar "
             f"in {w['period']}, median of {w['markets']} market{'s' if w['markets'] != 1 else ''} "
             f"({_z_text(w['z'])})",
@@ -986,7 +1026,7 @@ def live_features(snapshot: dict) -> list[dict]:
 
     for e in snapshot.get("energy") or []:
         feats.append(_observation(
-            f"headwind:energy:{e['id']}:{e['date']}",
+            f"headwind:energy:{e['id']}",
             f"{e['name']}: {e['change_pct']:+.1f}% in {markets.EN_HORIZON} trading days ({_z_text(e['z'])})",
             f"{e['price']:g} {e['unit']} on {e['date']}, against {e['prior_price']:g} on {e['prior_date']}. "
             f"Measured against the series' own {e['baseline_n']} earlier {markets.EN_HORIZON}-day changes.",
@@ -1001,7 +1041,7 @@ def live_features(snapshot: dict) -> list[dict]:
 
     for c in snapshot.get("fao") or []:
         feats.append(_observation(
-            f"headwind:food:{c['id']}:{c['period']}",
+            f"headwind:food:{c['id']}",
             f"{c['name']} ({c['period']}): {c['value']:g}, {c['change_pct']:+.1f}% on the month ({_z_text(c['z'])})",
             f"{c['value']:g} for {c['period']}, against {c['prior_value']:g} for {c['prior_period']} "
             f"(2014-2016 = 100). FAO revises earlier months; these are the values as published today."
@@ -1022,7 +1062,7 @@ def live_features(snapshot: dict) -> list[dict]:
         crit = (f" On the US Final 2025 List of Critical Minerals as {c['critical_list_name']}."
                 if c.get("critical_list_name") else "")
         feats.append(_observation(
-            f"headwind:pinksheet:{c['id']}:{c['period']}",
+            f"headwind:pinksheet:{c['id']}",
             f"{c['name']} ({c['period']}): {c['value']:g} {c['unit']}, {c['change_pct']:+.1f}% on the month "
             f"({_z_text(c['z'])})",
             f"{c['value']:g} {c['unit']} for {c['period']}, against {c['prior_value']:g} for {c['prior_period']}; "
@@ -1043,7 +1083,7 @@ def live_features(snapshot: dict) -> list[dict]:
         cc = w["country"]
         name = geo.name(cc) or cc
         feats.append(_observation(
-            f"headwind:localfood:{cc}:{w['period']}",
+            f"headwind:localfood:{cc}",
             f"{name}: local food prices {w['median_change_pct']:+.0f}% in {food.WFP_HORIZON} months, median of "
             f"{w['series']} price series ({_z_text(w['z'])})",
             f"Median {food.WFP_HORIZON}-month change to {w['period']} across {w['series']} market-and-commodity "
