@@ -374,6 +374,42 @@
       }).join("");
       return '<div class="row"><div class="row-title"><span>' + esc(labels[k] || k) + '</span><span class="badge ' + (ok ? "" : "badge-warn") + '">' + esc(ok ? "current" : "not current") + '</span></div><div class="small muted">' + esc(note) + "</div>" + subs + "</div>";
     }).join("");
+    folds();
+  }
+
+  // On a phone a long list or table shows its first FOLD entries (each puts the strongest or newest first) and a
+  // "Show all" button; wider screens show every entry. The fold is CSS (style.css, .fold-box), so nothing is hidden
+  // from a wide screen, a printout or a search engine. Same rule as Cordon's and Elements' tables. Tables that
+  // scroll in their own box (.scroll.tall) and lists with a fold of their own (Supreme Court opinions) are left.
+  var FOLD = 10;
+  function foldLong(box, items) {
+    var old = box.nextElementSibling;
+    if (old && old.classList.contains("fold-more")) { old.remove(); }
+    box.classList.remove("fold-box", "open");
+    if (items.length <= FOLD + 2) { return; }
+    Array.prototype.forEach.call(items, function (it, n) { it.classList.toggle("fold", n >= FOLD); });
+    box.classList.add("fold-box");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "fold-more";
+    btn.setAttribute("aria-expanded", "false");
+    btn.textContent = "Show all " + items.length;
+    btn.addEventListener("click", function () {
+      var open = box.classList.toggle("open");
+      btn.setAttribute("aria-expanded", String(open));
+      btn.textContent = open ? "Show the first " + FOLD : "Show all " + items.length;
+      if (!open) { box.scrollIntoView({ block: "nearest" }); }
+    });
+    box.insertAdjacentElement("afterend", btn);
+  }
+  function folds() {
+    Array.prototype.forEach.call(document.querySelectorAll("main .scroll:not(.tall) > table"), function (t) {
+      foldLong(t.parentElement, t.querySelectorAll("tbody > tr"));
+    });
+    ["rules-list", "tariffs-list", "inspection-list", "calendar", "lanes"].forEach(function (id) {
+      var box = document.getElementById(id);
+      if (box) { foldLong(box, box.querySelectorAll(":scope > .row")); }
+    });
   }
 
   fetch("data/snapshot.json")
