@@ -49,7 +49,7 @@ LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", 
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
            "dgtresor-gels": "sanctions", "gac-sema": "sanctions", "un-press": "unpress",
-           "supremecourt-gov": "scotus",
+           "supremecourt-gov": "scotus", "supremecourt-uk": "uksc",
            "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
            "usgs-mcs": "minerals", "census-trade": "trade", "usitc-hts": "tariffs", "whitehouse-actions": "tariffs"}
 LIST_KEY = {"ofac-sdn": "ofac-sdn", "un-consolidated": "un-sc-consolidated", "eu-fsf": "eu-fsf",
@@ -98,6 +98,8 @@ DRIFT = {
     "unpress": ("un-press", "items in the UN press feed", False),
     # Warn only: a new term's feed starts empty in October.
     "scotus": ("supremecourt-gov", "opinions in the two terms' feeds", False),
+    # Strict: the sitemap's judgment pages only grow (159 on 18 Nov 2026); a short list means the sitemap changed.
+    "uksc": ("supremecourt-uk", "judgment pages in the sitemap", True),
 }
 
 
@@ -129,6 +131,8 @@ def sizes(lane: str, result: dict) -> dict[str, int]:
         return {"tariffs": (result.get("hts_releases") or {}).get("total") or 0}
     if lane == "scotus":
         return {"scotus": len(result.get("scotus_opinions") or [])}
+    if lane == "uksc":
+        return {"uksc": (result.get("uksc_sitemap") or {}).get("judgment_pages") or 0}
     if lane == "unpress":
         return {"unpress": (result.get("un_press") or {}).get("items") or 0}
     if lane == "screening":
@@ -302,6 +306,18 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
             detail=f"{len(ops)} opinions in the two terms read, newest decided {max(decided) if decided else 'none'}; "
                    f"{len(snap.get('scotus_tracked') or [])} tariff-authority dockets tracked",
             error=err("scotus"), warnings=(notes.get("supremecourt-gov") or []) + [f"not read: {e}" for e in errs] or None)
+    uj = snap.get("uksc_judgments") or []
+    if uj or lanes.get("uksc"):
+        us = snap.get("uksc_sitemap") or {}
+        newest = uj[0] if uj else None
+        left = [f"{us['pending']} case pages left to read on the next run"] if us.get("pending") else []
+        out["supremecourt-uk"] = _entry(
+            "supremecourt-uk", ok=lane_ok("uksc"), now=now, prev=prev,
+            newest=_newest([j.get("judgment_date") for j in uj]), today=today,
+            detail=f"{len(uj)} judgments this year and last, newest {newest['citation'] + ' on ' + newest['judgment_date'] if newest else 'none'}; "
+                   f"{us.get('judgment_pages') or 0} judgment pages in the sitemap",
+            error=err("uksc"),
+            warnings=(notes.get("supremecourt-uk") or []) + left + [f"not read: {e}" for e in snap.get("uksc_errors") or []] or None)
     watch = minerals.watch_notes(snap.get("minerals") or {})
     if watch:
         out["usgs-mcs"]["warnings"] = list(out["usgs-mcs"].get("warnings") or []) + watch

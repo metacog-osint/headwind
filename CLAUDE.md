@@ -29,17 +29,8 @@ endings only). Wake's setup itself was already done 17 Nov (secrets, variable, `
 **First list changes under 1.9** (17 Nov): UK 9 added (GHR, all entities, 0 renames, so the FCDO noise question is
 still open), France 47 and 46 restated EU measures; feed text names them, `list-changes.json` holds three, the page
 script renders `named_added`; `us_person_data` none on all three. trade.gov re-keying not yet seen live.
-**UK Supreme Court (coverage plan, not built):** Find Case Law's Open Justice Licence v2.0 (read 18 Nov 2026) allows
-copy, publish and commercial use with the statement "Contains information licensed under the Open Justice Licence
-v2.0", but excludes "computational analysis", which its guidance defines as automated or algorithmic processing of
-large numbers of judgments (text mining, bulk extraction, automated classification) and licenses separately, free on
-application (caselawlicence@nationalarchives.gov.uk; "better to ask than to proceed"). Its terms of use bar external
-indexing. Reading the Atom feed for titles and citations is probably outside that, but it is automated, so ask TNA
-first or use the court's own site: supremecourt.uk's terms (read 18 Nov 2026) put its Crown copyright material under
-the OGL v3.0 "provided it is reproduced accurately and not in a misleading context". That site is a Next.js app:
-`/cases?cs=Judgment+given` ignores the filter server-side (6 cases, mixed statuses), `/news/latest-judgments` shows
-only the latest hand-down (28 Oct 2026, UKSC/2025/0034), and `/cases/uksc-YYYY-NNNN` pages exist; no feed found.
-Next step: read a case page for its neutral citation and judgment date, or ask TNA. The paragraph below is the state
+**UK Supreme Court lane `uksc` (built 18 Nov 2026, not committed):** see "UK Supreme Court" below and method.md.
+Find Case Law was not used (Open Justice Licence excludes computational analysis). The paragraph below is the state
 before this.
 
 **State, 18 Nov 2026: WFP cache fix built in worktree `[local path]` (branch
@@ -347,6 +338,7 @@ empty, and `lanes` in the snapshot says which. `build` refuses to run without a 
 | `trade` | `trade.py` | Census Bureau international trade API, imports by HS code and country, 24 codes. **Needs a free Census key** | 15 Nov: 24 codes, newest month Sep 2026 |
 | `tariffs` | `tariffs.py` | USITC Harmonized Tariff Schedule release list (JSON); White House presidential actions (RSS) | 15 Nov: 186 revisions (23 in 2026), 3 tariff actions signed in 30 days, all in the Federal Register. Both lanes with texts took 6 s |
 | `scotus` | `scotus.py` | supremecourt.gov slip opinion RSS (`TYear=` this term and last) and docket JSON (`/RSS/Cases/JSON/<docket>.json`) | 16 Nov, 12:37 AM CST: 75 opinions (56 signed, 19 per curiam), all 75 dated from their dockets; first run 2 min 56 s (75 dockets), later runs read only the two feeds, the tracked dockets and any undated case |
+| `uksc` | `uksc.py` | supremecourt.uk: sitemap (judgment pages), latest-judgments page, case pages (read once) | 18 Nov 2026, 11:13 AM CST: 159 judgment pages (158 cases); 108 case pages in the window read in 1 min 35 s; 85 judgments, [2025] UKSC 1 to [2026] UKSC 36 |
 | `unpress` | `unpress.py` | The UN's Meetings Coverage and Press Releases RSS (gzip even unasked), Security Council sanctions committee releases, number, date and link only | 16 Nov, 12:08 AM CST: 10 items back to 13 Nov 4:42 PM UTC, no committee release |
 | `minerals` | `minerals.py` | USGS Mineral Commodity Summaries 2026 data release on ScienceBase (item JSON, then two CSVs) | 13 Nov: 68 commodities with net import reliance, 47 with import shares by country |
 
@@ -775,6 +767,17 @@ On 12 Nov nothing was flagged; the largest z was 3.0 (Australian dollar).
   retry and read back; a patch script that stops part-way must not be rerun blind (an insertion's anchor survives
   it, so a rerun inserts twice: happened once, undone with `git checkout` of the six files).
 
+## UK Supreme Court (built 18 Nov 2026, lane `uksc`)
+- See doctrine/method.md "The UK Supreme Court". `uksc.py`: `parse_sitemap` (judgment pages by case slug; fails under
+  `MIN_JUDGMENT_PAGES` 100), `parse_case`, `parse_latest`, `to_read` (window from 1 Jan last year, newest first; at most
+  `UKSC_PAGES_PER_RUN` 120 and `UKSC_SECONDS_PER_RUN` 120 a run, as the job has 15 minutes), `merge` (keyed by neutral citation; joined appeals share one), `party_kind` /
+  `us_person_data` (scotus's test after a UK clean-up). Snapshot `uksc_judgments`, `uksc_read` (state, not on the
+  page), `uksc_errors`, `uksc_sitemap`; card `#uk-courts` in "Rules and courts"; items `headwind:uksc:<year>-<n>`
+  (14 days, HW-REQ-1, countries GB, OGL statement in the summary). Source and health id `supremecourt-uk` (drift
+  strict on the sitemap's judgment-page count); raw case pages under `supremecourt-uk-case`.
+- The case list's filter is a Next.js server action (`updateCases`, id changes per build): not used.
+- Fixtures `uksc_*` cut by `.claude/cut_uksc.py` from pages read 18 Nov 2026 (kept elements only, verbatim).
+
 ## Canada's list and UN committee releases (plan item 3, built 16 Nov 2026, `headwind-1.8`)
 - See doctrine/method.md "Canada's consolidated list" and "UN sanctions committee press releases".
 - **Canada** (`parse_canada_xml`, `canada_key`, `canada_renumbered`, `apply_renumbering`): key regime|schedule|item.
@@ -888,6 +891,9 @@ Full source register, terms read 15 Nov, build order and the minutes estimate: `
   states no licence of its own. Headwind publishes only counts taken from the list and a link to it, never its
   content, and since 13 Nov does not publish its index of the list either. Tom, 13 Nov: that is enough to deploy
   (the recommendation); asking the UN is still open as a courtesy.
+- UK Supreme Court (supremecourt.uk): its terms and conditions, read 18 Nov 2026, put Crown copyright material
+  under the OGL v3.0 "provided it is reproduced accurately and not in a misleading context"; video footage is under
+  the Open Supreme Court Licence (not used). Linking needs no permission.
 - USGS Mineral Commodity Summaries data release: CC0 1.0, read from the ScienceBase record on 13 Nov 2026.
 - Final 2025 List of Critical Minerals: a Federal Register notice, so reproducible without restriction (see Federal
   Register above).
