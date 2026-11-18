@@ -8,7 +8,9 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="tic-time.css">
 <link rel="stylesheet" href="tic-nav.css">
+<link rel="stylesheet" href="tic-related.css">
 <script src="tic-time.js"></script>
+<script src="tic-related.js"></script>
 <script src="tic-nav.js" defer data-current="headwind" data-health="on"></script>
 </head>
 <body>
@@ -77,6 +79,8 @@
     <div class="scroll"><table id="country-table"></table></div>
     <p class="small muted" id="country-note"></p>
   </section>
+  <!-- Elsewhere today: the other layers' findings in the watched countries above (tic-related.js from the hub) -->
+  <section class="card" id="tic-related" hidden></section>
 
   <section class="card" id="local-food" aria-labelledby="lf-h">
     <div class="card-head"><h2 id="lf-h">Local food prices in watched countries</h2>
