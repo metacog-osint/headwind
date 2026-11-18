@@ -1971,5 +1971,39 @@ class TestNames(unittest.TestCase):
                          ("KAL TEK LABS", "1988-08-26", "individuals"))         # unstated type with a US address
 
 
+
+class TestWatchFixes(unittest.TestCase):
+    """The two faults found in the 18 Nov 2026 watch check."""
+
+    def test_month_in_progress_dated_by_publisher(self):
+        gen, pub = "2026-11-18T20:00:26Z", "2026-11-15T08:49:41.798152"
+        self.assertEqual(feed._month_end_by("2026-11", gen, pub), "2026-11-15T08:49:41Z")
+        self.assertEqual(feed._month_end_by("2026-11", "2026-11-18T23:00:00Z", pub), "2026-11-15T08:49:41Z")
+        self.assertEqual(feed._month_end_by("2026-11", gen), gen)                       # no publisher date
+        self.assertEqual(feed._month_end_by("2026-11", gen, "2026-10-30T09:00:00"), gen)   # before the month
+        self.assertEqual(feed._month_end_by("2026-10", gen, pub), "2026-10-31T00:00:00Z")  # a finished month
+
+    def eu_health(self, eu_date, today, changes):
+        snap = {"generated_at": f"{today.isoformat()}T20:00:00Z", "lanes": {"sanctions": {"status": "ok"}},
+                "sanctions_lists": [{"id": "eu-fsf", "total": 6269, "source_generated": eu_date}],
+                "sanctions": changes}
+        return health.build(snap, {}, today)["eu-fsf"]
+
+    def test_eu_file_date_judged_and_france_cross_check(self):
+        fr = [{"list": "france-gels", "detected_at": "2026-11-17T15:50:41Z", "named_added": [
+                  {"name": "A", "programs": ["UE Russie"]}, {"name": "B", "programs": ["UE Ukraine intégrité territoriale"]},
+                  {"name": "C", "programs": ["FR national, art L. 562-2"]}]},
+              {"list": "uk-sanctions", "detected_at": "2026-11-17T15:50:41Z", "named_added": [
+                  {"name": "D", "programs": ["UE Russie"]}]}]
+        h = self.eu_health("2026-10-23T17:05:43.888+02:00", date(2026, 11, 18), fr)
+        self.assertEqual((h["state"], h["data_as_of"]), ("late", "2026-10-23"))
+        self.assertIn("France's register added 2 entries under EU programs on 2026-11-17, after 2026-10-23, the date "
+                      "of the EU file", h["warnings"])
+        self.assertIn("the publisher's file is dated 2026-10-23, 26 days ago", h["warnings"])
+        h = self.eu_health("2026-11-17T09:00:00+01:00", date(2026, 11, 18), fr)
+        self.assertEqual((h["state"], h.get("warnings")), ("fresh", None))            # France's day is not later
+        self.assertEqual(self.eu_health("2026-09-20T09:00:00+02:00", date(2026, 11, 18), [])["state"], "stale")
+
+
 if __name__ == "__main__":
     unittest.main()

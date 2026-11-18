@@ -34,12 +34,16 @@ WINDOWS = {"ecb-eurofxref": (4, 8), "eia-spot": (7, 14), "fao-ffpi": (40, 70), "
            # The Pink Sheet is updated on the second business day of the month with the month before.
            "worldbank-pinksheet": (40, 70),
            # The Census Bureau publishes a month's trade about five weeks after it ends.
-           "census-trade": (70, 100)}
+           "census-trade": (70, 100),
+           # The EU's Financial Sanctions File carries its own generation date and is regenerated as the EU adopts
+           # listings. Judged like data since 18 Nov 2026, when it had not moved since 23 Oct while France restated
+           # 151 EU entries (windows provisional: the EU's usual rhythm is not measured yet).
+           "eu-fsf": (14, 45)}
 
 # A publisher date that has not moved for this many days is noted (not a failure: an unchanged list is still a
 # reading). The UN regenerates its file every day, so two quiet days is already unusual.
 # France publishes its register as measures are taken (6 Nov 2026 was the latest on 15 Nov).
-QUIET_DAYS = {"un-sc-consolidated": 3, "eu-fsf": 30, "uk-sanctions-list": 30, "dgtresor-gels": 30}
+QUIET_DAYS = {"un-sc-consolidated": 3, "eu-fsf": 14, "uk-sanctions-list": 30, "dgtresor-gels": 30}
 # OFAC's file carries no date of its own, so its note uses the last change Headwind itself saw.
 # Canada's file carries no date either; it changes every few weeks (Last-Modified 10 Nov 2026 on 16 Nov).
 QUIET_SEEN_DAYS = {"ofac-sdn": 21, "gac-sema": 45}
@@ -327,8 +331,10 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
     for st in snap.get("sanctions_lists") or []:
         key = LIST_KEY.get(st["id"], st["id"])
         ok = lane.get("status") == "ok" and not st.get("error")
-        warns = list(notes.get(key) or []) + quiet_notes(key, st, today)
-        out[key] = _entry(key, ok=ok, now=now, prev=prev, newest=None, today=today,
+        warns = (list(notes.get(key) or []) + quiet_notes(key, st, today)
+                 + (eu_behind(st, snap.get("sanctions") or []) if key == "eu-fsf" else []))
+        newest = _day(st.get("source_generated")) if key in WINDOWS else None
+        out[key] = _entry(key, ok=ok, now=now, prev=prev, newest=newest, today=today,
                           detail=f"{st.get('total')} entries" + (f", publisher dated {st['source_generated'][:10]}"
                                                                   if st.get("source_generated") else ""),
                           error=st.get("error") or lane.get("error"), warnings=warns)
@@ -354,6 +360,26 @@ def quiet_notes(key: str, status: dict, today: date) -> list[str]:
             what = "no change seen since" if status.get("last_change_at") else "no change seen since the baseline of"
             out.append(f"{what} {seen.isoformat()}, {(today - seen).days} days ago")
     return out
+
+
+def eu_behind(status: dict, changes: list[dict]) -> list[str]:
+    """France restates EU listings in its own register. Entries France added under an EU program ("UE ...") on a day
+    after the EU file's own date are listings the EU file is older than: a note, counted from the names kept."""
+    d = _day(status.get("source_generated"))
+    if not d:
+        return []
+    n, days = 0, set()
+    for c in changes:
+        seen = _day(c.get("detected_at"))
+        if c.get("list") != "france-gels" or not seen or seen <= d:
+            continue
+        k = sum(1 for e in c.get("named_added") or [] if any(p.startswith("UE ") for p in e.get("programs") or []))
+        if k:
+            n, days = n + k, days | {seen.isoformat()}
+    if not n:
+        return []
+    return [f"France's register added {n} entries under EU programs on {', '.join(sorted(days))}, after "
+            f"{d.isoformat()}, the date of the EU file"]
 
 
 def summary(health: dict) -> dict[str, int]:

@@ -398,7 +398,8 @@ The feed carries a `health` member, one entry per source keyed by the source id 
 this run read the source (`failing` when not; the page shows the last good copy), the date of its newest
 data, and a state against the source's own rhythm: fresh, late or stale for the ECB (4 and 8 days, for
 business days and long weekends), EIA (7 and 14), FAO (40 and 70 days after the month's end) and WFP
-(75 and 135); `up` (read, no date to judge) for the rest.
+(75 and 135), and since 18 Nov 2026 the EU's sanctions file by its own generation date (14 and 45 days,
+provisional); `up` (read, no date to judge) for the rest.
 
 - **Drift.** Each run keeps the size of what a source gave (rows, dates, entries) for its last ten good
   readings. Once there are three, a reading under half the median fails the lane for sources parsed from
@@ -406,8 +407,15 @@ business days and long weekends), EIA (7 and 14), FAO (40 and 70 days after the 
   fifths, or for sizes that move on their own (the 60-day window of rules, WFP's countries, FAO's release
   dates, the screening file), it is a warning.
 - **Quiet publishers.** A note, not a failure, when a list's own file date has not moved for 3 days
-  (UN, which regenerates daily) or 30 days (EU, UK), or when Headwind has seen no change on OFAC's list,
-  which carries no date, for 21 days.
+  (UN, which regenerates daily), 14 days (EU, since 18 Nov 2026) or 30 days (UK, France), or when Headwind has
+  seen no change on OFAC's list, which carries no date, for 21 days.
+- **EU against France** (18 Nov 2026). France restates EU listings in its own register. When France's register
+  adds entries under EU programs ("UE ...") on a day after the EU file's own date, the EU entry carries a note with
+  their count. Why: on 18 Nov 2026 every EU file was dated 23 Oct while France had restated 151 EU entries on 17
+  and 18 Nov, none of them in the EU file, and health showed the EU list as up.
+- **Months still under way.** A monthly reading for the current month (WFP posts some countries' months as they
+  go) is dated by the publisher's last update of the file, not by the time of the run, so the reading keeps its
+  date until WFP posts again (18 Nov 2026: before, each run logged it as changed).
 
 ## Minerals
 Net import reliance and import shares are copied from the US Geological Survey's Mineral Commodity
