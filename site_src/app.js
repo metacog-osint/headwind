@@ -46,6 +46,18 @@
     TicRelated.render(box, { countries: ranked.map(function (r) { return r.cc; }), here: "headwind", names: names, level: 2 });
   }
 
+  // A table that scrolls sideways must be reachable by keyboard (WCAG 2.1.1): each .scroll box is a focusable region
+  // named by its card's heading.
+  function regions() {
+    document.querySelectorAll("main .scroll").forEach(function (b) {
+      if (b.hasAttribute("tabindex")) { return; }
+      var card = b.closest(".card"), h = card && card.querySelector("h2[id]");
+      b.tabIndex = 0;
+      b.setAttribute("role", "region");
+      if (h) { b.setAttribute("aria-labelledby", h.id); } else { b.setAttribute("aria-label", "Table"); }
+    });
+  }
+
   function render(s) {
     var names = s.country_names || {};
     var fx = (s.fx || []).slice().sort(function (a, b) { return Math.abs(b.z || 0) - Math.abs(a.z || 0); });
@@ -54,18 +66,27 @@
 
     document.getElementById("asof").textContent = "Collected " + when(s.generated_at) + ". Method " + (s.method_version || "") + ".";
 
-    var an = [];
-    fx.forEach(function (f) { if (f.anomaly) { an.push((names[f.country] || f.currency) + " (" + f.currency + "): " + Math.abs(f.change_pct).toFixed(1) + "% " + f.direction + " against the US dollar in 5 business days, z " + zText(f.z)); } });
-    en.forEach(function (e) { if (e.anomaly) { an.push(e.name + ": " + pct(e.change_pct) + " in 5 trading days, z " + zText(e.z)); } });
-    fao.forEach(function (c) { if (c.anomaly) { an.push(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z)); } });
-    ps.forEach(function (c) { if (c.anomaly) { an.push(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z)); } });
+    var an = [], far = null;
+    // Each unusual reading, and the one furthest from its own normal (largest |z|) for today's reading.
+    function add(text, z) { an.push(text); if (typeof z === "number" && (!far || Math.abs(z) > Math.abs(far.z))) { far = { text: text, z: z }; } }
+    fx.forEach(function (f) { if (f.anomaly) { add((names[f.country] || f.currency) + " (" + f.currency + "): " + Math.abs(f.change_pct).toFixed(1) + "% " + f.direction + " against the US dollar in 5 business days, z " + zText(f.z), f.z); } });
+    en.forEach(function (e) { if (e.anomaly) { add(e.name + ": " + pct(e.change_pct) + " in 5 trading days, z " + zText(e.z), e.z); } });
+    fao.forEach(function (c) { if (c.anomaly) { add(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z), c.z); } });
+    ps.forEach(function (c) { if (c.anomaly) { add(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z), c.z); } });
     (s.sanctions || []).concat(s.screening || []).forEach(function (d) { if (d.anomaly) { an.push(d.list_name + ": a designation batch larger than the list's usual (" + (d.national ? d.national.added + " national" : d.added) + " added, seen " + String(d.detected_at).slice(0, 10) + ")"); } });
-    fresh.forEach(function (w) { if (w.anomaly) { an.push((names[w.country] || w.country) + ": local food prices " + pct(w.median_change_pct) + " in 3 months, z " + zText(w.z)); } });
-    (s.fx_official || []).forEach(function (o) { if (o.anomaly) { an.push((names[o.country] || o.country) + ": official exchange rate " + Math.abs(o.change_pct).toFixed(1) + "% " + o.direction + " against the US dollar in " + o.period + ", z " + zText(o.z)); } });
-    (s.market_fx || []).forEach(function (w) { if (w.anomaly) { an.push((names[w.country] || w.country) + ": " + (w.unofficial ? "unofficial " : "") + "market exchange rate " + Math.abs(w.median_change_pct).toFixed(1) + "% " + w.direction + " against the US dollar in " + w.period + ", z " + zText(w.z)); } });
+    fresh.forEach(function (w) { if (w.anomaly) { add((names[w.country] || w.country) + ": local food prices " + pct(w.median_change_pct) + " in 3 months, z " + zText(w.z), w.z); } });
+    (s.fx_official || []).forEach(function (o) { if (o.anomaly) { add((names[o.country] || o.country) + ": official exchange rate " + Math.abs(o.change_pct).toFixed(1) + "% " + o.direction + " against the US dollar in " + o.period + ", z " + zText(o.z), o.z); } });
+    (s.market_fx || []).forEach(function (w) { if (w.anomaly) { add((names[w.country] || w.country) + ": " + (w.unofficial ? "unofficial " : "") + "market exchange rate " + Math.abs(w.median_change_pct).toFixed(1) + "% " + w.direction + " against the US dollar in " + w.period + ", z " + zText(w.z), w.z); } });
     document.getElementById("anomalies").innerHTML = an.length
       ? an.map(function (t) { return '<div class="row">' + esc(t) + "</div>"; }).join("")
       : '<p class="small muted">Nothing is outside its normal range in this collection.</p>';
+
+    // Today's reading (tic-shell): from this collection, no fixed counts; "unusual" is against each series' own past.
+    var rd = document.getElementById("reading");
+    rd.innerHTML = '<span class="tic-reading-k">Today’s reading</span>' + (an.length
+      ? "<b>" + an.length + "</b> reading" + (an.length === 1 ? " is" : "s are") + " outside " + (an.length === 1 ? "its" : "their") +
+        " own normal range in this collection." + (far ? " Furthest out: " + esc(far.text) + "." : "")
+      : "Nothing is outside its own normal range in this collection.");
 
     document.getElementById("tiles").innerHTML = [
       ["Unusual now", an.length], ["Currencies", fx.length], ["Energy, food and commodity series", en.length + fao.length + ps.length],
@@ -388,6 +409,7 @@
       return '<div class="row"><div class="row-title"><span>' + esc(labels[k] || k) + '</span><span class="badge ' + (ok ? "" : "badge-warn") + '">' + esc(ok ? "current" : "not current") + '</span></div><div class="small muted">' + esc(note) + "</div>" + subs + "</div>";
     }).join("");
     folds();
+    regions();
   }
 
   // On a phone a long list or table shows its first FOLD entries (each puts the strongest or newest first) and a

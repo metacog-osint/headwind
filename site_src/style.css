@@ -45,7 +45,7 @@ body {
 .top { border-bottom: 1px solid var(--border); background: var(--panel); padding: 12px 0; }
 .top-row { display: flex; justify-content: space-between; align-items: center; }
 .brand strong { font-size: 1.05rem; margin-right: 10px; }
-.top-nav a { color: var(--muted); text-decoration: none; margin-left: 16px; font-size: 0.88rem; }
+.top-nav a { color: var(--muted); text-decoration: none; margin-left: 16px; font-size: 0.88rem; display: inline-block; padding: 4px 0; min-height: 24px; } /* 24 px targets (WCAG 2.5.8) */
 .top-nav a:hover { color: var(--text); }
 .hero { padding: 28px 0 18px; }
 .hero h1 { margin: 0 0 8px; font-size: 1.65rem; }
@@ -92,6 +92,7 @@ main a:hover, main a:focus { text-decoration: underline; }
 }
 @media print { .fold-box:not(.open) .fold { display: revert; } .fold-more { display: none; } }
 main .tic-rel a { text-decoration: underline; } /* Elsewhere today: its links sit in text (WCAG 1.4.1) */
+main p a, main .row-title a, main .row .small a { text-decoration: underline; } /* links inside sentences, for the same reason */
 details.more > summary { cursor: pointer; padding: 10px 0; color: var(--link); font-size: 0.88rem; }
 details.more[open] > summary { border-bottom: 1px solid var(--border); }
 .row-title > span:first-child { min-width: 0; overflow-wrap: anywhere; }
