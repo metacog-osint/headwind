@@ -31,6 +31,8 @@ It reports measurements and records. It states no probability and gives no inves
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
 | Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML); since 19 Nov 2026 Australia's Consolidated List (xlsx) and Japan's asset-freeze list (CSV, with its ship file) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
 | US Supreme Court (since 16 Nov 2026) | The Court's slip opinion feeds (this term and the last) and its dockets (JSON) | As the Court publishes | Every signed and per curiam opinion, with the Court's case title, docket number and decision date; the tariff-authority dockets tracked; no anomaly test |
+| UK Supreme Court (since 18 Nov 2026) | The Court's own site: sitemap, latest-judgments page, case pages | As the Court publishes | Every judgment this year and last, with the Court's case title, case id and neutral citation; no anomaly test |
+| Court of Justice of the EU (since 19 Nov 2026) | The Publications Office's SPARQL endpoint (the metadata behind EUR-Lex) | Same day | Every judgment of the Court of Justice and the General Court in the last 60 days; the Grand Chamber's and full Court's in the feed; no anomaly test |
 | UN sanctions committee releases (since 16 Nov 2026) | The UN's Meetings Coverage and Press Releases feed (RSS) | As the UN publishes | Security Council sanctions committees' press releases: document number, date and link only; no anomaly test |
 | Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country; scored by designation batches where the list gives dates |
 | Minerals | USGS Mineral Commodity Summaries data release (net import reliance; import shares by country) | Annual | No anomaly test; context only, in `data/minerals.json` |
@@ -337,6 +339,45 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   reproduced accurately and not in a misleading context"; video footage of proceedings is under the Open Supreme
   Court Licence and is not used. Items and the page carry "Contains public sector information licensed under the
   Open Government Licence v3.0." Linking needs no permission (same terms page).
+
+## The Court of Justice of the European Union (19 Nov 2026)
+- **What is covered.** Every judgment of the Court of Justice and of the General Court dated in the last 60 days,
+  one item per judgment (per CELEX number and ECLI). Not covered: orders, Advocate General opinions, the courts'
+  press releases and calendars, and judgments before the window.
+- **Source and terms.** The Publications Office's SPARQL endpoint on CELLAR (`publications.europa.eu/webapi/rdf/sparql`,
+  keyless), which holds the metadata EUR-Lex shows. EUR-Lex's legal notice (read 19 Nov 2026): "EUR-Lex metadata is
+  dedicated to the public domain" under CC0 1.0, and its documents may be reused "for commercial or non-commercial
+  purposes" under Decision 2011/833/EU. EUR-Lex's robots.txt (same day) asks a 10-second crawl delay and disallows
+  its webservice (`/smartapi`) and document downloads; Headwind sends one query a run to the Publications Office and
+  only links to EUR-Lex's document pages, which robots.txt allows. The EUR-Lex webservice (it needs registration)
+  and CURIA's own pages are not used. Items, the page and the feed's licence carry "Source: EUR-Lex, © European
+  Union, https://eur-lex.europa.eu".
+- **What is read.** One query a run for the window, read whole each time, so a judgment whose English heading
+  arrives later is updated in place: CELEX number, ECLI, date, court, the Court's own heading (for the formation,
+  "Judgment of the Court (Grand Chamber) of ..."), the case numbers and the parties as the Court names them, and the
+  Court's subject words, read only for whether they name restrictive measures and not kept. Each judgment has a twin
+  record (CELEX `_1`, marked `do_not_index`) that is skipped. When the English version is not out yet, the French
+  one (the Court's working language) is read and the page and item say so; a heading the Office has not filled in
+  ("__[unreferenced:...]__") gives no formation. A reply that is not SPARQL JSON, or a judgment of an unknown court
+  or CELEX form, fails the lane; an empty window (the summer vacation) is a reading. Measured on 19 Nov 2026: a
+  judgment of that morning was on the endpoint the same day (record at 10:38 CET, English heading by 14:34); the
+  60 days held 221 judgments (110 Court of Justice, 111 General Court), 3 of the Grand Chamber, 18 on restrictive
+  measures, 3 not yet in English; the query took about a second.
+- **Which go in the feed (the strand's rule above).** The courts decide about 900 cases a year, so not every
+  judgment: the Court of Justice's own selection, the judgments of its Grand Chamber and full Court (the formations
+  it keeps for its weightiest cases). A judgment whose own subject words name restrictive measures (sanctions) is
+  marked on the page but kept out of the feed, because choosing by subject is outside the rule; `cjeu.FEED_RESTRICTIVE_MEASURES`
+  adds those judgments to the feed once Tom changes the rule. 14 days in the feed, 60 on the page.
+- **What an item says.** That the court gave a judgment (its ECLI) on a date, in a case or cases named by the
+  Court's own case numbers and parties, with the formation, why it is listed, and the EUR-Lex link. No summary, no
+  characterization, no country (the Court's decisions bind the Union; `countries` is empty, as for UN releases).
+- **`us_person_data`.** The UK test with EU words, side by side and also split on "and" (so "Heinz Reinwald and HK
+  Evolution LTD" still reads as a person): company forms used across the member states (GmbH, SpA, a.s., sp. z o.o.,
+  d.o.o., BV and the rest) are organizations; the EU's institutions, bodies and agencies, member states named alone,
+  and government words in English and French are government; everything else, including the initials the Court gives
+  anonymised people, is a person. A national authority named in its own language (Skatteverket,
+  Maahanmuuttovirasto) reads as a person, so mistakes go toward individuals. On the 221 judgments of 19 Nov 2026: 144
+  individuals, 61 organizations, 16 none.
 
 ## Names on list changes (`headwind-1.9`, 16 Nov 2026)
 - **What is named.** People, organizations and ships added, changed and removed on every list Headwind reads but the

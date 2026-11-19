@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 from tic_doctrine import CONTRACT, geo  # noqa: E402
 
-from . import batches, controls, food, inspection, markets, pinksheet, scotus, stats, tariffs, uksc, unpress  # noqa: E402
+from . import batches, cjeu, controls, food, inspection, markets, pinksheet, scotus, stats, tariffs, uksc, unpress  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
 METHOD = "headwind-1.10"
@@ -170,6 +170,21 @@ SRC_UKSC = {
     "independence_group": "uk-supreme-court",
     "source_type": "official or market data",
     "descriptor": "The Court's own case pages and judgments, as it publishes them.",
+}
+
+SRC_CJEU = {
+    "id": "eurlex-cellar",
+    "publisher": "Court of Justice of the European Union, via the Publications Office of the European Union (EUR-Lex)",
+    "title": "EU case law: judgments of the Court of Justice and the General Court (EUR-Lex metadata)",
+    "url": cjeu.CASE_LAW_PAGE,
+    "licence": "EUR-Lex metadata CC0 1.0; EUR-Lex documents reusable for commercial or non-commercial purposes "
+               "(Decision 2011/833/EU; EUR-Lex legal notice, read 19 Nov 2026). Source: EUR-Lex, "
+               "© European Union, https://eur-lex.europa.eu",
+    "grade": "A1",
+    "independence_group": "cjeu",
+    "source_type": "official or market data",
+    "descriptor": "The Court's own record of its judgments (case numbers, parties, formation, date), as the EU's "
+                  "Publications Office publishes it for EUR-Lex.",
 }
 
 LIST_SOURCE = {"ofac-sdn": SRC_OFAC, "un-consolidated": SRC_UN, "eu-fsf": SRC_EU, "uk-sanctions": SRC_UK,
@@ -759,6 +774,7 @@ def list_features(snapshot: dict) -> list[dict]:
     feats += unpress_features(snapshot, generated, valid_until)
     feats += scotus_features(snapshot, generated, valid_until)
     feats += uksc_features(snapshot, generated, valid_until)
+    feats += cjeu_features(snapshot, generated, valid_until)
     return feats
 
 
@@ -884,6 +900,43 @@ def uksc_features(snapshot: dict, generated: str, valid_until: str) -> list[dict
         f["properties"]["us_person_data"] = j.get("us_person_data") or "individuals"
         f["properties"]["neutral_citation"] = j["citation"]
         f["properties"]["case_urls"] = [c["url"] for c in cases]
+        feats.append(f)
+    return feats
+
+
+def cjeu_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
+    """Judgments of the last two weeks that the courts' own record selects (cjeu.py): a Court of Justice judgment of
+    the Grand Chamber or the full Court (and, only once cjeu.FEED_RESTRICTIVE_MEASURES is set, a judgment whose own
+    subject words name restrictive measures). The case numbers and parties are the Court's own; no judgment text;
+    us_person_data from the parties."""
+    accessed = ((snapshot.get("lanes") or {}).get("cjeu") or {}).get("fetched_at")
+    cutoff = _plus_hours(generated, -24 * cjeu.FEED_DAYS)[:10]
+    feats = []
+    for j in snapshot.get("cjeu_judgments") or []:
+        if not j.get("selected") or (j.get("date") or "") < cutoff:
+            continue
+        case_word = "Cases" if len(j["cases"]) > 1 else "Case"
+        cases = ", ".join(j["cases"])
+        sat = f" ({j['formation']})" if j.get("formation") else ""
+        why = ("the Court of Justice sat as the Grand Chamber" if j["selected"] == "Grand Chamber" else
+               "the Court of Justice sat as the full Court" if j["selected"] == "full Court" else
+               "the Court's own subject words for the case name restrictive measures (sanctions)")
+        parties = j.get("parties") or "parties not yet published"
+        lang = ("" if j.get("language") == "en" else
+                " The English version is not out yet; the parties are as the French version names them.")
+        f = _official(
+            f"headwind:cjeu:{j['celex']}",
+            f"{j['court']} of the EU{sat}: {parties}, {case_word} {cases} ({j['date']})",
+            f"The {j['court']} of the European Union gave judgment {j['ecli']} on {j['date']} in {case_word} "
+            f"{cases}, {parties}. Listed because {why}. The judgment is at the link; Headwind does not summarize or "
+            f"characterize it. The case numbers and parties are the Court's own, from EUR-Lex.{lang}",
+            data_as_of=f"{j['date']}T00:00:00Z", generated=generated, valid_until=valid_until, countries=[],
+            pmesii=["political", "economic"] if j["restrictive_measures"] else ["political"],
+            ascope=["organizations"], ncf=["operate_government"], requirement_ids=["HW-REQ-2"], measures={},
+            visual={"type": "page", "url": j["url"]}, source={**SRC_CJEU, "url": j["url"]}, accessed=accessed)
+        f["properties"]["us_person_data"] = j.get("us_person_data") or "individuals"
+        f["properties"]["ecli"] = j["ecli"]
+        f["properties"]["selected_because"] = j["selected"]
         feats.append(f)
     return feats
 
@@ -1306,12 +1359,15 @@ def build_feed(snapshot: dict) -> dict:
                     "List, CC BY 4.0 (Department of Foreign Affairs and Trade website – www.dfat.gov.au); Japan's "
                     "asset-freeze list, PDL1.0 (出典：財務省ウェブサイト, edited by Headwind); UN press "
                     "releases, linked only; "
-                    "Supreme Court of the United States opinions and dockets, US government works"),
+                    "Supreme Court of the United States opinions and dockets, US government works; UK Supreme Court "
+                    "case pages, Open Government Licence v3.0; EU case law, EUR-Lex metadata CC0 1.0 (© European "
+                    "Union, https://eur-lex.europa.eu)"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; World Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
                         "and Development Office; French Treasury (Direction générale du Trésor); Global Affairs Canada; Australian "
-                        "Department of Foreign Affairs and Trade; Ministry of Finance Japan; Supreme Court of the United States; US International Trade Administration; "
+                        "Department of Foreign Affairs and Trade; Ministry of Finance Japan; Supreme Court of the United States; The Supreme Court "
+                        "of the United Kingdom; Court of Justice of the European Union and the Publications Office of the EU (EUR-Lex); US International Trade Administration; "
                         "US Federal Register and the Office of the Federal Register; US International Trade Commission; The White House."),
         "language_key": LANGUAGE_KEY,
         # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read

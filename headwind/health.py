@@ -38,7 +38,10 @@ WINDOWS = {"ecb-eurofxref": (4, 8), "eia-spot": (7, 14), "fao-ffpi": (40, 70), "
            # The EU's Financial Sanctions File carries its own generation date and is regenerated as the EU adopts
            # listings. Judged like data since 18 Nov 2026, when it had not moved since 23 Oct while France restated
            # 151 EU entries (windows provisional: the EU's usual rhythm is not measured yet).
-           "eu-fsf": (14, 45)}
+           "eu-fsf": (14, 45),
+           # The Court of Justice and the General Court give judgment most weeks; their judicial vacations run from
+           # mid-July to the start of September and over Christmas, when a gap of up to about eight weeks is usual.
+           "eurlex-cellar": (21, 60)}
 
 # A publisher date that has not moved for this many days is noted (not a failure: an unchanged list is still a
 # reading). The UN regenerates its file every day, so two quiet days is already unusual.
@@ -57,7 +60,7 @@ LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", 
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
            "dgtresor-gels": "sanctions", "gac-sema": "sanctions", "dfat-consolidated": "sanctions",
            "mof-jp-sanctions": "sanctions", "un-press": "unpress",
-           "supremecourt-gov": "scotus", "supremecourt-uk": "uksc",
+           "supremecourt-gov": "scotus", "supremecourt-uk": "uksc", "eurlex-cellar": "cjeu",
            "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
            "usgs-mcs": "minerals", "census-trade": "trade", "usitc-hts": "tariffs", "whitehouse-actions": "tariffs"}
 LIST_KEY = {"ofac-sdn": "ofac-sdn", "un-consolidated": "un-sc-consolidated", "eu-fsf": "eu-fsf",
@@ -109,6 +112,8 @@ DRIFT = {
     "scotus": ("supremecourt-gov", "opinions in the two terms' feeds", False),
     # Strict: the sitemap's judgment pages only grow (159 on 18 Nov 2026); a short list means the sitemap changed.
     "uksc": ("supremecourt-uk", "judgment pages in the sitemap", True),
+    # Warn only: 60 days of judgments (221 on 19 Nov 2026) fall to a handful in the summer vacation.
+    "cjeu": ("eurlex-cellar", "judgments in the last 60 days", False),
 }
 
 
@@ -142,6 +147,8 @@ def sizes(lane: str, result: dict) -> dict[str, int]:
         return {"scotus": len(result.get("scotus_opinions") or [])}
     if lane == "uksc":
         return {"uksc": (result.get("uksc_sitemap") or {}).get("judgment_pages") or 0}
+    if lane == "cjeu":
+        return {"cjeu": len(result.get("cjeu_judgments") or [])}
     if lane == "unpress":
         return {"unpress": (result.get("un_press") or {}).get("items") or 0}
     if lane == "screening":
@@ -327,6 +334,18 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
                    f"{us.get('judgment_pages') or 0} judgment pages in the sitemap",
             error=err("uksc"),
             warnings=(notes.get("supremecourt-uk") or []) + left + [f"not read: {e}" for e in snap.get("uksc_errors") or []] or None)
+    cj = snap.get("cjeu_judgments") or []
+    if cj or lanes.get("cjeu"):
+        cr = snap.get("cjeu_read") or {}
+        newest = cj[0] if cj else None
+        late = [f"{cr['not_in_english']} judgments not yet in English (read in French)"] if cr.get("not_in_english") else []
+        out["eurlex-cellar"] = _entry(
+            "eurlex-cellar", ok=lane_ok("cjeu"), now=now, prev=prev, newest=_newest([j.get("date") for j in cj]),
+            today=today,
+            detail=f"{len(cj)} judgments of the Court of Justice and the General Court since {cr.get('since') or '?'}, "
+                   f"newest {newest['ecli'] + ' on ' + newest['date'] if newest else 'none'}; "
+                   f"{cr.get('selected') or 0} selected for the feed",
+            error=err("cjeu"), warnings=(notes.get("eurlex-cellar") or []) + late or None)
     watch = minerals.watch_notes(snap.get("minerals") or {})
     if watch:
         out["usgs-mcs"]["warnings"] = list(out["usgs-mcs"].get("warnings") or []) + watch
