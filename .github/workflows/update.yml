@@ -8,8 +8,9 @@ name: update
 # its last good copy. Both need the run before: data/snapshot.json and the two list indexes in data/state/. They
 # are kept in the Actions cache and not on the site. Each run saves a new cache entry and the next run restores the
 # newest. GitHub drops an entry nobody has read for 7 days. A second copy goes to this repository's release `state`
-# as assets (14 Nov 2026): headwind-state.tar.gz, the newest, and one per UTC day for 14 days. Release assets do not
-# expire. The repository is public (since 15 Nov 2026), so the release is public and the cache is to be treated as
+# as assets (14 Nov 2026): headwind-state.tar.gz, the newest, in release `state`; dated daily copies are kept for
+# good in release `state-YYYY-qN` (retention, 18 Nov 2026; none deleted). Release assets do not expire.
+# The repository is public (since 15 Nov 2026), so the release is public and the cache is to be treated as
 # public too: nothing goes into the state that may not be published. The indexes hold the publishers' own entry
 # ids, types and programs, taken from public lists, and since headwind-1.9 the names and address countries Headwind
 # publishes (every list but the UN's), and short name hashes; never UN list text. A
@@ -100,6 +101,10 @@ jobs:
         run: |
           git fetch -q --depth=1 origin main && git checkout -q FETCH_HEAD -- history 2>/dev/null \
             || echo "::warning::could not take history/ from main's tip; using this checkout's"
+          # Retention archives (history/deltas, history/fetch-index): appended after main's tip is taken, so a
+          # queued run cannot overwrite lines another run wrote; a failure is a warning, never a missed deploy.
+          python -m headwind.archive append \
+            || echo "::warning::archive step failed; list changes and fetch index not archived this run"
           python doctrine/kit/tic.py history site/data/feed.geojson --dir history --ended site/data/ended.geojson \
             --reading-key data_as_of \
             || { echo "::warning::history step failed; this run is missing from history/"; exit 0; }
@@ -133,13 +138,18 @@ jobs:
           npx --yes wrangler@4.151.3 pages deploy site --project-name headwind --branch main \
             --commit-hash "$GITHUB_SHA" --commit-message "update $GITHUB_SHA" --commit-dirty=true
       # After the deploy, so a failed upload never holds the site back; it still fails the run, which mails the owner.
+      # Release `state` keeps only the newest tarball (the restore path above). Dated copies are kept for good in
+      # one release per quarter, `state-YYYY-qN` (about 92 assets a quarter against the 1,000 limit); a same-day
+      # run replaces that day's copy, and the changes between two runs are in history/deltas.
       - name: Second copy of the state in the release (public, like the repository)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tar -czf headwind-state.tar.gz data/snapshot.json data/state
+          ls -l headwind-state.tar.gz
           day="headwind-state-$(date -u +%Y-%m-%d).tar.gz"
           cp headwind-state.tar.gz "$day"
+          q="state-$(date -u +%Y)-q$(( (10#$(date -u +%m) - 1) / 3 + 1 ))"
           title="Run state"
           notes="Headwind's run state: the last good snapshot and the list indexes (the publishers' own entry ids, types and programs, from public lists; names and address countries as Headwind publishes them, for every list but the UN Security Council's; short name hashes). Kept for the workflow to restore. Public with the repository, so nothing goes into it that may not be published."
           if ! gh release view state >/dev/null 2>&1; then
@@ -147,7 +157,19 @@ jobs:
           else
             gh release edit state --title "$title" --notes "$notes" >/dev/null
           fi
-          gh release upload state headwind-state.tar.gz "$day" --clobber
-          # Keep the newest and 14 daily copies.
-          daily=$(gh release view state --json assets --jq '.assets[].name' | grep -E '^headwind-state-[0-9-]{10}[.]tar[.]gz$' | sort)
-          for old in $(echo "$daily" | head -n -14); do gh release delete-asset state "$old" --yes; done
+          gh release upload state headwind-state.tar.gz --clobber
+          qnotes="Headwind's dated run states and ship-table versions for one quarter, kept for good (nothing is deleted). Public with the repository, so nothing goes into them that may not be published."
+          gh release view "$q" >/dev/null 2>&1 || gh release create "$q" --prerelease --latest=false --title "$q" --notes "$qnotes"
+          gh release upload "$q" "$day" --clobber
+          # Ship table (data/vessels.json): one dated asset per changed version, named with its content digest.
+          digest=$(python -m headwind.archive vessels-digest site/data/vessels.json)
+          last=$(gh release view "$q" --json assets --jq '.assets[].name' | grep -E '^headwind-vessels-' | sort | tail -n 1 || true)
+          case "$last" in
+            *"-$digest.json.gz") echo "vessels.json unchanged (digest $digest)";;
+            *) vname="headwind-vessels-$(date -u +%Y-%m-%dT%H%M)-$digest.json.gz"
+               gzip -9 -n -c site/data/vessels.json > "$vname"
+               gh release upload "$q" "$vname";;
+          esac
+          n=$(gh release view "$q" --json assets --jq '.assets | length')
+          echo "release $q holds $n assets (limit 1,000)"
+          if [ "$n" -ge 950 ]; then echo "::error::release $q has $n assets, near the 1,000 limit"; exit 1; fi
