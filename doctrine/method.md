@@ -29,7 +29,7 @@ It reports measurements and records. It states no probability and gives no inves
 | Local food prices | WFP prices by market, from the Humanitarian Data Exchange | Monthly, one to three months late | Median 3-month change across a country's price series, against its own 60 prior medians |
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
-| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
+| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML); since 19 Nov 2026 Australia's Consolidated List (xlsx) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
 | US Supreme Court (since 16 Nov 2026) | The Court's slip opinion feeds (this term and the last) and its dockets (JSON) | As the Court publishes | Every signed and per curiam opinion, with the Court's case title, docket number and decision date; the tariff-authority dockets tracked; no anomaly test |
 | UN sanctions committee releases (since 16 Nov 2026) | The UN's Meetings Coverage and Press Releases feed (RSS) | As the UN publishes | Security Council sanctions committees' press releases: document number, date and link only; no anomaly test |
 | Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country; scored by designation batches where the list gives dates |
@@ -174,6 +174,34 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - **Layout.** Canada renamed every field between its June and August 2026 files (Country to Country-Pays). A file
   with none of the expected fields fails the list, keeping the reading before; it is never read as delistings.
 
+## Australia's consolidated list (19 Nov 2026)
+- **What it is.** The Australian Sanctions Office's (DFAT) Consolidated List, one xlsx at a fixed address: 4,021
+  entries on the copy saved 17 Nov 2026 (2,581 individuals, 1,081 entities, 359 ships), one row per name (primary
+  name, aliases, original script) under a Reference ("2" for the entry, "2a", "2b" for its other names). 29 regimes:
+  14 autonomous, 15 under Security Council resolutions.
+- **Terms.** DFAT's copyright page (read 19 Nov 2026): everything on the site but the Coat of Arms is CC BY 4.0,
+  attributed "Department of Foreign Affairs and Trade website – www.dfat.gov.au"; robots.txt allows the file.
+  dfat.gov.au timed out from Headwind's machine on 15 Nov and on the morning of 19 Nov, then answered in about 8 s.
+- **UN restatements counted only** (Tom, 19 Nov 2026). The 1,067 entries under Security Council regimes ("1267",
+  "1718", "1988" ...) restate the UN's lists, whose terms withhold redistribution; DFAT's licence covers only its own
+  material. They are kept as [type, regime] and nothing else: counted, never named, not scored, placing no country,
+  and their ships left out of the cross-list. As with France, the change is split: Australia's own designations are
+  named and scored by the observed-batch rule, the restatements are one count line. "1373 (2001)" is not a UN
+  restatement: the UN keeps no list under resolution 1373, and those entries are Australia's own terrorism listings.
+- **Ids are stable.** On the Wayback copies of 12 Sep and 13 Nov 2026 and the live copy, 3,899 References stayed;
+  one changed its name (2693, a patronymic) and none its type or regime.
+- **Countries.** Citizenships as printed (";" between them), and from each address the country it ends with when
+  that is a citizenship name of the same file or one of a short list of address spellings ("Russian Federation",
+  "Japan"), whole or after a comma. Addresses are free text with street lines; only the country is kept, and a place
+  that is not a country ("Tehran", "Northern Ireland") gives none. Regimes place countries as on the EU and Canadian
+  lists ("Autonomous (Ukraine)" on Russia only; the vessel designations are Russia's); FFRY, the three thematic
+  regimes and 1373 are unplaced.
+- **No designation date.** The file's Control Date is the date an entry last changed, and its listing text is UN
+  wording for UN entries, so batches use Headwind's own readings, as for OFAC and France. The publisher's date is
+  the time DFAT saved the workbook (its `dcterms:modified`); the same part names who saved it, which is never kept.
+- **Layout.** The sheet's name carries a date on some copies ("Consolidated List - 13_11_2026"); a file without the
+  expected columns fails the list, keeping the reading before.
+
 ## UN sanctions committee press releases (`headwind-1.8`, 16 Nov 2026)
 - **Source.** The UN's Meetings Coverage and Press Releases RSS feed, the only feed found. A release counts when its
   link is a Security Council document (SC/nnnnn) and its title names a sanctions committee ("... Sanctions
@@ -271,14 +299,14 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 
 ## Names on list changes (`headwind-1.9`, 16 Nov 2026)
 - **What is named.** People, organizations and ships added, changed and removed on every list Headwind reads but the
-  UN Security Council's: OFAC's SDN list, the EU's, the UK's, France's and Canada's lists, and trade.gov's screening
-  lists. Each named entry carries its name as the publisher prints it ("LAST, First" on OFAC's list, "Nom, Prénom" on
+  UN Security Council's: OFAC's SDN list, the EU's, the UK's, France's, Canada's and Australia's lists (Australia's
+  own designations; its UN restatements are counted only), and trade.gov's screening lists. Each named entry carries its name as the publisher prints it ("LAST, First" on OFAC's list, "Nom, Prénom" on
   France's), its type, its programs, the countries of its addresses and nationality as printed, and the listing date
   where the list gives one. Birth dates, identity documents, street addresses, statements of reasons, aliases and
   contact details are not carried. OFAC's countries come from its own address file (`add.csv`); Canada's list prints
   no address or nationality.
 - **Why these lists and not the UN's.** Tom, 15 Nov 2026: publish what the licences allow. OFAC's and trade.gov's
-  lists are US government works. Canada allows non-commercial reproduction. France's Licence Ouverte 2.0 and the EU's
+  lists are US government works. Canada allows non-commercial reproduction. Australia's DFAT site is CC BY 4.0. France's Licence Ouverte 2.0 and the EU's
   reuse decision (2011/833/EU) allow reuse of personal data within data-protection law; the UK's Open Government
   Licence v3.0 does not cover personal data, which leaves the question to data-protection law too (all read 16 Nov
   2026). Headwind carries the least that identifies an entry, shows a removal as a removal, and takes down on request
