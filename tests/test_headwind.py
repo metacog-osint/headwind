@@ -15,6 +15,7 @@ import sys
 import tempfile
 import unittest
 import urllib.error
+import urllib.parse
 import xml.etree.ElementTree as ET
 import zipfile
 from unittest import mock
@@ -26,7 +27,7 @@ FIX = ROOT / "tests" / "fixtures"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import pinksheet, scotus, uksc, unpress  # noqa: E402
+from headwind import cjeu, pinksheet, scotus, uksc, unpress  # noqa: E402
 from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
                       sanctions, screening, stats, tariffs, trade)
 from tic_doctrine import contract, registers  # noqa: E402
@@ -104,6 +105,8 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         if not f.exists():
             raise OSError(f"no fixture for {url}")         # the lane notes it and goes on
         return f.read_bytes()
+    if url.startswith(cjeu.ENDPOINT + "?"):
+        return (FIX / "cjeu_sparql.json").read_bytes()
     if url == uksc.SITEMAP:
         return (FIX / "uksc_sitemap.xml").read_bytes()
     if url == uksc.LATEST:
@@ -963,6 +966,99 @@ class TestScotus(unittest.TestCase):
         f = feed.scotus_features(snap, snap["generated_at"], "2026-04-01T06:00:00Z")
         self.assertEqual([x["properties"]["id"] for x in f], ["headwind:scotusdocket:24-1287:2026-03-24"])
         self.assertIn('"Judgment Issued."', f[0]["properties"]["summary"])
+        self.assertEqual(lint({"features": f}), [])
+
+
+class TestCjeu(unittest.TestCase):
+    """The Publications Office's SPARQL reply of 19 Nov 2026 (60 days), cut to 11 judgments: Grand Chamber, restrictive
+    measures at both courts, two read in French (one with a placeholder heading), ordinary ones."""
+
+    def setUp(self):
+        self.js = cjeu.parse((FIX / "cjeu_sparql.json").read_bytes())
+        self.by = {j["celex"]: j for j in self.js}
+
+    def test_query(self):
+        url = cjeu.query_url(date(2026, 11, 19))
+        self.assertTrue(url.startswith(cjeu.ENDPOINT + "?query="))
+        q = urllib.parse.parse_qs(urllib.parse.urlsplit(url).query)
+        self.assertEqual(q["format"], ["application/sparql-results+json"])
+        self.assertIn('FILTER(?date >= "2026-09-20"^^xsd:date)', q["query"][0])
+        self.assertIn("FILTER NOT EXISTS { ?work cdm:do_not_index ?x }", q["query"][0])   # the _1 twin works
+
+    def test_parse(self):
+        self.assertEqual(len(self.js), 11)
+        self.assertEqual([j["date"] for j in self.js], sorted((j["date"] for j in self.js), reverse=True))
+        gc = self.by["62025CJ0241"]
+        self.assertEqual((gc["court"], gc["formation"], gc["cases"], gc["parties"], gc["ecli"], gc["selected"],
+                          gc["language"], gc["url"]),
+                         ("Court of Justice", "Grand Chamber", ["C-241/25"], "Société Générale SA v Skatteverket",
+                          "ECLI:EU:C:2026:985", "Grand Chamber", "en",
+                          "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62025CJ0241"))
+        self.assertEqual(self.by["62023CJ0698"]["cases"], ["C-698/23 P"])
+        rm = self.by["62024TJ0535"]
+        self.assertEqual((rm["court"], rm["formation"], rm["restrictive_measures"], rm["selected"],
+                          rm["us_person_data"]),
+                         ("General Court", "Seventh Chamber, Extended Composition", True, None, "organizations"))
+        self.assertEqual((self.by["62024CJ0897"]["restrictive_measures"], self.by["62024CJ0897"]["us_person_data"]),
+                         (True, "individuals"))
+        self.assertEqual(self.by["62025TJ0093"]["us_person_data"], "organizations")   # Iran Shipping Lines
+        self.assertIsNone(self.by["62025CJ0029"]["selected"])
+        fr = self.by["62025CJ0543"]
+        self.assertEqual((fr["language"], fr["formation"], fr["parties"], fr["us_person_data"], fr["url"][:46]),
+                         ("fr", "neuvième chambre", "Commission européenne contre Hongrie", "none",
+                          "https://eur-lex.europa.eu/legal-content/FR/TXT"))
+        self.assertIsNone(self.by["62025CJ0230"]["formation"])    # "__[unreferenced:arret-c-iii-ext]__ du ..."
+        self.assertEqual((sum(1 for j in self.js if j["selected"]), sum(1 for j in self.js if j["restrictive_measures"])),
+                         (3, 4))
+        with mock.patch.object(cjeu, "FEED_RESTRICTIVE_MEASURES", True):     # only on Tom's yes
+            js = cjeu.parse((FIX / "cjeu_sparql.json").read_bytes())
+        self.assertEqual({j["celex"]: j["selected"] for j in js if j["selected"] == "restrictive measures"},
+                         dict.fromkeys(["62024CJ0897", "62024TJ0535", "62025TJ0093", "62025TJ0479"],
+                                       "restrictive measures"))
+
+    def test_parse_fails_loudly(self):
+        d = json.loads((FIX / "cjeu_sparql.json").read_text(encoding="utf-8"))
+        d["results"]["bindings"][0]["court"]["value"] = "http://publications.europa.eu/resource/authority/corporate-body/EP"
+        with self.assertRaises(ValueError):
+            cjeu.parse(json.dumps(d).encode())
+        with self.assertRaises(KeyError):
+            cjeu.parse(b'{"head": {}}')
+        self.assertEqual(cjeu.parse(b'{"head": {"vars": []}, "results": {"bindings": []}}'), [])   # a quiet summer
+
+    def test_parties(self):
+        cases = {"Heinz Reinwald and HK Evolution LTD v European Union Intellectual Property Office": "individuals",
+                 "European Commission v Hungary": "none",
+                 "European Data Protection Supervisor v European Parliament and Council of the European Union": "none",
+                 "Republic of Poland v European Parliament and Council of the European Union": "none",
+                 "Kerry Inc. and Kerry Ingredients (UK) Ltd v European Commission": "organizations",
+                 "Silgan Holdings, Inc. and Others v European Commission": "organizations",
+                 "KOOPERATIVA poisťovňa, a.s. Vienna Insurance Group v O. A.": "individuals",
+                 "A and Others v Maahanmuuttovirasto": "individuals",
+                 "": "individuals"}
+        self.assertEqual({t: cjeu.us_person_data(t) for t in cases}, cases)
+
+    def test_merge_and_feed(self):
+        first = cjeu.merge([], self.js, "2026-11-19T21:00:00Z")
+        again = cjeu.merge(first, self.js[2:], "2026-11-20T03:00:00Z")
+        self.assertEqual((len(again), again[0]["first_seen"]), (9, "2026-11-19T21:00:00Z"))
+        snap = {"cjeu_judgments": first, "lanes": {"cjeu": {"fetched_at": "2026-11-19T21:00:00Z"}}}
+        f = feed.cjeu_features(snap, "2026-11-20T00:00:00Z", "2026-11-22T00:00:00Z")
+        self.assertEqual([x["properties"]["id"] for x in f], ["headwind:cjeu:62025CJ0241", "headwind:cjeu:62023CJ0698"])
+        with mock.patch.object(cjeu, "FEED_RESTRICTIVE_MEASURES", True):
+            snap["cjeu_judgments"] = cjeu.merge([], cjeu.parse((FIX / "cjeu_sparql.json").read_bytes()), "x")
+        f = feed.cjeu_features(snap, "2026-11-20T00:00:00Z", "2026-11-22T00:00:00Z")
+        self.assertEqual([x["properties"]["id"] for x in f],
+                         ["headwind:cjeu:62025CJ0241", "headwind:cjeu:62023CJ0698", "headwind:cjeu:62024CJ0897"])
+        p = f[0]["properties"]
+        self.assertEqual(p["title"], "Court of Justice of the EU (Grand Chamber): Société Générale SA v Skatteverket, "
+                                     "Case C-241/25 (2026-11-17)")
+        self.assertEqual((p["countries"], p["us_person_data"], p["ecli"], p["selected_because"], p["sources"][0]["id"],
+                          p["requirement_ids"], p["tier"]),
+                         ([], "individuals", "ECLI:EU:C:2026:985", "Grand Chamber", "eurlex-cellar", ["HW-REQ-2"],
+                          "routine"))
+        self.assertIn("Listed because the Court of Justice sat as the Grand Chamber.", p["summary"])
+        self.assertIn("restrictive measures (sanctions)", f[2]["properties"]["summary"])
+        self.assertEqual(f[2]["properties"]["pmesii_pt"], ["political", "economic"])
         self.assertEqual(lint({"features": f}), [])
 
 
@@ -1878,6 +1974,8 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual([t["docket"] for t in snap["scotus_tracked"]], ["24-1287", "25-250"])
             self.assertIn("supremecourt-gov", snap["health"])
             self.assertIn("supremecourt-uk", snap["health"])
+            self.assertEqual((len(snap["cjeu_judgments"]), snap["cjeu_read"]["selected"],
+                              snap["health"]["eurlex-cellar"]["lane"]), (11, 3, "cjeu"))
             self.assertEqual((snap["uksc_errors"], snap["uksc_sitemap"]["judgment_pages"]), ([], 6))
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
                              [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11),

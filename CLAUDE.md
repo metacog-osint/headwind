@@ -4,13 +4,13 @@ Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind
 and food prices against their own normal range; changes to official sanctions and US screening lists; export-control,
 sanctions and trade rules (BIS, OFAC, USTR) and their public-inspection filings; tariff actions; US import reliance
 for minerals; a calendar of dates for Verdict. Second strand, **legal events** (`HW-REQ-2`, 18 Nov 2026): highest
-and international courts' decisions as each court publishes them, no anomaly test; US and UK Supreme Courts live.
+and international courts' decisions as each court publishes them, no anomaly test; US and UK Supreme Courts and the CJEU live.
 Measurements only: no probabilities, no investment advice. Live at https://headwind.theintelligence.company (Pages project `headwind`,
 `headwind-2lx.pages.dev`). Repo `metacog-osint/headwind`, **public since 15 Nov 2026**.
 
 **Notes:** this file holds lasting facts only (12 KB cap). Current state and open items: `.claude/HANDOFF.md`.
 Full notes to 18 Nov 2026 (98 KB: state, live checks, backtests, licences):
-`.claude/notes-archive-2026-11-18.md` (git-ignored; copy in `[local path]`). Method in
+`.claude/notes-archive-2026-11-18.md` (git-ignored; backup location in HANDOFF). Method in
 detail, lane by lane: `doctrine/method.md`. Registers: `doctrine/indicators.json` (1.4), `sources.json`,
 `requirements.json`. Plan and scope: `[local path]` (row and step 13) and
 `[local path]` (items 5 to 12 not built).
@@ -106,6 +106,7 @@ says which. `build` refuses to run without a snapshot.
 | `trade` | Census intl trade API, 24 HS codes. **Census key** | context; Census endorsement notice required on page |
 | `scotus` | supremecourt.gov slip opinion RSS + docket JSON | `TARIFF_DOCKETS` 24-1287, 25-250 |
 | `uksc` | supremecourt.uk sitemap, latest page, case pages | OGL v3.0; Find Case Law not used (licence bars computational analysis) |
+| `cjeu` | Publications Office SPARQL (EUR-Lex metadata, CC0), 60 days | CJ and GC judgments; feed: Grand Chamber, full Court |
 | `unpress` | UN press RSS, sanctions committee releases | number, date, link only; feed of 10 can drop releases (warning) |
 | `minerals` | USGS MCS 2026 (ScienceBase); `CRITICAL_2025` constant | watches for MCS 2027 and a new critical list; change `ITEM_ID` and the constant by hand |
 
@@ -120,7 +121,7 @@ and no commercial promotion. ECB free with source cited and changes stated. EIA 
 Energy Information Administration". Federal Register, Fed, OFAC, trade.gov, Census, USGS (CC0): US government.
 EU 2011/833/EU reuse; UK OGL v3.0 (excludes personal data; names published anyway on Tom's (b)); France Licence
 Ouverte 2.0; Canada reproduction for non-commercial use; Australia (DFAT) CC BY 4.0; Japan (MOF) PDL1.0 (source line 出典：財務省ウェブサイト + PDL1.0, and an edited-by note). **UN list: counts and a link only, never its content or
-index** (UN terms withhold redistribution). UK Supreme Court OGL v3.0.
+index** (UN terms withhold redistribution). UK Supreme Court OGL v3.0. EUR-Lex metadata CC0.
 
 ## Not built, and why
 Switzerland SECO (needs written consent); New Zealand (MFAT terms bar automated access); IMF Board actions (terms bar automated
