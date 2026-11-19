@@ -32,7 +32,7 @@ It reports measurements and records. It states no probability and gives no inves
 | Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML); since 19 Nov 2026 Australia's Consolidated List (xlsx) and Japan's asset-freeze list (CSV, with its ship file) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
 | US Supreme Court (since 16 Nov 2026) | The Court's slip opinion feeds (this term and the last) and its dockets (JSON) | As the Court publishes | Every signed and per curiam opinion, with the Court's case title, docket number and decision date; the tariff-authority dockets tracked; no anomaly test |
 | UK Supreme Court (since 18 Nov 2026) | The Court's own site: sitemap, latest-judgments page, case pages | As the Court publishes | Every judgment this year and last, with the Court's case title, case id and neutral citation; no anomaly test |
-| Court of Justice of the EU (since 19 Nov 2026) | The Publications Office's SPARQL endpoint (the metadata behind EUR-Lex) | Same day | Every judgment of the Court of Justice and the General Court in the last 60 days; the Grand Chamber's and full Court's in the feed; no anomaly test |
+| Court of Justice of the EU (since 19 Nov 2026) | The Publications Office's SPARQL endpoint (the metadata behind EUR-Lex) | Same day | Every judgment of the Court of Justice and the General Court in the last 60 days; in the feed, the Grand Chamber's and full Court's and those on restrictive measures; no anomaly test |
 | UN sanctions committee releases (since 16 Nov 2026) | The UN's Meetings Coverage and Press Releases feed (RSS) | As the UN publishes | Security Council sanctions committees' press releases: document number, date and link only; no anomaly test |
 | Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country; scored by designation batches where the list gives dates |
 | Minerals | USGS Mineral Commodity Summaries data release (net import reliance; import shares by country) | Annual | No anomaly test; context only, in `data/minerals.json` |
@@ -264,7 +264,9 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - **Which decisions, without judgment.** At a court that decides few cases (the US and UK Supreme Courts, about 50 to
   70 a year), every merits decision. Where the court itself selects (a press release, a decision type), the court's
   own selection. Where neither holds, only a fixed and published text rule, marked as a text match. Never a reading
-  of importance or of subject.
+  of importance or of subject, with one stated exception (Tom, 19 Nov 2026): a court's own subject index may select
+  the cases it files under restrictive measures (sanctions), because they bear on Headwind's lists; the item says
+  that this is why it is listed.
 - **Not measured.** No anomaly test and no indicator: a court's pace says nothing measured about stress. Court items
   are tier `routine` and carry `HW-REQ-2`. The strand has no warning problem; one would need its own hypotheses.
 - **One court at a time,** each after its licence and access are read and recorded here.
@@ -366,8 +368,10 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - **Which go in the feed (the strand's rule above).** The courts decide about 900 cases a year, so not every
   judgment: the Court of Justice's own selection, the judgments of its Grand Chamber and full Court (the formations
   it keeps for its weightiest cases). A judgment whose own subject words name restrictive measures (sanctions) is
-  marked on the page but kept out of the feed, because choosing by subject is outside the rule; `cjeu.FEED_RESTRICTIVE_MEASURES`
-  adds those judgments to the feed once Tom changes the rule. 14 days in the feed, 60 on the page.
+  also in the feed, under the rule's one stated exception (Tom, 19 Nov 2026; `cjeu.FEED_RESTRICTIVE_MEASURES`),
+  from either court; the item says it is listed because the Court's own subject words name restrictive measures.
+  On 19 Nov 2026 that was 18 judgments in the 60 days beside the 3 of the Grand Chamber. 14 days in the feed, 60 on
+  the page.
 - **What an item says.** That the court gave a judgment (its ECLI) on a date, in a case or cases named by the
   Court's own case numbers and parties, with the formation, why it is listed, and the EUR-Lex link. No summary, no
   characterization, no country (the Court's decisions bind the Union; `countries` is empty, as for UN releases).
