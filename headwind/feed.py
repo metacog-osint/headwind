@@ -1245,7 +1245,7 @@ def build_feed(snapshot: dict) -> dict:
         "contract": CONTRACT,
         "program": "headwind",
         "generated_at": generated,
-        "licence": ("Headwind code MIT; ECB reference rates free to reuse with credit; World Bank Global Economic "
+        "licence": ("Headwind code GNU AGPL-3.0; ECB reference rates free to reuse with credit; World Bank Global Economic "
                     "Monitor CC BY 4.0; EIA data US public domain; "
                     "FAO CC BY 4.0; WFP food prices CC BY-IGO; OFAC list, Consolidated Screening List and "
                     "Federal Register and its public inspection US public domain; USITC tariff schedule releases and White House presidential actions US government works; UN Security Council list, no "
