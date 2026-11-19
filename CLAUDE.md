@@ -9,7 +9,7 @@ Measurements only: no probabilities, no investment advice. Live at https://headw
 `headwind-2lx.pages.dev`). Repo `metacog-osint/headwind`, **public since 15 Nov 2026**.
 
 **Notes:** this file holds lasting facts only (12 KB cap). Current state and open items: `.claude/HANDOFF.md`.
-Full notes to 18 Nov 2026 (98 KB, every state paragraph, live checks, backtests, licence readings):
+Full notes to 18 Nov 2026 (98 KB: state, live checks, backtests, licences):
 `.claude/notes-archive-2026-11-18.md` (git-ignored; copy in `C:\Users\PSRA User 4\Backups\handover\`). Method in
 detail, lane by lane: `doctrine/method.md`. Registers: `doctrine/indicators.json` (1.4), `sources.json`,
 `requirements.json`. Plan and scope: `D:\Projects\_ideas\new-programs.md` (row and step 13) and
@@ -98,7 +98,7 @@ says which. `build` refuses to run without a snapshot.
 | `pinksheet` | World Bank Pink Sheet xlsx (link read yearly) | fertilizers and 8 list metals; CC BY 4.0 (dataset 0038238) |
 | `baseline` | World Bank WDI, six indicators | context, not in the feed |
 | `calendar` | Fed and ECB schedule pages, FAO dates | rate decisions go to Verdict as `rule_date` |
-| `sanctions` | OFAC `sdn.csv`, UN XML, EU FSF XML, UK Sanctions List XML, France `france-gels` JSON, Canada `canada-sema` XML, Australia `australia-dfat` xlsx (UN entries counted only) | change = diff of two own readings; each list alone; short parse or >half lost fails the list; designation batches (`batches.py`) |
+| `sanctions` | OFAC `sdn.csv`, UN XML, EU FSF XML, UK Sanctions List XML, France `france-gels` JSON, Canada `canada-sema` XML, Australia `australia-dfat` xlsx, Japan `japan-mof` CSV + ship CSV (dated links read from MOF's page); AU and JP UN entries counted only | change = diff of two own readings; each list alone; short parse or >half lost fails the list; designation batches (`batches.py`) |
 | `screening` | trade.gov CSL JSON (all but SDN) | re-keyed ids paired by name hash and type |
 | `controls` | Federal Register: BIS, OFAC, USTR rules and USTR notices (60 d), register of dates (800 d), presidential tariff documents | 14 days in feed; dates to Verdict |
 | `inspection` | Federal Register public inspection | `HW-IND-2` matcher; agency filter ignored by API, so whole issues read |
@@ -119,11 +119,11 @@ WFP/HDX CC BY-IGO. World Bank (GEM, WDI, Pink Sheet) CC BY 4.0. FAO CC BY 4.0 wi
 and no commercial promotion. ECB free with source cited and changes stated. EIA public domain, credit "Source: U.S.
 Energy Information Administration". Federal Register, Fed, OFAC, trade.gov, Census, USGS (CC0): US government.
 EU 2011/833/EU reuse; UK OGL v3.0 (excludes personal data; names published anyway on Tom's (b)); France Licence
-Ouverte 2.0; Canada reproduction for non-commercial use; Australia (DFAT) CC BY 4.0. **UN list: counts and a link only, never its content or
+Ouverte 2.0; Canada reproduction for non-commercial use; Australia (DFAT) CC BY 4.0; Japan (MOF) PDL1.0 (source line 出典：財務省ウェブサイト + PDL1.0, and an edited-by note). **UN list: counts and a link only, never its content or
 index** (UN terms withhold redistribution). UK Supreme Court OGL v3.0.
 
 ## Not built, and why
-Switzerland SECO (needs written consent); Japan (PDL1.0, read 19 Nov: next); New Zealand (MFAT terms bar automated access); IMF Board actions (terms bar automated
+Switzerland SECO (needs written consent); New Zealand (MFAT terms bar automated access); IMF Board actions (terms bar automated
 download); stock indices (OECD terms unread, Datastream, STOXX bars derivatives); CBP CSMS (no keyless feed); BLS and
 IMF data API (403); France's date endpoint and legal-basis dates (unused); UKSC case filter (Next.js server action).
 `HW-EEI-1` (designated vessels in Wake's tracks) not matched yet; `vessels.json` carries what it needs.

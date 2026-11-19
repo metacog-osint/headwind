@@ -29,7 +29,7 @@ It reports measurements and records. It states no probability and gives no inves
 | Local food prices | WFP prices by market, from the Humanitarian Data Exchange | Monthly, one to three months late | Median 3-month change across a country's price series, against its own 60 prior medians |
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
-| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML); since 19 Nov 2026 Australia's Consolidated List (xlsx) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
+| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML); since 19 Nov 2026 Australia's Consolidated List (xlsx) and Japan's asset-freeze list (CSV, with its ship file) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
 | US Supreme Court (since 16 Nov 2026) | The Court's slip opinion feeds (this term and the last) and its dockets (JSON) | As the Court publishes | Every signed and per curiam opinion, with the Court's case title, docket number and decision date; the tariff-authority dockets tracked; no anomaly test |
 | UN sanctions committee releases (since 16 Nov 2026) | The UN's Meetings Coverage and Press Releases feed (RSS) | As the UN publishes | Security Council sanctions committees' press releases: document number, date and link only; no anomaly test |
 | Screening lists | trade.gov Consolidated Screening List: the BIS Entity List and ten other US Commerce, State and Treasury lists (the SDN list is read from OFAC instead) | Re-imported hourly by trade.gov | Entries added and removed since Headwind's last reading, per list, by address country; scored by designation batches where the list gives dates |
@@ -202,6 +202,47 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - **Layout.** The sheet's name carries a date on some copies ("Consolidated List - 13_11_2026"); a file without the
   expected columns fails the list, keeping the reading before.
 
+## Japan's asset-freeze list (19 Nov 2026)
+- **What it is.** The Ministry of Finance's list of everyone whose assets are frozen under the Foreign Exchange and
+  Foreign Trade Act (資産凍結等対象者一覧), one CSV (UTF-8, 32 columns), and a second CSV of the IMO numbers of the
+  ships under Japan's services ban (特定の船舶に関する役務取引等の規制措置, from 2 Oct 2026). Both names carry a date
+  (`shisantouketsu20261120.csv`), so the links are read from MOF's list page each run; the newest of each is taken,
+  and the list's date in the name is the publisher's date. 2,931 entries on the copy of 20 Nov 2026: 2,028
+  individuals, 868 entities, 35 ships.
+- **Terms.** MOF's terms page (著作権・リンク等について, read 19 Nov 2026) puts the site under the Public Data License
+  1.0 (PDL1.0, Digital Agency): reproduction, redistribution and adaptation allowed, commercial use too, compatible
+  with CC BY 4.0. It asks for a source line (出典：財務省ウェブサイト（URL）、PDL1.0（URL）) and, for edited content,
+  a note that it was edited and by whom, never presented as MOF's unedited data. The page and the feed carry both.
+  Nothing on the terms page bars scripted reading, and MOF serves no robots.txt (404 on 19 Nov 2026).
+- **Programs.** The list's 区分 is a number per program and type (40 in use; a program's people and organizations
+  are often two numbers). Headwind maps each number to an English name for the page's heading (`JP_PROGRAMS`); a number not
+  in the map shows as "category n" among the list's unknown programs and is counted only until it is read.
+- **UN restatements counted only** (Tom, 19 Nov 2026, as for Australia). The 1,002 entries under Security Council
+  programs (1267/1988, Iraq, DR Congo, Sudan, 1718, Iran, Somalia, Libya, Central African Republic, Yemen, South
+  Sudan, Haiti) are kept as [type, program]: counted, never named, not scored, placing no country. Category 3, Japan's
+  resolution-1373 listing of people and organizations already on the UN's Al-Qaida list (each marked 重複, a
+  duplicate of a category-2 entry), is counted only too. Japan's own: category 4 (its resolution-1373 terrorism
+  listings: the UN keeps no list under 1373), category 13 (its 2006 listings under resolution 1695 on North Korea:
+  no UN list either), and every program "in coordination with the US, EU and others" (FRY, North Korea, Syria,
+  Ukraine, Russia, Belarus, third countries, Israeli settlers) and the ship ban.
+- **Ids are stable.** On the Wayback copies of 23 Jun 2025 and 14 Oct 2026 and the live copy of 20 Nov 2026,
+  2,649 and then 2,896 番号 stayed, none changed its category, and no entry went and came back under a new number;
+  names changed on 11 and then 1 (spacing, full-width brackets, an acronym added). Between 14 Oct and 20 Nov MOF
+  removed 4 UN entries and added none.
+- **Names and countries.** The English name column as printed, NFKC-normalized (full-width letters and brackets read
+  as plain ones). Countries from the nationality and address-country columns, English where given, else the
+  Japanese through a short map (北朝鮮 North Korea, 中華人民共和国 China); the city and street columns are never read.
+  Birth dates, birthplaces, passports, identity numbers, positions, aliases, titles, other information and MOFA's
+  notice text are never carried. Ships carry only their IMO number: the file gives no name, flag or type.
+- **Designation dates.** 告示日付 is the notice date (later dates on it are revisions, marked 改訂), so Japan's own
+  entries are scored by designation batch, as the EU's and UK's are; UN entries carry no date into the measure.
+- **Placement.** "Ukraine (Crimea and eastern Ukraine)" on Russia only (as the EU's UKR and Canada's Ukraine
+  regulations); "Russia (third countries)" and the ship ban on Russia (MOF lists the ship file under its Russia
+  measures, and all 35 ships are on OFAC's and Canada's Russia lists); North Korea, Syria and Belarus on their
+  countries; FRY, 1373 and the settlers program unplaced.
+- **Failure.** A page without the two links, a file without the expected columns, an entry number out of form, or
+  an unreadable ship file fails the list, keeping the reading before (the ships are never reported as removed).
+
 ## UN sanctions committee press releases (`headwind-1.8`, 16 Nov 2026)
 - **Source.** The UN's Meetings Coverage and Press Releases RSS feed, the only feed found. A release counts when its
   link is a Security Council document (SC/nnnnn) and its title names a sanctions committee ("... Sanctions
@@ -299,14 +340,14 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 
 ## Names on list changes (`headwind-1.9`, 16 Nov 2026)
 - **What is named.** People, organizations and ships added, changed and removed on every list Headwind reads but the
-  UN Security Council's: OFAC's SDN list, the EU's, the UK's, France's, Canada's and Australia's lists (Australia's
-  own designations; its UN restatements are counted only), and trade.gov's screening lists. Each named entry carries its name as the publisher prints it ("LAST, First" on OFAC's list, "Nom, Prénom" on
+  UN Security Council's: OFAC's SDN list, the EU's, the UK's, France's, Canada's, Australia's and Japan's lists (their
+  own designations; Australia's and Japan's UN restatements are counted only), and trade.gov's screening lists. Each named entry carries its name as the publisher prints it ("LAST, First" on OFAC's list, "Nom, Prénom" on
   France's), its type, its programs, the countries of its addresses and nationality as printed, and the listing date
   where the list gives one. Birth dates, identity documents, street addresses, statements of reasons, aliases and
   contact details are not carried. OFAC's countries come from its own address file (`add.csv`); Canada's list prints
   no address or nationality.
 - **Why these lists and not the UN's.** Tom, 15 Nov 2026: publish what the licences allow. OFAC's and trade.gov's
-  lists are US government works. Canada allows non-commercial reproduction. Australia's DFAT site is CC BY 4.0. France's Licence Ouverte 2.0 and the EU's
+  lists are US government works. Canada allows non-commercial reproduction. Australia's DFAT site is CC BY 4.0; Japan's MOF site is under PDL1.0, compatible with CC BY 4.0. France's Licence Ouverte 2.0 and the EU's
   reuse decision (2011/833/EU) allow reuse of personal data within data-protection law; the UK's Open Government
   Licence v3.0 does not cover personal data, which leaves the question to data-protection law too (all read 16 Nov
   2026). Headwind carries the least that identifies an entry, shows a removal as a removal, and takes down on request
