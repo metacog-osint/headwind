@@ -97,6 +97,9 @@ def _rows(zf: zipfile.ZipFile, sheet: str) -> list[dict[str, str]]:
     return out
 
 
+rows = _rows         # one sheet of an xlsx as {column letter: text} per row; also read by sanctions.parse_au_xlsx
+
+
 def parse(body: bytes) -> dict:
     """{'updated': 'YYYY-MM-DD' or None, 'units': {id: unit}, 'series': {id: [(YYYY-MM, value), ...]}}."""
     zf = zipfile.ZipFile(io.BytesIO(body))

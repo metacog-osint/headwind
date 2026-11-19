@@ -125,6 +125,7 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
              ("fsd/fsf/public/files/xmlFullSanctionsList_1_1", "eu_fsf.xml"),
              ("sanctionslist.fcdo.gov.uk", "uk_sanctions.xml"), ("gels-avoirs.dgtresor.gouv.fr", "fr_gels.json"),
              ("sanctions/sema-lmes.xml", "canada_sema.xml"), ("press.un.org/en/rss.xml", "un_press.xml"),
+             ("Australian_Sanctions_Consolidated_List.xlsx", "au_dfat.xlsx"),
              ("federalregister.gov", "federal_register.json"), ("data.trade.gov", "trade_gov_csl.json")]
     for needle, name in table:
         if needle in url:
@@ -457,7 +458,8 @@ class TestVesselCrosslist(unittest.TestCase):
     def test_crosslist(self):
         ofac, uk = self.indexes()
         s, t = sanctions.vessel_crosslist({"ofac-sdn": ofac, "uk-sanctions": uk})
-        self.assertEqual((s["imo_numbers"], s["on_both"], s["only"]), (15, 1, {"ofac-sdn": 8, "uk-sanctions": 6, "france-gels": 0, "canada-sema": 0}))
+        self.assertEqual((s["imo_numbers"], s["on_both"], s["only"]), (15, 1, {"ofac-sdn": 8, "uk-sanctions": 6, "france-gels": 0, "canada-sema": 0,
+                                                                     "australia-dfat": 0}))
         r = next(r for r in t if r["imo"] == "7303803")
         self.assertEqual(r["on"]["ofac-sdn"], {"ids": ["23730"], "name": "AN SAN 1",
                                                "flag": "Democratic People's Republic of Korea"})
@@ -649,6 +651,94 @@ class TestCanada(unittest.TestCase):
         idx, _, _ = self.read()
         s, t = sanctions.vessel_crosslist({"canada-sema": idx})
         self.assertEqual((s["only"]["canada-sema"], s["without_imo"]["canada-sema"]), (3, 0))
+
+
+class TestAustralia(unittest.TestCase):
+    """Australia's Consolidated List: 26 entries cut redacted from the copy of 13 Nov 2026 (Wayback) and the same
+    entries plus the 7 DFAT added by 17 Nov 2026 (live copy, saved 17 Nov 01:39 UTC). People: name replaced by
+    PERSON-<hash>, addresses cut to their countries; entries under Security Council regimes: name replaced, no
+    citizenship or address; birth details, Additional Information and Listing Information blanked everywhere."""
+
+    def read(self, name="au_dfat.xlsx"):
+        return sanctions.parse_au_xlsx((FIX / name).read_bytes())
+
+    def test_parse(self):
+        generated, idx = self.read()
+        self.assertEqual(generated, "2026-11-17T01:39:24Z")
+        self.assertEqual(len(idx), 33)                               # primary names only; aliases are rows of their own
+        self.assertEqual(sanctions._tally(idx, idx)[0], {"entity": 9, "individual": 19, "vessel": 5})
+        self.assertEqual(sanctions.unknown_programs("australia-dfat", idx), [])
+        un = [k for k, e in idx.items() if not sanctions.is_au_own(e)]
+        self.assertEqual(sorted(un, key=int), ["2", "147", "149", "1113", "8831"])
+        self.assertTrue(all(len(idx[k]) == 2 for k in un))          # counted only: no name, no countries, no IMO
+        self.assertEqual(idx["272"], ["entity", ["1373 (2001)"], {"name": "Aum Shinrikyo", "countries": ["Japan", "Russia"]}])
+        self.assertTrue(sanctions.is_au_own(idx["272"]))            # 1373: Australia's own listing, not a UN list
+        self.assertEqual(idx["2831"][2]["countries"], ["Russian Federation"])
+        ship = idx["8227"][2]
+        self.assertEqual((ship["name"], ship["imo"], ship["flag"]), ("ANDAMAN SKIES", "9288693", None))
+        self.assertIsNone(idx["8599"][2]["imo"])                    # "DPRK Vessel Class": the list gives no IMO
+
+    def test_countries_from_free_text_addresses(self):
+        known = {"Pakistan", "Afghanistan", "Ireland", "Saudi Arabia", "Congo, Democratic Republic of the"}
+        f = sanctions.au_countries
+        self.assertEqual(f("Jordan;United States of America", "", known), ["Jordan", "United States of America"])
+        self.assertEqual(f("", "a) Kitas Ghar, Karachi, Pakistan b) (Office, Lahore, Pakistan) c) Kabul, Afghanistan",
+                           known), ["Afghanistan", "Pakistan"])
+        self.assertEqual(f("", "Moscow, Russia 109052", known), ["Russia"])           # postcode after the country
+        self.assertEqual(f("", "Riyadh, Saudi Arabia (detained", known), ["Saudi Arabia"])
+        self.assertEqual(f("", "Kinshasa, Congo, Democratic Republic of the", known), ["Congo, Democratic Republic of the"])
+        for place in ("Tehran", "Belfast, Northern Ireland", "16a Nagatinskaya Street Moscow Russia 115487"):
+            self.assertEqual(f("", place, known), [], place)        # no country name after a comma: none kept
+
+    def test_real_change_13_to_17_nov(self):
+        _, before = self.read("au_dfat_2026-11-13.xlsx")
+        _, after = self.read()
+        d = sanctions.delta("australia-dfat", before, after, "2026-11-19T18:00:00Z", "2026-11-13T20:06:27Z")
+        self.assertEqual((d["added"], d["removed"], d["changed"]), (7, 0, 0))
+        self.assertEqual(d["national"]["added_by_program"], {"Autonomous (Thematic - Human Rights)": 7})
+        self.assertEqual(d["restated"], {"added": 0, "removed": 0, "changed": 0})
+        self.assertEqual(d["countries"], [])                         # a thematic regime places no country
+        self.assertEqual(len(d["named_added"]), 7)
+        self.assertEqual(d["batches"][0]["basis"], "headwind readings")    # no designation date in the file
+        self.assertEqual(d["us_person_data"], "none")
+
+    def test_un_entries_counted_never_named(self):
+        _, idx = self.read()
+        un = sorted(k for k, e in idx.items() if not sanctions.is_au_own(e))
+        russian = sorted(k for k, e in idx.items() if e[1] == ["Autonomous (Russia)"])[:2]
+        prev = {k: v for k, v in idx.items() if k not in un[:3] + russian}
+        d = sanctions.delta("australia-dfat", prev, idx, "2026-11-19T18:00:00Z", None)
+        self.assertEqual((d["added"], d["national"]["added"], d["restated"]["added"]), (5, 2, 3))
+        self.assertEqual(d["countries"], ["RU"])                     # from the Australian entries only
+        self.assertEqual(len(d["named_added"]), 2)
+        self.assertFalse(any(r["list_id"] in un for r in d["named_added"]))
+        f = feed.list_features({"generated_at": "2026-11-19T18:00:00Z", "sanctions": [d], "lanes": {}})
+        p = f[0]["properties"]
+        self.assertIn("2 Australian designations added, 0 removed; 3 added and 0 removed restating UN Security Council "
+                      "listings", p["title"])
+        self.assertIn("never named", p["summary"])
+        self.assertNotIn("UN-ENTRY", p["summary"])
+        self.assertEqual(p["source"]["id"] if isinstance(p.get("source"), dict) else "dfat-consolidated",
+                         "dfat-consolidated")
+
+    def test_ships_cross_listed_without_un_ships(self):
+        _, idx = self.read()
+        s, _ = sanctions.vessel_crosslist({"australia-dfat": idx})
+        self.assertEqual((s["only"]["australia-dfat"], s["without_imo"]["australia-dfat"]), (3, 1))   # 1718 ship left out
+
+    def test_a_new_layout_fails_loudly(self):
+        import io as _io
+        import zipfile as _zf
+        src = _zf.ZipFile(FIX / "au_dfat.xlsx")
+        buf = _io.BytesIO()
+        with _zf.ZipFile(buf, "w") as z:
+            for n in src.namelist():
+                data = src.read(n)
+                if n == "xl/sharedStrings.xml":
+                    data = data.replace(b">Committees<", b">Regime<")
+                z.writestr(n, data)
+        with self.assertRaisesRegex(ValueError, "layout"):
+            sanctions.parse_au_xlsx(buf.getvalue())
 
 
 class TestUnPress(unittest.TestCase):
@@ -1703,7 +1793,7 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual((snap["uksc_errors"], snap["uksc_sitemap"]["judgment_pages"]), ([], 6))
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
                              [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11),
-                              ("france-gels", 20), ("canada-sema", 24)])
+                              ("france-gels", 20), ("canada-sema", 24), ("australia-dfat", 33)])
             self.assertTrue(list((tmp / "data" / "raw" / "eu-fsf").glob("*.xml.gz")))
             # 5 rules and 3 USTR notices (one left out); tariff actions of the last 60 days come on top, so how many
             # depends on the day the test runs.
