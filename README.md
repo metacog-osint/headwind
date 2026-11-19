@@ -31,3 +31,9 @@ python -m unittest discover -s tests -v       # offline test suite
 ```
 
 Method: `doctrine/method.md`.
+
+## Licence
+
+Copyright © 2026 Thomas Brummer, The Intelligence Company. Headwind's code is licensed under the GNU Affero General Public License
+v3.0 (`LICENSE`). Third-party and shared files keep their own licences, and data keeps its sources'
+terms; both are listed in `NOTICE`.
