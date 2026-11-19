@@ -115,6 +115,23 @@ SRC_AUSTRALIA = {
                    "the UN Security Council listings it applies."),
 }
 
+SRC_JAPAN = {
+    "id": "mof-jp-sanctions",
+    "publisher": "Ministry of Finance Japan",
+    "title": "Japan's asset-freeze list under the Foreign Exchange and Foreign Trade Act (資産凍結等対象者一覧)",
+    "url": "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/list.html",
+    "licence": ("Public Data License 1.0 (PDL1.0), compatible with CC BY 4.0 (MOF's terms page, read 19 Nov 2026). "
+                "出典：財務省ウェブサイト（https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/"
+                "economic_sanctions/list.html）、PDL1.0（https://www.digital.go.jp/resources/open_data/"
+                "public_data_license_v1.0）を加工して作成. Edited by The Intelligence Company (Headwind): reduced to "
+                "entry numbers, types, programs, English names and countries, and compared between readings."),
+    "grade": "A1",
+    "independence_group": "jp-mof-sanctions",
+    "source_type": "official or market data",
+    "descriptor": ("Every person and organization whose assets are frozen in Japan, and the ships under its services "
+                   "ban: Japan's own designations and the UN Security Council listings it applies."),
+}
+
 SRC_UNPRESS = {
     "id": "un-press",
     "publisher": "United Nations (Meetings Coverage and Press Releases)",
@@ -156,7 +173,8 @@ SRC_UKSC = {
 }
 
 LIST_SOURCE = {"ofac-sdn": SRC_OFAC, "un-consolidated": SRC_UN, "eu-fsf": SRC_EU, "uk-sanctions": SRC_UK,
-               "france-gels": SRC_FRANCE, "canada-sema": SRC_CANADA, "australia-dfat": SRC_AUSTRALIA}
+               "france-gels": SRC_FRANCE, "canada-sema": SRC_CANADA, "australia-dfat": SRC_AUSTRALIA,
+               "japan-mof": SRC_JAPAN}
 
 SRC_CSL = {
     "id": "trade-gov-csl",
@@ -441,7 +459,8 @@ def _batch_ref(s: dict) -> dict | None:
 VESSELS_IN_TEXT = 25
 ALSO_ON = {"ofac-sdn": "the OFAC SDN list", "uk-sanctions": "the UK Sanctions List",
            "france-gels": "France's asset-freeze register", "canada-sema": "Canada's consolidated list",
-           "australia-dfat": "Australia's consolidated list"}
+           "australia-dfat": "Australia's consolidated list",
+           "japan-mof": "Japan's services-ban ship list"}
 
 
 def _vessel_text(word: str, vessels: list[dict]) -> str:
@@ -533,6 +552,8 @@ def _edit_text(s: dict) -> str:
 # ones, the measures restated, and the lists Headwind reads them on.
 SPLIT_WORDS = {
     "france-gels": ("national", "national freezes", "EU and UN measures", "the EU's and the UN Security Council's own lists"),
+    "japan-mof": ("Japanese", "Japanese designations", "UN Security Council listings",
+                  "the UN Security Council's own list"),
     "australia-dfat": ("Australian", "Australian designations", "UN Security Council listings",
                        "the UN Security Council's own list"),
 }
@@ -545,7 +566,7 @@ def _restated_text(rest: dict, list_id: str = "france-gels") -> str:
     if not (rest["added"] or rest["removed"] or rest["changed"]):
         return f"No change among the entries that restate {what}."
     # Australia's UN entries carry no name (the UN's terms); France's restated entries are named as France prints them.
-    named = ", never named" if list_id == "australia-dfat" else ""
+    named = ", never named" if list_id in ("australia-dfat", "japan-mof") else ""
     return (f"Entries restating {what}, which Headwind also reads on {where}, so they are counted here but not "
             f"scored{named} and place no country: {rest['added']} added, {rest['removed']} removed, "
             f"{rest['changed']} changed.")
@@ -1282,14 +1303,15 @@ def build_feed(snapshot: dict) -> dict:
                     "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0; "
                     "France's Registre national des gels, Licence Ouverte 2.0; Canada's consolidated autonomous "
                     "sanctions list, non-commercial reproduction (Canada.ca terms); Australian Sanctions Consolidated "
-                    "List, CC BY 4.0 (Department of Foreign Affairs and Trade website – www.dfat.gov.au); UN press "
+                    "List, CC BY 4.0 (Department of Foreign Affairs and Trade website – www.dfat.gov.au); Japan's "
+                    "asset-freeze list, PDL1.0 (出典：財務省ウェブサイト, edited by Headwind); UN press "
                     "releases, linked only; "
                     "Supreme Court of the United States opinions and dockets, US government works"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; World Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
                         "and Development Office; French Treasury (Direction générale du Trésor); Global Affairs Canada; Australian "
-                        "Department of Foreign Affairs and Trade; Supreme Court of the United States; US International Trade Administration; "
+                        "Department of Foreign Affairs and Trade; Ministry of Finance Japan; Supreme Court of the United States; US International Trade Administration; "
                         "US Federal Register and the Office of the Federal Register; US International Trade Commission; The White House."),
         "language_key": LANGUAGE_KEY,
         # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read

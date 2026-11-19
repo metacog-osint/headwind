@@ -126,6 +126,8 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
              ("sanctionslist.fcdo.gov.uk", "uk_sanctions.xml"), ("gels-avoirs.dgtresor.gouv.fr", "fr_gels.json"),
              ("sanctions/sema-lmes.xml", "canada_sema.xml"), ("press.un.org/en/rss.xml", "un_press.xml"),
              ("Australian_Sanctions_Consolidated_List.xlsx", "au_dfat.xlsx"),
+             ("economic_sanctions/list.html", "jp_list.html"), ("economic_sanctions/shisantouketsu", "jp_mof.csv"),
+             ("economic_sanctions/ekimukisei_IMOnumber_", "jp_ships.csv"),
              ("federalregister.gov", "federal_register.json"), ("data.trade.gov", "trade_gov_csl.json")]
     for needle, name in table:
         if needle in url:
@@ -459,7 +461,7 @@ class TestVesselCrosslist(unittest.TestCase):
         ofac, uk = self.indexes()
         s, t = sanctions.vessel_crosslist({"ofac-sdn": ofac, "uk-sanctions": uk})
         self.assertEqual((s["imo_numbers"], s["on_both"], s["only"]), (15, 1, {"ofac-sdn": 8, "uk-sanctions": 6, "france-gels": 0, "canada-sema": 0,
-                                                                     "australia-dfat": 0}))
+                                                                     "australia-dfat": 0, "japan-mof": 0}))
         r = next(r for r in t if r["imo"] == "7303803")
         self.assertEqual(r["on"]["ofac-sdn"], {"ids": ["23730"], "name": "AN SAN 1",
                                                "flag": "Democratic People's Republic of Korea"})
@@ -739,6 +741,92 @@ class TestAustralia(unittest.TestCase):
                 z.writestr(n, data)
         with self.assertRaisesRegex(ValueError, "layout"):
             sanctions.parse_au_xlsx(buf.getvalue())
+
+
+class TestJapan(unittest.TestCase):
+    """Japan's asset-freeze list (MOF): 25 entries cut redacted from the copy of 20 Nov 2026 and the same entries plus
+    the 4 UN entries MOF removed, from the Wayback copy of 14 Oct 2026; 3 ships from the ship file of 2 Oct 2026; the
+    list page cut to its file links. People: name replaced by PERSON-<hash>; UN entries: name replaced, no countries;
+    every personal column blanked."""
+
+    def read(self, name="jp_mof.csv", dates=None):
+        return sanctions.parse_jp_csv((FIX / name).read_bytes(), (FIX / "jp_ships.csv").read_bytes(), dates)
+
+    def test_links_from_the_page(self):
+        csv_url, ship_url, day = sanctions.jp_files((FIX / "jp_list.html").read_text(encoding="utf-8"))
+        self.assertTrue(csv_url.endswith("/economic_sanctions/shisantouketsu20261120.csv"))   # the newest, not 1014
+        self.assertTrue(ship_url.endswith("/economic_sanctions/ekimukisei_IMOnumber_20261002.csv"))
+        self.assertEqual(day, "2026-11-20")
+        with self.assertRaisesRegex(ValueError, "page has changed"):
+            sanctions.jp_files("<html></html>")
+
+    def test_parse(self):
+        dates = {}
+        idx = self.read(dates=dates)
+        self.assertEqual(len(idx), 28)
+        self.assertEqual(sanctions._tally(idx, idx)[0], {"entity": 12, "individual": 13, "vessel": 3})
+        self.assertEqual(sanctions.unknown_programs("japan-mof", idx), [])
+        un = sorted(k for k, e in idx.items() if not sanctions.is_jp_own(e))
+        self.assertEqual(un, ["002-000002", "002-000591", "003-000001", "005-000001", "014-000001", "019-000001",
+                              "044-000001"])
+        self.assertTrue(all(len(idx[k]) == 2 for k in un))          # counted only: no name, no countries
+        self.assertFalse(any(k in dates for k in un))               # and no date in the batch measure
+        self.assertEqual(idx["004-000009"], ["entity", ["1373 (terrorists)"],
+                                             {"name": "Holy Land Foundation for Relief and Development",
+                                              "countries": ["U.S.A."]}])
+        self.assertEqual(idx["017-000001"][2]["countries"], ["North Korea"])     # printed in Japanese only (北朝鮮)
+        self.assertEqual(idx["013-000001"][1], ["1695 (North Korea)"])          # Japan's own: no UN list under 1695
+        self.assertEqual(idx["ship-001-000001"], ["vessel", ["Designated vessels (services ban)"],
+                                                  {"name": None, "imo": "9179842", "mmsi": None, "flag": None,
+                                                   "vessel_type": None}])
+        self.assertEqual((dates["029-000761"], dates["001-000001"]), ("2026-10-02", "2002-03-01"))
+        self.assertEqual(sanctions._jp_date("2001.9.22 2008.6.25改訂 2012.3.27改訂"), "2001-09-22")
+
+    def test_real_change_14_oct_to_20_nov(self):
+        before = self.read("jp_mof_2026-10-14.csv")
+        dates = {}
+        after = self.read(dates=dates)
+        d = sanctions.delta("japan-mof", before, after, "2026-11-19T20:00:00Z", "2026-10-21T07:11:29Z", dates=dates)
+        self.assertEqual((d["added"], d["removed"], d["changed"]), (0, 4, 0))
+        self.assertEqual(d["restated"], {"added": 0, "removed": 4, "changed": 0})
+        self.assertEqual(d["national"]["removed"], 0)
+        self.assertEqual((d["named_removed"], d["countries"], d["anomaly"]), ([], [], False))
+        self.assertEqual(d["unnamed_removed"], 4)                  # UN entries: counted only, never named
+
+    def test_own_designations_named_dated_and_placed(self):
+        dates = {}
+        idx = self.read(dates=dates)
+        prev = {k: v for k, v in idx.items() if k not in ("029-000760", "029-000761", "002-000002", "004-000009")}
+        d = sanctions.delta("japan-mof", prev, idx, "2026-11-19T20:00:00Z", None, dates=dates)
+        self.assertEqual((d["added"], d["national"]["added"], d["restated"]["added"]), (4, 3, 1))
+        self.assertEqual(d["countries"], ["RU"])                    # Russia's program; 1373 places none
+        self.assertEqual(sorted(r["list_id"] for r in d["named_added"]), ["004-000009", "029-000760", "029-000761"])
+        self.assertEqual(d["us_person_data"], "organizations")
+        self.assertEqual({(b["basis"], b["date"]) for b in d["batches"]},
+                         {("designation date", "2001-12-19"), ("designation date", "2026-10-02")})
+        f = feed.list_features({"generated_at": "2026-11-19T20:00:00Z", "sanctions": [d], "lanes": {}})
+        p = f[0]["properties"]
+        self.assertIn("3 Japanese designations added, 0 removed; 1 added and 0 removed restating UN Security Council "
+                      "listings", p["title"])
+        self.assertIn("never named", p["summary"])
+        self.assertNotIn("UN-ENTRY", json.dumps(f))
+
+    def test_ships_cross_listed(self):
+        idx = self.read()
+        s, t = sanctions.vessel_crosslist({"japan-mof": idx, "ofac-sdn": {"1": ["vessel", ["RUSSIA-EO14024"],
+                                           {"name": "X", "imo": "9179842", "flag": None}]}})
+        self.assertEqual((s["only"]["japan-mof"], s["on_two_or_more"]), (2, 1))
+
+    def test_unknown_category_counted_only(self):
+        body = (FIX / "jp_mof.csv").read_bytes().replace(b"\n43,043-", b"\n99,043-")
+        idx = sanctions.parse_jp_csv(body, (FIX / "jp_ships.csv").read_bytes())
+        self.assertEqual(idx["043-000001"], ["individual", ["category 99"]])
+        self.assertEqual(sanctions.unknown_programs("japan-mof", idx), ["category 99"])
+
+    def test_a_new_layout_fails_loudly(self):
+        body = (FIX / "jp_mof.csv").read_bytes().replace("氏名（英語）".encode(), "氏名（ローマ字）".encode())
+        with self.assertRaisesRegex(ValueError, "layout"):
+            sanctions.parse_jp_csv(body, (FIX / "jp_ships.csv").read_bytes())
 
 
 class TestUnPress(unittest.TestCase):
@@ -1793,7 +1881,8 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual((snap["uksc_errors"], snap["uksc_sitemap"]["judgment_pages"]), ([], 6))
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
                              [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11),
-                              ("france-gels", 20), ("canada-sema", 24), ("australia-dfat", 33)])
+                              ("france-gels", 20), ("canada-sema", 24), ("australia-dfat", 33),
+                              ("japan-mof", 28)])
             self.assertTrue(list((tmp / "data" / "raw" / "eu-fsf").glob("*.xml.gz")))
             # 5 rules and 3 USTR notices (one left out); tariff actions of the last 60 days come on top, so how many
             # depends on the day the test runs.

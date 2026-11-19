@@ -319,6 +319,15 @@ def _read_list(list_id, raw_dir, getter):
         body, rec = fetch.fetch("dfat-consolidated", sanctions.AU_XLSX, raw_dir, "xlsx", timeout=120, getter=getter)
         generated, index = sanctions.parse_au_xlsx(body)
         return index, generated, rec, None
+    if list_id == "japan-mof":
+        # The file names carry a date, so the links come from the list page. The ship file is part of the list: if
+        # it cannot be read the list fails and keeps its reading before (its ships are never reported as removed).
+        page, _ = fetch.fetch("mof-jp-sanctions-page", sanctions.JP_PAGE, raw_dir, "html", timeout=60, getter=getter)
+        csv_url, ship_url, generated = sanctions.jp_files(page.decode("utf-8", errors="replace"))
+        body, rec = fetch.fetch("mof-jp-sanctions", csv_url, raw_dir, "csv", timeout=120, getter=getter, gz=True)
+        ships, _ = fetch.fetch("mof-jp-vessels", ship_url, raw_dir, "csv", timeout=60, getter=getter)
+        index = sanctions.parse_jp_csv(body, ships, dates)
+        return index, generated, rec, dates
     raise ValueError(f"unknown list {list_id}")
 
 
