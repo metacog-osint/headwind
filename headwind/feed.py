@@ -906,9 +906,9 @@ def uksc_features(snapshot: dict, generated: str, valid_until: str) -> list[dict
 
 def cjeu_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
     """Judgments of the last two weeks that the courts' own record selects (cjeu.py): a Court of Justice judgment of
-    the Grand Chamber or the full Court (and, only once cjeu.FEED_RESTRICTIVE_MEASURES is set, a judgment whose own
-    subject words name restrictive measures). The case numbers and parties are the Court's own; no judgment text;
-    us_person_data from the parties."""
+    the Grand Chamber or the full Court, and a judgment of either court whose own subject words name restrictive
+    measures (cjeu.FEED_RESTRICTIVE_MEASURES, Tom 19 Nov 2026). The case numbers and parties are the Court's own; no
+    judgment text; us_person_data from the parties."""
     accessed = ((snapshot.get("lanes") or {}).get("cjeu") or {}).get("fetched_at")
     cutoff = _plus_hours(generated, -24 * cjeu.FEED_DAYS)[:10]
     feats = []
