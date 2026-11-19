@@ -157,12 +157,13 @@
     document.getElementById("vessel-cross").innerHTML = vc.imo_numbers ? '<p class="small muted">' + esc(
       "Ships matched by IMO number: " + Number(vc.imo_numbers).toLocaleString() + " numbers, " +
       Number(vc.on_both).toLocaleString() + " on both the OFAC and UK lists, " +
-      (vc.on_two_or_more !== undefined ? Number(vc.on_two_or_more).toLocaleString() + " on two or more of the OFAC, UK, French, Canadian and Australian lists, " : "") +
+      (vc.on_two_or_more !== undefined ? Number(vc.on_two_or_more).toLocaleString() + " on two or more of the OFAC, UK, French, Canadian, Australian and Japanese lists, " : "") +
       Number((vc.only || {})["ofac-sdn"] || 0).toLocaleString() + " on OFAC's only, " +
       Number((vc.only || {})["uk-sanctions"] || 0).toLocaleString() + " on the UK's only, " +
       Number((vc.only || {})["france-gels"] || 0).toLocaleString() + " on France's only, " +
       Number((vc.only || {})["canada-sema"] || 0).toLocaleString() + " on Canada's only, " +
-      Number((vc.only || {})["australia-dfat"] || 0).toLocaleString() + " on Australia's only; " +
+      Number((vc.only || {})["australia-dfat"] || 0).toLocaleString() + " on Australia's only, " +
+      Number((vc.only || {})["japan-mof"] || 0).toLocaleString() + " on Japan's only; " +
       Number((vc.without_imo || {})["ofac-sdn"] || 0) + " OFAC, " + Number((vc.without_imo || {})["uk-sanctions"] || 0) +
       " UK, " + Number((vc.without_imo || {})["france-gels"] || 0) + " French, " + Number((vc.without_imo || {})["canada-sema"] || 0) +
       " Canadian and " + Number((vc.without_imo || {})["australia-dfat"] || 0) +
@@ -393,7 +394,7 @@
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, kept from before titles were published (counted only until they age out): notices, ' + esc(countedText) + ".</p>" : "");
 
-    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada, Australia)", unpress: "UN sanctions committee press releases", scotus: "US Supreme Court opinions and dockets", uksc: "UK Supreme Court judgments", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", pinksheet: "Fertilizer and metal prices (World Bank Pink Sheet)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
+    var labels = { sanctions: "Sanctions lists (OFAC, UN Security Council, EU, UK, France, Canada, Australia, Japan)", unpress: "UN sanctions committee press releases", scotus: "US Supreme Court opinions and dockets", uksc: "UK Supreme Court judgments", inspection: "Public inspection (Office of the Federal Register)", screening: "US screening lists (trade.gov)", minerals: "Mineral import reliance (USGS)", trade: "Mineral imports by country (US Census Bureau)", tariffs: "Tariff schedule revisions (USITC) and signed actions (White House)", controls: "Rules and USTR notices (US Federal Register)", fx: "Exchange rates (ECB)", gem: "Official monthly exchange rates (World Bank)", energy: "Energy prices (EIA)", fao: "Food indices (FAO)", pinksheet: "Fertilizer and metal prices (World Bank Pink Sheet)", wfp: "Local food prices (WFP via HDX)", baseline: "Country baselines (World Bank)", calendar: "Calendars (Federal Reserve, ECB)" };
     var health = s.health || {};
     var stateText = { fresh: "fresh", late: "late", stale: "stale", failing: "not read", up: "read", never: "never read" };
     document.getElementById("lanes").innerHTML = Object.keys(s.lanes || {}).map(function (k) {
