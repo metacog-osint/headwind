@@ -200,9 +200,11 @@
         ["Named, changed", (d.named_changed || []).map(changedWho)],
         ["Removed, no longer on the list (seen " + when(d.detected_at) + ")", (d.named_removed || []).map(who)]];
       var html = groups.filter(function (g) { return g[1].length; }).map(function (g) {
+        // Each group of names opens on a press (19 Nov 2026: the names made the Sanctions section 9,800 px tall on a
+        // phone); the counts above stay in view. Printing opens them (style.css).
         var shown = g[1].slice(0, NAMES_SHOWN), more = g[1].length - shown.length;
-        return '<div class="small">' + esc(g[0] + ": " + shown.join("; ") + ".") +
-          (more > 0 ? ' <a href="data/list-changes.json">' + esc(more + " more in the data file") + "</a>" : "") + "</div>";
+        return '<details class="more names"><summary>' + esc(g[0] + ": " + g[1].length) + '</summary><div class="small">' + esc(shown.join("; ") + ".") +
+          (more > 0 ? ' <a href="data/list-changes.json">' + esc(more + " more in the data file") + "</a>" : "") + "</div></details>";
       }).join("");
       if (d.unnamed_removed) { html += '<div class="small muted">' + esc(d.unnamed_removed + " removed from a reading kept before names were carried: counted only.") + "</div>"; }
       return html;
@@ -263,8 +265,8 @@
       return '<div class="row"><div class="row-title"><span><a href="' + esc(o.link) + '" rel="noopener">' + esc(o.title) + "</a>, No. " + esc(o.docket) + '</span><span class="badge">' + esc(o.decided || ("posted " + String(o.posted || "").slice(0, 10))) + '</span></div><div class="small muted">' +
         esc((o.kind === "signed" ? (o.author || "Signed opinion") : "Per curiam") + "; term 20" + o.term + ". ") + '<a href="' + esc(o.docket_url) + '" rel="noopener">Docket</a></div></div>';
     }
-    document.getElementById("scotus-opinions").innerHTML = so.length ? so.slice(0, soShown).map(soRow).join("") +
-      (so.length > soShown ? '<details><summary class="small">All ' + so.length + " opinions</summary>" + so.slice(soShown).map(soRow).join("") + "</details>" : "") +
+    // The newest soShown opinions, then "Show all N" with a find box (tic-fold.js).
+    document.getElementById("scotus-opinions").innerHTML = so.length ? '<div data-tic-fold="' + soShown + '" data-tic-fold-find>' + so.map(soRow).join("") + "</div>" +
       ((s.scotus_errors || []).length ? '<p class="small muted">' + esc("Not read on the last run: " + s.scotus_errors.join("; ")) + "</p>" : "")
       : '<p class="small muted">No opinion read yet.</p>';
 
@@ -275,8 +277,7 @@
         cs.map(function (c) { return '<a href="' + esc(c.url) + '" rel="noopener">' + esc(c.title) + "</a> (" + esc(c.case_id) + ")"; }).join("; ") +
         '</span><span class="badge">' + esc(j.judgment_date) + "</span></div></div>";
     }
-    document.getElementById("uksc-judgments").innerHTML = (uj.length ? uj.slice(0, ujShown).map(ujRow).join("") +
-      (uj.length > ujShown ? '<details><summary class="small">All ' + uj.length + " judgments</summary>" + uj.slice(ujShown).map(ujRow).join("") + "</details>" : "")
+    document.getElementById("uksc-judgments").innerHTML = (uj.length ? '<div data-tic-fold="' + ujShown + '" data-tic-fold-find>' + uj.map(ujRow).join("") + "</div>"
       : '<p class="small muted">No judgment read yet.</p>') +
       (us.pending ? '<p class="small muted">' + esc(us.pending + " case pages are still to be read; the list fills in on the next runs.") + "</p>" : "") +
       ((s.uksc_errors || []).length ? '<p class="small muted">' + esc("Not read on the last run: " + s.uksc_errors.join("; ")) + "</p>" : "");
@@ -341,10 +342,8 @@
       if ((r.named_dates || []).length) { bits.push("later dates named: " + r.named_dates.join(", ")); }
       return '<div class="row"><div class="row-title"><span><a href="' + esc(r.url) + '" rel="noopener">' + esc(r.agency + ": " + r.title) + '</a></span><span class="badge">' + esc(r.published_date) + '</span></div><div class="small muted">' + esc(bits.filter(Boolean).join("; ")) + "</div></div>";
     });
-    var RULES_SHOWN = 6;
-    document.getElementById("rules-list").innerHTML = ruleRows.length
-      ? ruleRows.slice(0, RULES_SHOWN).join("") + (ruleRows.length > RULES_SHOWN
-        ? '<details class="more"><summary>Show ' + (ruleRows.length - RULES_SHOWN) + " earlier documents</summary>" + ruleRows.slice(RULES_SHOWN).join("") + "</details>" : "")
+    // #rules-list carries data-tic-fold="6": the newest six, then "Show all N" (tic-fold.js).
+    document.getElementById("rules-list").innerHTML = ruleRows.length ? ruleRows.join("")
       : '<p class="small muted">No rules collected.</p>';
 
     function paceLine(p, noun) {
@@ -366,7 +365,7 @@
       paceLine(s.tariff_pace, "presidential tariff actions published") +
       paceLine(s.hts_pace, "tariff schedule revisions posted") +
       (revs.length ? '<p class="small muted">' + esc("Newest revisions: " + revs.join("; ") + ". Revisions a year: " + years.join(", ") + ".") + "</p>" : "") +
-      pending.join("") +
+      (pending.length ? "<div data-tic-fold>" + pending.join("") + "</div>" : "") +
       (s.signed_error ? '<p class="small muted">The White House feed could not be read this run.</p>' : "");
 
     var counted = {};
@@ -387,7 +386,7 @@
     });
     var piLane = (s.lanes || {}).inspection || {};
     var countedText = Object.keys(counted).map(function (k) { return k + " " + counted[k]; }).join(", ");
-    document.getElementById("inspection-list").innerHTML = (piRows.length ? piRows.join("")
+    document.getElementById("inspection-list").innerHTML = (piRows.length ? "<div data-tic-fold>" + piRows.join("") + "</div>"
       : '<p class="small muted">' + (piLane.status === "ok" ? "No BIS, OFAC or USTR rule, and no USTR notice, on public inspection in the last 30 days."
         : "Public inspection could not be read this run; see Sources and their state.") + "</p>")
       + (countedText ? '<p class="small muted">Also on public inspection in the last 30 days, kept from before titles were published (counted only until they age out): notices, ' + esc(countedText) + ".</p>" : "");
@@ -408,49 +407,38 @@
       }).join("");
       return '<div class="row"><div class="row-title"><span>' + esc(labels[k] || k) + '</span><span class="badge ' + (ok ? "" : "badge-warn") + '">' + esc(ok ? "current" : "not current") + '</span></div><div class="small muted">' + esc(note) + "</div>" + subs + "</div>";
     }).join("");
-    folds();
     regions();
   }
+  // Long tables and lists fold with the hub's tic-fold.js: each element carries data-tic-fold in index.html (or in
+  // the markup drawn above), and the fold re-applies after every redraw. Each list keeps its own order, strongest
+  // or newest first. A printout shows every name too.
+  window.addEventListener("beforeprint", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("details.names"), function (d) { d.open = true; });
+  });
 
-  // On a phone a long list or table shows its first FOLD entries (each puts the strongest or newest first) and a
-  // "Show all" button; wider screens show every entry. The fold is CSS (style.css, .fold-box), so nothing is hidden
-  // from a wide screen, a printout or a search engine. Same rule as Cordon's and Elements' tables. Tables that
-  // scroll in their own box (.scroll.tall) and lists with a fold of their own (Supreme Court opinions) are left.
-  var FOLD = 10;
-  function foldLong(box, items) {
-    var old = box.nextElementSibling;
-    if (old && old.classList.contains("fold-more")) { old.remove(); }
-    box.classList.remove("fold-box", "open");
-    if (items.length <= FOLD + 2) { return; }
-    Array.prototype.forEach.call(items, function (it, n) { it.classList.toggle("fold", n >= FOLD); });
-    box.classList.add("fold-box");
-    var btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "fold-more";
-    btn.setAttribute("aria-expanded", "false");
-    btn.textContent = "Show all " + items.length;
-    btn.addEventListener("click", function () {
-      var open = box.classList.toggle("open");
-      btn.setAttribute("aria-expanded", String(open));
-      btn.textContent = open ? "Show the first " + FOLD : "Show all " + items.length;
-      if (!open) { box.scrollIntoView({ block: "nearest" }); }
-    });
-    box.insertAdjacentElement("afterend", btn);
-  }
-  function folds() {
-    Array.prototype.forEach.call(document.querySelectorAll("main .scroll:not(.tall) > table"), function (t) {
-      foldLong(t.parentElement, t.querySelectorAll("tbody > tr"));
-    });
-    ["rules-list", "tariffs-list", "inspection-list", "calendar", "lanes"].forEach(function (id) {
-      var box = document.getElementById(id);
-      if (box) { foldLong(box, box.querySelectorAll(":scope > .row")); }
-    });
+  // A link to a section (#local-food, from COP) lands before the tables above it fill in, fold, and "Elsewhere
+  // today" arrives (19 Nov 2026: it stopped 1,500 px short). Keep the section in view while the page settles, for
+  // up to four seconds, and stop as soon as the reader scrolls, presses a key or touches the page.
+  function land() {
+    var id = location.hash.length > 1 ? decodeURIComponent(location.hash.slice(1)) : "";
+    var target = id ? document.getElementById(id) : null;
+    var main = document.querySelector("main");
+    if (!target || !main) { return; }
+    target.scrollIntoView();
+    if (!window.ResizeObserver) { return; }
+    var until = Date.now() + 4000, ro;
+    function stop() { if (ro) { ro.disconnect(); ro = null; } }
+    ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (ev) { window.addEventListener(ev, stop, { once: true, passive: true }); });
+    ro = new ResizeObserver(function () { if (Date.now() > until) { stop(); return; } target.scrollIntoView(); });
+    ro.observe(main);
+    setTimeout(stop, 4000);
   }
 
   fetch("data/snapshot.json")
     .then(function (r) { return r.json(); })
     .then(function (s) {
       render(s);
+      land();
       if (T) {
         var slot = document.getElementById("time-settings");
         if (slot) { T.mountSettings(slot); }

@@ -11,9 +11,11 @@
 <link rel="stylesheet" href="tic-related.css">
 <link rel="stylesheet" href="tic-shell.css">
 <link rel="stylesheet" href="tic-tabs.css">
+<link rel="stylesheet" href="tic-fold.css">
 <script src="tic-time.js"></script>
 <script src="tic-related.js"></script>
 <script src="tic-tabs.js" defer></script>
+<script src="tic-fold.js" defer></script>
 <script src="tic-nav.js" defer data-current="headwind" data-health="on"></script>
 </head>
 <body>
@@ -56,24 +58,24 @@
     <section class="card" id="fx" aria-labelledby="fx-h">
       <div class="card-head"><h2 id="fx-h">Currencies against the US dollar</h2>
         <p class="muted small">Five business days. ECB reference rates, which cover about 30 currencies and not the rouble.</p></div>
-      <div class="scroll"><table id="fx-table"></table></div>
+      <div class="scroll"><table id="fx-table" data-tic-fold data-tic-fold-find></table></div>
     </section>
     <div>
       <section class="card" id="energy" aria-labelledby="en-h">
         <div class="card-head"><h2 id="en-h">Energy</h2>
           <p class="muted small">Five trading days. EIA spot prices, a day or two behind.</p></div>
-        <div class="scroll"><table id="energy-table"></table></div>
+        <div class="scroll"><table id="energy-table" data-tic-fold data-tic-fold-find></table></div>
       </section>
       <section class="card" id="food" aria-labelledby="fd-h">
         <div class="card-head"><h2 id="fd-h">FAO food price indices</h2>
           <p class="muted small">Change on the month; 2014–2016 = 100. FAO revises earlier months.</p></div>
-        <div class="scroll"><table id="fao-table"></table></div>
+        <div class="scroll"><table id="fao-table" data-tic-fold data-tic-fold-find></table></div>
       </section>
       <section class="card" id="pinksheet" aria-labelledby="ps-h">
         <div class="card-head"><h2 id="ps-h">Fertilizers and critical-list metals</h2>
           <p class="muted small" id="ps-note">Change on the month; monthly averages in nominal US dollars from the World
             Bank&rsquo;s Pink Sheet (CC BY 4.0).</p></div>
-        <div class="scroll"><table id="pinksheet-table"></table></div>
+        <div class="scroll"><table id="pinksheet-table" data-tic-fold data-tic-fold-find></table></div>
       </section>
     </div>
   </div>
@@ -87,7 +89,7 @@
         Monitor; market rates are those WFP collects in local markets, many of them unofficial. "Market against official"
         compares the median market rate with the official average for the same month. Nothing here is combined into a
         score.</p></div>
-    <div class="scroll"><table id="country-table"></table></div>
+    <div class="scroll"><table id="country-table" data-tic-fold data-tic-fold-find></table></div>
     <p class="small muted" id="country-note"></p>
   </section>
   <!-- Elsewhere today: the other layers' findings in the watched countries above (tic-related.js from the hub) -->
@@ -97,7 +99,7 @@
     <div class="card-head"><h2 id="lf-h">Local food prices in watched countries</h2>
       <p class="muted small">Median three-month change across each country's market price series. Nominal prices in local
         currency, from WFP. Data arrives one to three months late.</p></div>
-    <div class="scroll"><table id="wfp-table"></table></div>
+    <div class="scroll"><table id="wfp-table" data-tic-fold data-tic-fold-find></table></div>
     <p class="small muted" id="wfp-missing"></p>
   </section>
 
@@ -134,7 +136,7 @@
         the BIS and State lists itself; an entry that comes back under a new id with the same name and type is
         counted once, as the same entry.</p></div>
     <div id="screening-deltas"></div>
-    <div class="scroll"><table id="screening-table"></table></div>
+    <div class="scroll"><table id="screening-table" data-tic-fold data-tic-fold-find></table></div>
   </section>
   </div>
   <div id="sec-rules" data-tab-label="Rules">
@@ -143,7 +145,7 @@
         <p class="muted small">Rules and proposed rules published in the US Federal Register by BIS, OFAC and USTR,
           USTR's notices (Section 301 actions and exclusions), BIS's and ITA's Section 232 notices, and presidential
           documents that are tariff actions, in the last 60 days, as they were titled.</p></div>
-      <div id="rules-list"></div>
+      <div id="rules-list" data-tic-fold="6"></div>
       <h3 class="sub" id="tariffs-h">Tariff actions and the tariff schedule</h3>
       <p class="muted small">How many presidential tariff actions the Federal Register published, and how many
         revisions of the Harmonized Tariff Schedule the US International Trade Commission posted, in the last 28
@@ -166,11 +168,11 @@
       <p class="muted small" id="minerals-note">Net import reliance is imports less exports, adjusted for stock changes, as a
         share of US consumption. Figures are annual, from the US Geological Survey, and are copied as published.</p></div>
     <p class="small muted" id="minerals-list"></p>
-    <div class="scroll tall"><table id="minerals-table"></table></div>
+    <div class="scroll"><table id="minerals-table" data-tic-fold data-tic-fold-find></table></div>
     <p class="small muted" id="minerals-first"></p>
     <h3 class="small" id="trade-h">US imports by source country, from the Census Bureau</h3>
     <p class="small muted" id="trade-note"></p>
-    <div class="scroll tall"><table id="trade-table"></table></div>
+    <div class="scroll"><table id="trade-table" data-tic-fold data-tic-fold-find></table></div>
   </section>
 
   </div>
@@ -204,12 +206,12 @@
     <section class="card" aria-labelledby="cal-h">
       <div class="card-head"><h2 id="cal-h">Coming dates</h2>
         <p class="muted small">From the publishers' own schedules. US inflation and jobs dates are not covered yet.</p></div>
-      <div id="calendar"></div>
+      <div id="calendar" data-tic-fold></div>
     </section>
     <section class="card" aria-labelledby="src-h">
       <div class="card-head"><h2 id="src-h">Sources and their state</h2>
         <p class="muted small">A source that failed shows its last good copy and says so. Fresh, late and stale compare a source's newest data with its own rhythm (business days for the ECB, months for FAO and WFP); read means it was read and its data carry no date to judge. A note flags a reading much smaller than usual, or a publisher date that has not moved for a long time.</p></div>
-      <div id="lanes"></div>
+      <div id="lanes" data-tic-fold></div>
     </section>
   </div>
   </div>
