@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-tic-layer="systems">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="tic-time.css">
 <link rel="stylesheet" href="tic-nav.css">
 <link rel="stylesheet" href="tic-related.css">
+<link rel="stylesheet" href="tic-shell.css">
 <link rel="stylesheet" href="tic-tabs.css">
 <script src="tic-time.js"></script>
 <script src="tic-related.js"></script>
@@ -18,7 +19,7 @@
 <body>
 <header class="top">
   <div class="wrap top-row">
-    <div class="brand"><strong>Headwind</strong><span class="muted">The Intelligence Company</span></div>
+    <div class="brand"><strong>Headwind</strong><a class="tic-layer" href="https://theintelligence.company/#layers">Systems layer</a><span class="muted">The Intelligence Company</span></div>
     <nav class="top-nav">
       <a href="data/feed.geojson">Feed</a>
       <a href="data/events.json">Calendar</a>
@@ -32,11 +33,12 @@
 <main class="wrap">
   <section class="hero">
     <h1>Economic stress, measured against its own normal.</h1>
+    <p class="tic-reading" id="reading" aria-live="polite"></p>
+    <div class="tiles tic-tiles" id="tiles" aria-live="polite"></div>
     <p class="lede">Each currency, energy price and food price is compared with its own past changes. An item is marked
       unusual only when the move is far outside that range. These are measurements, not forecasts and not investment
       advice. A second strand lists the decisions of the US and UK Supreme Courts as the courts publish them.</p>
     <p class="small muted" id="asof" aria-live="polite">Loading…</p>
-    <div class="tiles" id="tiles" aria-live="polite"></div>
   </section>
 
   <!-- Sections row (tic-tabs.js from the hub): one group at a time on a phone, a jumping row wider -->
