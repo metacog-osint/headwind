@@ -1,9 +1,9 @@
 """Sanctions lists: what was added or removed since Headwind last looked.
 
-Seven official lists, all keyless: the US Treasury's SDN list (OFAC, sdn.csv, with its address file add.csv),
+Eight official lists, all keyless: the US Treasury's SDN list (OFAC, sdn.csv, with its address file add.csv),
 the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML), the UK Sanctions List
 (FCDO, XML), France's Registre national des gels (JSON), Canada's consolidated list (XML) and Australia's
-Consolidated List (DFAT, xlsx). Each run reduces a
+Consolidated List (DFAT, xlsx), and Japan's asset-freeze list (Ministry of Finance, CSV). Each run reduces a
 list to an index of entry id -> [type, groups, details], compares it with the index kept from the run before, and
 reports the difference by type and by sanctions program, naming what changed.
 
@@ -22,6 +22,7 @@ import csv
 import io
 import json
 import re
+import unicodedata
 import xml.etree.ElementTree as ET
 import zipfile
 from collections import Counter
@@ -59,6 +60,14 @@ CA_PAGE = ("https://www.international.gc.ca/world-monde/international_relations-
 # machine on 15 Nov 2026 and on the morning of 19 Nov, then answered in about 8 s.
 AU_XLSX = "https://www.dfat.gov.au/sites/default/files/Australian_Sanctions_Consolidated_List.xlsx"
 AU_PAGE = "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list"
+# Japan's asset-freeze list under the Foreign Exchange and Foreign Trade Act (Ministry of Finance), CSV, about 3.3 MB,
+# and the IMO numbers of the ships under its services ban, CSV. Both file names carry a date
+# (shisantouketsu20261120.csv), so the links are read from the list page each run. MOF's terms page (著作権・リンク等
+# について, read 19 Nov 2026): the Public Data License 1.0 (PDL1.0), commercial use allowed, compatible with CC BY 4.0;
+# a source line is required, and a note that the content was edited and by whom.
+JP_PAGE = "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/list.html"
+JP_TERMS = "https://www.mof.go.jp/about_mof/notice/index.html"
+PDL_URL = "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0"
 
 LISTS = {
     "ofac-sdn": {"name": "OFAC SDN list", "publisher": "US Treasury (OFAC)", "url": OFAC_RECENT, "min_entries": 5000},
@@ -75,6 +84,8 @@ LISTS = {
     "australia-dfat": {"name": "Australian Sanctions Consolidated List",
                        "publisher": "Australian Department of Foreign Affairs and Trade (Australian Sanctions Office)",
                        "url": AU_PAGE, "min_entries": 3000},
+    "japan-mof": {"name": "Japan's asset-freeze list (Ministry of Finance)", "publisher": "Ministry of Finance Japan",
+                  "url": JP_PAGE, "min_entries": 2000},
 }
 
 # EU programme codes, as the Financial Sanctions Files give them, that name a country. Read against the
@@ -102,7 +113,10 @@ UK_REGIME_COUNTRY = {
     "Republic of Guinea-Bissau": "GW", "South Sudan": "SS", "Haiti": "HT", "Guinea": "GN",
     "Bosnia and Herzegovina": "BA", "Mali": "ML",
 }
-UK_UNPLACED = {"Isil (Da'esh) and Al-Qaeda (United Nations Sanctions)", "Global Human Rights", "Cyber",
+# "Global Human Rights and International Humanitarian Law": on the list read 19 Nov 2026 (9 entries, beside 186 under
+# "Global Human Rights"; shown live as an unknown program); a thematic regime, unplaced as its parent is.
+UK_UNPLACED = {"Isil (Da'esh) and Al-Qaeda (United Nations Sanctions)", "Global Human Rights",
+               "Global Human Rights and International Humanitarian Law", "Cyber",
                "Global Anti-Corruption", "Counter-Terrorism (International Sanctions)", "Counter-Terrorism",
                "Global Irregular Migration and Trafficking in Persons", "Chemical Weapons"}
 
@@ -134,8 +148,48 @@ AU_REGIME_COUNTRY = {
 AU_UNPLACED = {"Autonomous (FFRY)", "Autonomous (Thematic - Human Rights)", "Autonomous (Thematic - Cyber)",
                "Autonomous (Thematic – Corruption)", "1373 (2001)"}
 
+# Japan's programs, by the list's 区分 (category) number, read against the list page and the file of 20 Nov 2026
+# (40 categories in use; a program's people and organizations are often two numbers). Labels are Headwind's English for
+# the page's headings. True marks a program under a Security Council resolution that restates a UN list: counted
+# only, never named, placing no country (Tom, 19 Nov 2026, as for Australia). Category 3 is Japan's resolution-1373
+# listing of people and organizations already on the UN's Al-Qaida list (each entry is marked 重複, duplicate, of a
+# category-2 entry), so it restates the UN list too. Not restatements, because the UN keeps no list under them:
+# 4 (Japan's own resolution-1373 listings) and 13 (Japan's 2006 listings under resolution 1695 on North Korea).
+JP_PROGRAMS = {
+    1: ("FRY (Milosevic and associates)", False), 2: ("UN 1267/1988 (Taliban, ISIL and Al-Qaida)", True),
+    3: ("1373 (UN Al-Qaida listings restated)", True), 4: ("1373 (terrorists)", False),
+    5: ("UN 1483 (Iraq)", True), 6: ("UN 1483 (Iraq)", True), 7: ("UN 1483 (Iraq)", True),
+    9: ("UN 1596 (DR Congo)", True), 10: ("UN 1596 (DR Congo)", True), 12: ("UN 1591 (Sudan)", True),
+    13: ("1695 (North Korea)", False), 14: ("UN 1718 (North Korea)", True), 15: ("UN 1718 (North Korea)", True),
+    16: ("North Korea (with the US and EU)", False), 17: ("North Korea (with the US and EU)", False),
+    19: ("UN 1737 (Iran)", True), 20: ("UN 1737 (Iran)", True), 21: ("UN 1844 (Somalia)", True),
+    22: ("UN 1970 (Libya)", True), 23: ("UN 1970 (Libya)", True),
+    24: ("Syria (Assad and associates)", False), 25: ("Syria (Assad and associates)", False),
+    26: ("Ukraine (Crimea and eastern Ukraine)", False), 27: ("Ukraine (Crimea and eastern Ukraine)", False),
+    28: ("Russia", False), 29: ("Russia", False), 30: ("Russia", False),
+    31: ("Belarus", False), 32: ("Belarus", False), 33: ("Belarus", False),
+    34: ("Russia (third countries)", False), 35: ("Russia (third countries)", False), 36: ("Russia (third countries)", False),
+    37: ("UN 2127 (Central African Republic)", True), 38: ("UN 2127 (Central African Republic)", True),
+    39: ("UN 2140 (Yemen)", True), 40: ("UN 2206 (South Sudan)", True),
+    42: ("UN 2653 (Haiti)", True), 44: ("UN 2653 (Haiti)", True), 43: ("Israeli settlers (violence)", False),
+}
+JP_VESSELS = "Designated vessels (services ban)"
+JP_UN = {label for label, un in JP_PROGRAMS.values() if un}
+# Japan's own programs that name a country. "Ukraine (Crimea and eastern Ukraine)" is placed on Russia only, as Tom
+# placed the EU's UKR and Canada's Ukraine regulations; "Russia (third countries)" (shipping companies and banks
+# outside Russia and Belarus) and the vessel ban (MOF's ship file sits under the Russia measures on the page, and all
+# 35 ships of 2 Oct 2026 are on OFAC's and Canada's Russia lists) are Russia's. Left unplaced on purpose: FRY (as
+# Australia's FFRY), 1373 (terrorism) and the settlers program (conduct, as Canada's Extremist Settler Violence).
+JP_PROGRAM_COUNTRY = {
+    "1695 (North Korea)": "KP", "North Korea (with the US and EU)": "KP", "Syria (Assad and associates)": "SY",
+    "Ukraine (Crimea and eastern Ukraine)": "RU", "Russia": "RU", "Belarus": "BY", "Russia (third countries)": "RU",
+    JP_VESSELS: "RU",
+}
+JP_UNPLACED = {"FRY (Milosevic and associates)", "1373 (terrorists)", "Israeli settlers (violence)"}
+
 LIST_COUNTRY = {"eu-fsf": (EU_PROGRAMME_COUNTRY, EU_UNPLACED), "uk-sanctions": (UK_REGIME_COUNTRY, UK_UNPLACED),
-                "canada-sema": (CA_REGIME_COUNTRY, CA_UNPLACED), "australia-dfat": (AU_REGIME_COUNTRY, AU_UNPLACED)}
+                "canada-sema": (CA_REGIME_COUNTRY, CA_UNPLACED), "australia-dfat": (AU_REGIME_COUNTRY, AU_UNPLACED),
+                "japan-mof": (JP_PROGRAM_COUNTRY, JP_UNPLACED)}
 KEEP_DAYS = 30          # how long a delta stays in the snapshot
 SHRINK_LIMIT = 0.5      # a list that loses more than half its entries is a broken download, not a delisting
 
@@ -191,6 +245,8 @@ def unknown_programs(list_id: str, index: dict) -> list[str]:
     groups = {g for e in index.values() for g in e[1]}
     if list_id == "australia-dfat":
         groups = {g for g in groups if not au_restates_un(g)}
+    if list_id == "japan-mof":
+        groups -= JP_UN
     return sorted(groups - set(placed) - unplaced)
 
 
@@ -668,6 +724,120 @@ def parse_au_xlsx(body: bytes) -> tuple[str | None, dict[str, list]]:
     return _au_generated(zf), index
 
 
+JP_OWN = {label for label, un in JP_PROGRAMS.values() if not un} | {JP_VESSELS}
+JP_TYPE = {"個人": "individual", "団体": "entity"}
+JP_COLUMNS = ("区分", "番号", "告示日付", "個人・団体", "氏名（日本語）", "氏名（英語）", "国籍（日本語）", "国籍（英語）",
+              "住所・所在地（国）（日本語）", "住所・所在地（国）（英語）")
+JP_SHIP_COLUMNS = ("区分", "番号", "告示日付", "IMO番号")
+# Country names the list prints only in Japanese (nationality, and an address's country where the English column is
+# empty), read against Japan's own entries on the file of 20 Nov 2026; a name not here is kept as printed.
+JP_COUNTRY = {
+    "北朝鮮": "North Korea", "パレスチナ": "Palestine", "レバノン": "Lebanon", "サウディ・アラビア": "Saudi Arabia",
+    "サウジアラビア": "Saudi Arabia", "ヨルダン": "Jordan", "中華人民共和国": "China", "中国": "China",
+    "ロシア": "Russia", "ロシア連邦": "Russian Federation", "クウェイト": "Kuwait", "クウェート": "Kuwait",
+    "スーダン": "Sudan", "トルコ": "Turkey", "エジプト": "Egypt", "イギリス": "United Kingdom", "英国": "United Kingdom",
+    "スロバキア共和国": "Slovakia", "スイス": "Switzerland", "リビア": "Libya", "アラブ首長国連邦": "United Arab Emirates",
+    "ドイツ": "Germany", "シリア": "Syria", "インド": "India", "ミャンマー": "Myanmar",
+    "ベトナム社会主義共和国": "Vietnam", "ベラルーシ共和国": "Belarus", "ベラルーシ": "Belarus", "イラン": "Iran",
+    "米国": "United States", "アメリカ合衆国": "United States", "アメリカ": "United States",
+}
+_JP_DATE = re.compile(r"(\d{4})\.(\d{1,2})\.(\d{1,2})")
+
+
+def jp_program(code: str) -> str:
+    """The program of a 区分 number; a number not in JP_PROGRAMS shows as 'category <n>' (unknown_programs) and is
+    counted only until it is read and added."""
+    try:
+        n = int(code)
+    except ValueError:
+        return f"category {code or 'none'}"
+    return JP_PROGRAMS[n][0] if n in JP_PROGRAMS else f"category {n}"
+
+
+def is_jp_own(entry: list) -> bool:
+    """An entry of Japan's own programs. A UN restatement, or a category not yet read, is not."""
+    return bool(entry[1]) and all(g in JP_OWN for g in entry[1])
+
+
+def jp_files(page: str) -> tuple[str, str, str]:
+    """(list CSV, ship CSV, the list's date as YYYY-MM-DD) from the links on MOF's list page. Both names carry a date
+    ('shisantouketsu20261120.csv', 'ekimukisei_IMOnumber_20261002.csv'); the newest of each is taken."""
+    def newest(pattern):
+        found = sorted(set(re.findall(pattern, page)), key=lambda m: m[1])
+        if not found:
+            raise ValueError(f"japan-mof: no link matching {pattern!r} on the list page; the page has changed")
+        return found[-1]
+    path, day = newest(r'href="(?:\./)?((?:[\w/.-]*/)?shisantouketsu(\d{8})\.csv)"')
+    ship_path, _ = newest(r'href="(?:\./)?((?:[\w/.-]*/)?ekimukisei_IMOnumber_(\d{8})\.csv)"')
+    base = JP_PAGE.rsplit("/", 1)[0] + "/"
+    return base + path, base + ship_path, f"{day[:4]}-{day[4:6]}-{day[6:]}"
+
+
+def _jp_rows(body: bytes, columns: tuple, what: str) -> list[dict]:
+    text = body.decode("utf-8-sig")
+    rows = list(csv.DictReader(io.StringIO(text)))
+    if not rows:
+        raise ValueError(f"japan-mof: the {what} is empty")
+    missing = [c for c in columns if c not in rows[0]]
+    if missing:
+        raise ValueError(f"japan-mof: no column {', '.join(missing)} in the {what}; the file's layout has changed")
+    return [{k: " ".join((v or "").split()) for k, v in r.items() if k} for r in rows]
+
+
+def _jp_date(text: str) -> str | None:
+    """The notice date of an entry: the first date of 告示日付 ('2001.9.22 2008.6.25改訂 ...': the later dates are
+    revisions)."""
+    m = _JP_DATE.match(text or "")
+    return f"{int(m[1]):04d}-{int(m[2]):02d}-{int(m[3]):02d}" if m else None
+
+
+def jp_countries(row: dict) -> list[str]:
+    """Nationality and the countries of the addresses, from the English columns, or from the Japanese ones (through
+    JP_COUNTRY) where the English column is empty. The city and street columns are never read."""
+    def split(v):
+        return [p.strip() for p in re.split(r"[;；、]", v or "") if p.strip()]
+    out = []
+    for en, ja in (("国籍（英語）", "国籍（日本語）"), ("住所・所在地（国）（英語）", "住所・所在地（国）（日本語）")):
+        vals = split(row.get(en)) or [JP_COUNTRY.get(p, p) for p in split(row.get(ja))]
+        out += vals
+    return nm.countries(out)
+
+
+def parse_jp_csv(body: bytes, ships: bytes, dates: dict | None = None) -> dict[str, list]:
+    """Japan's asset-freeze list and its ship file, one index. An entry is keyed on its 番号 ('029-000761': the 区分
+    number, then a serial), stable across the Wayback copies of 23 Jun 2025 and 14 Oct 2026 and the live copy of 20
+    Nov 2026; ships are keyed 'ship-' and the ship file's own 番号. An entry is [type, [program]]. Japan's own entries
+    carry the English name as printed (NFKC, so full-width letters and brackets read as plain ones) and their
+    countries (jp_countries); ships carry their IMO number (the file gives no name, flag or type). UN restatements
+    carry nothing more (counted only, never named). Birth dates, birthplaces, passports, identity numbers, positions,
+    aliases, city and street addresses, 'other information' and MOFA's notice text are never carried. `dates`, when
+    given, is filled with each own entry's notice date, for the batch measure only."""
+    index = {}
+    for r in _jp_rows(body, JP_COLUMNS, "list"):
+        i = r["番号"]
+        if not re.fullmatch(r"\d{3}-\d{6}", i):
+            raise ValueError(f"japan-mof: an entry has the number {i!r}")
+        if i in index:
+            raise ValueError(f"japan-mof: two entries share the number {i}")
+        entry = [JP_TYPE.get(r["個人・団体"], "unknown"), [jp_program(r["区分"])]]
+        if is_jp_own(entry):
+            name = unicodedata.normalize("NFKC", r["氏名（英語）"] or r["氏名（日本語）"])
+            entry.append(nm.details(name, jp_countries(r)))
+            if dates is not None:
+                dates[i] = _jp_date(r["告示日付"])
+        index[i] = entry
+    for r in _jp_rows(ships, JP_SHIP_COLUMNS, "ship file"):
+        i = "ship-" + r["番号"]
+        if i in index:
+            raise ValueError(f"japan-mof: two ships share the number {r['番号']}")
+        imo = r["IMO番号"]
+        index[i] = ["vessel", [JP_VESSELS], {"name": None, "imo": imo if re.fullmatch(r"\d{7}", imo) else None,
+                                             "mmsi": None, "flag": None, "vessel_type": None}]
+        if dates is not None:
+            dates[i] = _jp_date(r["告示日付"])
+    return index
+
+
 def check_size(list_id: str, index: dict, prev_index: dict | None) -> None:
     if len(index) < LISTS[list_id]["min_entries"]:
         raise ValueError(f"{list_id}: only {len(index)} entries parsed; the download looks cut short")
@@ -767,20 +937,23 @@ SPLIT_KEYS = ("added", "removed", "changed", "added_by_type", "added_by_program"
 
 
 # Lists that restate other lists Headwind reads, beside measures of their own: the test for an entry of the
-# publisher's own. France: national freezes (Tom, 15 Nov 2026); Australia: every regime but the Security
+# publisher's own. France: national freezes (Tom, 15 Nov 2026); Australia and Japan: every program but the Security
 # Council's (Tom, 19 Nov 2026).
-OWN_ENTRY = {"france-gels": lambda e: is_fr_national(e), "australia-dfat": lambda e: is_au_own(e)}
+OWN_ENTRY = {"france-gels": lambda e: is_fr_national(e), "australia-dfat": lambda e: is_au_own(e),
+             "japan-mof": lambda e: is_jp_own(e)}
 
 
 def _split(list_id: str, out: dict, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None,
-           compare_vessels: bool, added_history: list | None, compare_names: bool = True) -> dict:
+           compare_vessels: bool, added_history: list | None, compare_names: bool = True,
+           dates: dict | None = None) -> dict:
     """A list that restates measures Headwind reads on other lists (France's EU and UN entries, Australia's UN
     entries) beside measures of its own. `national` is the change among entries of the publisher's own on either
     reading (OWN_ENTRY), scored by the observed-batch rule and placing its countries; `restated` is the rest,
-    counted only: never scored and placing no country, so a package is not counted twice."""
+    counted only: never scored and placing no country, so a package is not counted twice. `dates` (Japan's notice
+    dates, given for its own entries only) scores the own entries by designation date."""
     nat = {i for idx in (prev_index, index) for i, e in idx.items() if OWN_ENTRY[list_id](e)}
     sub = delta(list_id, {k: v for k, v in prev_index.items() if k in nat}, {k: v for k, v in index.items() if k in nat},
-                detected_at, prior_checked_at, compare_vessels, None, added_history, split=False,
+                detected_at, prior_checked_at, compare_vessels, dates, added_history, split=False,
                 compare_names=compare_names) or {}
     out["national"] = {k: sub.get(k, {} if k not in ("added", "removed", "changed") else 0) for k in SPLIT_KEYS}
     out["restated"] = {k: out[k] - out["national"][k] for k in ("added", "removed", "changed")}
@@ -841,13 +1014,14 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
         out.update({"named_changed": [], "renamed": 0, "us_person_data": "none"})
     if list_id in OWN_ENTRY and split:
         return _split(list_id, out, prev_index, index, detected_at, prior_checked_at, compare_vessels, added_history,
-                      compare_names)
+                      compare_names, dates)
     return out
 
 
 # The lists whose people and organizations are named. The UN's terms bar redistribution of its content; Australia's
-# entries under Security Council regimes are counted only, for the same reason (they carry no name in the index).
-NAMED_LISTS = ("ofac-sdn", "eu-fsf", "uk-sanctions", "france-gels", "canada-sema", "australia-dfat")
+# and Japan's entries under Security Council regimes are counted only, for the same reason (they carry no name in
+# the index).
+NAMED_LISTS = ("ofac-sdn", "eu-fsf", "uk-sanctions", "france-gels", "canada-sema", "australia-dfat", "japan-mof")
 
 
 # The lists that carry ships. The UN file has none; EU vessel measures sit in regulation annexes, not in its file.
@@ -855,7 +1029,8 @@ NAMED_LISTS = ("ofac-sdn", "eu-fsf", "uk-sanctions", "france-gels", "canada-sema
 # Canada's list 731 (all under its Russia regulations, 16 Nov 2026); Australia's 359 (19 Nov 2026), 299 of them
 # under its Russia vessel designations; its 60 ships under Security Council regimes are counted only, so they are
 # left out of the cross-list.
-VESSEL_LISTS = ("ofac-sdn", "uk-sanctions", "france-gels", "canada-sema", "australia-dfat")
+# Japan's ship file gives 35 IMO numbers (2 Oct 2026), no names.
+VESSEL_LISTS = ("ofac-sdn", "uk-sanctions", "france-gels", "canada-sema", "australia-dfat", "japan-mof")
 
 
 def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict, list[dict]]:

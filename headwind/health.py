@@ -44,8 +44,9 @@ WINDOWS = {"ecb-eurofxref": (4, 8), "eia-spot": (7, 14), "fao-ffpi": (40, 70), "
 # reading). The UN regenerates its file every day, so two quiet days is already unusual.
 # France publishes its register as measures are taken (6 Nov 2026 was the latest on 15 Nov).
 # Australia's file carries the time DFAT saved it; it changed four times in the first half of Nov 2026.
+# Japan's file is named by the list's date; MOF posted files dated 2, 9 and 14 Oct and 20 Nov 2026.
 QUIET_DAYS = {"un-sc-consolidated": 3, "eu-fsf": 14, "uk-sanctions-list": 30, "dgtresor-gels": 30,
-              "dfat-consolidated": 30}
+              "dfat-consolidated": 30, "mof-jp-sanctions": 45}
 # OFAC's file carries no date of its own, so its note uses the last change Headwind itself saw.
 # Canada's file carries no date either; it changes every few weeks (Last-Modified 10 Nov 2026 on 16 Nov).
 QUIET_SEEN_DAYS = {"ofac-sdn": 21, "gac-sema": 45}
@@ -54,13 +55,14 @@ LANE_OF = {"ecb-eurofxref": "fx", "worldbank-gem": "gem", "eia-spot": "energy", 
            "worldbank-pinksheet": "pinksheet",
            "worldbank-wdi": "baseline", "release-calendars": "calendar", "ofac-sdn": "sanctions",
            "un-sc-consolidated": "sanctions", "eu-fsf": "sanctions", "uk-sanctions-list": "sanctions",
-           "dgtresor-gels": "sanctions", "gac-sema": "sanctions", "dfat-consolidated": "sanctions", "un-press": "unpress",
+           "dgtresor-gels": "sanctions", "gac-sema": "sanctions", "dfat-consolidated": "sanctions",
+           "mof-jp-sanctions": "sanctions", "un-press": "unpress",
            "supremecourt-gov": "scotus", "supremecourt-uk": "uksc",
            "trade-gov-csl": "screening", "us-federal-register": "controls", "fr-public-inspection": "inspection",
            "usgs-mcs": "minerals", "census-trade": "trade", "usitc-hts": "tariffs", "whitehouse-actions": "tariffs"}
 LIST_KEY = {"ofac-sdn": "ofac-sdn", "un-consolidated": "un-sc-consolidated", "eu-fsf": "eu-fsf",
             "uk-sanctions": "uk-sanctions-list", "france-gels": "dgtresor-gels", "canada-sema": "gac-sema",
-            "australia-dfat": "dfat-consolidated"}
+            "australia-dfat": "dfat-consolidated", "japan-mof": "mof-jp-sanctions"}
 
 
 def _day(s: str | None) -> date | None:
@@ -345,7 +347,7 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
     # A list that has never been read on this snapshot (no status row) is still owed an entry when the lane failed.
     if lane.get("status") == "failed":
         for key in ("ofac-sdn", "un-sc-consolidated", "eu-fsf", "uk-sanctions-list", "dgtresor-gels", "gac-sema",
-                    "dfat-consolidated"):
+                    "dfat-consolidated", "mof-jp-sanctions"):
             out.setdefault(key, _entry(key, ok=False, now=now, prev=prev, newest=None, today=today,
                                        detail="not read", error=lane.get("error")))
     return dict(sorted(out.items()))

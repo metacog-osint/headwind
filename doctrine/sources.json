@@ -66,6 +66,15 @@
       "independence_group": "au-dfat-sanctions"
     },
     {
+      "id": "mof-jp-sanctions",
+      "name": "Ministry of Finance Japan: list of persons subject to asset freezes under the Foreign Exchange and Foreign Trade Act (shisantouketsu<YYYYMMDD>.csv) and the IMO numbers of ships under its services ban (ekimukisei_IMOnumber_<YYYYMMDD>.csv), links read from list.html",
+      "url": "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/list.html",
+      "licence": "Public Data License 1.0 (PDL1.0), compatible with CC BY 4.0, MOF terms page read 19 Nov 2026; source line 出典：財務省ウェブサイト with the page and licence URLs, and a note that Headwind edited it. Entries under UN Security Council programs are counted only (the UN's terms)",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "jp-mof-sanctions"
+    },
+    {
       "id": "supremecourt-gov",
       "name": "Supreme Court of the United States: slip opinion RSS feeds (slipopinion_rss.aspx?TYear=) and docket JSON (/RSS/Cases/JSON/<docket>.json)",
       "url": "https://www.supremecourt.gov/opinions/opinions.aspx",
