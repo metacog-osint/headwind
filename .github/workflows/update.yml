@@ -173,3 +173,21 @@ jobs:
           n=$(gh release view "$q" --json assets --jq '.assets | length')
           echo "release $q holds $n assets (limit 1,000)"
           if [ "$n" -ge 950 ]; then echo "::error::release $q has $n assets, near the 1,000 limit"; exit 1; fi
+      # Private archive (19 Nov 2026, retention rule: no data lost). The raw source copies (sanctions lists, CSL,
+      # prices, notices) were discarded with the runner; they go to the PRIVATE repo metacog-osint/tic-archive as
+      # release assets (tools/tic_archive.py, release headwind-raw-YYYY-MM: a snapshot per run, only changed files
+      # uploaded). Not to the public state releases above. API keys are replaced by REDACTED if a reply echoes one.
+      # After the deploy, so a failure turns the run red but never holds the live site. Token: TIC_ARCHIVE_TOKEN,
+      # contents:write on tic-archive only.
+      - name: Private archive (raw replies, to tic-archive)
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ secrets.TIC_ARCHIVE_TOKEN }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::secret TIC_ARCHIVE_TOKEN is not set, so nothing went to the private archive"; exit 1
+          fi
+          python tools/tic_archive.py put --program headwind --lane raw --src data/raw \
+            --redact-env-if-set EIA_API_KEY --redact-env-if-set CENSUS_API_KEY
