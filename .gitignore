@@ -9,3 +9,5 @@ private/
 
 # raw source copies and the working snapshot (rebuilt by collect)
 data/raw/
+data/snapshot.json
+data/state/
