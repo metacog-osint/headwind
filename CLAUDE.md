@@ -38,7 +38,7 @@ says which. `build` refuses to run without a snapshot.
   copies). With neither, a run fails unless started by hand with `first_reading`. **The state is public**: nothing
   goes in it that may not be published (UN list text never does).
 - **Retention** (`headwind/archive.py`): `history/deltas/YYYY-MM.jsonl.gz` (full list changes; removed individuals
-  by count and id unless `ARCHIVE_REMOVED_INDIVIDUALS`), `history/fetch-index/`, dated states in release
+  in full, `ARCHIVE_REMOVED_INDIVIDUALS = True`, Tom 19 Nov 2026), `history/fetch-index/`, dated states in release
   `state-YYYY-qN` (none deleted), ship-table versions beside them.
 - **History log:** `doctrine/kit/tic.py history ... --reading-key data_as_of` writes `history/` and
   `site/data/ended.geojson`; a failure there is a warning, never a missed deploy. COP reads `ended` and

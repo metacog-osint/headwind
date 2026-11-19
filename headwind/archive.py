@@ -24,11 +24,12 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Privacy switch (owner decision pending). False: an individual removed from a list is archived as a count plus
+# Privacy switch. Tom, 19 Nov 2026: removed individuals are retained in full (government lists, publicly
+# released). False: an individual removed from a list is archived as a count plus
 # the list id only, as the published history log already does. True: the full record (name, type, programs, address
 # countries, listing date) is archived too. Entries of unstated type count as individuals, as in
 # names.person_data. Organizations, ships, and individuals added or changed are always archived in full.
-ARCHIVE_REMOVED_INDIVIDUALS = False
+ARCHIVE_REMOVED_INDIVIDUALS = True
 
 NOT_INDIVIDUAL = ("entity", "vessel", "aircraft")
 

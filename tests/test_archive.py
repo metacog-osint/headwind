@@ -42,11 +42,11 @@ class TestDeltaArchive(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def test_default_flag_is_off(self):
-        self.assertIs(archive.ARCHIVE_REMOVED_INDIVIDUALS, False)
+    def test_default_flag_is_on(self):
+        self.assertIs(archive.ARCHIVE_REMOVED_INDIVIDUALS, True)   # Tom, 19 Nov 2026
 
     def test_removed_individuals_are_counted_with_list_ids_only_when_flag_off(self):
-        archive.append_deltas({"sanctions": [delta("a")]}, self.h, NOW)
+        archive.append_deltas({"sanctions": [delta("a")]}, self.h, NOW, archive_removed_individuals=False)
         (rec,) = read(self.h / "deltas" / "2026-11.jsonl.gz")
         self.assertEqual(rec["kind"], "sanctions")
         self.assertEqual([r["name"] for r in rec["named_removed"]], ["GONE CORP"])
