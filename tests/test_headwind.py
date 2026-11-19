@@ -998,7 +998,8 @@ class TestCjeu(unittest.TestCase):
         rm = self.by["62024TJ0535"]
         self.assertEqual((rm["court"], rm["formation"], rm["restrictive_measures"], rm["selected"],
                           rm["us_person_data"]),
-                         ("General Court", "Seventh Chamber, Extended Composition", True, None, "organizations"))
+                         ("General Court", "Seventh Chamber, Extended Composition", True, "restrictive measures",
+                          "organizations"))
         self.assertEqual((self.by["62024CJ0897"]["restrictive_measures"], self.by["62024CJ0897"]["us_person_data"]),
                          (True, "individuals"))
         self.assertEqual(self.by["62025TJ0093"]["us_person_data"], "organizations")   # Iran Shipping Lines
@@ -1009,12 +1010,13 @@ class TestCjeu(unittest.TestCase):
                           "https://eur-lex.europa.eu/legal-content/FR/TXT"))
         self.assertIsNone(self.by["62025CJ0230"]["formation"])    # "__[unreferenced:arret-c-iii-ext]__ du ..."
         self.assertEqual((sum(1 for j in self.js if j["selected"]), sum(1 for j in self.js if j["restrictive_measures"])),
-                         (3, 4))
-        with mock.patch.object(cjeu, "FEED_RESTRICTIVE_MEASURES", True):     # only on Tom's yes
-            js = cjeu.parse((FIX / "cjeu_sparql.json").read_bytes())
-        self.assertEqual({j["celex"]: j["selected"] for j in js if j["selected"] == "restrictive measures"},
+                         (7, 4))
+        self.assertEqual({j["celex"]: j["selected"] for j in self.js if j["selected"] == "restrictive measures"},
                          dict.fromkeys(["62024CJ0897", "62024TJ0535", "62025TJ0093", "62025TJ0479"],
                                        "restrictive measures"))
+        with mock.patch.object(cjeu, "FEED_RESTRICTIVE_MEASURES", False):    # the formations alone
+            js = cjeu.parse((FIX / "cjeu_sparql.json").read_bytes())
+        self.assertEqual(sum(1 for j in js if j["selected"]), 3)
 
     def test_parse_fails_loudly(self):
         d = json.loads((FIX / "cjeu_sparql.json").read_text(encoding="utf-8"))
@@ -1042,10 +1044,6 @@ class TestCjeu(unittest.TestCase):
         again = cjeu.merge(first, self.js[2:], "2026-11-20T03:00:00Z")
         self.assertEqual((len(again), again[0]["first_seen"]), (9, "2026-11-19T21:00:00Z"))
         snap = {"cjeu_judgments": first, "lanes": {"cjeu": {"fetched_at": "2026-11-19T21:00:00Z"}}}
-        f = feed.cjeu_features(snap, "2026-11-20T00:00:00Z", "2026-11-22T00:00:00Z")
-        self.assertEqual([x["properties"]["id"] for x in f], ["headwind:cjeu:62025CJ0241", "headwind:cjeu:62023CJ0698"])
-        with mock.patch.object(cjeu, "FEED_RESTRICTIVE_MEASURES", True):
-            snap["cjeu_judgments"] = cjeu.merge([], cjeu.parse((FIX / "cjeu_sparql.json").read_bytes()), "x")
         f = feed.cjeu_features(snap, "2026-11-20T00:00:00Z", "2026-11-22T00:00:00Z")
         self.assertEqual([x["properties"]["id"] for x in f],
                          ["headwind:cjeu:62025CJ0241", "headwind:cjeu:62023CJ0698", "headwind:cjeu:62024CJ0897"])
@@ -1975,7 +1973,7 @@ class TestEndToEnd(unittest.TestCase):
             self.assertIn("supremecourt-gov", snap["health"])
             self.assertIn("supremecourt-uk", snap["health"])
             self.assertEqual((len(snap["cjeu_judgments"]), snap["cjeu_read"]["selected"],
-                              snap["health"]["eurlex-cellar"]["lane"]), (11, 3, "cjeu"))
+                              snap["health"]["eurlex-cellar"]["lane"]), (11, 7, "cjeu"))
             self.assertEqual((snap["uksc_errors"], snap["uksc_sitemap"]["judgment_pages"]), ([], 6))
             self.assertEqual([(l["id"], l["total"]) for l in snap["sanctions_lists"]],
                              [("ofac-sdn", 36), ("un-consolidated", 14), ("eu-fsf", 9), ("uk-sanctions", 11),
