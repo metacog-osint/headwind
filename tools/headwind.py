@@ -24,8 +24,8 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      markets, minerals, names, pinksheet, releases, sanctions, scotus, screening, tariffs, trade,
-                      uksc, unpress)
+                      cjeu, markets, minerals, names, pinksheet, releases, sanctions, scotus, screening, tariffs,
+                      trade, uksc, unpress)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
 LANE_FIELDS = {
@@ -47,6 +47,7 @@ LANE_FIELDS = {
     "unpress": ["un_committee_releases", "un_press"],
     "scotus": ["scotus_opinions", "scotus_tracked", "scotus_errors"],
     "uksc": ["uksc_judgments", "uksc_read", "uksc_errors", "uksc_sitemap"],
+    "cjeu": ["cjeu_judgments", "cjeu_read"],
 }
 EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
          "energy": [], "fao": [], "fao_release_dates": [], "pinksheet": [], "pinksheet_updated": None,
@@ -56,7 +57,8 @@ EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_up
          "minerals": {}, "mineral_trade": {}, "tariff_pace": {}, "hts_releases": {}, "hts_pace": {},
          "signed_actions": [], "signed_error": None, "un_committee_releases": [], "un_press": {},
          "scotus_opinions": [], "scotus_tracked": [], "scotus_errors": [],
-         "uksc_judgments": [], "uksc_read": {}, "uksc_errors": [], "uksc_sitemap": {}}
+         "uksc_judgments": [], "uksc_read": {}, "uksc_errors": [], "uksc_sitemap": {},
+         "cjeu_judgments": [], "cjeu_read": {}}
 
 
 def _lane_fx(raw_dir, prev, getter):
@@ -603,6 +605,20 @@ def _lane_uksc(raw_dir, prev, getter):
                              "read_this_run": len(cases), "pending": pending, "latest": latest}}, recs
 
 
+def _lane_cjeu(raw_dir, prev, getter):
+    """Judgments of the Court of Justice and the General Court of the last 60 days: one query to the Publications
+    Office's SPARQL endpoint (EUR-Lex metadata, CC0). The lane fails when the reply is not SPARQL JSON or holds a
+    judgment it does not understand; an empty window (the courts' summer vacation) is still a reading."""
+    now, today = fetch.now_utc(), date.today()
+    body, rec = fetch.fetch("eurlex-cellar", cjeu.query_url(today), raw_dir, "json", timeout=120, getter=getter,
+                            gz=True)
+    judgments = cjeu.merge(prev.get("cjeu_judgments") or [], cjeu.parse(body), now)
+    return {"cjeu_judgments": judgments,
+            "cjeu_read": {"checked_at": now, "since": cjeu.window_start(today), "judgments": len(judgments),
+                          "selected": sum(1 for j in judgments if j.get("selected")),
+                          "not_in_english": sum(1 for j in judgments if j.get("language") != "en")}}, [rec]
+
+
 def _lane_inspection(raw_dir, prev, getter):
     """Filings on public inspection by BIS, OFAC and USTR: the issues of the last few days, kept 30 days, and the
     text of each rule, proposed rule and USTR notice (read once per PDF). A text that cannot be read is noted on
@@ -676,7 +692,7 @@ LANES = {"fx": _lane_fx, "gem": _lane_gem, "energy": _lane_energy, "fao": _lane_
          "calendar": _lane_calendar, "sanctions": _lane_sanctions, "screening": _lane_screening,
          "controls": _lane_controls, "inspection": _lane_inspection, "minerals": _lane_minerals,
          "trade": _lane_trade, "tariffs": _lane_tariffs, "unpress": _lane_unpress,
-         "scotus": _lane_scotus, "uksc": _lane_uksc}
+         "scotus": _lane_scotus, "uksc": _lane_uksc, "cjeu": _lane_cjeu}
 
 
 def finish_snapshot(snap: dict, today: date) -> dict:
@@ -807,7 +823,8 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                      "question_drafts", "vessel_crosslist", "mineral_trade", "tariff_pace",
                                      "hts_releases", "hts_pace", "signed_actions", "signed_error",
                                      "un_committee_releases", "un_press", "scotus_opinions", "scotus_tracked",
-                                     "scotus_errors", "uksc_judgments", "uksc_errors", "uksc_sitemap")}
+                                     "scotus_errors", "uksc_judgments", "uksc_errors", "uksc_sitemap",
+                                     "cjeu_judgments", "cjeu_read")}
     page["events"] = snap["events"]["events"]
     page["country_names"] = names
     # Counted-only filings as they may be published, whatever snapshot this is built from (a failed inspection
