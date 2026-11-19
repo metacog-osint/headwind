@@ -1,8 +1,9 @@
 """Sanctions lists: what was added or removed since Headwind last looked.
 
-Six official lists, all keyless: the US Treasury's SDN list (OFAC, sdn.csv, with its address file add.csv),
+Seven official lists, all keyless: the US Treasury's SDN list (OFAC, sdn.csv, with its address file add.csv),
 the UN Security Council consolidated list (XML), the EU's Financial Sanctions Files (XML), the UK Sanctions List
-(FCDO, XML), France's Registre national des gels (JSON) and Canada's consolidated list (XML). Each run reduces a
+(FCDO, XML), France's Registre national des gels (JSON), Canada's consolidated list (XML) and Australia's
+Consolidated List (DFAT, xlsx). Each run reduces a
 list to an index of entry id -> [type, groups, details], compares it with the index kept from the run before, and
 reports the difference by type and by sanctions program, naming what changed.
 
@@ -22,10 +23,11 @@ import io
 import json
 import re
 import xml.etree.ElementTree as ET
+import zipfile
 from collections import Counter
 from datetime import datetime, timedelta
 
-from . import batches, screening
+from . import batches, pinksheet, screening
 from . import names as nm
 
 OFAC_SDN_CSV = "https://www.treasury.gov/ofac/downloads/sdn.csv"
@@ -51,6 +53,12 @@ CA_XML = ("https://www.international.gc.ca/world-monde/assets/office_docs/intern
           "sanctions/sema-lmes.xml")
 CA_PAGE = ("https://www.international.gc.ca/world-monde/international_relations-relations_internationales/"
            "sanctions/consolidated-consolide.aspx?lang=eng")
+# Australia's Consolidated List (DFAT, Australian Sanctions Office), xlsx, about 1.3 MB, at a fixed address. DFAT's
+# copyright page (read 19 Nov 2026): all material on the site but the Coat of Arms is under CC BY 4.0, attributed
+# "Department of Foreign Affairs and Trade website – www.dfat.gov.au". dfat.gov.au timed out from Headwind's
+# machine on 15 Nov 2026 and on the morning of 19 Nov, then answered in about 8 s.
+AU_XLSX = "https://www.dfat.gov.au/sites/default/files/Australian_Sanctions_Consolidated_List.xlsx"
+AU_PAGE = "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list"
 
 LISTS = {
     "ofac-sdn": {"name": "OFAC SDN list", "publisher": "US Treasury (OFAC)", "url": OFAC_RECENT, "min_entries": 5000},
@@ -64,6 +72,9 @@ LISTS = {
                 "publisher": "French Treasury (Direction générale du Trésor)", "url": FR_PAGE, "min_entries": 3000},
     "canada-sema": {"name": "Consolidated Canadian Autonomous Sanctions List", "publisher": "Global Affairs Canada",
                     "url": CA_PAGE, "min_entries": 3000},
+    "australia-dfat": {"name": "Australian Sanctions Consolidated List",
+                       "publisher": "Australian Department of Foreign Affairs and Trade (Australian Sanctions Office)",
+                       "url": AU_PAGE, "min_entries": 3000},
 }
 
 # EU programme codes, as the Financial Sanctions Files give them, that name a country. Read against the
@@ -108,8 +119,23 @@ CA_REGIME_COUNTRY = {
 CA_UNPLACED = {"Justice for Victims of Corrupt Foreign Officials Regulations (JVCFOR)", "Hamas Terrorist Attacks",
                "Extremist Settler Violence"}
 
+# Australia's regimes, by the list's Committees field, read against the live list on 19 Nov 2026 (29 regimes: 14
+# autonomous, 15 under Security Council resolutions). "Autonomous (Ukraine)" (Russia and Ukraine instruments) is
+# placed on Russia only, as Tom placed the EU's UKR and Canada's Ukraine regulations; "Autonomous (Vessels)" holds
+# the ships designated under the Sanctioned Vessels – Russia designations. Left unplaced on purpose: FFRY (the former
+# Federal Republic of Yugoslavia, as OFAC's BALKANS), the three thematic regimes (human rights, cyber, corruption)
+# and 1373 (Australia's own terrorism listings). The UN regimes restate the Security Council's lists: counted only,
+# placing no country (au_restates_un).
+AU_REGIME_COUNTRY = {
+    "Autonomous (Russia)": "RU", "Autonomous (Ukraine)": "RU", "Autonomous (Vessels)": "RU", "Autonomous (Iran)": "IR",
+    "Autonomous (Syria)": "SY", "Autonomous (DPRK)": "KP", "Autonomous (Myanmar)": "MM", "Autonomous (Libya)": "LY",
+    "Autonomous (Zimbabwe)": "ZW", "Autonomous (Afghanistan)": "AF",
+}
+AU_UNPLACED = {"Autonomous (FFRY)", "Autonomous (Thematic - Human Rights)", "Autonomous (Thematic - Cyber)",
+               "Autonomous (Thematic – Corruption)", "1373 (2001)"}
+
 LIST_COUNTRY = {"eu-fsf": (EU_PROGRAMME_COUNTRY, EU_UNPLACED), "uk-sanctions": (UK_REGIME_COUNTRY, UK_UNPLACED),
-                "canada-sema": (CA_REGIME_COUNTRY, CA_UNPLACED)}
+                "canada-sema": (CA_REGIME_COUNTRY, CA_UNPLACED), "australia-dfat": (AU_REGIME_COUNTRY, AU_UNPLACED)}
 KEEP_DAYS = 30          # how long a delta stays in the snapshot
 SHRINK_LIMIT = 0.5      # a list that loses more than half its entries is a broken download, not a delisting
 
@@ -162,7 +188,10 @@ def unknown_programs(list_id: str, index: dict) -> list[str]:
     if list_id not in LIST_COUNTRY:
         return []
     placed, unplaced = LIST_COUNTRY[list_id]
-    return sorted({g for e in index.values() for g in e[1]} - set(placed) - unplaced)
+    groups = {g for e in index.values() for g in e[1]}
+    if list_id == "australia-dfat":
+        groups = {g for g in groups if not au_restates_un(g)}
+    return sorted(groups - set(placed) - unplaced)
 
 
 def uk_regime(name: str) -> str:
@@ -529,6 +558,116 @@ def apply_renumbering(prev_index: dict, pairs: list[tuple]) -> dict:
     return out
 
 
+AU_TYPE = {"Individual": "individual", "Entity": "entity", "Vessel": "vessel"}
+AU_SHEET = "Consolidated List"
+AU_COLUMNS = ("Reference", "Name of Individual or Entity", "Type", "Name Type", "Citizenship", "Address", "IMO Number",
+              "Committees")
+_AU_ITEM = re.compile(r"(?:^|\s)[a-z]\)\s+")          # "a) Kabul, Afghanistan b) Karachi, Pakistan"
+_AU_TRAILER = re.compile(r"\s*\([^()]*\)?\s*$")      # "Kuwait (at time of listing)", "Saudi Arabia (detained"
+_AU_POSTCODE = re.compile(r"\s+\d[\d ]*$")           # "Russia 109052"
+# Country names that end addresses of Australia's own entries but are no entry's citizenship, read against the live
+# list on 19 Nov 2026 (the citizenship names of the same file are the rest of the vocabulary).
+AU_ADDRESS_COUNTRIES = {
+    "Russian Federation", "Syrian Arab Republic", "North Korea", "DPRK", "Democratic People's Republic of Korea",
+    "Democratic People’s Republic of Korea", "Taiwan", "United Arab Emirates", "Palestine", "Vietnam",
+    "Kyrgyz Republic", "Luxembourg", "Japan", "South Africa", "Bangladesh", "United States", "Sri Lanka", "Peru",
+    "Namibia", "Marshall Islands", "Cyprus", "Republic of Belarus", "Russia", "Iran", "Belarus",
+}
+
+
+def au_restates_un(group: str | None) -> bool:
+    """A Security Council regime on Australia's list ('1267 (ISIL (Da'esh) and Al-Qaida)', '1718 (DPRK)'): DFAT names
+    them by the resolution's number. '1373 (2001)' is not one: the UN keeps no list under resolution 1373, and those
+    entries are Australia's own terrorism listings (Charter of the United Nations (Listed Persons and Entities)
+    instruments)."""
+    g = (group or "").strip()
+    return bool(re.match(r"\d", g)) and not g.startswith("1373")
+
+
+def is_au_own(entry: list) -> bool:
+    return not any(au_restates_un(g) for g in entry[1])
+
+
+def au_countries(citizenship: str | None, address: str | None, known: set[str]) -> list[str]:
+    """The countries of an Australian entry: its citizenships ('Jordan;United States of America') and, from each of
+    its addresses, the country it ends with when that is a name the same file uses for a citizenship or one of
+    AU_ADDRESS_COUNTRIES. DFAT prints addresses as free text, street lines included ('Kabul, Afghanistan',
+    'a) Japan b) Russia', 'Tehran'); only the country is kept. The country must be the whole part or follow a comma,
+    so a place that is not a country name ('Tehran', 'Northern Ireland') gives none, and an address that runs its
+    country on without a comma ('... Moscow Russia 115487') gives none either."""
+    out = [c for c in (" ".join(p.split()) for p in (citizenship or "").split(";")) if c]
+    by_length = sorted(set(known) | AU_ADDRESS_COUNTRIES, key=len, reverse=True)
+    for part in re.split(r";", _AU_ITEM.sub(";", address or "")):
+        part = " ".join(part.split()).strip(" ,.")
+        for _ in range(3):
+            part = _AU_POSTCODE.sub("", _AU_TRAILER.sub("", part)).strip(" ,.")
+        hit = next((k for k in by_length if part == k or part.endswith(", " + k)), None)
+        if hit:
+            out.append(hit)
+    return nm.countries(out)
+
+
+def _au_generated(zf) -> str | None:
+    """When DFAT last saved the file (the workbook's dcterms:modified). The same part names who saved it; that is
+    never kept."""
+    try:
+        core = ET.fromstring(zf.read("docProps/core.xml"))
+    except (KeyError, ET.ParseError):
+        return None
+    m = core.find("{http://purl.org/dc/terms/}modified")
+    t = (m.text or "").strip() if m is not None else ""
+    return t if re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", t) else None
+
+
+def parse_au_xlsx(body: bytes) -> tuple[str | None, dict[str, list]]:
+    """Australia's Consolidated List: one row per name, keyed on Reference ('2' for the primary name, '2a', '2b' for
+    its aliases and original scripts). An entry is its primary-name row: [type, [regime]] with the regime as the
+    Committees field prints it. Entries under a Security Council regime restate the UN's lists (Tom, 19 Nov 2026:
+    counted only, never named), so they carry no third member. Australia's own entries carry, for a person or
+    organization, the name as printed and its countries (au_countries); for a ship, its name and IMO number (the list
+    gives no flag, type or MMSI). Birth dates, places of birth, street addresses, 'Additional Information' and the
+    listing text are never carried. The file gives no designation date: its Control Date is the date an entry last
+    changed."""
+    zf = zipfile.ZipFile(io.BytesIO(body))
+    # The sheet's name carries a date on some copies ("Consolidated List - 13_11_2026", 13 Nov 2026).
+    book = ET.fromstring(zf.read("xl/workbook.xml"))
+    sheets = [s.get("name") or "" for s in book.iter("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}sheet")]
+    sheet = next((s for s in sheets if s.startswith(AU_SHEET)), None)
+    if sheet is None:
+        raise ValueError(f"australia-dfat: no sheet named {AU_SHEET!r} (sheets: {', '.join(sheets)})")
+    rows = pinksheet.rows(zf, sheet)
+    if not rows:
+        raise ValueError("australia-dfat: the sheet is empty")
+    col = {v.strip(): k for k, v in rows[0].items()}
+    missing = [c for c in AU_COLUMNS if c not in col]
+    if missing:
+        raise ValueError(f"australia-dfat: no column {', '.join(missing)}; the file's layout has changed")
+    get = lambda r, name: " ".join((r.get(col[name]) or "").split())       # noqa: E731
+    known = {c for r in rows[1:] for c in (" ".join(p.split()) for p in (r.get(col["Citizenship"]) or "").split(";")) if c}
+    index = {}
+    for r in rows[1:]:
+        if get(r, "Name Type") != "Primary Name":
+            continue
+        ref = get(r, "Reference")
+        if not re.fullmatch(r"\d+", ref):
+            raise ValueError(f"australia-dfat: a primary name has the reference {ref!r}")
+        if ref in index:
+            raise ValueError(f"australia-dfat: two primary names share the reference {ref}")
+        kind = AU_TYPE.get(get(r, "Type"), "unknown")
+        entry = [kind, [get(r, "Committees") or "none stated"]]
+        if is_au_own(entry):
+            if kind == "vessel":
+                imo = get(r, "IMO Number")
+                entry.append({"name": nm.clean(get(r, "Name of Individual or Entity")),
+                              "imo": imo if re.fullmatch(r"\d{7}", imo) else None, "mmsi": None, "flag": None,
+                              "vessel_type": None})
+            else:
+                entry.append(nm.details(get(r, "Name of Individual or Entity"),
+                                        au_countries(get(r, "Citizenship"), r.get(col["Address"]), known)))
+        index[ref] = entry
+    return _au_generated(zf), index
+
+
 def check_size(list_id: str, index: dict, prev_index: dict | None) -> None:
     if len(index) < LISTS[list_id]["min_entries"]:
         raise ValueError(f"{list_id}: only {len(index)} entries parsed; the download looks cut short")
@@ -627,20 +766,27 @@ SPLIT_KEYS = ("added", "removed", "changed", "added_by_type", "added_by_program"
               "removed_by_program", "changed_by_type", "programs_gained", "programs_lost", "retyped")
 
 
-def _fr_split(out: dict, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None,
-              compare_vessels: bool, added_history: list | None, compare_names: bool = True) -> dict:
-    """France's register restates EU and UN measures that Headwind reads on those lists, beside France's own
-    national freezes (Tom, 15 Nov 2026: count the national ones apart). `national` is the change among entries
-    that carry a national legal basis on either reading, scored by the observed-batch rule; `restated` is the
-    rest, counted only: never scored and placing no country, so an EU package is not counted twice."""
-    nat = {i for idx in (prev_index, index) for i, e in idx.items() if is_fr_national(e)}
-    sub = delta("france-gels", {k: v for k, v in prev_index.items() if k in nat}, {k: v for k, v in index.items() if k in nat},
+# Lists that restate other lists Headwind reads, beside measures of their own: the test for an entry of the
+# publisher's own. France: national freezes (Tom, 15 Nov 2026); Australia: every regime but the Security
+# Council's (Tom, 19 Nov 2026).
+OWN_ENTRY = {"france-gels": lambda e: is_fr_national(e), "australia-dfat": lambda e: is_au_own(e)}
+
+
+def _split(list_id: str, out: dict, prev_index: dict, index: dict, detected_at: str, prior_checked_at: str | None,
+           compare_vessels: bool, added_history: list | None, compare_names: bool = True) -> dict:
+    """A list that restates measures Headwind reads on other lists (France's EU and UN entries, Australia's UN
+    entries) beside measures of its own. `national` is the change among entries of the publisher's own on either
+    reading (OWN_ENTRY), scored by the observed-batch rule and placing its countries; `restated` is the rest,
+    counted only: never scored and placing no country, so a package is not counted twice."""
+    nat = {i for idx in (prev_index, index) for i, e in idx.items() if OWN_ENTRY[list_id](e)}
+    sub = delta(list_id, {k: v for k, v in prev_index.items() if k in nat}, {k: v for k, v in index.items() if k in nat},
                 detected_at, prior_checked_at, compare_vessels, None, added_history, split=False,
                 compare_names=compare_names) or {}
     out["national"] = {k: sub.get(k, {} if k not in ("added", "removed", "changed") else 0) for k in SPLIT_KEYS}
     out["restated"] = {k: out[k] - out["national"][k] for k in ("added", "removed", "changed")}
     out["batches"] = sub.get("batches") or []
     out["anomaly"] = bool(sub.get("anomaly"))
+    out["countries"] = sub.get("countries") or []
     return out
 
 
@@ -654,7 +800,8 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
     id with the same IMO number is counted once, as re-keyed, not as a removal and an addition. People and
     organizations added, removed and changed are named (`named_added`, `named_removed`, `named_changed`) on every
     list that carries names; a removal from an index kept before names were carried is counted only
-    (`unnamed_removed`). France's register is split into its national freezes and its restatements (`_fr_split`)."""
+    (`unnamed_removed`). France's register and Australia's list are split into the publisher's own measures and its
+    restatements (`_split`)."""
     added = sorted(set(index) - set(prev_index))
     removed = sorted(set(prev_index) - set(index))
     pairs = rekeyed_vessels(prev_index, index, added, removed)
@@ -692,20 +839,23 @@ def delta(list_id: str, prev_index: dict, index: dict, detected_at: str, prior_c
                     "us_person_data": nm.person_data(named_added, named_removed, ed["named_changed"])})
     else:
         out.update({"named_changed": [], "renamed": 0, "us_person_data": "none"})
-    if list_id == "france-gels" and split:
-        return _fr_split(out, prev_index, index, detected_at, prior_checked_at, compare_vessels, added_history,
-                         compare_names)
+    if list_id in OWN_ENTRY and split:
+        return _split(list_id, out, prev_index, index, detected_at, prior_checked_at, compare_vessels, added_history,
+                      compare_names)
     return out
 
 
-# The lists whose people and organizations are named. The UN's terms bar redistribution of its content.
-NAMED_LISTS = ("ofac-sdn", "eu-fsf", "uk-sanctions", "france-gels", "canada-sema")
+# The lists whose people and organizations are named. The UN's terms bar redistribution of its content; Australia's
+# entries under Security Council regimes are counted only, for the same reason (they carry no name in the index).
+NAMED_LISTS = ("ofac-sdn", "eu-fsf", "uk-sanctions", "france-gels", "canada-sema", "australia-dfat")
 
 
 # The lists that carry ships. The UN file has none; EU vessel measures sit in regulation annexes, not in its file.
 # France's register names 39 ships (North Korea, UN measures restated; 6 Nov 2026), each with an IMO number;
-# Canada's list 731 (all under its Russia regulations, 16 Nov 2026).
-VESSEL_LISTS = ("ofac-sdn", "uk-sanctions", "france-gels", "canada-sema")
+# Canada's list 731 (all under its Russia regulations, 16 Nov 2026); Australia's 359 (19 Nov 2026), 299 of them
+# under its Russia vessel designations; its 60 ships under Security Council regimes are counted only, so they are
+# left out of the cross-list.
+VESSEL_LISTS = ("ofac-sdn", "uk-sanctions", "france-gels", "canada-sema", "australia-dfat")
 
 
 def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict, list[dict]]:
@@ -719,7 +869,7 @@ def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict,
     no_imo: Counter = Counter()
     for list_id in VESSEL_LISTS:
         for i, e in (indexes.get(list_id) or {}).items():
-            if e[0] != "vessel":
+            if e[0] != "vessel" or (list_id == "australia-dfat" and len(e) < 3):     # counted only (UN restated)
                 continue
             det = e[2] if len(e) > 2 else {}
             if not det.get("imo"):

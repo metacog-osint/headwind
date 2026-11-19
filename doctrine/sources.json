@@ -57,6 +57,15 @@
       "independence_group": "ca-gac-sanctions"
     },
     {
+      "id": "dfat-consolidated",
+      "name": "Australian Department of Foreign Affairs and Trade (Australian Sanctions Office): Australian Sanctions Consolidated List (xlsx)",
+      "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list",
+      "licence": "CC BY 4.0, DFAT copyright page read 19 Nov 2026 (all material but the Coat of Arms), attributed 'Department of Foreign Affairs and Trade website \u2013 www.dfat.gov.au'. Entries under UN Security Council regimes are counted only (the UN's terms)",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "au-dfat-sanctions"
+    },
+    {
       "id": "supremecourt-gov",
       "name": "Supreme Court of the United States: slip opinion RSS feeds (slipopinion_rss.aspx?TYear=) and docket JSON (/RSS/Cases/JSON/<docket>.json)",
       "url": "https://www.supremecourt.gov/opinions/opinions.aspx",
