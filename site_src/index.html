@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Headwind: economic stress</title>
-<meta name="description" content="Currencies, energy and food prices measured against their own normal range, changes to official sanctions lists, new export-control rules, the dates of coming economic decisions and, as a second strand, the decisions of the US and UK Supreme Courts. Measurements, not investment advice.">
+<meta name="description" content="Currencies, energy and food prices measured against their own normal range, changes to official sanctions lists, new export-control rules, the dates of coming economic decisions and, as a second strand, the decisions of the US and UK Supreme Courts and the EU's courts. Measurements, not investment advice.">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="tic-time.css">
 <link rel="stylesheet" href="tic-nav.css">
@@ -39,7 +39,8 @@
     <div class="tiles tic-tiles" id="tiles" aria-live="polite"></div>
     <p class="lede">Each currency, energy price and food price is compared with its own past changes. An item is marked
       unusual only when the move is far outside that range. These are measurements, not forecasts and not investment
-      advice. A second strand lists the decisions of the US and UK Supreme Courts as the courts publish them.</p>
+      advice. A second strand lists the decisions of the US and UK Supreme Courts and the EU's courts as the courts
+      publish them.</p>
     <p class="small muted" id="asof" aria-live="polite">Loading…</p>
   </section>
 
@@ -182,7 +183,9 @@
   <div id="sec-courts" data-tab-label="Courts">
   <p class="small muted strand-note">Legal events, Headwind's second strand: the decisions of highest courts,
     listed as each court publishes them, with the court's own case title and number. They are not measured
-    against a normal range and not ranked by importance: every merits decision of these courts is listed.</p>
+    against a normal range and not ranked by importance: every merits decision of these courts is listed. The EU's
+    courts decide far more cases, so all are listed here and the feed carries the Court of Justice's own selection:
+    the judgments of its Grand Chamber and full Court.</p>
   <div class="two">
     <section class="card" id="courts" aria-labelledby="co-h">
       <div class="card-head"><h2 id="co-h">US Supreme Court</h2>
@@ -201,6 +204,17 @@
           characterize a judgment; it is at the link (the citation links the Court's PDF, the title the case page).
           Contains public sector information licensed under the Open Government Licence v3.0.</p></div>
       <div id="uksc-judgments"></div>
+    </section>
+    <section class="card" id="eu-courts" aria-labelledby="eu-h">
+      <div class="card-head"><h2 id="eu-h">Court of Justice of the European Union</h2>
+        <p class="muted small">Every judgment of the Court of Justice and the General Court in the last 60 days, from
+          the record the EU's Publications Office keeps for EUR-Lex, with the Court's own case numbers and parties,
+          the formation and the date. Marked: a judgment of the Court of Justice's Grand Chamber or full Court (these
+          go in the feed), and a case the Court's own subject words file under restrictive measures (sanctions).
+          A judgment not yet in English is shown as the French version names it. Headwind does not summarize or
+          characterize a judgment; it is at the link. Source: EUR-Lex, &copy; European Union,
+          <a href="https://eur-lex.europa.eu">eur-lex.europa.eu</a> (metadata CC0).</p></div>
+      <div id="cjeu-judgments"></div>
     </section>
   </div>
   </div>
@@ -238,7 +252,9 @@
     Headwind, which keeps entry numbers, types, programs, English names and countries, with its own English program
     names); United Nations press releases (linked, not reproduced); Supreme Court of the United States (opinions
     and dockets); The Supreme Court of the United Kingdom (case pages and judgments: contains public sector
-    information licensed under the Open Government Licence v3.0); US International Trade Administration (Consolidated Screening List);
+    information licensed under the Open Government Licence v3.0); Court of Justice of the European Union (judgments,
+    from EUR-Lex: &copy; European Union, <a href="https://eur-lex.europa.eu">https://eur-lex.europa.eu</a>; metadata
+    CC0 1.0); US International Trade Administration (Consolidated Screening List);
     US Federal Register; US International Trade Commission (Harmonized Tariff Schedule); The White House
     (presidential actions); US Census Bureau (international trade); US Geological Survey (Mineral Commodity
     Summaries, CC0). Exchange rates are the ECB's euro reference rates,

@@ -285,6 +285,21 @@
       (us.pending ? '<p class="small muted">' + esc(us.pending + " case pages are still to be read; the list fills in on the next runs.") + "</p>" : "") +
       ((s.uksc_errors || []).length ? '<p class="small muted">' + esc("Not read on the last run: " + s.uksc_errors.join("; ")) + "</p>" : "");
 
+    var cj = s.cjeu_judgments || [], cr = s.cjeu_read || {}, cjShown = 12;
+    function cjRow(j) {
+      var mark = (j.selected ? ' <span class="badge">' + esc(j.selected) + "</span>" : "") +
+        (j.restrictive_measures && j.selected !== "restrictive measures" ? ' <span class="badge">restrictive measures</span>' : "");
+      return '<div class="row"><div class="row-title"><span><a href="' + esc(j.url) + '" rel="noopener">' +
+        esc((j.cases || []).join(", ")) + "</a>: " + esc(j.parties || "parties not yet published") + " (" +
+        esc(j.court + (j.formation ? ", " + j.formation : "")) + ")" + (j.language === "en" ? "" : " [" + esc(j.language || "?") + "]") +
+        mark + '</span><span class="badge">' + esc(j.date) + "</span></div></div>";
+    }
+    document.getElementById("cjeu-judgments").innerHTML = cj.length ? '<div data-tic-fold="' + cjShown + '" data-tic-fold-find>' + cj.map(cjRow).join("") + "</div>" +
+      '<p class="small muted">' + esc(cj.length + " judgments since " + (cr.since || "") + ", " + (cr.selected || 0) + " in the feed's selection, " +
+        cj.filter(function (j) { return j.restrictive_measures; }).length + " on restrictive measures" +
+        (cr.not_in_english ? ", " + cr.not_in_english + " not yet in English" : "") + ".") + "</p>"
+      : '<p class="small muted">No judgment read yet.</p>';
+
     var tr = s.mineral_trade || {};
     function usd(v) { return v === null || v === undefined ? "" : "$" + (v >= 1e9 ? (v / 1e9).toFixed(2) + " bn" : v >= 1e6 ? (v / 1e6).toFixed(1) + " m" : Math.round(v).toLocaleString()); }
     if ((tr.codes || []).length) {

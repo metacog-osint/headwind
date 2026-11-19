@@ -93,6 +93,15 @@
       "independence_group": "uk-supreme-court"
     },
     {
+      "id": "eurlex-cellar",
+      "name": "Court of Justice of the European Union: judgments of the Court of Justice and the General Court, from the Publications Office's SPARQL endpoint on CELLAR (the metadata behind EUR-Lex)",
+      "url": "https://eur-lex.europa.eu/collection/eu-law/eu-case-law.html",
+      "licence": "EUR-Lex metadata dedicated to the public domain (CC0 1.0); EUR-Lex documents reusable for commercial or non-commercial purposes under Decision 2011/833/EU (EUR-Lex legal notice, read 19 Nov 2026). Metadata only is read; no judgment text",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "cjeu"
+    },
+    {
       "id": "un-press",
       "name": "United Nations Meetings Coverage and Press Releases (RSS, press.un.org/en/rss.xml): Security Council sanctions committee releases",
       "url": "https://press.un.org/en",
