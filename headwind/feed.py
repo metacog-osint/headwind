@@ -101,6 +101,20 @@ SRC_CANADA = {
     "descriptor": "Every person, entity and ship listed under Canada's autonomous sanctions regulations.",
 }
 
+SRC_AUSTRALIA = {
+    "id": "dfat-consolidated",
+    "publisher": "Australian Department of Foreign Affairs and Trade (Australian Sanctions Office)",
+    "title": "Australian Sanctions Consolidated List",
+    "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list",
+    "licence": ("Creative Commons Attribution 4.0 International (DFAT's copyright page, read 19 Nov 2026). Source: "
+                "Department of Foreign Affairs and Trade website – www.dfat.gov.au"),
+    "grade": "A1",
+    "independence_group": "au-dfat-sanctions",
+    "source_type": "official or market data",
+    "descriptor": ("Every person, entity and ship under Australian sanctions laws: Australia's own designations and "
+                   "the UN Security Council listings it applies."),
+}
+
 SRC_UNPRESS = {
     "id": "un-press",
     "publisher": "United Nations (Meetings Coverage and Press Releases)",
@@ -142,7 +156,7 @@ SRC_UKSC = {
 }
 
 LIST_SOURCE = {"ofac-sdn": SRC_OFAC, "un-consolidated": SRC_UN, "eu-fsf": SRC_EU, "uk-sanctions": SRC_UK,
-               "france-gels": SRC_FRANCE, "canada-sema": SRC_CANADA}
+               "france-gels": SRC_FRANCE, "canada-sema": SRC_CANADA, "australia-dfat": SRC_AUSTRALIA}
 
 SRC_CSL = {
     "id": "trade-gov-csl",
@@ -426,7 +440,8 @@ def _batch_ref(s: dict) -> dict | None:
 
 VESSELS_IN_TEXT = 25
 ALSO_ON = {"ofac-sdn": "the OFAC SDN list", "uk-sanctions": "the UK Sanctions List",
-           "france-gels": "France's asset-freeze register", "canada-sema": "Canada's consolidated list"}
+           "france-gels": "France's asset-freeze register", "canada-sema": "Canada's consolidated list",
+           "australia-dfat": "Australia's consolidated list"}
 
 
 def _vessel_text(word: str, vessels: list[dict]) -> str:
@@ -514,13 +529,26 @@ def _edit_text(s: dict) -> str:
     return "; ".join(bits) + "."
 
 
-def _restated_text(rest: dict) -> str:
-    """France's register: the entries that restate EU and UN measures, one count line, never scored."""
+# Lists split into the publisher's own measures and its restatements (sanctions.OWN_ENTRY): the word for the own
+# ones, the measures restated, and the lists Headwind reads them on.
+SPLIT_WORDS = {
+    "france-gels": ("national", "national freezes", "EU and UN measures", "the EU's and the UN Security Council's own lists"),
+    "australia-dfat": ("Australian", "Australian designations", "UN Security Council listings",
+                       "the UN Security Council's own list"),
+}
+
+
+def _restated_text(rest: dict, list_id: str = "france-gels") -> str:
+    """The entries that restate measures Headwind reads on other lists (France's EU and UN entries, Australia's UN
+    entries): one count line, never scored."""
+    _, _, what, where = SPLIT_WORDS[list_id]
     if not (rest["added"] or rest["removed"] or rest["changed"]):
-        return "No change among the entries that restate EU and UN measures."
-    return (f"Entries restating EU and UN measures, which Headwind also reads on the EU's and the UN Security Council's "
-            f"own lists, so they are counted here but not scored and place no country: {rest['added']} added, "
-            f"{rest['removed']} removed, {rest['changed']} changed.")
+        return f"No change among the entries that restate {what}."
+    # Australia's UN entries carry no name (the UN's terms); France's restated entries are named as France prints them.
+    named = ", never named" if list_id == "australia-dfat" else ""
+    return (f"Entries restating {what}, which Headwind also reads on {where}, so they are counted here but not "
+            f"scored{named} and place no country: {rest['added']} added, {rest['removed']} removed, "
+            f"{rest['changed']} changed.")
 
 
 def _renamed_text(vessels: list[dict], limit: int = 25) -> str:
@@ -605,24 +633,25 @@ def list_features(snapshot: dict) -> list[dict]:
             continue
         nat, rest = s.get("national"), s.get("restated")
         base = nat if nat is not None else s
+        own, own_plural, restated_what, _ = SPLIT_WORDS.get(s["list"], ("national", "national freezes", "", ""))
         parts = []
         if base["added"]:
-            parts.append(f"Added {base['added']}{' national' if nat is not None else ''}: by type, "
+            parts.append(f"Added {base['added']}{' ' + own if nat is not None else ''}: by type, "
                          f"{_counts(base['added_by_type'])}; by program, {_counts(base['added_by_program'])}.")
         if base["removed"]:
-            parts.append(f"Removed {base['removed']}{' national' if nat is not None else ''}: by type, "
+            parts.append(f"Removed {base['removed']}{' ' + own if nat is not None else ''}: by type, "
                          f"{_counts(base['removed_by_type'])}; by program, {_counts(base['removed_by_program'])}.")
         parts.append(_edit_text(base))
         if s.get("renumbered"):
             parts.append(f"{s['renumbered']} entries only changed their item number on the list and are counted as "
                          f"the same entries, not as removed and added.")
         if nat is not None:
-            parts.append(_restated_text(rest))
+            parts.append(_restated_text(rest, s["list"]))
         since = f" since Headwind's reading of {s['prior_checked_at'][:10]}" if s.get("prior_checked_at") else ""
         title = (f"{s['list_name']}: {s['added']} added, {s['removed']} removed{_changed_title(s)}" if nat is None else
-                 f"{s['list_name']}: {nat['added']} national freezes added, {nat['removed']} removed"
+                 f"{s['list_name']}: {nat['added']} {own_plural} added, {nat['removed']} removed"
                  f"{', ' + str(nat['changed']) + ' changed' if nat.get('changed') else ''}; {rest['added']} added and "
-                 f"{rest['removed']} removed restating EU and UN measures")
+                 f"{rest['removed']} removed restating {restated_what}")
         feats.append(_official(
             f"headwind:sanctions:{s['id']}",
             title,
@@ -1252,12 +1281,15 @@ def build_feed(snapshot: dict) -> dict:
                     "licence stated; EU financial "
                     "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0; "
                     "France's Registre national des gels, Licence Ouverte 2.0; Canada's consolidated autonomous "
-                    "sanctions list, non-commercial reproduction (Canada.ca terms); UN press releases, linked only; "
+                    "sanctions list, non-commercial reproduction (Canada.ca terms); Australian Sanctions Consolidated "
+                    "List, CC BY 4.0 (Department of Foreign Affairs and Trade website – www.dfat.gov.au); UN press "
+                    "releases, linked only; "
                     "Supreme Court of the United States opinions and dockets, US government works"),
         "attribution": ("Headwind, The Intelligence Company. Data: European Central Bank; World Bank; US Energy Information "
                         "Administration; FAO; World Food Programme via the Humanitarian Data Exchange; "
                         "US Treasury (OFAC); United Nations Security Council; European Commission; UK Foreign, Commonwealth "
-                        "and Development Office; French Treasury (Direction générale du Trésor); Global Affairs Canada; Supreme Court of the United States; US International Trade Administration; "
+                        "and Development Office; French Treasury (Direction générale du Trésor); Global Affairs Canada; Australian "
+                        "Department of Foreign Affairs and Trade; Supreme Court of the United States; US International Trade Administration; "
                         "US Federal Register and the Office of the Federal Register; US International Trade Commission; The White House."),
         "language_key": LANGUAGE_KEY,
         # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read

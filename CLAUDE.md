@@ -98,7 +98,7 @@ says which. `build` refuses to run without a snapshot.
 | `pinksheet` | World Bank Pink Sheet xlsx (link read yearly) | fertilizers and 8 list metals; CC BY 4.0 (dataset 0038238) |
 | `baseline` | World Bank WDI, six indicators | context, not in the feed |
 | `calendar` | Fed and ECB schedule pages, FAO dates | rate decisions go to Verdict as `rule_date` |
-| `sanctions` | OFAC `sdn.csv`, UN XML, EU FSF XML, UK Sanctions List XML, France `france-gels` JSON, Canada `canada-sema` XML | change = diff of two own readings; each list alone; short parse or >half lost fails the list; designation batches (`batches.py`) |
+| `sanctions` | OFAC `sdn.csv`, UN XML, EU FSF XML, UK Sanctions List XML, France `france-gels` JSON, Canada `canada-sema` XML, Australia `australia-dfat` xlsx (UN entries counted only) | change = diff of two own readings; each list alone; short parse or >half lost fails the list; designation batches (`batches.py`) |
 | `screening` | trade.gov CSL JSON (all but SDN) | re-keyed ids paired by name hash and type |
 | `controls` | Federal Register: BIS, OFAC, USTR rules and USTR notices (60 d), register of dates (800 d), presidential tariff documents | 14 days in feed; dates to Verdict |
 | `inspection` | Federal Register public inspection | `HW-IND-2` matcher; agency filter ignored by API, so whole issues read |
@@ -119,11 +119,11 @@ WFP/HDX CC BY-IGO. World Bank (GEM, WDI, Pink Sheet) CC BY 4.0. FAO CC BY 4.0 wi
 and no commercial promotion. ECB free with source cited and changes stated. EIA public domain, credit "Source: U.S.
 Energy Information Administration". Federal Register, Fed, OFAC, trade.gov, Census, USGS (CC0): US government.
 EU 2011/833/EU reuse; UK OGL v3.0 (excludes personal data; names published anyway on Tom's (b)); France Licence
-Ouverte 2.0; Canada reproduction for non-commercial use. **UN list: counts and a link only, never its content or
+Ouverte 2.0; Canada reproduction for non-commercial use; Australia (DFAT) CC BY 4.0. **UN list: counts and a link only, never its content or
 index** (UN terms withhold redistribution). UK Supreme Court OGL v3.0.
 
 ## Not built, and why
-Switzerland SECO (needs written consent); Japan, NZ, Australia (terms unread); IMF Board actions (terms bar automated
+Switzerland SECO (needs written consent); Japan (PDL1.0, read 19 Nov: next); New Zealand (MFAT terms bar automated access); IMF Board actions (terms bar automated
 download); stock indices (OECD terms unread, Datastream, STOXX bars derivatives); CBP CSMS (no keyless feed); BLS and
 IMF data API (403); France's date endpoint and legal-basis dates (unused); UKSC case filter (Next.js server action).
 `HW-EEI-1` (designated vessels in Wake's tracks) not matched yet; `vessels.json` carries what it needs.

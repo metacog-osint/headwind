@@ -313,6 +313,12 @@ def _read_list(list_id, raw_dir, getter):
         _CA_NAMES.clear()
         generated, index = sanctions.parse_canada_xml(body, dates, _CA_NAMES)
         return index, generated, rec, dates
+    if list_id == "australia-dfat":
+        # No designation dates: DFAT's Control Date is the date an entry last changed, so the batch rule uses
+        # Headwind's own readings, as for OFAC and France.
+        body, rec = fetch.fetch("dfat-consolidated", sanctions.AU_XLSX, raw_dir, "xlsx", timeout=120, getter=getter)
+        generated, index = sanctions.parse_au_xlsx(body)
+        return index, generated, rec, None
     raise ValueError(f"unknown list {list_id}")
 
 
