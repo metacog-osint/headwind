@@ -1,0 +1,22 @@
+name: ci
+# Checks on pull requests (and pushes to other branches), so a PR shows a result before it ships (#66, 19 Nov 2026).
+# Offline only: no network lane, no secret, no deploy. update.yml keeps the schedule, the state and the deploy;
+# it also runs these tests on every push to main.
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with: { python-version: "3.12" }
+      - name: Tests
+        run: python -m unittest discover -s tests
+      - name: Registers and feed check
+        run: python tools/headwind.py check
