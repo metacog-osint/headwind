@@ -80,7 +80,7 @@ tr:last-child td { border-bottom: none; }
 .top-nav a:first-child { margin-left: 0; }
 main a { color: var(--link); text-decoration: none; }
 main a:hover, main a:focus { text-decoration: underline; }
-/* Long lists and tables: the first entries and "Show all N" at every width (tic-fold.js from the hub, data-tic-fold). */
+/* Long lists and tables: a scrolling window about ten rows tall and "Show all N" (tic-fold.js from the hub, data-tic-fold). */
 main .tic-rel a { text-decoration: underline; } /* Elsewhere today: its links sit in text (WCAG 1.4.1) */
 main p a, main .row-title a, main .row .small a { text-decoration: underline; } /* links inside sentences, for the same reason */
 details.more > summary { cursor: pointer; padding: 10px 0; color: var(--link); font-size: 0.88rem; }
