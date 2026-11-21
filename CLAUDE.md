@@ -9,11 +9,10 @@ Measurements only: no probabilities, no investment advice. Live at https://headw
 `headwind-2lx.pages.dev`). Repo `metacog-osint/headwind`, **public since 15 Nov 2026**.
 
 **Notes:** this file holds lasting facts only (12 KB cap). Current state and open items: `.claude/HANDOFF.md`.
-Full notes to 18 Nov 2026 (98 KB: state, live checks, backtests, licences):
-`.claude/notes-archive-2026-11-18.md` (git-ignored; backup location in HANDOFF). Method in
-detail, lane by lane: `doctrine/method.md`. Registers: `doctrine/indicators.json` (1.4), `sources.json`,
-`requirements.json`. Plan and scope: `D:\Projects\_ideas\new-programs.md` (row and step 13) and
-`D:\Projects\_ideas\drafts\2026-11-15-headwind-coverage-plan.md` (items 5 to 12 not built).
+Full notes to 18 Nov 2026:
+`.claude/notes-archive-2026-11-18.md` (git-ignored; backup location in HANDOFF). Method: `doctrine/method.md`. Registers: `doctrine/indicators.json` (1.4), `sources.json`,
+`requirements.json`. Plan and scope: `D:\Projects\_ideas\new-programs.md` and
+`D:\Projects\_ideas\drafts\2026-11-15-headwind-coverage-plan.md`.
 
 ## Commands
 ```bash
@@ -22,7 +21,7 @@ python tools/headwind.py collect --only fx    # some lanes; the rest keep their 
 python tools/headwind.py build                # site/ from data/snapshot.json
 python tools/headwind.py check                # validate the registers and lint the feed
 python -m unittest discover -s tests          # offline tests against real fixtures
-python tools/serve.py                         # site/ on http://127.0.0.1:8751 with _headers (CSP); preview entry headwind-site
+python tools/serve.py                         # site/ on http://127.0.0.1:8751 with _headers (CSP)
 ```
 `collect` never makes data up: a failed lane keeps its last good copy (`from_previous`) or stays empty, and `lanes`
 says which. `build` refuses to run without a snapshot.
@@ -30,7 +29,7 @@ says which. `build` refuses to run without a snapshot.
 ## Deploy and state
 - **A push to `main` runs `.github/workflows/update.yml`** (no paths filter, so a notes-only push runs it too): tests,
   state restore, `collect`, `build`, `check`, history log, state save, `wrangler pages deploy`. Also cron `23 */6`
-  and tic-dispatch's `workflow_dispatch` (:50 past 03, 09, 15, 21 UTC). Public repo, so Actions minutes are free.
+  and tic-dispatch's `workflow_dispatch` (:50 past 03, 09, 15, 21 UTC).
 - **`main` gains a `headwind-bot` history commit on most runs**: merge `origin/main` into your branch before every
   push; push by sha. The main checkout works on `live/first-slice`.
 - **State** (`data/snapshot.json`, `data/state/`) must carry between runs or every run is a first reading: Actions
@@ -44,9 +43,9 @@ says which. `build` refuses to run without a snapshot.
   `site/data/ended.geojson`; a failure there is a warning, never a missed deploy. COP reads `ended` and
   `source_health` (COP `config/programs.json`).
 - Secrets `EIA_API_KEY`, `CENSUS_API_KEY`, `CLOUDFLARE_PAGES_TOKEN`; variable `CLOUDFLARE_ACCOUNT_ID`. Set variables
-  with `--body`, never a PowerShell pipe (a BOM broke a run on 13 Nov). `wrangler pages project create` needs `--force`.
+  with `--body`, never a PowerShell pipe (a BOM broke a run on 13 Nov).
 - Kit: vendored in `doctrine/kit/` (0.5.13); a test checks it is unedited and, beside `../tic-doctrine`, current.
-  `tic-doctrine/tools/sync.py` takes its first argument as the target (`--help` makes a folder named `--help`).
+  `tic-doctrine/tools/sync.py` takes its first argument as the target (even `--help`).
 
 ## Rules
 - **Standard library only** (Python 3.11+). Raw copies to `data/raw/<source>/<sha12>.<ext>` + `index.jsonl`
@@ -74,17 +73,16 @@ says which. `build` refuses to run without a snapshot.
   support@theintelligence.company; `us_person_data` from address countries (OFAC `add.csv`). Ship owners never kept.
   OFAC and BIS notices on public inspection keep only `federalregister.gov/d/<number>`. USITC's `creator` never kept.
 - **Court items** carry the court's own case title and number; `us_person_data` by party test (Tom accepted, 16 Nov).
-  Courts, ICC and tariff litigation live inside Headwind as the legal-events strand, not a new program; BRICS membership goes to Readout.
+  Courts and tariff litigation live in Headwind's legal-events strand; BRICS membership goes to Readout.
 - **Country placement** (Tom): `UKRAINE-EO13661/13662` Russia; `-EO13660/13685` Russia and Ukraine; `PAARSSR-EO13894`
   Syria; EU `UKR` and Canada's Ukraine regime Russia only; EU `SDNZ` Sudan; France: national entries apart,
   restatements counted only, no countries. Conduct programs stay unplaced; an unknown code shows as
   `unknown_programs`: add it to a map.
 - **Keys** (EIA, Census): env var or `%USERPROFILE%\.headwind\<name>_api_key.txt`; added only to the request as sent;
-  recorded URLs, raw index, snapshot and errors stay keyless (tests). Never print one. In an old PowerShell:
-  `$env:EIA_API_KEY = [Environment]::GetEnvironmentVariable('EIA_API_KEY','User')`.
-- **D: drive:** writes sometimes fail with `OSError: [Errno 22]`; patch scripts retry and read back. Never rerun a
-  patch script that stopped part-way (anchors survive, so it inserts twice).
-- Fixtures are real replies cut small (cut scripts in git-ignored `.claude/`); `.gitattributes` keeps the USGS CSVs
+  recorded URLs, raw index, snapshot and errors stay keyless (tests). Never print one.
+- **D: drive:** writes sometimes fail with `OSError: [Errno 22]`; patch scripts retry and read back; never rerun
+  one that stopped part-way (it inserts twice).
+- Fixtures are real replies cut small; `.gitattributes` keeps the USGS CSVs
   byte for byte.
 
 ## Lanes
@@ -113,7 +111,7 @@ says which. `build` refuses to run without a snapshot.
 Source health (`health.py`): per source id, fresh/late/stale by its own rhythm, drift checks, quiet-publisher
 warnings, one retry on timeout, 5xx or 429. Outputs in `site/data/`: `feed.geojson`, `events.json` (Verdict),
 `snapshot.json`, `baseline.json`, `minerals.json`, `vessels.json` (IMO cross-list), `list-changes.json`,
-`ended.geojson`, `question_drafts.json` (read by nothing).
+`ended.geojson`, `question_drafts.json`.
 
 ## Licences (short; readings and dates in the archive)
 WFP/HDX CC BY-IGO. World Bank (GEM, WDI, Pink Sheet) CC BY 4.0. FAO CC BY 4.0 with its citation form (not yet used)
@@ -124,7 +122,7 @@ Ouverte 2.0; Canada reproduction for non-commercial use; Australia (DFAT) CC BY 
 index** (UN terms withhold redistribution). UK Supreme Court OGL v3.0. EUR-Lex metadata CC0.
 
 ## Not built, and why
-Switzerland SECO (needs written consent); New Zealand (MFAT terms bar automated access); IMF Board actions (terms bar automated
+ICC (held, Tom 20 Nov 2026: terms bar redistributing or compiling without written permission; on OFAC's SDN list, `ICC-EO14203`; no lane, hand log or permission request); Switzerland SECO (needs written consent); New Zealand (MFAT terms bar automated access); IMF Board actions (terms bar automated
 download); stock indices (OECD terms unread, Datastream, STOXX bars derivatives); CBP CSMS (no keyless feed); BLS and
 IMF data API (403); France's date endpoint and legal-basis dates (unused); UKSC case filter (Next.js server action).
 `HW-EEI-1` (designated vessels in Wake's tracks) not matched yet; `vessels.json` carries what it needs.
