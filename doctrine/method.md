@@ -10,8 +10,9 @@ scheduled dates on which economic decisions and figures are published.
 
 **Legal events** (`HW-REQ-2`, since 18 Nov 2026): the decisions of highest national courts and of international
 courts, listed as each court publishes them (below, "The legal events strand"). The US Supreme Court and the UK
-Supreme Court are live. Courts, the ICC and tariff litigation were placed in Headwind rather than in a program of
-their own (15 Nov 2026); they are a strand apart because they do not measure economic stress. The strands meet in the
+Supreme Court are live. Courts and tariff litigation were placed in Headwind rather than in a program of
+their own (15 Nov 2026); the ICC is not carried, because its terms bar redistributing or compiling its material
+without written permission (20 Nov 2026). Legal events are a strand apart because they do not measure economic stress. The strands meet in the
 tariff-authority cases, which are tracked by docket under economic stress (`HW-PIR-2`).
 
 It reports measurements and records. It states no probability and gives no investment advice.
