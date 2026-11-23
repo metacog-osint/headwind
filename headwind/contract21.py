@@ -134,7 +134,7 @@ def apply(features: list[dict], snapshot: dict) -> list[dict]:
         if precision:
             p["event_time_precision"] = precision
         if family in ("sanctions", "screening") and row.get("detected_at"):
-            p["last_change"], p["last_change_at"] = "new", row["detected_at"]
+            p["last_change"], p["last_change_at"] = "new", min(row["detected_at"], p["published_at"])
         if p.get("tier") == "anomaly":
             sig = signal(family, row)
             if sig:
