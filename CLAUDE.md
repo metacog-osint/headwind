@@ -1,4 +1,4 @@
-# Headwind (`[local path]`)
+# Headwind
 
 Economic stress for The Intelligence Company (`tic-feed/2`, program id `headwind`, prefix `HW`): currencies, energy
 and food prices against their own normal range; changes to official sanctions and US screening lists; export-control,
@@ -11,8 +11,8 @@ Measurements only: no probabilities, no investment advice. Live at https://headw
 **Notes:** this file holds lasting facts only (12 KB cap). Current state and open items: `.claude/HANDOFF.md`.
 Full notes to 18 Nov 2026:
 `.claude/notes-archive-2026-11-18.md` (git-ignored; backup location in HANDOFF). Method: `doctrine/method.md`. Registers: `doctrine/indicators.json` (1.4), `sources.json`,
-`requirements.json`. Plan and scope: `[local path]` and
-`[local path]`.
+`requirements.json`. Plan and scope: the private planning notes and
+the private planning notes.
 
 ## Commands
 ```bash
