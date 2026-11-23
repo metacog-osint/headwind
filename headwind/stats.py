@@ -20,6 +20,7 @@ The baseline is rolling. A fixed baseline is not kept yet (see doctrine/method.m
 """
 from __future__ import annotations
 
+import math
 import statistics
 
 Z_ANOMALY = 3.5
@@ -37,11 +38,19 @@ def changes(values: list[float], horizon: int) -> list[float | None]:
     return out
 
 
+def exceedance(value: float, base: list[float], centre: float) -> float:
+    """The share of the baseline at least as far from its centre as `value`, counting this reading: (k + 1) / (n + 1),
+    rounded up, so it is never finer than one in n + 1 (contract revision 2.1, `signal.exceedance`)."""
+    k = sum(1 for b in base if abs(b - centre) >= abs(value - centre))
+    return min(1.0, math.ceil((k + 1) / (len(base) + 1) * 10000) / 10000)
+
+
 def score(value: float, base: list[float], floor: float) -> dict:
     """z, anomaly flag and flag_rate for `value` against `base`; `floor` is in the same units as value."""
-    z = rate = None
+    z = rate = expected = rarity = None
     if len(base) >= MIN_BASELINE:
         med = statistics.median(base)
+        expected, rarity = round(med * 100.0, 2), exceedance(value, base, med)
         scale = max(1.4826 * statistics.median(abs(b - med) for b in base), floor / Z_ANOMALY)
         if scale > 0:
             z = (value - med) / scale
@@ -50,6 +59,8 @@ def score(value: float, base: list[float], floor: float) -> dict:
         "z": None if z is None else round(z, 2),
         "baseline_n": len(base),
         "flag_rate": None if rate is None else round(rate, 3),
+        "expected": expected,        # the baseline's median, in percent
+        "exceedance": rarity,
         "anomaly": bool(z is not None and abs(z) >= Z_ANOMALY and abs(value) >= floor),
     }
 

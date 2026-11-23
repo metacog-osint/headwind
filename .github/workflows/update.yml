@@ -106,7 +106,7 @@ jobs:
           python -m headwind.archive append \
             || echo "::warning::archive step failed; list changes and fetch index not archived this run"
           python doctrine/kit/tic.py history site/data/feed.geojson --dir history --ended site/data/ended.geojson \
-            --reading-key data_as_of \
+            --reading-key data_as_of --fill-last-change \
             || { echo "::warning::history step failed; this run is missing from history/"; exit 0; }
           git config user.name "headwind-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
