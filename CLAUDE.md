@@ -44,7 +44,7 @@ says which. `build` refuses to run without a snapshot.
   `source_health` (COP `config/programs.json`).
 - Secrets `EIA_API_KEY`, `CENSUS_API_KEY`, `CLOUDFLARE_PAGES_TOKEN`; variable `CLOUDFLARE_ACCOUNT_ID`. Set variables
   with `--body`, never a PowerShell pipe (a BOM broke a run on 13 Nov).
-- Kit: vendored in `doctrine/kit/` (0.5.13); a test checks it is unedited and, beside `../tic-doctrine`, current.
+- Kit: vendored in `doctrine/kit/` (0.6.9); a test checks it is unedited and, beside `../tic-doctrine`, current.
   `tic-doctrine/tools/sync.py` takes its first argument as the target (even `--help`).
 
 ## Rules

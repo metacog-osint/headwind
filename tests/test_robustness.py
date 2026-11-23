@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 sys.path.insert(0, str(ROOT / "tests"))
 
-from headwind import feed, fetch, health, sanctions, screening  # noqa: E402
+from headwind import contract21, feed, fetch, health, sanctions, screening  # noqa: E402
 
 spec = importlib.util.spec_from_file_location("headwind_cli", ROOT / "tools" / "headwind.py")
 headwind_cli = importlib.util.module_from_spec(spec)
@@ -110,7 +110,7 @@ class TestHealthInFeed(unittest.TestCase):
                 self.assertEqual(e["failures"], 0)
             headwind_cli.build_site(tmp)
             doc = json.loads((tmp / "site" / "data" / "feed.geojson").read_text(encoding="utf-8"))
-            self.assertEqual(doc["health"], h)
+            self.assertEqual(doc["health"], contract21.published_health(h))     # date-only times as midnight UTC
             sources = {f["properties"]["sources"][0]["id"] for f in doc["features"]}
             self.assertTrue(sources <= set(h), sources - set(h))
             page = json.loads((tmp / "site" / "data" / "snapshot.json").read_text(encoding="utf-8"))
