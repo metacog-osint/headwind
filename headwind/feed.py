@@ -15,9 +15,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
-from tic_doctrine import CONTRACT, geo  # noqa: E402
+from tic_doctrine import CONTRACT, __version__ as KIT_VERSION, geo  # noqa: E402
 
-from . import batches, cjeu, controls, food, inspection, markets, pinksheet, scotus, stats, tariffs, uksc, unpress  # noqa: E402
+from . import batches, cjeu, contract21, controls, food, inspection, markets, pinksheet, scotus, stats, tariffs, uksc, unpress  # noqa: E402
 
 SITE = "https://headwind.theintelligence.company"
 METHOD = "headwind-1.10"
@@ -1342,10 +1342,13 @@ def build_feed(snapshot: dict) -> dict:
 
     # Exchange rates, energy, FAO indices, local food prices. Measurements only.
     features.extend(live_features(snapshot))
+    contract21.apply(features, snapshot)
 
     return {
         "type": "FeatureCollection",
         "contract": CONTRACT,
+        "contract_rev": contract21.CONTRACT_REV,
+        "kit": KIT_VERSION,
         "program": "headwind",
         "generated_at": generated,
         "licence": ("Headwind code GNU AGPL-3.0; ECB reference rates free to reuse with credit; World Bank Global Economic "
@@ -1373,6 +1376,6 @@ def build_feed(snapshot: dict) -> dict:
         # One entry per source, keyed by the source id the items carry (headwind/health.py): whether this run read
         # it, how old its newest data are, and any drift or quiet-publisher warning. COP and the kit's history log
         # read this; a source shown "failing" is a last good copy, not a quiet one.
-        "health": snapshot.get("health") or {},
+        "health": contract21.published_health(snapshot.get("health") or {}),
         "features": features,
     }

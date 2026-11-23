@@ -102,7 +102,7 @@ def measure_fx(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
             "country": CURRENCY_COUNTRY.get(cur),
             "per_usd": round(m["value"], 6),
             "prior_per_usd": round(m["prior_value"], 6),
-            **{k: m[k] for k in ("date", "prior_date", "change_pct", "z", "baseline_n", "flag_rate", "anomaly")},
+            **{k: m[k] for k in ("date", "prior_date", "change_pct", "z", "baseline_n", "flag_rate", "expected", "exceedance", "anomaly")},
             "direction": "weaker" if m["change_pct"] > 0 else "stronger" if m["change_pct"] < 0 else "unchanged",
         })
     return out
@@ -153,7 +153,7 @@ def measure_gem(series: dict[str, list[tuple[str, float]]], iso3_to_cc: dict[str
         out.append({
             "country": cc, "iso3": iso3, "per_usd": round(m["value"], 6), "prior_per_usd": round(m["prior_value"], 6),
             "period": m["date"], "prior_period": m["prior_date"],
-            **{k: m[k] for k in ("change_pct", "z", "baseline_n", "flag_rate")},
+            **{k: m[k] for k in ("change_pct", "z", "baseline_n", "flag_rate", "expected", "exceedance")},
             "direction": "weaker" if m["change_pct"] > 0 else "stronger" if m["change_pct"] < 0 else "unchanged",
             "months_old": months_old, "stale": stale, "anomaly": bool(m["anomaly"] and not stale),
             "recent": [[d, round(v, 6)] for d, v in pts[-GEM_RECENT:]],
@@ -217,5 +217,5 @@ def measure_energy(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
             continue
         out.append({**{k: v for k, v in meta.items() if k != "route"}, "eia_series": sid,
                     "price": m["value"], "prior_price": m["prior_value"],
-                    **{k: m[k] for k in ("date", "prior_date", "change_pct", "z", "baseline_n", "flag_rate", "anomaly")}})
+                    **{k: m[k] for k in ("date", "prior_date", "change_pct", "z", "baseline_n", "flag_rate", "expected", "exceedance", "anomaly")}})
     return out

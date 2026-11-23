@@ -101,7 +101,7 @@ def measure_fao(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
         out.append({
             "id": sid, "name": name, "period": m["date"], "value": m["value"], "prior_period": m["prior_date"],
             "prior_value": m["prior_value"],
-            **{k: m[k] for k in ("change_pct", "z", "baseline_n")},
+            **{k: m[k] for k in ("change_pct", "z", "baseline_n", "expected", "exceedance")},
             "flag_rate": rr["flag_rate_rules"] if rr["flag_rate_rules"] is not None else m["flag_rate"],
             "rules": _rules(m["anomaly"], rr), "rise_run": rr["rise_run"],
             "rank_share_above": rr["rank_share_above"],
@@ -213,7 +213,8 @@ def measure_wfp(csv_text: str, today_period: str) -> dict | None:
     return {
         "period": period, "median_change_pct": round(pct, 1), "series": n, "markets": len(markets),
         "share_rising": round(up_share, 2), "z": sc["z"], "baseline_n": sc["baseline_n"],
-        "flag_rate": sc["flag_rate"], "months_old": months_old, "stale": stale,
+        "flag_rate": sc["flag_rate"], "expected": sc.get("expected"), "exceedance": sc.get("exceedance"),
+        "months_old": months_old, "stale": stale,
         "rules": sc.get("rules", []), "rise_run": sc.get("rise_run"), "rank_share_above": sc.get("rank_share_above"),
         "anomaly": bool(sc["anomaly"] and not stale),
     }
@@ -254,7 +255,8 @@ def measure_wfp_fx(csv_text: str, today_period: str) -> dict | None:
         "unofficial": any("unofficial" in x.lower() for x in names), "labels": sorted(names),
         "direction": "weaker" if pct > 0 else "stronger" if pct < 0 else "unchanged",
         "share_weaker": round(up_share, 2), "z": sc["z"], "baseline_n": sc["baseline_n"],
-        "flag_rate": sc["flag_rate"], "months_old": months_old, "stale": stale,
+        "flag_rate": sc["flag_rate"], "expected": sc.get("expected"), "exceedance": sc.get("exceedance"),
+        "months_old": months_old, "stale": stale,
         "anomaly": bool(sc["anomaly"] and not stale),
         "recent": recent, "split_months": split_months,
     }
