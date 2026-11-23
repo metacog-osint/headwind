@@ -2247,6 +2247,55 @@ class TestNames(unittest.TestCase):
 
 
 
+class TestUnusualListMatchesRule(unittest.TestCase):
+    """ideas#214: the "Outside the normal range" list holds to the rule printed above it (site_src/index.html)."""
+
+    SNAP = {
+        "generated_at": "2026-11-23T21:50:00+00:00", "method_version": "headwind-test", "country_names": {"SD": "Sudan", "MX": "Mexico", "IL": "Israel"},
+        "fx": [
+            {"currency": "MXN", "country": "MX", "per_usd": 19.2, "date": "2026-11-23", "change_pct": 3.69, "z": 4.36, "flag_rate": 0.04, "anomaly": True, "direction": "weaker"},
+            {"currency": "ILS", "country": "IL", "per_usd": 3.35, "date": "2026-11-23", "change_pct": 3.9, "z": 3.45, "flag_rate": 0.004, "anomaly": False, "direction": "weaker"},
+        ],
+        "local_food": [{"country": "SD", "period": "2026-10", "median_change_pct": 55.9, "z": 2.78, "share_rising": 0.89, "series": 153,
+                        "markets": 5, "stale": False, "anomaly": True, "rules": ["rank", "run"], "rise_run": 9, "flag_rate": 0.08}],
+    }
+
+    def run_page(self):
+        import subprocess
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node not installed")
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "s.json"
+            f.write_text(json.dumps(self.SNAP), encoding="utf-8")
+            out = subprocess.run([node, str(ROOT / "tests" / "unusual_harness.js"), str(ROOT / "site_src" / "app.js"), str(f)],
+                                 capture_output=True, text=True, encoding="utf-8", timeout=60, check=True).stdout
+        return json.loads(out)
+
+    def test_every_listed_item_meets_the_printed_rule_or_names_its_own(self):
+        page = self.run_page()
+        rows = re.findall(r'<div class="row">(.*?)</div>', page["anomalies"])
+        self.assertEqual(len(rows), 2)
+        for row in rows:
+            z = float(re.search(r"z ([+-]\d+\.\d+)", row).group(1))
+            self.assertTrue(abs(z) >= 3.5 or "flagged by:" in row, row)
+        # today's reading counts the same rows
+        self.assertIn("<b>%d</b>" % len(rows), page["reading"])
+        self.assertIn("flagged by: above the 95th percentile of its past changes; 9 monthly rises in a row", page["anomalies"])
+
+    def test_a_z_just_under_the_line_is_not_shown_as_the_line(self):
+        page = self.run_page()
+        self.assertIn("+3.45", page["fx"])
+        self.assertNotIn("+3.5<", page["fx"])
+
+    def test_the_printed_rule_states_the_food_rules(self):
+        html = (ROOT / "site_src" / "index.html").read_text(encoding="utf-8")
+        m = re.search(r'id="an-h">.*?</p>', html, re.S)
+        self.assertIn("Robust z of 3.5 or more", m.group(0))
+        self.assertIn("95th percentile", m.group(0))
+        self.assertIn("six months in a row", m.group(0))
+
+
 class TestWatchFixes(unittest.TestCase):
     """The two faults found in the 18 Nov 2026 watch check."""
 
