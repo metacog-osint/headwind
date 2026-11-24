@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="tic-shell.css">
 <link rel="stylesheet" href="tic-tabs.css">
 <link rel="stylesheet" href="tic-fold.css">
+<link rel="alternate" type="application/geo+json" title="Headwind feed (GeoJSON)" href="data/feed.geojson">
 <script src="tic-time.js"></script>
 <script src="tic-related.js"></script>
 <script src="tic-tabs.js" defer></script>
@@ -23,10 +24,6 @@
   <div class="wrap top-row">
     <div class="brand"><strong>Headwind</strong><a class="tic-layer" href="https://theintelligence.company/#layers">Systems layer</a><span class="muted">The Intelligence Company</span></div>
     <nav class="top-nav">
-      <a href="data/feed.geojson">Feed</a>
-      <a href="data/events.json">Calendar</a>
-      <a href="data/baseline.json">Country baselines</a>
-      <a href="data/minerals.json">Minerals</a>
       <span id="time-settings"></span>
     </nav>
   </div>
@@ -293,6 +290,12 @@
     Summaries, CC0). Exchange rates are the ECB's euro reference rates,
     restated by Headwind as units of each currency per US dollar. This product uses the Census Bureau Data API but
     is not endorsed or certified by the Census Bureau. Not investment advice.</p>
+  <nav class="tic-data" aria-label="Data and downloads"><span class="tic-data-k">Data and downloads</span>
+    <a href="data/feed.geojson">Feed (GeoJSON)</a>
+    <a href="data/events.json">Calendar (JSON)</a>
+    <a href="data/baseline.json">Country baselines (JSON)</a>
+    <a href="data/minerals.json">Minerals (JSON)</a>
+    <a href="https://github.com/metacog-osint/headwind">Source code</a></nav>
 </footer>
 <script src="app.js"></script>
 </body>
