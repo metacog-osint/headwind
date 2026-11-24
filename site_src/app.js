@@ -178,7 +178,13 @@
       " Canadian and " + Number((vc.without_imo || {})["australia-dfat"] || 0) +
       " Australian entries give no IMO number (Australia's ships under UN regimes are counted only, not matched)." + ((vc.from_earlier_run || []).length ? " From an earlier reading: " + vc.from_earlier_run.join(", ") + "." : "")) +
       ' <a href="data/vessels.json">Every ship, with each list\'s entry ids, name and flag</a>.</p>' : "";
-    function counts(o) { return Object.keys(o || {}).slice(0, 6).map(function (k) { return k + " " + o[k]; }).join(", "); }
+    // ideas#264: a bare two-letter country code (some lists print RU, UA) reads as the country's name; names pass through.
+    var REGION = (function () { try { return new Intl.DisplayNames(["en"], { type: "region" }); } catch (e) { return null; } })();
+    function country(c) {
+      if (REGION && /^[A-Z]{2}$/.test(c || "")) { try { var n = REGION.of(c); if (n && n !== c && n !== "Unknown Region") { return n; } } catch (e) { } }
+      return c;
+    }
+    function counts(o) { return Object.keys(o || {}).slice(0, 6).map(function (k) { return country(k) + " " + o[k]; }).join(", "); }
     function batchLine(lines, d) {
       var b = d.batches || [];
       if (!b.length) { return; }
@@ -194,7 +200,7 @@
     var NAMES_SHOWN = 40;
     function who(r) {
       var bits = [r.type, (r.programs || []).join("; ")].filter(Boolean);
-      if ((r.countries || []).length) { bits.push((r.countries || []).join(", ")); }
+      if ((r.countries || []).length) { bits.push((r.countries || []).map(country).join(", ")); }
       if (r.listed) { bits.push("listed " + r.listed); }
       return r.name + " (" + bits.join(", ") + ")";
     }
@@ -204,7 +210,7 @@
       if (r.type_before) { what.push("was " + r.type_before); }
       if ((r.gained || []).length) { what.push("programs gained " + r.gained.join(", ")); }
       if ((r.lost || []).length) { what.push("programs lost " + r.lost.join(", ")); }
-      if (r.countries_before) { what.push("address countries were " + (r.countries_before.join(", ") || "none")); }
+      if (r.countries_before) { what.push("address countries were " + (r.countries_before.map(country).join(", ") || "none")); }
       return r.name + " (" + r.type + "; " + (what.join("; ") || "details changed") + ")";
     }
     function named(d) {
@@ -317,7 +323,7 @@
       table("trade-table", ["HS code", "For", "Last 12 months", "Against the 12 before", "China's share (before)", "Leading sources"], tr.codes.filter(function (c) { return c.newest_month; }).map(function (c) {
         return [esc(c.hs + " " + (c.description || "")), esc((c.minerals || []).join(", ")), esc(usd(c.imports_12m_usd)), esc(c.change_pct !== null && c.change_pct !== undefined ? pct(c.change_pct) : c.imports_prior_12m_usd === 0 ? "none the year before" : "no earlier year"),
           esc(c.china_share_pct === null ? "" : c.china_share_pct + "%" + (c.china_share_prior_pct === null || c.china_share_prior_pct === undefined ? "" : " (" + c.china_share_prior_pct + "%)")),
-          esc((c.sources || []).map(function (x) { return x.country + " " + x.share_pct + "%"; }).join(", "))];
+          esc((c.sources || []).map(function (x) { return country(x.country) + " " + x.share_pct + "%"; }).join(", "))];
       }));
     }
     var sl = s.screening_lists || [];
