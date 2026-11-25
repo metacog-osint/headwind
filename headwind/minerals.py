@@ -119,6 +119,9 @@ def watch_notes(m: dict) -> list[str]:
     notes += [f'the Federal Register has published "{n["title"]}" ({n["published"]}, document {n["document"]}); '
               f"Headwind still carries the {CRITICAL_LIST['title']}" for n in w.get("newer_lists") or []]
     notes += [f"could not check for {e}" for e in w.get("errors") or []]
+    world = (m or {}).get("world") or {}
+    if world.get("status") == "failed":
+        notes.append(f"the world production and reserves table was not read: {world.get('error')}")
     return notes
 
 

@@ -40,7 +40,7 @@
     },
     {
       "id": "dgtresor-gels",
-      "name": "French Treasury (Direction générale du Trésor): Registre national des gels (JSON, the register's public API)",
+      "name": "French Treasury (Direction g\u00e9n\u00e9rale du Tr\u00e9sor): Registre national des gels (JSON, the register's public API)",
       "url": "https://gels-avoirs.dgtresor.gouv.fr/",
       "licence": "Licence Ouverte / Open Licence 2.0 (data.gouv.fr record 'Registre national des gels', licence lov2, read 15 Nov 2026)",
       "use": "ingest",
@@ -69,7 +69,7 @@
       "id": "mof-jp-sanctions",
       "name": "Ministry of Finance Japan: list of persons subject to asset freezes under the Foreign Exchange and Foreign Trade Act (shisantouketsu<YYYYMMDD>.csv) and the IMO numbers of ships under its services ban (ekimukisei_IMOnumber_<YYYYMMDD>.csv), links read from list.html",
       "url": "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/list.html",
-      "licence": "Public Data License 1.0 (PDL1.0), compatible with CC BY 4.0, MOF terms page read 19 Nov 2026; source line 出典：財務省ウェブサイト with the page and licence URLs, and a note that Headwind edited it. Entries under UN Security Council programs are counted only (the UN's terms)",
+      "licence": "Public Data License 1.0 (PDL1.0), compatible with CC BY 4.0, MOF terms page read 19 Nov 2026; source line \u51fa\u5178\uff1a\u8ca1\u52d9\u7701\u30a6\u30a7\u30d6\u30b5\u30a4\u30c8 with the page and licence URLs, and a note that Headwind edited it. Entries under UN Security Council programs are counted only (the UN's terms)",
       "use": "ingest",
       "grade": "A1",
       "independence_group": "jp-mof-sanctions"
@@ -139,7 +139,7 @@
     },
     {
       "id": "fao-ffpi",
-      "name": "FAO World Food Situation — FAO Food Price Index",
+      "name": "FAO World Food Situation \u2014 FAO Food Price Index",
       "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
       "licence": "CC BY 4.0 (FAO database terms of use)",
       "use": "ingest",
@@ -244,6 +244,24 @@
       "use": "ingest",
       "grade": "A1",
       "independence_group": "usgs"
+    },
+    {
+      "id": "usgs-mcs-world",
+      "name": "US Geological Survey: Mineral Commodity Summaries 2026, all-chapters table (MCS2026_ALLchapters_Reconcile.csv): world production and reserves by country",
+      "url": "https://doi.org/10.5066/P1WKQ63T",
+      "licence": "CC0 1.0",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "usgs"
+    },
+    {
+      "id": "eu-crma-annexes",
+      "name": "European Union: Critical Raw Materials Act, Regulation (EU) 2024/1252, Annex I (strategic) and Annex II (critical raw materials)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1252/oj/eng",
+      "licence": "CC BY 4.0 (European Commission reuse policy, Decision 2011/833/EU)",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "eu-commission"
     },
     {
       "id": "usitc-hts",

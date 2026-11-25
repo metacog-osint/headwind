@@ -365,6 +365,23 @@
       }
       var firsts = (mn.by_source || []).filter(function (b) { return b.named_first > 1; }).slice(0, 8).map(function (b) { return b.source + " " + b.named_first; });
       document.getElementById("minerals-first").textContent = firsts.length ? "Named first among major import sources, out of the " + mn.with_sources + " commodities with sources given: " + firsts.join(", ") + "." : "";
+      var wd = mn.world || {}, eu = mn.eu_list;
+      var euNote = eu ? " EU marks the commodity's entry in the " + eu.title + " (" + eu.citation + "): strategic (" + eu.strategic_count + " materials) or critical (" + eu.critical_count + ")." : "";
+      if (wd.status === "ok" && (wd.series || []).length) {
+        var prod = wd.series.filter(function (x) { return x.kind === "production"; });
+        document.getElementById("world-note").innerHTML = esc("World production by country, latest year USGS gives, from the ") +
+          '<a href="' + esc(wd.item_url) + '" rel="noopener">' + esc(wd.title || "Mineral Commodity Summaries") + "</a>" +
+          esc(" (" + wd.file + ", CC0). " + wd.note + euNote + " Reserves are in the ") + '<a href="data/minerals.json">data file</a>' + esc(".");
+        table("world-table", ["Commodity", "Statistic", "Year", "Largest producer", "Top 3", "China", "HHI", "EU"], prod.map(function (x) {
+          return [esc(x.commodity), esc(x.statistic + (x.unit ? ", " + x.unit : "")), esc(x.year),
+            esc(x.top.country + " " + Math.round(x.top.share * 100) + "%"), esc(Math.round(x.top3_share * 100) + "%"),
+            esc(x.china_share === null || x.china_share === undefined ? "not named" : Math.round(x.china_share * 100) + "%"),
+            esc(Number(x.hhi).toLocaleString()), esc(x.eu ? x.eu.list : "")];
+        }));
+      } else {
+        document.getElementById("world-note").textContent = wd.status === "failed" ? "The world production table was not read on the last run: " + (wd.error || "") : "Not read yet.";
+        table("world-table", [], []);
+      }
     } else {
       table("minerals-table", [], []);
     }

@@ -1,0 +1,22 @@
+{
+ "id": "69837e43b66b01367d7ec7c7",
+ "title": "Mineral Commodity Summaries 2026",
+ "dates": [
+  {
+   "type": "Publication",
+   "dateString": "2026-02-06",
+   "label": "Publication Date"
+  }
+ ],
+ "files": [
+  {
+   "name": "MCS2026_ALLchapters_Reconcile.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837e43b66b01367d7ec7c7?f=__disk__synthetic",
+   "checksum": {
+    "value": "584787aec68a30cbe5488a78ba82952d",
+    "type": "MD5"
+   }
+  }
+ ],
+ "_fixture_note": "Made up by hand in ScienceBase's item layout (id, title, dates, files with checksum), 25 Nov 2026: no real ScienceBase reply was recorded. The CSV beside it is synthetic too, in the column layout the item's metadata lists."
+}
