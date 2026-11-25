@@ -1484,7 +1484,7 @@ class TestListParsers(unittest.TestCase):
         generated, idx = sanctions.parse_un_xml((FIX / "un_consolidated.xml").read_bytes())
         self.assertEqual(generated[:10], "2026-11-13")
         self.assertEqual(len(idx), 14)
-        self.assertEqual(idx["6907993"], ["individual", ["DRC"]])
+        self.assertEqual(idx["99000001"], ["individual", ["DRC"]])   # made-up id (UN terms)
 
     def test_eu(self):
         generated, idx = sanctions.parse_eu_xml((FIX / "eu_fsf.xml").read_bytes())
