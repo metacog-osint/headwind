@@ -1491,7 +1491,9 @@ class TestListParsers(unittest.TestCase):
         self.assertEqual(generated[:10], "2026-10-23")
         self.assertEqual(len(idx), 9)
         self.assertEqual({v[0] for v in idx.values()}, {"individual", "entity"})
-        self.assertTrue(all(len(v) == 3 and sorted(v[2]) == ["countries", "name"] for v in idx.values() if v[0] != "vessel"))
+        self.assertTrue(all(len(v) == 3 and sorted(v[2]) == ["aliases", "countries", "name"]
+                            for v in idx.values() if v[0] != "vessel"))
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{12}", v[2]["aliases"]) for v in idx.values()))
         self.assertTrue(all(v[2]["name"] for v in idx.values()))
         self.assertEqual(sanctions.countries_for(["UKR", "TAQA", "IRN"], "eu-fsf"), ["IR", "RU"])
         self.assertEqual(sanctions.countries_for(["SDNZ"], "eu-fsf"), ["SD"])   # Tom, 14 Nov 2026
@@ -2203,6 +2205,61 @@ class TestNames(unittest.TestCase):
         old = {"1": ["entity", ["X"]], "2": ["individual", ["X"]]}
         d = sanctions.delta("eu-fsf", old, {"1": new["1"]}, "2026-11-16T18:00:00Z", None)
         self.assertEqual((d["removed"], d["named_removed"], d["unnamed_removed"], d["changed"]), (1, [], 1, 0))
+
+    def test_an_eu_reorder_of_names_is_no_change(self):
+        # The EU file printed each entry's strong aliases in another order on 20 Nov 2026 (1,167 entries)
+        # and 26 Nov (3,493), and taking the first strong alias reported each as renamed.
+        body = (FIX / "eu_fsf.xml").read_bytes()
+        _, idx = sanctions.parse_eu_xml(body)
+        root = ET.fromstring(body)
+        ns = sanctions.EU_NS
+        many = [e for e in root.findall("e:sanctionEntity", ns)
+                if sum(1 for a in e.findall("e:nameAlias", ns) if a.get("strong") == "true") > 1]
+        self.assertTrue(many)                       # the fixture has an entry with several strong aliases
+        for e in many:                              # print every entry's aliases the other way round
+            aliases = e.findall("e:nameAlias", ns)
+            for a in aliases:
+                e.remove(a)
+            for a in reversed(aliases):
+                e.append(a)
+        _, flipped = sanctions.parse_eu_xml(ET.tostring(root))
+        self.assertEqual(flipped, idx)              # the same name and digest, whatever the order
+        self.assertIsNone(sanctions.delta("eu-fsf", idx, flipped, "2026-11-20T21:50:00Z", None))
+        # A name added to an entry is a change, with the name shown kept; an edited name likewise.
+        lid = many[0].get("logicalId")
+        grown = ET.fromstring(ET.tostring(root))
+        e = next(x for x in grown.findall("e:sanctionEntity", ns) if x.get("logicalId") == lid)
+        extra = ET.SubElement(e, f"{{{ns['e']}}}nameAlias", {"wholeName": "A NEW ALIAS", "strong": "true",
+                                                             "logicalId": "999999999"})
+        _, idx2 = sanctions.parse_eu_xml(ET.tostring(grown))
+        d = sanctions.delta("eu-fsf", idx, idx2, "2026-11-21T21:50:00Z", None)
+        rec = d["named_changed"][0]
+        self.assertEqual((d["changed"], d["renamed"], rec["list_id"], rec["aliases_changed"]), (1, 0, lid, True))
+        self.assertNotIn("name_before", rec)
+        self.assertIn("its other names changed", feed._names_text(d))
+        # The name shown edited: a rename, as before.
+        extra.set("logicalId", "1")
+        _, idx3 = sanctions.parse_eu_xml(ET.tostring(grown))
+        d = sanctions.delta("eu-fsf", idx, idx3, "2026-11-21T21:50:00Z", None)
+        rec = d["named_changed"][0]
+        self.assertEqual((d["renamed"], rec["name"], rec["name_before"]), (1, "A NEW ALIAS", idx[lid][2]["name"]))
+        # A name taken away is a change too.
+        e.remove(extra)
+        first = e.findall("e:nameAlias", ns)[0]
+        e.remove(first)
+        _, idx4 = sanctions.parse_eu_xml(ET.tostring(grown))
+        self.assertEqual(sanctions.delta("eu-fsf", idx, idx4, "2026-11-21T21:50:00Z", None)["changed"], 1)
+        # The first reading after the digest was added (the older index has none) compares no names.
+        older = {k: [v[0], v[1], {"name": "AN OLDER PICK", "countries": v[2]["countries"]}] for k, v in idx.items()}
+        self.assertIsNone(sanctions.delta("eu-fsf", older, idx, "2026-11-27T03:50:00Z", None))
+        # A real change of programs still counts on that reading.
+        moved = {k: [v[0], v[1] + ["NEWP"], v[2]] if k == lid else v for k, v in idx.items()}
+        self.assertEqual(sanctions.delta("eu-fsf", older, moved, "2026-11-27T03:50:00Z", None)["changed"], 1)
+
+    def test_the_name_set_digest(self):
+        self.assertEqual(sanctions.nm.name_set_digest(["B", "A", " A "]), sanctions.nm.name_set_digest(["A", "B"]))
+        self.assertNotEqual(sanctions.nm.name_set_digest(["A", "B"]), sanctions.nm.name_set_digest(["A", "B", "C"]))
+        self.assertIsNone(sanctions.nm.name_set_digest(["", None]))
 
     def test_the_un_list_is_never_named(self):
         _, idx = sanctions.parse_un_xml((FIX / "un_consolidated.xml").read_bytes())

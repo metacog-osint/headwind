@@ -282,13 +282,28 @@ def parse_eu_xml(body: bytes, dates: dict | None = None) -> tuple[str | None, di
     return root.get("generationDate"), index
 
 
+def _alias_order(a) -> tuple:
+    lid = (a.get("logicalId") or "").strip()
+    return (0, int(lid)) if lid.isdigit() else (1, 0)
+
+
 def _eu_details(e) -> dict:
-    """The name the EU marks strong (else the first given) and the country codes of the entry's citizenships and
-    addresses. Birth dates, functions, identity documents and remarks are not carried."""
+    """One name for the entry, the digest of all its names, and the country codes of its citizenships and
+    addresses. Birth dates, functions, identity documents and remarks are not carried.
+
+    The name is the alias the EU marks strong with the lowest alias id (else the lowest of all its aliases). Most
+    entries carry several strong aliases, and the file prints them in an order that moves between generations: on
+    20 Nov 2026 taking the first strong alias made 1,167 entries look renamed, and on 26 Nov 3,493, each new name an
+    alias the entry already had. The alias ids stay with their names across files, so this choice does not move.
+    `aliases` is a digest of the entry's distinct names, whatever their order: a name added, removed or edited
+    changes it, a reorder does not (`edits`)."""
     aliases = [a for a in e.findall("e:nameAlias", EU_NS) if nm.clean(a.get("wholeName"))]
-    pick = next((a for a in aliases if a.get("strong") == "true"), aliases[0] if aliases else None)
+    strong = [a for a in aliases if a.get("strong") == "true"]
+    pick = min(strong or aliases, key=_alias_order) if aliases else None
     cs = [x.get("countryIso2Code") for tag in ("e:citizenship", "e:address") for x in e.findall(tag, EU_NS)]
-    return nm.details(pick.get("wholeName") if pick is not None else None, [c for c in cs if c and c != "00"])
+    out = nm.details(pick.get("wholeName") if pick is not None else None, [c for c in cs if c and c != "00"])
+    out["aliases"] = nm.name_set_digest(a.get("wholeName") for a in aliases)
+    return out
 
 
 def _iso_day(text: str | None) -> str | None:
@@ -899,13 +914,25 @@ def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True,
     organization that changed (`named_changed`, with the programs it gained and lost and, when renamed, its name
     before), and each vessel, before and after for each field that moved. `pairs` are (old id, new id) for one entry
     under a new id, compared as one. An index written before vessel details or names were kept, or kept in an older
-    form (`compare_vessels`, `compare_names` False), gives no such comparison."""
+    form (`compare_vessels`, `compare_names` False), gives no such comparison.
+
+    An entry that keeps the digest of all its names (the EU's, `aliases`) is compared on that digest: a name added,
+    removed or edited is a change (`aliases_changed`, with `name_before` when the name shown moved too), and the
+    same names in another order are none. Where only one reading keeps the digest (the first reading after it was
+    added), the entry is not compared by name."""
     changed, gained, lost, retyped, vessels, named_changed = [], Counter(), Counter(), Counter(), [], []
     for old_id, new_id in [(i, i) for i in sorted(set(index) & set(prev_index))] + list(pairs):
         old, new = prev_index[old_id], index[new_id]
         before, after = nm.entry(prev_index, old_id), nm.entry(index, new_id)
-        renamed = bool(compare_names and before and after and before["name"] != after["name"])
-        if old[0] != new[0] or sorted(old[1]) != sorted(new[1]) or renamed:
+        renamed = realiased = False
+        if compare_names and before and after:
+            d_old, d_new = old[2].get("aliases"), new[2].get("aliases")
+            if d_old and d_new:
+                realiased = d_old != d_new
+                renamed = realiased and before["name"] != after["name"]
+            elif not d_old and not d_new:
+                renamed = before["name"] != after["name"]
+        if old[0] != new[0] or sorted(old[1]) != sorted(new[1]) or renamed or realiased:
             changed.append(new_id)
             gained.update(set(new[1]) - set(old[1]))
             lost.update(set(old[1]) - set(new[1]))
@@ -915,6 +942,8 @@ def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True,
                 rec = {**after, "gained": sorted(set(new[1]) - set(old[1])), "lost": sorted(set(old[1]) - set(new[1]))}
                 if renamed:
                     rec["name_before"] = before["name"]
+                if realiased:
+                    rec["aliases_changed"] = True
                 if old[0] != new[0]:
                     rec["type_before"] = old[0]
                 named_changed.append(rec)

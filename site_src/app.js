@@ -207,6 +207,7 @@
     function changedWho(r) {
       var what = [];
       if (r.name_before) { what.push("was " + r.name_before); }
+      else if (r.aliases_changed) { what.push("its other names changed"); }
       if (r.type_before) { what.push("was " + r.type_before); }
       if ((r.gained || []).length) { what.push("programs gained " + r.gained.join(", ")); }
       if ((r.lost || []).length) { what.push("programs lost " + r.lost.join(", ")); }
