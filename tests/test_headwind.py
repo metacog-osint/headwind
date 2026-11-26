@@ -503,9 +503,9 @@ class TestMineralsWorld(unittest.TestCase):
         self.assertIsNone(m("Zinc"))
 
     def test_world_failure_is_a_warning_not_a_lane_failure(self):
-        def getter(url, timeout=60):
+        def getter(url, timeout=60):   # an item record without the table: a layout change, which no stored copy covers
             if minerals_world.WORLD_ITEM_ID in url:
-                raise urllib.error.HTTPError(url, 403, "Forbidden", {}, None)
+                return b'{"files": []}'
             return fake_getter(url, timeout)
         with tempfile.TemporaryDirectory() as tmp:
             result, _ = headwind_cli._lane_minerals(Path(tmp) / "raw", {}, getter)
@@ -577,6 +577,13 @@ class TestMineralsWorldStoredCopy(unittest.TestCase):
         self.assertEqual(stored["series"], live["series"])
         self.assertNotIn("read_from", live)
         self.assertIn("stored copy", minerals.watch_notes({"world": stored})[-1])
+
+    def test_the_stored_copy_is_usgs_file(self):
+        f, body = minerals_world.stored_world()            # checks the MD5 the stored record lists
+        self.assertEqual((f["name"], f["md5"]), (minerals_world.WORLD_FILE, "36185ff3742087e1dd90c52fe634fe12"))
+        w = self.world(None)                               # ScienceBase refusing; the real stored copy is read
+        self.assertEqual((w["status"], w["read_from"]["copy"]), ("ok", "stored"))
+        self.assertGreaterEqual(len(w["series"]), minerals_world.MIN_SERIES)
 
     def test_no_stored_copy_is_reported(self):
         with tempfile.TemporaryDirectory() as d:
