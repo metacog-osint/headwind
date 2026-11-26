@@ -628,6 +628,8 @@ def _names_text(s: dict, un: bool = False) -> str:
         what = []
         if r.get("name_before"):
             what.append(f"was {r['name_before']}")
+        elif r.get("aliases_changed"):
+            what.append("its other names changed")
         if r.get("type_before"):
             what.append(f"was a{'n' if r['type_before'][:1] in 'aeiou' else ''} {r['type_before']}")
         if r.get("gained"):
@@ -1103,6 +1105,40 @@ def inspection_features(snapshot: dict, generated: str, valid_until: str, access
 
 
 
+FX_BROAD_ID = "headwind:fx:usd-broad"
+
+
+def _broad_item(b: dict, generated: str, valid_until: str, lane_accessed: str | None) -> dict:
+    """The US dollar against all the currencies the ECB quotes, one item every run. It is the anomaly on a day when
+    markets.FX_BROAD_MIN or more currencies are unusual the same way; those currencies' own items are then routine,
+    so one move of the dollar reaches COP once, not once per country."""
+    n, m, h = len(b["currencies"]), b["quoted"], markets.FX_HORIZON
+    med = b["median_change_pct"]
+    way = "stronger" if med > 0 else "weaker" if med < 0 else "unchanged"
+    title = (f"US dollar: {b['dollar']} against {n} of {m} currencies at once in {h} business days" if b["broad"]
+             else f"US dollar against {m} currencies: median currency {abs(med):.1f}% "
+                  f"{'weaker' if med > 0 else 'stronger' if med < 0 else 'unchanged'} in {h} business days")
+    summary = (f"Of the {m} currencies the ECB quoted on {b['date']}, {b['flagged_weaker']} were unusually weaker "
+               f"against the US dollar over {h} business days and {b['flagged_stronger']} unusually stronger, each "
+               f"against its own {markets.FX_WINDOW} earlier {h}-day changes; the median currency moved "
+               f"{med:+.2f}% per US dollar (the dollar {way}). When {markets.FX_BROAD_MIN} or more are unusual the "
+               f"same way on one day, the move is the dollar's and is reported once, here; those currencies' own "
+               f"items stay routine.")
+    if b["broad"]:
+        summary += f" Moved with the dollar on {b['date']}: {', '.join(b['currencies'])}."
+    return _observation(
+        FX_BROAD_ID, title, summary + " ECB reference rates, restated per US dollar.",
+        anomaly=b["broad"], data_as_of=f"{b['date']}T00:00:00Z", generated=generated, valid_until=valid_until,
+        countries=[], ncf=["provide_funding_liquidity", "provide_capital_markets"], requirement_ids=["HW-PIR-4"],
+        measures={"quoted": m, "flagged_weaker": b["flagged_weaker"], "flagged_stronger": b["flagged_stronger"],
+                  "median_change_pct": med, "common_move": n},
+        anchor="fx", source=SRC_ECB, indicator_id="HW-IND-4",
+        baseline_ref=f"rolling: each currency against its own {markets.FX_WINDOW} prior {h}-day changes "
+                     f"(|z| >= {stats.Z_ANOMALY:g}, a move of at least {markets.FX_FLOOR:g}%); a move of the dollar "
+                     f"when {markets.FX_BROAD_MIN} or more are anomalies the same way",
+        coverage=1.0, lane_accessed=lane_accessed, ascope=["events"])
+
+
 def live_features(snapshot: dict) -> list[dict]:
     generated = snapshot["generated_at"]
     valid_until = _plus_hours(generated, 48)
@@ -1112,6 +1148,7 @@ def live_features(snapshot: dict) -> list[dict]:
     def accessed(lane: str) -> str | None:
         return (lanes.get(lane) or {}).get("fetched_at")
 
+    broad = markets.broad_move(snapshot.get("fx") or [])
     for f in snapshot.get("fx") or []:
         cc = f.get("country")
         name = (geo.name(cc) if cc else None) or ("Euro area" if f["currency"] == "EUR" else f["currency"])
@@ -1121,17 +1158,25 @@ def live_features(snapshot: dict) -> list[dict]:
             f"in {markets.FX_HORIZON} business days ({_z_text(f['z'])})",
             f"{f['per_usd']:g} {f['currency']} per US dollar on {f['date']}, against {f['prior_per_usd']:g} on "
             f"{f['prior_date']}. Measured against the currency's own {f['baseline_n']} earlier "
-            f"{markets.FX_HORIZON}-day changes. ECB reference rate, restated per US dollar.",
-            anomaly=f["anomaly"], data_as_of=f"{f['date']}T00:00:00Z", generated=generated, valid_until=valid_until,
+            f"{markets.FX_HORIZON}-day changes. ECB reference rate, restated per US dollar."
+            + (f" Part of a move of the US dollar itself: {len(broad['currencies'])} of {broad['quoted']} currencies "
+               f"were unusual the same way on {f['date']}, reported once as {FX_BROAD_ID}." if f.get("common_move")
+               else ""),
+            anomaly=bool(f["anomaly"] and not f.get("common_move")), data_as_of=f"{f['date']}T00:00:00Z",
+            generated=generated, valid_until=valid_until,
             countries=[cc] if cc else [], ncf=["provide_funding_liquidity", "provide_capital_markets"],
             requirement_ids=["HW-PIR-4"],
             measures={"per_usd": f["per_usd"], "change_pct": f["change_pct"], "z": f["z"],
-                      "baseline_n": f["baseline_n"], "flag_rate": f.get("flag_rate")},
+                      "baseline_n": f["baseline_n"], "flag_rate": f.get("flag_rate"),
+                      **({"common_move": True} if f.get("common_move") else {})},
             anchor="fx", source=SRC_ECB, indicator_id="HW-IND-4",
             baseline_ref=f"rolling: the series' own {markets.FX_WINDOW} prior {markets.FX_HORIZON}-day changes; "
                          f"anomaly at |z| >= {stats.Z_ANOMALY:g} and a move of at least {markets.FX_FLOOR:g}%",
             coverage=1.0, lane_accessed=accessed("fx"), ascope=["events"],
             hypothesis_id="HW-H-2A" if cc in WATCHED else None))
+
+    if broad:
+        feats.append(_broad_item(broad, generated, valid_until, accessed("fx")))
 
     for o in snapshot.get("fx_official") or []:
         if o.get("stale"):
@@ -1302,7 +1347,8 @@ def country_view(snapshot: dict) -> list[dict]:
         row = {"country": cc, "name": geo.name(cc) or cc}
         row["daily"] = None if not daily else {
             "currency": daily["currency"], "per_usd": daily["per_usd"], "change_pct": daily["change_pct"],
-            "z": daily["z"], "anomaly": daily["anomaly"], "date": daily["date"],
+            "z": daily["z"], "anomaly": bool(daily["anomaly"] and not daily.get("common_move")),
+            "common_move": bool(daily.get("common_move")), "date": daily["date"],
             "note": None if daily.get("country") == cc else f"{daily['currency']}, the currency in use"}
         row["official"] = None if not o else {k: o[k] for k in ("per_usd", "change_pct", "z", "anomaly", "period",
                                                                 "stale")}
@@ -1326,7 +1372,8 @@ def country_view(snapshot: dict) -> list[dict]:
         if not f and cc in missing:
             row["local_food_missing"] = missing[cc]
         present = []
-        if any(x and x.get("anomaly") and not x.get("stale") for x in (by_cc.get(cc), o, w)):
+        if any(x and x.get("anomaly") and not x.get("stale") and not x.get("common_move")
+               for x in (by_cc.get(cc), o, w)):
             present.append("HW-IND-4")
         if f and f.get("anomaly"):
             present.append("HW-IND-6")

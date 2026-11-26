@@ -37,7 +37,7 @@ LANE_FIELDS = {
     "wfp": ["local_food", "local_food_missing", "market_fx"],
     "baseline": ["baseline"],
     "calendar": ["fomc_dates", "ecb_dates"],
-    "sanctions": ["sanctions", "sanctions_lists", "vessel_crosslist", "vessel_table"],
+    "sanctions": ["sanctions", "sanctions_lists", "vessel_crosslist", "vessel_table", "vessel_lead"],
     "screening": ["screening", "screening_lists"],
     "controls": ["controls", "scheduled_dates", "tariff_pace"],
     "inspection": ["inspection", "inspection_issues"],
@@ -52,7 +52,7 @@ LANE_FIELDS = {
 EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
          "energy": [], "fao": [], "fao_release_dates": [], "pinksheet": [], "pinksheet_updated": None,
          "local_food": [], "local_food_missing": [],
-         "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
+         "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "vessel_lead": {}, "screening": [],
          "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
          "minerals": {}, "mineral_trade": {}, "tariff_pace": {}, "hts_releases": {}, "hts_pace": {},
          "signed_actions": [], "signed_error": None, "un_committee_releases": [], "un_press": {},
@@ -389,6 +389,11 @@ def _lane_sanctions(raw_dir, prev, getter):
                               "index": index}
         if ca_names is not None:
             new_state[list_id]["names"] = ca_names
+        if dates and list_id in sanctions.DATED_VESSEL_LISTS:
+            # Each ship's listing date as the publisher gives it (cross_list_lead); kept so a list that fails a
+            # later run still has its dates.
+            new_state[list_id]["vessel_dates"] = {i: d for i, d in sorted(dates.items())
+                                                  if d and i in index and index[i][0] == "vessel"}
         lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated, last_change))
     if not recs:
         raise RuntimeError("no sanctions list could be read: " + "; ".join(errors))
@@ -400,10 +405,11 @@ def _lane_sanctions(raw_dir, prev, getter):
     cross, table = sanctions.vessel_crosslist({k: v.get("index") or {} for k, v in new_state.items()},
                                               stale=tuple(l for l in failed if l in new_state))
     cross["checked_at"] = now
+    lead = sanctions.cross_list_lead(table, {k: v.get("vessel_dates") or {} for k, v in new_state.items()}, now)
     for d in deltas:
         sanctions.mark_also_on(d, table)
     return {"sanctions": sanctions.roll(prev.get("sanctions") or [], deltas, now), "sanctions_lists": lists,
-            "vessel_crosslist": cross, "vessel_table": table}, recs
+            "vessel_crosslist": cross, "vessel_table": table, "vessel_lead": lead}, recs
 
 
 def _lane_screening(raw_dir, prev, getter):
@@ -820,7 +826,7 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                      "energy", "fao", "pinksheet", "pinksheet_updated",
                                      "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
                                      "screening_lists", "controls", "inspection", "inspection_issues", "minerals",
-                                     "question_drafts", "vessel_crosslist", "mineral_trade", "tariff_pace",
+                                     "question_drafts", "vessel_crosslist", "vessel_lead", "mineral_trade", "tariff_pace",
                                      "hts_releases", "hts_pace", "signed_actions", "signed_error",
                                      "un_committee_releases", "un_press", "scotus_opinions", "scotus_tracked",
                                      "scotus_errors", "uksc_judgments", "uksc_errors", "uksc_sitemap",
@@ -859,6 +865,16 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                         for l in sanctions.VESSEL_LISTS},
             "summary": snap.get("vessel_crosslist") or {},
             "vessels": snap.get("vessel_table") or []}),
+        "data/lead-time.json": dump({
+            "generated_at": snap["generated_at"],
+            "note": ("Which publisher listed a ship first: ships, by IMO number, on two or more of the UK Sanctions List, "
+                     "Canada's consolidated list and Japan's ship list, with each list's own designation date (the "
+                     "earliest of its entries for that number). OFAC's, France's and Australia's files give no date, "
+                     "so their ships are not placed in time (also_on_undated). These are the publishers' dates: they "
+                     "measure the publishers, not Headwind, and say nothing about the ship."),
+            "sources": {l: {"name": sanctions.LISTS[l]["name"], "url": sanctions.LISTS[l]["url"]}
+                        for l in sanctions.DATED_VESSEL_LISTS},
+            **(snap.get("vessel_lead") or {})}),
         "data/list-changes.json": dump(list_changes(snap)),
         "data/question_drafts.json": dump({"note": "Drafts only. Nothing here is registered in Verdict.",
                                            "drafts": snap.get("question_drafts") or []}),
