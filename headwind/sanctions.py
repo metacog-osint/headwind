@@ -1098,6 +1098,61 @@ def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict,
     return summary, table
 
 
+# The lists whose files give each ship's own listing date: the UK's DateDesignated, Canada's DateOfListing and the
+# notice date in Japan's ship file. OFAC's, France's and Australia's files give none, so their ships cannot be
+# placed in time here.
+DATED_VESSEL_LISTS = ("uk-sanctions", "canada-sema", "japan-mof")
+
+
+def cross_list_lead(table: list[dict], vessel_dates: dict[str, dict], checked_at: str) -> dict:
+    """Which publisher listed a ship first, for ships (by IMO number, `vessel_crosslist`) on two or more of the lists
+    that date their entries. A list's date for a ship is the earliest date of its entries for that IMO number. These
+    are the publishers' own dates: the table measures the publishers, not Headwind, and says nothing about the ship.
+
+    `pairs` gives, for each two lists, how many ships both list, how many each listed first and how many on the same
+    day, with the median and largest number of days the later list followed. `ships` gives each ship's dates.
+    `date_range` is each list's earliest and latest ship date: a list whose ship measure began later (Japan's ship
+    list starts with one notice of 2 Oct 2026) can only follow."""
+    import statistics
+    from datetime import date
+
+    ships, pairs = [], {}
+    for r in table:
+        listed = {}
+        for l in DATED_VESSEL_LISTS:
+            on = r["on"].get(l)
+            days = [d for d in (vessel_dates.get(l, {}).get(i) for i in (on or {}).get("ids") or []) if d]
+            if days:
+                listed[l] = min(days)
+        if len(listed) < 2:
+            continue
+        first_day = min(listed.values())
+        ships.append({"imo": r["imo"], "names": {l: r["on"][l].get("name") for l in listed},
+                      "listed": listed, "first": [l for l in listed if listed[l] == first_day],
+                      "days_after_first": {l: (date.fromisoformat(d) - date.fromisoformat(first_day)).days
+                                           for l, d in listed.items()},
+                      "also_on_undated": sorted(l for l in r["on"] if l not in DATED_VESSEL_LISTS)})
+        for x, a in enumerate(DATED_VESSEL_LISTS):
+            for b in DATED_VESSEL_LISTS[x + 1:]:
+                if a in listed and b in listed:
+                    gap = (date.fromisoformat(listed[b]) - date.fromisoformat(listed[a])).days
+                    pairs.setdefault((a, b), []).append(gap)
+
+    def later(gaps):
+        return {"ships": len(gaps), "median_days": statistics.median(gaps) if gaps else None,
+                "max_days": max(gaps) if gaps else None}
+    out_pairs = []
+    for (a, b), gaps in pairs.items():
+        out_pairs.append({"lists": [a, b], "ships": len(gaps), "same_day": sum(1 for g in gaps if g == 0),
+                          "first": {a: later([g for g in gaps if g > 0]), b: later([-g for g in gaps if g < 0])}})
+    return {"checked_at": checked_at, "lists_dated": list(DATED_VESSEL_LISTS),
+            "lists_undated": [l for l in VESSEL_LISTS if l not in DATED_VESSEL_LISTS],
+            "date_range": {l: [min(v.values()), max(v.values())] for l in DATED_VESSEL_LISTS
+                           if (v := {i: d for i, d in (vessel_dates.get(l) or {}).items() if d})},
+            "ships_on_two_or_more_dated": len(ships), "pairs": out_pairs,
+            "ships": sorted(ships, key=lambda s: (min(s["listed"].values()), s["imo"]))}
+
+
 def mark_also_on(d: dict, table: list[dict]) -> dict:
     """Give each ship named in a change the other lists that carry its IMO number (after this run's reading)."""
     on = {r["imo"]: set(r["on"]) for r in table}
