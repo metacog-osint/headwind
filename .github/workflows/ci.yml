@@ -18,5 +18,7 @@ jobs:
         with: { python-version: "3.12" }
       - name: Tests
         run: python -m unittest discover -s tests
-      - name: Registers and feed check
-        run: python tools/headwind.py check
+      # A checkout has no built site/, so there is no feed to lint here; update.yml checks the feed after it
+      # builds it.
+      - name: Registers check
+        run: python tools/headwind.py check --registers-only
