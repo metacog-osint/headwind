@@ -1328,7 +1328,8 @@ class TestFeed(unittest.TestCase):
         self.assertEqual(lint(fc), [])
         ids = [f["properties"]["id"] for f in fc["features"]]
         self.assertNotIn("headwind:localfood:VE", ids)      # stale data is not published as current
-        self.assertEqual(len(ids), 5)
+        self.assertIn("headwind:fx:usd-broad", ids)         # the dollar against all currencies, every run
+        self.assertEqual(len(ids), 6)
         for f in fc["features"]:
             p = f["properties"]
             self.assertEqual(p["kind"], "observation")
@@ -2205,6 +2206,31 @@ class TestNames(unittest.TestCase):
         old = {"1": ["entity", ["X"]], "2": ["individual", ["X"]]}
         d = sanctions.delta("eu-fsf", old, {"1": new["1"]}, "2026-11-16T18:00:00Z", None)
         self.assertEqual((d["removed"], d["named_removed"], d["unnamed_removed"], d["changed"]), (1, [], 1, 0))
+
+    def test_a_move_of_the_dollar_is_one_item(self):
+        def series(jump):
+            days = [f"2025-{1 + i // 28:02d}-{1 + i % 28:02d}" for i in range(300)]
+            vals = [1.0 + 0.002 * ((i * 7) % 5 - 2) for i in range(300)]
+            vals[-5:] = [v * (1 + jump) for v in vals[-5:]]
+            return list(zip(days, vals))
+        base = {f"C{i:02d}": series(0.0) for i in range(17)}
+        wide = markets.measure_fx({**base, **{f"W{i:02d}": series(0.06) for i in range(12)}})
+        self.assertEqual(sum(1 for r in wide if r.get("common_move")), 12)
+        b = markets.broad_move(wide)
+        self.assertEqual((b["broad"], b["dollar"], b["flagged_weaker"], b["quoted"]), (True, "stronger", 12, 29))
+        snap = {"generated_at": "2025-11-27T06:00:00Z", "fx": wide, "lanes": {}}
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features(snap)}
+        self.assertEqual(items["headwind:fx:usd-broad"]["tier"], "anomaly")
+        self.assertIn("12 of 29", items["headwind:fx:usd-broad"]["title"])
+        self.assertEqual(items["headwind:fx:W00"]["tier"], "routine")
+        self.assertTrue(items["headwind:fx:W00"]["measures"]["common_move"])
+        self.assertIn("headwind:fx:usd-broad", items["headwind:fx:W00"]["summary"])
+        # Three currencies moving is theirs: each keeps its anomaly, and the dollar's item is routine.
+        few = markets.measure_fx({**base, **{f"W{i:02d}": series(0.06) for i in range(3)}})
+        self.assertFalse(any(r.get("common_move") for r in few))
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features({**snap, "fx": few})}
+        self.assertEqual((items["headwind:fx:W00"]["tier"], items["headwind:fx:usd-broad"]["tier"]),
+                         ("anomaly", "routine"))
 
     def test_an_eu_reorder_of_names_is_no_change(self):
         # The EU file printed each entry's strong aliases in another order on 20 Nov 2026 (1,167 entries)

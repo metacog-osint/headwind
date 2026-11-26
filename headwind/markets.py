@@ -10,6 +10,7 @@ import csv
 import io
 import json
 import re
+import statistics
 import urllib.parse
 import zipfile
 
@@ -91,7 +92,16 @@ def parse_ecb_csv(text: str) -> dict[str, list[tuple[str, float]]]:
     return out
 
 
+# A day when this many currencies are unusual against the US dollar in the same direction is a move of the dollar
+# itself, not of each currency: on 17 Mar 2020 23 of today's 29 currencies were flagged weaker at once, and on
+# 14 Apr 2025 11 stronger. Back-test on the ECB's file, 2 Jan 2019 to 26 Nov 2026 (2,025 days): 11 days reach 10
+# in one direction, 7 reach 15, 38 reach 5.
+FX_BROAD_MIN = 10
+
+
 def measure_fx(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
+    """Each currency against the US dollar, measured on its own history. On a day when FX_BROAD_MIN or more of them
+    are anomalies in the same direction, each of those carries `common_move` (see broad_move)."""
     out = []
     for cur, pts in sorted(series.items()):
         m = stats.measure(pts, FX_HORIZON, FX_WINDOW, FX_FLOOR)
@@ -105,7 +115,33 @@ def measure_fx(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
             **{k: m[k] for k in ("date", "prior_date", "change_pct", "z", "baseline_n", "flag_rate", "expected", "exceedance", "anomaly")},
             "direction": "weaker" if m["change_pct"] > 0 else "stronger" if m["change_pct"] < 0 else "unchanged",
         })
+    latest = max((r["date"] for r in out), default=None)
+    for direction in ("weaker", "stronger"):
+        same = [r for r in out if r["date"] == latest and r["anomaly"] and r["direction"] == direction]
+        if len(same) >= FX_BROAD_MIN:
+            for r in same:
+                r["common_move"] = True
     return out
+
+
+def broad_move(fx: list[dict]) -> dict | None:
+    """The US dollar against every currency quoted on the latest day: how many were unusual in each direction (each
+    against its own history, `measure_fx`), the median currency's change per US dollar, and, on a dollar-wide day,
+    the currencies that moved with it (`common_move`). A positive median is a stronger dollar. None without rates."""
+    latest = max((r["date"] for r in fx or []), default=None)
+    rows = [r for r in fx or [] if r["date"] == latest]
+    if not rows:
+        return None
+    common = sorted(r["currency"] for r in rows if r.get("common_move"))
+    weaker = sum(1 for r in rows if r.get("anomaly") and r["direction"] == "weaker")
+    stronger = sum(1 for r in rows if r.get("anomaly") and r["direction"] == "stronger")
+    median = statistics.median(r["change_pct"] for r in rows)
+    dollar = None
+    if common:
+        dollar = "stronger" if next(r for r in rows if r.get("common_move"))["direction"] == "weaker" else "weaker"
+    return {"date": latest, "prior_date": min(r["prior_date"] for r in rows), "quoted": len(rows),
+            "flagged_weaker": weaker, "flagged_stronger": stronger, "median_change_pct": round(median, 2),
+            "broad": bool(common), "dollar": dollar, "currencies": common}
 
 
 def gem_url(iso3s) -> str:
