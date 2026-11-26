@@ -78,7 +78,13 @@
     var an = [], far = null;
     // Each unusual reading, and the one furthest from its own normal (largest |z|) for today's reading.
     function add(text, z) { an.push(text); if (typeof z === "number" && (!far || Math.abs(z) > Math.abs(far.z))) { far = { text: text, z: z }; } }
-    fx.forEach(function (f) { if (f.anomaly) { add((names[f.country] || f.currency) + " (" + f.currency + "): " + Math.abs(f.change_pct).toFixed(1) + "% " + f.direction + " against the US dollar in 5 business days, z " + zText(f.z), f.z); } });
+    // A move of the dollar itself (10 or more currencies unusual the same way) is one line, not one per currency.
+    var common = fx.filter(function (f) { return f.common_move; });
+    if (common.length) {
+      add("US dollar: " + (common[0].direction === "weaker" ? "stronger" : "weaker") + " against " + common.length + " of " + fx.length +
+        " currencies at once in 5 business days (" + common.map(function (f) { return f.currency; }).sort().join(", ") + ")", null);
+    }
+    fx.forEach(function (f) { if (f.anomaly && !f.common_move) { add((names[f.country] || f.currency) + " (" + f.currency + "): " + Math.abs(f.change_pct).toFixed(1) + "% " + f.direction + " against the US dollar in 5 business days, z " + zText(f.z), f.z); } });
     en.forEach(function (e) { if (e.anomaly) { add(e.name + ": " + pct(e.change_pct) + " in 5 trading days, z " + zText(e.z), e.z); } });
     fao.forEach(function (c) { if (c.anomaly) { add(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z) + foodRules(c), c.z); } });
     ps.forEach(function (c) { if (c.anomaly) { add(c.name + " (" + c.period + "): " + pct(c.change_pct) + " on the month, z " + zText(c.z), c.z); } });

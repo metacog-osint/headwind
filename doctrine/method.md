@@ -384,6 +384,18 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   Maahanmuuttovirasto) reads as a person, so mistakes go toward individuals. On the 221 judgments of 19 Nov 2026: 144
   individuals, 61 organizations, 16 none.
 
+## A move of the US dollar itself (26 Nov 2026)
+- Every currency is measured per US dollar, so a move of the dollar shows in all of them at once: on 17 Mar 2020,
+  23 of the 29 currencies Headwind reads were unusually weaker the same day. On a day when 10 or more currencies are
+  anomalies in the same direction, Headwind reports the move once, as `headwind:fx:usd-broad` (tier anomaly), and
+  those currencies' own items stay in the feed as routine, marked `common_move`, with their measures unchanged. A
+  currency that moved the other way keeps its own anomaly. The item is published every run: the median currency's
+  change per US dollar and how many currencies were unusual each way.
+- Back-test on the ECB's file, 2 Jan 2019 to 26 Nov 2026 (2,025 days): 11 days reach 10 currencies in one direction,
+  7 reach 15. Measuring each currency net of the median move was tried and not used: it removed most of the broad
+  days but raised the flags in ordinary times (897 to 1,057) and still flagged 15 currencies on 17 Mar 2020.
+- HW-IND-4 is unchanged: a watched country's currency inside a dollar-wide move does not carry it.
+
 ## Names on list changes (`headwind-1.9`, 16 Nov 2026)
 - **What is named.** People, organizations and ships added, changed and removed on every list Headwind reads but the
   UN Security Council's: OFAC's SDN list, the EU's, the UK's, France's, Canada's, Australia's and Japan's lists (their
