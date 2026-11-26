@@ -899,8 +899,10 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
     return files
 
 
-def check_all(root: Path = ROOT) -> list[str]:
+def check_all(root: Path = ROOT, registers_only: bool = False) -> list[str]:
     errs = registers.check(root / "doctrine")
+    if registers_only:
+        return errs
     regs = registers.ids(root / "doctrine")
     feed_path = root / "site" / "data" / "feed.geojson"
     if not feed_path.exists():
@@ -924,7 +926,9 @@ def main(argv=None) -> int:
                    help="also write data/state/ into site/, for a scheduled run to restore from")
     r = sub.add_parser("restore")
     r.add_argument("--from", dest="base_url", required=True, help="the published site to read the last state from")
-    sub.add_parser("check")
+    k = sub.add_parser("check")
+    k.add_argument("--registers-only", action="store_true",
+                   help="check the registers only (a checkout with no built site/)")
     args = ap.parse_args(argv)
 
     if args.cmd == "collect":
@@ -968,7 +972,7 @@ def main(argv=None) -> int:
             return 1
         return 0
     if args.cmd == "check":
-        errs = check_all(ROOT)
+        errs = check_all(ROOT, registers_only=args.registers_only)
         for e in errs:
             print("  -", e)
         print(f"Headwind check: {'PASS' if not errs else f'FAIL ({len(errs)} problems)'}")
