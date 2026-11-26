@@ -384,6 +384,18 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   Maahanmuuttovirasto) reads as a person, so mistakes go toward individuals. On the 221 judgments of 19 Nov 2026: 144
   individuals, 61 organizations, 16 none.
 
+## Who listed a ship first (26 Nov 2026)
+- Ships on two or more of the lists that date their ship entries, matched by IMO number: the UK Sanctions List
+  (DateDesignated), Canada's consolidated list (DateOfListing) and Japan's ship list (its notice date). A list's
+  date for a ship is the earliest of its entries for that number. For each two lists: how many ships both list, how
+  many each listed first (with the median and largest number of days the other followed) and how many on the same
+  day. Every ship's dates are in `data/lead-time.json`.
+- OFAC's, France's and Australia's files give no designation date, so their ships are not placed in time; a ship
+  also on one of them says so (`also_on_undated`). A list whose ship measure began later can only follow: Japan's
+  ship list starts with one notice of 2 Oct 2026, and Canada's ship entries run from 21 Feb 2025.
+- These are the publishers' own dates. The table measures the publishers, not Headwind, and says nothing about a
+  ship's conduct.
+
 ## A move of the US dollar itself (26 Nov 2026)
 - Every currency is measured per US dollar, so a move of the dollar shows in all of them at once: on 17 Mar 2020,
   23 of the 29 currencies Headwind reads were unusually weaker the same day. On a day when 10 or more currencies are

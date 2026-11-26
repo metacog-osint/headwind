@@ -2207,6 +2207,36 @@ class TestNames(unittest.TestCase):
         d = sanctions.delta("eu-fsf", old, {"1": new["1"]}, "2026-11-16T18:00:00Z", None)
         self.assertEqual((d["removed"], d["named_removed"], d["unnamed_removed"], d["changed"]), (1, [], 1, 0))
 
+    def test_who_listed_a_ship_first(self):
+        table = [{"imo": "1000001", "on": {"uk-sanctions": {"ids": ["RUS1", "RUS9"], "name": "A"},
+                                           "canada-sema": {"ids": ["c1"], "name": "A"},
+                                           "ofac-sdn": {"ids": ["1"], "name": "A"}}},
+                 {"imo": "1000002", "on": {"uk-sanctions": {"ids": ["RUS2"], "name": "B"},
+                                           "japan-mof": {"ids": ["ship-1"], "name": None}}},
+                 {"imo": "1000003", "on": {"uk-sanctions": {"ids": ["RUS3"], "name": "C"},
+                                           "canada-sema": {"ids": ["c3"], "name": "C"}}},
+                 {"imo": "1000004", "on": {"uk-sanctions": {"ids": ["RUS4"], "name": "D"},
+                                           "ofac-sdn": {"ids": ["4"], "name": "D"}}}]
+        dates = {"uk-sanctions": {"RUS1": "2025-03-01", "RUS9": "2025-01-01", "RUS2": "2025-05-10", "RUS3": "2025-02-01",
+                                  "RUS4": "2025-01-01"},
+                 "canada-sema": {"c1": "2025-02-15", "c3": "2025-02-01"}, "japan-mof": {"ship-1": "2025-05-01"}}
+        lead = sanctions.cross_list_lead(table, dates, "2026-11-27T00:00:00Z")
+        self.assertEqual(lead["ships_on_two_or_more_dated"], 3)     # a ship on one dated list only is left out
+        ships = {s["imo"]: s for s in lead["ships"]}
+        self.assertEqual(ships["1000001"]["listed"]["uk-sanctions"], "2025-01-01")    # the earliest of its entries
+        self.assertEqual((ships["1000001"]["first"], ships["1000001"]["days_after_first"]["canada-sema"]),
+                         (["uk-sanctions"], 45))
+        self.assertEqual(ships["1000001"]["also_on_undated"], ["ofac-sdn"])
+        self.assertEqual(ships["1000002"]["first"], ["japan-mof"])
+        pairs = {tuple(p["lists"]): p for p in lead["pairs"]}
+        uk_ca = pairs[("uk-sanctions", "canada-sema")]
+        self.assertEqual((uk_ca["ships"], uk_ca["same_day"], uk_ca["first"]["uk-sanctions"]["ships"],
+                          uk_ca["first"]["uk-sanctions"]["median_days"], uk_ca["first"]["canada-sema"]["ships"]),
+                         (2, 1, 1, 45, 0))
+        self.assertEqual(pairs[("uk-sanctions", "japan-mof")]["first"]["japan-mof"]["max_days"], 9)
+        self.assertEqual(lead["lists_undated"], ["ofac-sdn", "france-gels", "australia-dfat"])
+        self.assertEqual(lead["date_range"]["uk-sanctions"], ["2025-01-01", "2025-05-10"])
+
     def test_a_move_of_the_dollar_is_one_item(self):
         def series(jump):
             days = [f"2025-{1 + i // 28:02d}-{1 + i % 28:02d}" for i in range(300)]
