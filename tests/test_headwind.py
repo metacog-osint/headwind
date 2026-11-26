@@ -150,6 +150,15 @@ def lint(fc: dict) -> list[str]:
             for _, sev, m in contract.check(f, regs) if sev == "error"]
 
 
+class TestSourceLabels(unittest.TestCase):
+    def test_every_lane_has_a_name_in_sources_and_their_state(self):
+        # 26 Nov 2026: the cjeu lane had no entry, so the page showed the bare key "cjeu" as a source's name.
+        page = (ROOT / "site_src" / "app.js").read_text(encoding="utf-8")
+        block = page.split("var labels = {", 1)[1].split("};", 1)[0]
+        named = set(re.findall(r'(\w+): "', block))
+        self.assertEqual(set(headwind_cli.LANES) - named, set())
+
+
 class TestStats(unittest.TestCase):
     def test_a_past_spike_does_not_hide_the_next(self):
         vals = [100.0 + (i % 5) * 0.2 for i in range(300)]
