@@ -371,7 +371,7 @@
         var prod = wd.series.filter(function (x) { return x.kind === "production"; });
         document.getElementById("world-note").innerHTML = esc("World production by country, latest year USGS gives, from the ") +
           '<a href="' + esc(wd.item_url) + '" rel="noopener">' + esc(wd.title || "Mineral Commodity Summaries") + "</a>" +
-          esc(" (" + wd.file + ", CC0). " + wd.note + euNote + " Reserves are in the ") + '<a href="data/minerals.json">data file</a>' + esc(".");
+          esc(" (" + wd.file + ", CC0). " + wd.note + euNote + (wd.read_from && wd.read_from.copy === "stored" ? " ScienceBase did not answer the last reading, so this table comes from Headwind's stored copy of the same file, which matches the checksum USGS lists." : "") + " Reserves are in the ") + '<a href="data/minerals.json">data file</a>' + esc(".");
         table("world-table", ["Commodity", "Statistic", "Year", "Largest producer", "Top 3", "China", "HHI", "EU"], prod.map(function (x) {
           return [esc(x.commodity), esc(x.statistic + (x.unit ? ", " + x.unit : "")), esc(x.year),
             esc(x.top.country + " " + Math.round(x.top.share * 100) + "%"), esc(Math.round(x.top3_share * 100) + "%"),

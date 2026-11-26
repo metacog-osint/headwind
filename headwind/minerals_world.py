@@ -24,6 +24,7 @@ import io
 import json
 import re
 from collections import defaultdict
+from pathlib import Path
 
 from . import minerals
 
@@ -95,6 +96,26 @@ def find_world_file(item_body: bytes | str) -> dict:
             return {"title": doc.get("title"), "published": pub, "name": f["name"], "url": f["url"],
                     "md5": ((f.get("checksum") or {}).get("value") or "").lower() or None}
     raise ValueError(f"USGS data release: no {WORLD_FILE} in item {WORLD_ITEM_ID}")
+
+
+# A stored copy of the all-chapters table, read only when ScienceBase does not answer (its firewall refuses
+# scheduled runners). It goes in STORED_DIR as two files: WORLD_ITEM_FILE, the item's JSON record
+# (catalog/item/<WORLD_ITEM_ID>?format=json, as ScienceBase serves it), and the table itself under its own name, both
+# downloaded in a browser. The table is checked against the MD5 the record lists, so only USGS's own bytes are read.
+STORED_DIR = Path(__file__).resolve().parent / "stored" / "usgs_mcs2026"
+WORLD_ITEM_FILE = "world_item.json"
+
+
+def stored_world(stored_dir: Path | None = None) -> tuple[dict, bytes]:
+    """The stored copy as (file record, table bytes), checked against the USGS MD5. FileNotFoundError when none."""
+    d = Path(stored_dir or STORED_DIR)
+    item = d / WORLD_ITEM_FILE
+    if not item.exists():
+        raise FileNotFoundError(f"no stored copy of {WORLD_FILE}")
+    f = find_world_file(item.read_bytes())
+    body = (d / f["name"]).read_bytes()
+    minerals.check_md5(body, f["md5"], f["name"])
+    return f, body
 
 
 def _col(row: dict, *names: str) -> str:

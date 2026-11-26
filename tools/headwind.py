@@ -671,23 +671,37 @@ def _lane_minerals(raw_dir, prev, getter):
     return {"minerals": doc}, recs
 
 
-def _minerals_world(raw_dir, getter, recs, cc_of) -> dict:
+def _minerals_world(raw_dir, getter, recs, cc_of, stored_dir=None) -> dict:
     """World production and reserves by country (USGS chapter tables, same data release). A failed read is noted on
-    the record and on the usgs-mcs health entry; the import-reliance tables above still pass."""
+    the record and on the usgs-mcs health entry; the import-reliance tables above still pass. When ScienceBase does
+    not answer, the stored copy is read if there is one (minerals_world.STORED_DIR), and the record says so."""
     cc = lambda name: minerals_world.NAME_CC.get(name) or cc_of(name)  # noqa: E731
+    read_from = None
     try:
-        item, rec = fetch.fetch("usgs-mcs-world-item", minerals.ITEM_URL.format(item=minerals_world.WORLD_ITEM_ID),
-                                raw_dir, "json", getter=getter)
-        recs.append(rec)
-        f = minerals_world.find_world_file(item)
-        body, rec = fetch.fetch("usgs-mcs-world", f["url"], raw_dir, "csv", getter=getter)
-        recs.append(rec)
-        minerals.check_md5(body, f["md5"], f["name"])
+        try:
+            item, rec = fetch.fetch("usgs-mcs-world-item",
+                                    minerals.ITEM_URL.format(item=minerals_world.WORLD_ITEM_ID), raw_dir, "json",
+                                    getter=getter)
+            recs.append(rec)
+            f = minerals_world.find_world_file(item)
+            body, rec = fetch.fetch("usgs-mcs-world", f["url"], raw_dir, "csv", getter=getter)
+            recs.append(rec)
+            minerals.check_md5(body, f["md5"], f["name"])
+        except OSError as exc:   # urllib errors, timeouts and refusals; a checksum or layout change still fails
+            reason = f"{type(exc).__name__}: {exc}"[:200]
+            try:
+                f, body = minerals_world.stored_world(stored_dir)
+            except FileNotFoundError as missing:
+                raise OSError(f"ScienceBase did not answer ({reason}); {missing}") from exc
+            read_from = {"copy": "stored", "reason": reason, "at": fetch.now_utc()}
         world = minerals_world.build_world(minerals_world.parse_world(body.decode("utf-8-sig")), cc)
         if len(world["series"]) < minerals_world.MIN_SERIES:
             raise ValueError(f"only {len(world['series'])} production or reserves series read; see statistics_seen")
-        return {"status": "ok", "file": f["name"], "title": f["title"], "published": f["published"],
-                "item_url": minerals.SB_ITEM_PAGE.format(item=minerals_world.WORLD_ITEM_ID), **world}
+        out = {"status": "ok", "file": f["name"], "title": f["title"], "published": f["published"],
+               "item_url": minerals.SB_ITEM_PAGE.format(item=minerals_world.WORLD_ITEM_ID), **world}
+        if read_from:
+            out["read_from"] = read_from
+        return out
     except Exception as exc:  # noqa: BLE001 - the world table is an addition; its failure is reported, not fatal
         return {"status": "failed", "error": f"{type(exc).__name__}: {exc}"[:300], "series": []}
 

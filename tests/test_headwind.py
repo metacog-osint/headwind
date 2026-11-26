@@ -5,6 +5,7 @@ names and remarks are blanked.
 """
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import io
 import json
@@ -511,6 +512,56 @@ class TestMineralsWorld(unittest.TestCase):
         self.assertEqual(result["minerals"]["world"]["status"], "failed")
         self.assertTrue(result["minerals"]["reliance"])
         self.assertIn("world production and reserves table was not read", minerals.watch_notes(result["minerals"])[-1])
+
+
+class TestMineralsWorldStoredCopy(unittest.TestCase):
+    """The world table falls back to a stored copy when ScienceBase refuses, and only to one that matches the MD5
+    in its stored item record. The table here is the synthetic fixture, with its own MD5 written into the record."""
+
+    @staticmethod
+    def refusing(url, timeout=60):
+        if "sciencebase.gov" in url:
+            raise urllib.error.HTTPError(url, 403, "Forbidden", {}, None)
+        return fake_getter(url, timeout)
+
+    def stored(self, d: Path, md5: str | None = None) -> None:
+        body = (FIX / "usgs_world_synthetic.csv").read_bytes()
+        item = json.loads((FIX / "usgs_world_item_synthetic.json").read_text(encoding="utf-8"))
+        f = minerals_world.find_world_file(json.dumps(item))
+        for rec in item["files"]:
+            if rec.get("name") == f["name"]:
+                rec["checksum"] = {"type": "MD5", "value": md5 or hashlib.md5(body).hexdigest()}
+        (d / minerals_world.WORLD_ITEM_FILE).write_text(json.dumps(item), encoding="utf-8")
+        (d / f["name"]).write_bytes(body)
+
+    def world(self, stored_dir, getter=None):
+        with tempfile.TemporaryDirectory() as tmp:
+            return headwind_cli._minerals_world(Path(tmp) / "raw", getter or self.refusing, [], lambda n: None,
+                                                stored_dir=stored_dir)
+
+    def test_refused_read_uses_the_stored_copy(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.stored(Path(d))
+            stored = self.world(d)
+        live = self.world(None, fake_getter)
+        self.assertEqual((stored["status"], stored["read_from"]["copy"]), ("ok", "stored"))
+        self.assertIn("403", stored["read_from"]["reason"])
+        self.assertEqual(stored["series"], live["series"])
+        self.assertNotIn("read_from", live)
+        self.assertIn("stored copy", minerals.watch_notes({"world": stored})[-1])
+
+    def test_no_stored_copy_is_reported(self):
+        with tempfile.TemporaryDirectory() as d:
+            w = self.world(d)
+        self.assertEqual(w["status"], "failed")
+        self.assertIn("no stored copy", w["error"])
+
+    def test_a_stored_copy_with_the_wrong_checksum_is_not_read(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.stored(Path(d), md5="0" * 32)
+            w = self.world(d)
+        self.assertEqual(w["status"], "failed")
+        self.assertIn("checksum", w["error"])
 
 
 class TestVesselCrosslist(unittest.TestCase):
