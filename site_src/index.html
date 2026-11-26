@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23142235'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23e3a83b' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23e3a83b'/%3E%3C/svg%3E">
 <title>Headwind: economic stress</title>
 <meta name="description" content="Currencies, energy and food prices measured against their own normal range, changes to official sanctions lists, new export-control rules, the dates of coming economic decisions and, as a second strand, the decisions of the US and UK Supreme Courts and the EU's courts. Measurements, not investment advice.">
 <link rel="stylesheet" href="style.css">
@@ -12,6 +13,7 @@
 <link rel="stylesheet" href="tic-shell.css">
 <link rel="stylesheet" href="tic-tabs.css">
 <link rel="stylesheet" href="tic-fold.css">
+<link rel="alternate" type="application/geo+json" title="Headwind feed (GeoJSON)" href="data/feed.geojson">
 <script src="tic-time.js"></script>
 <script src="tic-related.js"></script>
 <script src="tic-tabs.js" defer></script>
@@ -19,20 +21,18 @@
 <script src="tic-nav.js" defer data-current="headwind" data-health="on"></script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <header class="top">
   <div class="wrap top-row">
     <div class="brand"><strong>Headwind</strong><a class="tic-layer" href="https://theintelligence.company/#layers">Systems layer</a><span class="muted">The Intelligence Company</span></div>
     <nav class="top-nav">
-      <a href="data/feed.geojson">Feed</a>
-      <a href="data/events.json">Calendar</a>
-      <a href="data/baseline.json">Country baselines</a>
-      <a href="data/minerals.json">Minerals</a>
       <span id="time-settings"></span>
     </nav>
   </div>
 </header>
 
-<main class="wrap">
+<main id="main" class="wrap">
+  <noscript><p class="noscript">This page needs JavaScript to draw its tables. The feed and source code below work without it.</p></noscript>
   <section class="hero">
     <h1>Economic stress, measured against its own normal.</h1>
     <p class="tic-reading" id="reading" aria-live="polite"></p>
@@ -41,6 +41,38 @@
       unusual only when the move is far outside that range. These are measurements, not forecasts and not investment
       advice. A second strand lists the decisions of the US and UK Supreme Courts and the EU's courts as the courts
       publish them.</p>
+    <p class="small muted caveat">Unusual means far outside a series' own past changes; it is not a warning or a
+      prediction. <a href="https://github.com/metacog-osint/headwind/blob/main/doctrine/method.md">How Headwind measures it</a>.</p>
+    <details class="more terms" id="terms">
+      <summary>Terms on this page</summary>
+      <dl>
+        <dt>z, robust z</dt><dd>How far the latest change sits from the series' usual changes, counted from their median
+          in units of their typical spread (the median absolute deviation, scaled). z +5.13 is far above usual; 3.5 or
+          more is marked unusual. Each z is shown beside the change itself.</dd>
+        <dt>95th percentile</dt><dd>A rise larger than 95 of every 100 of the series' past changes.</dd>
+        <dt>HW-IND-4, HW-WP-2</dt><dd>Headwind's own indicator and warning-problem numbers, listed in its
+          <a href="https://github.com/metacog-osint/headwind/blob/main/doctrine/indicators.json">indicator register</a>
+          (HW-IND-4 is a currency, HW-IND-6 local food).</dd>
+        <dt>EUR, MXN, ILS</dt><dd>Three-letter currency codes (ISO 4217), shown beside the country.</dd>
+        <dt>OFAC, SDN</dt><dd>The US Treasury's Office of Foreign Assets Control and its Specially Designated Nationals
+          list.</dd>
+        <dt>SDGT, IRAN-EO13902, IFSR</dt><dd>Sanctions programmes, as each list prints them: Specially Designated
+          Global Terrorist; a US executive order by number; the Iranian Financial Sanctions Regulations; UKR, the EU's
+          regime on actions undermining Ukraine's territorial integrity. France's list
+          prints its regimes in French, where UE means an EU regime.</dd>
+        <dt>BIS, ITA, USTR, USITC</dt><dd>The US Commerce Department's Bureau of Industry and Security and its
+          International Trade Administration; the Office of the US Trade Representative; the US International Trade
+          Commission.</dd>
+        <dt>Section 232, Section 301</dt><dd>US laws under which the government acts on imports for national security
+          (Trade Expansion Act of 1962) and against unfair trade practices (Trade Act of 1974).</dd>
+        <dt>HS code</dt><dd>A Harmonized System tariff code, the customs number for a kind of goods.</dd>
+        <dt>ECB, EIA, FAO, WFP, FOMC</dt><dd>The European Central Bank; the US Energy Information Administration; the
+          UN Food and Agriculture Organization; the World Food Programme; the Federal Reserve's Federal Open Market
+          Committee, which sets US interest rates.</dd>
+        <dt>IMO number</dt><dd>A ship's permanent seven-digit number from the International Maritime Organization.</dd>
+        <dt>[2026] UKSC 36, UKSC/2025/0067</dt><dd>A UK Supreme Court judgment's citation, and a case's own number.</dd>
+      </dl>
+    </details>
     <p class="small muted" id="asof" aria-live="polite">Loading…</p>
   </section>
 
@@ -49,7 +81,7 @@
   <div id="sec-unusual" data-tab-label="Unusual">
   <section class="card" aria-labelledby="an-h">
     <div class="card-head"><h2 id="an-h">Outside the normal range</h2>
-      <p class="muted small">Robust z of 3.5 or more against the series' own history, and a move above the lane's floor.</p></div>
+      <p class="muted small">Robust z of 3.5 or more against the series' own history, and a move above the lane's floor. Local food prices and FAO food indices are also listed when they rise above the 95th percentile of their own past changes, or rise six months in a row, even with a lower z; each such item says which rule fired. Sanctions and screening lists appear when a designation batch is larger than the list's usual. z is shown to two decimals, so a z just under 3.5 is not rounded up to it.</p></div>
     <div id="anomalies"></div>
   </section>
 
@@ -126,6 +158,7 @@
         longer listed be taken down: <a href="mailto:support@theintelligence.company">support@theintelligence.company</a>.</p></div>
     <div id="sanction-lists"></div>
     <div id="vessel-cross"></div>
+    <div id="vessel-lead"></div>
     <div id="sanction-deltas"></div>
     <h3 class="small">UN Security Council sanctions committee press releases</h3>
     <div id="un-releases"></div>
@@ -261,6 +294,12 @@
     Summaries, CC0). Exchange rates are the ECB's euro reference rates,
     restated by Headwind as units of each currency per US dollar. This product uses the Census Bureau Data API but
     is not endorsed or certified by the Census Bureau. Not investment advice.</p>
+  <nav class="tic-data" aria-label="Data and downloads"><span class="tic-data-k">Data and downloads</span>
+    <a href="data/feed.geojson">Feed (GeoJSON)</a>
+    <a href="data/events.json">Calendar (JSON)</a>
+    <a href="data/baseline.json">Country baselines (JSON)</a>
+    <a href="data/minerals.json">Minerals (JSON)</a>
+    <a href="https://github.com/metacog-osint/headwind">Source code</a></nav>
 </footer>
 <script src="app.js"></script>
 </body>

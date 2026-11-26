@@ -143,7 +143,7 @@ def measure(parsed: dict) -> list[dict]:
             "id": sid, "name": name, "group": group, "critical_list_name": critical,
             "unit": parsed["units"].get(sid) or "", "floor_pct": floor, "period": m["date"], "value": m["value"],
             "prior_period": m["prior_date"], "prior_value": m["prior_value"],
-            **{k: m[k] for k in ("change_pct", "z", "baseline_n", "flag_rate", "anomaly")},
+            **{k: m[k] for k in ("change_pct", "z", "baseline_n", "flag_rate", "expected", "exceedance", "anomaly")},
             "as_issued": [{"period": d, "value": v} for d, v in pts[-12:]],
         })
     order = list(by_id)
