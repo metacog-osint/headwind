@@ -247,7 +247,7 @@
     },
     {
       "id": "usgs-mcs-world",
-      "name": "US Geological Survey: Mineral Commodity Summaries 2026, all-chapters table (MCS2026_ALLchapters_Reconcile.csv): world production and reserves by country",
+      "name": "US Geological Survey: Mineral Commodity Summaries 2026, commodities table (MCS2026_Commodities_Data.csv): world production and reserves by country",
       "url": "https://doi.org/10.5066/P1WKQ63T",
       "licence": "CC0 1.0",
       "use": "ingest",

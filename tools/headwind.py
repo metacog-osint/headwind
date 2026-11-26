@@ -694,7 +694,7 @@ def _minerals_world(raw_dir, getter, recs, cc_of, stored_dir=None) -> dict:
             except FileNotFoundError as missing:
                 raise OSError(f"ScienceBase did not answer ({reason}); {missing}") from exc
             read_from = {"copy": "stored", "reason": reason, "at": fetch.now_utc()}
-        world = minerals_world.build_world(minerals_world.parse_world(body.decode("utf-8-sig")), cc)
+        world = minerals_world.build_world(minerals_world.parse_world(minerals_world.decode(body)), cc)
         if len(world["series"]) < minerals_world.MIN_SERIES:
             raise ValueError(f"only {len(world['series'])} production or reserves series read; see statistics_seen")
         out = {"status": "ok", "file": f["name"], "title": f["title"], "published": f["published"],

@@ -540,7 +540,7 @@ for which each country is named first among the major import sources. It is a co
 ordering and says nothing about substitutes, stockpiles or domestic capacity.
 
 **World supply (25 Nov 2026, draft).** From the same data release's chapter table
-(MCS2026_ALLchapters_Reconcile.csv, CC0), the world production and reserves rows by country. For each commodity and
+(MCS2026_Commodities_Data.csv, CC0), the world production and reserves rows by country. For each commodity and
 statistic, in the latest year USGS gives: the largest producer and its share of the world total, the top three
 countries' share, China's share and a Herfindahl-Hirschman index (HHI, the sum of squared percentage shares of the
 countries USGS names; 10,000 is one country). Shares are over the world total USGS prints, or over the named

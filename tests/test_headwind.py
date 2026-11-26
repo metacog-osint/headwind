@@ -514,6 +514,34 @@ class TestMineralsWorld(unittest.TestCase):
         self.assertIn("world production and reserves table was not read", minerals.watch_notes(result["minerals"])[-1])
 
 
+class TestMineralsWorldRealFile(unittest.TestCase):
+    """usgs_commodities_excerpt.csv: the header and the gallium and cobalt world rows of MCS2026_Commodities_Data.csv,
+    byte for byte as USGS publishes it (Windows-1252, CRLF)."""
+
+    def built(self):
+        body = (FIX / "usgs_commodities_excerpt.csv").read_bytes()
+        self.assertRaises(UnicodeDecodeError, body.decode, "utf-8")
+        parsed = minerals_world.parse_world(minerals_world.decode(body))
+        return minerals_world.build_world(parsed, {"China": "CN", "Congo (Kinshasa)": "CD"}.get)
+
+    def test_world_total_row_joins_its_series(self):
+        series = {(x["commodity"], x["statistic"]): x for x in self.built()["series"]}
+        self.assertEqual(set(series), {("Gallium", "Production (Primary production)"),
+                                       ("Cobalt", "Production (Mine production)"), ("Cobalt", "Reserves (Reserves)")})
+        reserves = series[("Cobalt", "Reserves (Reserves)")]
+        self.assertEqual(reserves["total"], 12_000_000)
+        self.assertEqual(reserves["total_basis"], "world total as USGS prints it")
+
+    def test_rounded_total_below_the_sum(self):
+        gallium = next(x for x in self.built()["series"] if x["commodity"] == "Gallium")
+        self.assertEqual(gallium["year"], "2025")
+        self.assertEqual(gallium["total"], 909_000)
+        self.assertIn("rounded world total of 900,000", gallium["total_basis"])
+        self.assertEqual(gallium["top"]["country"], "China")
+        self.assertAlmostEqual(gallium["china_share"], 0.9901)
+        self.assertLessEqual(gallium["top3_share"], 1)
+
+
 class TestMineralsWorldStoredCopy(unittest.TestCase):
     """The world table falls back to a stored copy when ScienceBase refuses, and only to one that matches the MD5
     in its stored item record. The table here is the synthetic fixture, with its own MD5 written into the record."""

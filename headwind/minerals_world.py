@@ -1,10 +1,11 @@
 """World supply concentration for mineral commodities, from the USGS Mineral Commodity Summaries chapters.
 
-The same data release as minerals.py (DOI 10.5066/P1WKQ63T, CC0) has a second ScienceBase item, "Mineral
-Commodity Summaries 2026", whose one table holds every commodity chapter in long form
-(MCS2026_ALLchapters_Reconcile.csv). Its columns, from the item's metadata (read 25 Nov 2026): MCS chapter,
-Section, Commodity, Country, Statistics, Statistics_detail, Unit, Year, Value, Notes, Other notes. Value is a number
-or one of USGS's codes (W withheld, NA not available, XX not applicable, E estimated, a dash for zero).
+The same data release as minerals.py (DOI 10.5066/P1WKQ63T, CC0) publishes one large table that holds every
+commodity chapter in long form, MCS2026_Commodities_Data.csv (about 3 MB). Headwind reads it from the release's item
+"Mineral Commodity Summaries 2026 Data Release - Commodity Salient U.S. and World Statistics" (WORLD_ITEM_ID). Its columns, as read in the published file
+on 26 Nov 2026: MCS chapter, Section, Commodity, Country, Statistics, Statistics_detail, Unit, Year, Value, Notes,
+Is critical mineral 2025, Other notes. Value is a number or one of USGS's codes (W withheld, NA not available, XX not
+applicable, E estimated, a dash for zero). The file is Windows-1252 text with CRLF line ends, not UTF-8.
 
 Headwind reads the world rows: production (and reserves, where the chapter gives them) by country. From them it
 works out, for each commodity, statistic and year, which country produces most and its share of the world total, the
@@ -12,10 +13,10 @@ top three countries' share, China's share and a Herfindahl-Hirschman index over 
 are context, written to site/data/minerals.json beside the import-reliance tables; not feed items. Shares are
 Headwind's arithmetic on USGS's figures; the figures themselves are copied as published.
 
-The Section and Statistics wording was not read before this was written (no real ScienceBase
-file was recorded), so the parser does not trust fixed strings: it picks rows by words ("production", "reserves") and keeps a
-count of every Section and Statistics value it saw, which the page and the data file show, so a mismatch is visible
-on the first live run.
+The published file has many Section wordings ("World Mine Production and Reserves", "World Refinery Production
+and Capacity" and others), so the parser does not trust fixed strings: it picks rows by words ("production",
+"reserves") and keeps a count of every Section and Statistics value it saw, which the page and the data file show, so
+a change of wording is visible.
 """
 from __future__ import annotations
 
@@ -28,8 +29,8 @@ from pathlib import Path
 
 from . import minerals
 
-WORLD_ITEM_ID = "69837e43b66b01367d7ec7c7"   # "Mineral Commodity Summaries 2026", same DOI as minerals.ITEM_ID
-WORLD_FILE = "MCS2026_ALLchapters_Reconcile.csv"
+WORLD_ITEM_ID = "69837e43b66b01367d7ec7c7"   # "... Commodity Salient U.S. and World Statistics", same DOI as minerals.ITEM_ID
+WORLD_FILE = "MCS2026_Commodities_Data.csv"
 MIN_SERIES = 20
 
 # USGS country names that differ from the kit's (Natural Earth) names. Unknown names are kept with no code.
@@ -42,6 +43,7 @@ NAME_CC = {"Republic of Korea": "KR", "Korea, North": "KP", "Korea, Republic of"
 # Rows that are not one country.
 TOTAL_RE = re.compile(r"world total", re.I)
 NOT_A_COUNTRY_RE = re.compile(r"world|other countries|others|total|rest of", re.I)
+ROUNDED_RE = re.compile(r"\s*[:,(]?\s*rounded\)?\s*$", re.I)
 
 # The EU Critical Raw Materials Act, Regulation (EU) 2024/1252, Annex I (17 strategic raw materials) and Annex II
 # (34 critical raw materials, the strategic ones included). European Commission content, CC BY 4.0 (Commission
@@ -118,6 +120,15 @@ def stored_world(stored_dir: Path | None = None) -> tuple[dict, bytes]:
     return f, body
 
 
+def decode(body: bytes) -> str:
+    """The table's text. USGS publishes it as Windows-1252, not UTF-8; UTF-8 is tried first in case a later edition
+    changes."""
+    try:
+        return body.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return body.decode("cp1252")
+
+
 def _col(row: dict, *names: str) -> str:
     """A column by any of its spellings (case and spaces or underscores ignored)."""
     want = {re.sub(r"[\s_]+", "", n).lower() for n in names}
@@ -170,7 +181,8 @@ def parse_world(text: str) -> dict:
                 and not re.search(r"world", stat, re.I):
             # A US salient-statistics row, not the world table. Kept only when the row is in a world section.
             continue
-        detail = _col(r, "Statistics_detail", "Statistics detail")
+        # The world-total row names its detail "Mine production: rounded" where the country rows say "Mine production".
+        detail = ROUNDED_RE.sub("", _col(r, "Statistics_detail", "Statistics detail"))
         name = stat + (f" ({detail})" if detail else "")
         v, flag = value(_col(r, "Value"))
         series[(commodity, kind, name, _col(r, "Unit"))][year].append((country, v, flag))
@@ -190,7 +202,11 @@ def concentration(rows: list[tuple[str, float | None, str | None]], cc_of) -> di
     if len(named) < 2:
         return None
     others = sum(v for c, v, _ in rows if v is not None and NOT_A_COUNTRY_RE.search(c) and not TOTAL_RE.search(c))
-    total = total_row if total_row else sum(v for _, v, _ in named) + others
+    summed = sum(v for _, v, _ in named) + others
+    # USGS rounds its world total, so the countries it names can add up to more (gallium 2025: 909,000 against a
+    # printed 900,000). Shares are then taken over the sum, so none passes 100%.
+    printed_used = bool(total_row) and total_row >= summed
+    total = total_row if printed_used else summed
     if not total:
         return None
     named.sort(key=lambda x: (-x[1], x[0]))
@@ -198,8 +214,9 @@ def concentration(rows: list[tuple[str, float | None, str | None]], cc_of) -> di
                **({"flag": f} if f else {})} for c, v, f in named]
     china = next((s["share"] for s in shares if s["cc"] == "CN"), None)
     return {
-        "total": total, "total_basis": "world total as USGS prints it" if total_row else
-        "sum of the countries USGS names and its 'other countries' row",
+        "total": total, "total_basis": "world total as USGS prints it" if printed_used else
+        "sum of the countries USGS names and its 'other countries' row" + (
+            f" (above USGS's rounded world total of {total_row:,.0f})" if total_row else ""),
         "top": shares[0], "top3_share": round(sum(s["share"] for s in shares[:3]), 4),
         "china_share": china, "hhi": round(sum((s["share"] * 100) ** 2 for s in shares)),
         "countries_named": len(named), "withheld": withheld, "shares": shares[:10],
