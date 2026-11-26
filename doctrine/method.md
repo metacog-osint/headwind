@@ -392,6 +392,13 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   where the list gives one. Birth dates, identity documents, street addresses, statements of reasons, aliases and
   contact details are not carried. OFAC's countries come from its own address file (`add.csv`); Canada's list prints
   no address or nationality.
+- **The EU's name for an entry.** Most EU entries carry several names marked strong, and the file prints them in an
+  order that moves between generations. Headwind shows the strong name with the lowest alias id (each EU name keeps
+  its id from file to file), and keeps a 12-digit digest of the entry's distinct names, not the names. A name added,
+  removed or edited is a change ("its other names changed", or "was" with the name before when the name shown
+  moved); the same names in another order are none. Before 27 Nov 2026 Headwind showed the first strong name, and two
+  reorders were counted as renames: 1,167 entries on 20 Nov and 3,493 on 26 Nov 2026, every new name one the entry
+  already had. Both changes stay in the record, tagged HW-IND-7 (more than half of the change renamed).
 - **Why these lists and not the UN's.** Tom, 15 Nov 2026: publish what the licences allow. OFAC's and trade.gov's
   lists are US government works. Canada allows non-commercial reproduction. Australia's DFAT site is CC BY 4.0; Japan's MOF site is under PDL1.0, compatible with CC BY 4.0. France's Licence Ouverte 2.0 and the EU's
   reuse decision (2011/833/EU) allow reuse of personal data within data-protection law; the UK's Open Government

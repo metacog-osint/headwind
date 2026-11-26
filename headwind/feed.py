@@ -628,6 +628,8 @@ def _names_text(s: dict, un: bool = False) -> str:
         what = []
         if r.get("name_before"):
             what.append(f"was {r['name_before']}")
+        elif r.get("aliases_changed"):
+            what.append("its other names changed")
         if r.get("type_before"):
             what.append(f"was a{'n' if r['type_before'][:1] in 'aeiou' else ''} {r['type_before']}")
         if r.get("gained"):
