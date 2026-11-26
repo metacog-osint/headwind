@@ -5,6 +5,7 @@ names and remarks are blanked.
 """
 from __future__ import annotations
 
+import email.message
 import importlib.util
 import io
 import json
@@ -447,6 +448,57 @@ class TestMineralsWatch(unittest.TestCase):
             snap = headwind_cli.collect(Path(tmp), getter=fake_getter)
         self.assertEqual(snap["minerals"]["watch"]["errors"], [])
         self.assertNotIn("warnings", snap["health"]["usgs-mcs"])
+
+
+class TestMineralsStoredCopy(unittest.TestCase):
+    """When ScienceBase refuses the reading, the lane reads the stored copy of the same release, which must match
+    the USGS checksums and give the same figures as the live read."""
+
+    @staticmethod
+    def refusing(url, timeout=60):
+        if "sciencebase.gov" in url:
+            hdrs = email.message.Message()
+            hdrs["server"] = "cloudflare"
+            hdrs["cf-mitigated"] = "challenge"
+            raise urllib.error.HTTPError(url, 403, "Forbidden", hdrs, None)
+        return fake_getter(url, timeout)
+
+    def test_stored_copy_matches_the_release(self):
+        found, texts = minerals.stored_release()
+        self.assertEqual(found["published"], "2026-02-06")
+        self.assertEqual(texts["reliance"], (FIX / "usgs_net_import_reliance.csv").read_bytes().decode("utf-8-sig"))
+        self.assertEqual(texts["sources"], (FIX / "usgs_major_import_sources.csv").read_bytes().decode("utf-8-sig"))
+
+    def test_a_changed_stored_file_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            for f in minerals.STORED_DIR.iterdir():
+                (d / f.name).write_bytes(f.read_bytes())
+            name = minerals.find_files((d / "item.json").read_bytes())["files"]["reliance"]["name"]
+            (d / name).write_bytes((d / name).read_bytes() + b"\n")
+            with self.assertRaises(ValueError):
+                minerals.stored_release(d)
+
+    def test_refused_reading_uses_the_stored_copy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            live, _ = headwind_cli._lane_minerals(Path(tmp) / "raw", {}, fake_getter)
+            stored, recs = headwind_cli._lane_minerals(Path(tmp) / "raw", {}, self.refusing)
+        live, stored = live["minerals"], stored["minerals"]
+        self.assertNotIn("read_from", live)
+        self.assertEqual(stored["read_from"]["copy"], "stored")
+        self.assertIn("403", stored["read_from"]["reason"])
+        self.assertIn("cf-mitigated=challenge", stored["read_from"]["reason"])
+        for key in ("reliance", "import_sources", "published", "edition", "by_source"):
+            self.assertEqual(stored[key], live[key])
+        self.assertEqual(len(stored["watch"]["errors"]), 1)                     # the edition search was refused too
+        self.assertEqual(len(recs), 1)                                          # only the Federal Register search
+
+    def test_end_to_end_lane_ok_with_a_warning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            snap = headwind_cli.collect(Path(tmp), getter=self.refusing, only=["minerals"])
+        self.assertEqual(snap["lanes"]["minerals"]["status"], "ok")
+        h = snap["health"]["usgs-mcs"]
+        self.assertTrue(h["warnings"][0].startswith("ScienceBase did not answer"))
 
 
 class TestVesselCrosslist(unittest.TestCase):
@@ -2068,10 +2120,14 @@ class TestEndToEnd(unittest.TestCase):
             def down(url, timeout=60):
                 raise OSError("down")
             snap = headwind_cli.collect(tmp, getter=down)
-            self.assertTrue(all(v["status"] == "failed" and not v["from_previous"] for v in snap["lanes"].values()))
+            # The minerals lane reads its stored copy of the USGS release; every other lane is empty.
+            others = {k: v for k, v in snap["lanes"].items() if k != "minerals"}
+            self.assertTrue(all(v["status"] == "failed" and not v["from_previous"] for v in others.values()))
+            self.assertEqual(snap["lanes"]["minerals"]["status"], "ok")
+            self.assertEqual(snap["minerals"]["read_from"]["copy"], "stored")
             self.assertEqual((snap["fx"], snap["energy"], snap["fao"], snap["local_food"]), ([], [], [], []))
             self.assertEqual((snap["sanctions"], snap["sanctions_lists"], snap["controls"]), ([], [], []))
-            self.assertEqual((snap["screening"], snap["screening_lists"], snap["minerals"]), ([], [], {}))
+            self.assertEqual((snap["screening"], snap["screening_lists"]), ([], []))
             self.assertEqual(feed.build_feed(snap)["features"], [])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)

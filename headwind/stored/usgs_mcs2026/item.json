@@ -1,0 +1,38 @@
+{
+ "title": "Mineral Commodity Summaries 2026 Data Release - Mineral Industry Trends and Salient Statistics",
+ "dates": [
+  {
+   "type": "Publication",
+   "dateString": "2026-02-06",
+   "label": "Publication Date"
+  },
+  {
+   "type": "Start",
+   "dateString": "2021",
+   "label": ""
+  },
+  {
+   "type": "End",
+   "dateString": "2025",
+   "label": ""
+  }
+ ],
+ "files": [
+  {
+   "name": "MCS2026_Fig2_Net_Import_Reliance.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__e8%2Fea%2Fc2%2Fe8eac272416293ccbb00be9271ecd07a4d549456",
+   "checksum": {
+    "value": "ac4593283060f39d39caa2af2bcd37c9",
+    "type": "MD5"
+   }
+  },
+  {
+   "name": "MCS2026_Fig3_Major_Import_Sources.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837ec8b66b01367d7ec7d9?f=__disk__ce%2F72%2Fae%2Fce72ae30205494334a5bfe2195781ae2d5747bc9",
+   "checksum": {
+    "value": "013c72116dcbc3e492f17bf5fcef965f",
+    "type": "MD5"
+   }
+  }
+ ]
+}

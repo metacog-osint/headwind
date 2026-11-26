@@ -5,7 +5,9 @@
     python tools/headwind.py check       # validate the registers and lint the feed
 
 collect never falls back to made-up data. A lane that fails keeps its last good copy (marked
-from_previous) or stays empty, and the snapshot's "lanes" block says which.
+from_previous) or stays empty, and the snapshot's "lanes" block says which. The one exception is the minerals
+lane: when ScienceBase does not answer, it reads the stored copy of the same USGS release (headwind/stored/),
+checked against the USGS checksums, and marks it read_from.
 """
 from __future__ import annotations
 
@@ -649,20 +651,30 @@ def _lane_inspection(raw_dir, prev, getter):
 
 def _lane_minerals(raw_dir, prev, getter):
     """USGS Mineral Commodity Summaries: net import reliance and import sources. Annual; context, not feed items."""
-    item, rec0 = fetch.fetch("usgs-mcs-item", minerals.ITEM_URL.format(item=minerals.ITEM_ID), raw_dir, "json",
-                             getter=getter)
-    found = minerals.find_files(item)
-    bodies, recs = {}, [rec0]
-    for key, f in found["files"].items():
-        body, rec = fetch.fetch(f"usgs-mcs-{key}", f["url"], raw_dir, "csv", getter=getter)
-        minerals.check_md5(body, f["md5"], f["name"])
-        bodies[key] = body.decode("utf-8-sig")
-        recs.append(rec)
+    read_from = None
+    try:
+        item, rec0 = fetch.fetch("usgs-mcs-item", minerals.ITEM_URL.format(item=minerals.ITEM_ID), raw_dir, "json",
+                                 getter=getter)
+        found = minerals.find_files(item)
+        bodies, recs = {}, [rec0]
+        for key, f in found["files"].items():
+            body, rec = fetch.fetch(f"usgs-mcs-{key}", f["url"], raw_dir, "csv", getter=getter)
+            minerals.check_md5(body, f["md5"], f["name"])
+            bodies[key] = body.decode("utf-8-sig")
+            recs.append(rec)
+    except OSError as exc:   # urllib errors, timeouts and refusals (a checksum or layout change still fails)
+        # ScienceBase did not answer. The release is annual and the stored copy is the same files (checked
+        # against the USGS checksums), so the figures stay current; the site and the health entry say which copy.
+        found, bodies = minerals.stored_release()
+        recs = []
+        read_from = {"copy": "stored", "reason": minerals.refusal(exc), "at": fetch.now_utc()}
     by_name = {c["name"]: c["cc"] for c in json.loads(
         (ROOT / "doctrine" / "kit" / "geo" / "countries.json").read_text(encoding="utf-8"))["countries"]}
     cc_of = lambda name: minerals.NAME_CC.get(name) or by_name.get(name)  # noqa: E731
     doc = minerals.build(found, minerals.parse_reliance(bodies["reliance"]), minerals.parse_sources(bodies["sources"]),
                          cc_of)
+    if read_from:
+        doc["read_from"] = read_from
     doc["watch"] = _minerals_watch(raw_dir, getter, recs)
     return {"minerals": doc}, recs
 

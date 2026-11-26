@@ -348,7 +348,8 @@
     if ((mn.import_sources || []).length) {
       document.getElementById("minerals-note").innerHTML = esc("Net import reliance in " + mn.reliance_year + " is imports less exports, adjusted for stock changes, as a share of US consumption. Import shares are for " + mn.sources_period + ". Annual figures, copied as published in the ") +
         '<a href="' + esc(mn.url) + '" rel="noopener">' + esc("USGS Mineral Commodity Summaries " + String(mn.edition || "").replace("MCS", "") + " data release") + "</a>" + esc(mn.published ? " of " + day(mn.published + "T12:00:00Z") + "." : ".") +
-        esc(" The table lists the " + mn.import_sources.length + " commodities in the Summaries' import-sources figure; the ") + '<a href="data/minerals.json">data file</a>' + esc(" also has net import reliance for " + (mn.reliance || []).length + " commodities.");
+        esc(" The table lists the " + mn.import_sources.length + " commodities in the Summaries' import-sources figure; the ") + '<a href="data/minerals.json">data file</a>' + esc(" also has net import reliance for " + (mn.reliance || []).length + " commodities." +
+          (mn.read_from && mn.read_from.copy === "stored" ? " ScienceBase did not answer the last reading, so these figures come from Headwind's stored copy of the same release, which matches the checksums USGS lists." : ""));
       table("minerals-table", ["Commodity", "Net import reliance", "Import sources and their share"], mn.import_sources.map(function (m) {
         return [esc(m.commodity), esc(m.reliance_text ? m.reliance_text + "%" : "not given"),
           esc((m.shares || []).map(function (x) { return x.source + " " + x.pct + "%"; }).join(", ") || "not given")];
