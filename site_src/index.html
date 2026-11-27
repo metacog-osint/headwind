@@ -155,7 +155,14 @@
         named as changed, and a listed vessel whose name, IMO, MMSI, flag or type changes is named before and after.
         The date is when Headwind saw the change, not the date of the designation. Every name of the last 30 days:
         <a href="data/list-changes.json">data file</a>. To report an error, or to ask that the name of someone no
-        longer listed be taken down: <a href="mailto:support@theintelligence.company">support@theintelligence.company</a>.</p></div>
+        longer listed be taken down: <a href="mailto:support@theintelligence.company">support@theintelligence.company</a>.</p>
+      <p class="muted small" id="ftm-note">Every named entry on these lists and on the US screening lists, as of
+        Headwind's last reading, is also published as <a href="https://followthemoney.tech/docs/">FollowTheMoney</a>
+        entities (the format OpenSanctions and Aleph read): a listed party and a Sanction linking it to its list, one
+        JSON entity per line, in the release <a href="https://github.com/metacog-osint/headwind/releases/tag/entities">entities</a>
+        with a file giving each list's terms. Left out by their terms: the UN Security Council's list, France's
+        register (the French Treasury's reuse notice asks for its authorization) and individuals on the UK list (the
+        Open Government Licence does not cover personal data).</p></div>
     <div id="sanction-lists"></div>
     <div id="vessel-cross"></div>
     <div id="vessel-lead"></div>
@@ -294,11 +301,17 @@
     Summaries, CC0). Exchange rates are the ECB's euro reference rates,
     restated by Headwind as units of each currency per US dollar. This product uses the Census Bureau Data API but
     is not endorsed or certified by the Census Bureau. Not investment advice.</p>
+  <p id="checksums">Checking a copy: every file in Headwind's
+    <a href="https://github.com/metacog-osint/headwind/releases">releases</a> is listed with its SHA-256 in that
+    release's <code>SHA256SUMS</code> (and <code>headwind-manifest.json</code>). Download both and run
+    <code>sha256sum -c SHA256SUMS --ignore-missing</code> (Linux), <code>shasum -a 256 -c SHA256SUMS</code> (macOS) or
+    <code>Get-FileHash &lt;file&gt; -Algorithm SHA256</code> (Windows PowerShell) and compare.</p>
   <nav class="tic-data" aria-label="Data and downloads"><span class="tic-data-k">Data and downloads</span>
     <a href="data/feed.geojson">Feed (GeoJSON)</a>
     <a href="data/events.json">Calendar (JSON)</a>
     <a href="data/baseline.json">Country baselines (JSON)</a>
     <a href="data/minerals.json">Minerals (JSON)</a>
+    <a href="https://github.com/metacog-osint/headwind/releases/tag/entities">List entities (FollowTheMoney)</a>
     <a href="https://github.com/metacog-osint/headwind">Source code</a></nav>
 </footer>
 <script src="app.js"></script>

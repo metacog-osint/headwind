@@ -4,6 +4,9 @@ The code is licensed under the GNU Affero General Public License v3.0 (LICENSE).
 Third-party and shared files in this repository keep their own licences:
 
 - doctrine/kit/        The Intelligence Company doctrine kit, MIT (doctrine/kit/LICENSE)
+- headwind/ftm_model.json  An extract of the FollowTheMoney data model (js/src/defaultModel.json, version 4.11.3),
+  MIT License, Copyright (c) 2017-2024 Journalism Development Network, Inc.; Copyright (c) 2025 OpenSanctions
+  Datenbanken GmbH. Written by tools/ftm_model.py.
 - tic-*.js, tic-*.css in site/ and site_src/
   The Intelligence Company's shared site scripts (tic-fold, tic-nav, tic-related, tic-tabs, tic-time) and the stylesheet tic-shell.css, MIT.
   Canonical copies: site/shared/ in github.com/metacog-osint/theintelligence-company.
