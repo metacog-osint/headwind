@@ -21,6 +21,15 @@ Headwind reports measurements. It states no probability and gives no investment 
 10. **US Geological Survey** Mineral Commodity Summaries: net import reliance and import sources by commodity,
     marked against the Final 2025 List of Critical Minerals.
 
+## Release files
+
+- Release `entities`: `headwind-entities.ftm.gz`, the named entries of the sanctions and screening lists as
+  [FollowTheMoney](https://followthemoney.tech/docs/) entities (one JSON entity per line), and
+  `headwind-entities.about.json`, which gives each list's terms and what is left out. Replaced every run.
+- Release `state`: the run state the workflow restores; `state-YYYY-qN`: dated copies.
+- Every release carries `SHA256SUMS` and `headwind-manifest.json` with the SHA-256 of each of its files. To check
+  a copy: `sha256sum -c SHA256SUMS --ignore-missing`, or `python -m headwind.manifest verify headwind-manifest.json`.
+
 ## Commands
 
 ```bash
