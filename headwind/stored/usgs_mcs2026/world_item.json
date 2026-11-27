@@ -1,0 +1,30 @@
+{
+ "title": "Mineral Commodity Summaries 2026 Data Release - Commodity Salient U.S. and World Statistics",
+ "dates": [
+  {
+   "type": "Publication",
+   "dateString": "2026-02-06",
+   "label": "Publication Date"
+  },
+  {
+   "type": "Start",
+   "dateString": "2021",
+   "label": ""
+  },
+  {
+   "type": "End",
+   "dateString": "2025",
+   "label": ""
+  }
+ ],
+ "files": [
+  {
+   "name": "MCS2026_Commodities_Data.csv",
+   "url": "https://www.sciencebase.gov/catalog/file/get/69837e43b66b01367d7ec7c7?f=__disk__d3%2Fac%2F84%2Fd3ac8466552946c5e8caa2c2c6338d9e1aff655d",
+   "checksum": {
+    "value": "36185ff3742087e1dd90c52fe634fe12",
+    "type": "MD5"
+   }
+  }
+ ]
+}

@@ -246,6 +246,24 @@
       "independence_group": "usgs"
     },
     {
+      "id": "usgs-mcs-world",
+      "name": "US Geological Survey: Mineral Commodity Summaries 2026, commodities table (MCS2026_Commodities_Data.csv): world production and reserves by country",
+      "url": "https://doi.org/10.5066/P1WKQ63T",
+      "licence": "CC0 1.0",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "usgs"
+    },
+    {
+      "id": "eu-crma-annexes",
+      "name": "European Union: Critical Raw Materials Act, Regulation (EU) 2024/1252, Annex I (strategic) and Annex II (critical raw materials)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1252/oj/eng",
+      "licence": "CC BY 4.0 (European Commission reuse policy, Decision 2011/833/EU)",
+      "use": "ingest",
+      "grade": "A1",
+      "independence_group": "eu-commission"
+    },
+    {
       "id": "usitc-hts",
       "name": "US International Trade Commission, Harmonized Tariff Schedule release list (reststop/releaseList)",
       "url": "https://hts.usitc.gov/",

@@ -583,6 +583,22 @@ figure. They are annual and are not feed items. Headwind adds one count: the num
 for which each country is named first among the major import sources. It is a count of USGS's own
 ordering and says nothing about substitutes, stockpiles or domestic capacity.
 
+**World supply (25 Nov 2026, draft).** From the same data release's chapter table
+(MCS2026_Commodities_Data.csv, CC0), the world production and reserves rows by country. For each commodity and
+statistic, in the latest year USGS gives: the largest producer and its share of the world total, the top three
+countries' share, China's share and a Herfindahl-Hirschman index (HHI, the sum of squared percentage shares of the
+countries USGS names; 10,000 is one country). Shares are over the world total USGS prints, or over the named
+countries plus "other countries" where it prints none (reserves often have no world total). Withheld figures (W)
+are left out, so a share can be overstated where a large producer is withheld. Rows are picked by the words
+"production" and "reserves" in USGS's Statistics column, not by fixed strings, and every Section and Statistics
+value seen is kept in `data/minerals.json` (`world.statistics_seen`) so a change of wording shows. A failed read of
+this table is a warning on the usgs-mcs health entry; the import-reliance tables still pass. Context only: no feed
+item and no anomaly test. Concentration is a fact about supply, not a forecast of a disruption.
+
+**EU lists.** Each commodity also carries its entry, if any, in the EU Critical Raw Materials Act (Regulation (EU)
+2024/1252): Annex I's 17 strategic raw materials or Annex II's 34 critical ones (CC BY 4.0, European Commission). The
+annexes are copied into `headwind/minerals_world.py` and are reviewed by 24 May 2027.
+
 ## US mineral imports by country (15 Nov 2026)
 For 24 HS codes standing for minerals on the 2025 List of Critical Minerals, the Census Bureau's monthly general
 imports (customs value) by country of origin: the last 12 calendar months against the 12 before, the leading
