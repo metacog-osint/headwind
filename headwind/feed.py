@@ -505,7 +505,7 @@ def _rekeyed_text(vessels: list[dict]) -> str:
             f"entry and not as removed and added ({len(vessels)}): {'; '.join(rows)}{tail}.")
 
 
-# HW-IND-1 and HW-IND-7 (doctrine/indicators.json, register 1.4, Tom's yes 18 Nov 2026), measured on each list change.
+# HW-IND-1 and HW-IND-7 (doctrine/indicators.json, register 1.4, 18 Nov 2026), measured on each list change.
 IND1_SHIPS = 3          # an OFAC change that adds this many ships with IMO numbers meets HW-IND-1
 IND7_SHARE = 0.5        # renamed, re-keyed or renumbered entries above this share of a change meet HW-IND-7
 
@@ -828,7 +828,7 @@ def _pace_text(p: dict, noun: str) -> str:
 
 def scotus_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
     """Supreme Court opinions decided in the last two weeks, and new entries on the tariff-authority dockets. The
-    Court's own case title and docket number (Tom, 15 Nov 2026); us_person_data from scotus.us_person_data. Nothing
+    Court's own case title and docket number (15 Nov 2026); us_person_data from scotus.us_person_data. Nothing
     is summarized: the opinion and the docket are at the links."""
     lanes = snapshot.get("lanes") or {}
     accessed = (lanes.get("scotus") or {}).get("fetched_at")
@@ -876,7 +876,7 @@ def scotus_features(snapshot: dict, generated: str, valid_until: str) -> list[di
 
 def uksc_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
     """UK Supreme Court judgments handed down in the last two weeks: the Court's own case titles, case ids and neutral
-    citation (Tom, 15 Nov 2026), the judgment date and the links. One item per judgment; joined appeals decided in
+    citation (15 Nov 2026), the judgment date and the links. One item per judgment; joined appeals decided in
     one judgment are listed together. No judgment text; us_person_data from uksc.us_person_data."""
     lanes = snapshot.get("lanes") or {}
     accessed = (lanes.get("uksc") or {}).get("fetched_at")
@@ -910,7 +910,7 @@ def uksc_features(snapshot: dict, generated: str, valid_until: str) -> list[dict
 def cjeu_features(snapshot: dict, generated: str, valid_until: str) -> list[dict]:
     """Judgments of the last two weeks that the courts' own record selects (cjeu.py): a Court of Justice judgment of
     the Grand Chamber or the full Court, and a judgment of either court whose own subject words name restrictive
-    measures (cjeu.FEED_RESTRICTIVE_MEASURES, Tom 19 Nov 2026). The case numbers and parties are the Court's own; no
+    measures (cjeu.FEED_RESTRICTIVE_MEASURES, 19 Nov 2026). The case numbers and parties are the Court's own; no
     judgment text; us_person_data from the parties."""
     accessed = ((snapshot.get("lanes") or {}).get("cjeu") or {}).get("fetched_at")
     cutoff = _plus_hours(generated, -24 * cjeu.FEED_DAYS)[:10]

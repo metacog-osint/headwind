@@ -70,7 +70,7 @@ RUN_MIN = 6          # food lanes: the reading has risen this many months in a r
 
 
 def rank_run(value: float, base: list[float], history: list[float], floor: float) -> dict:
-    """Two rules beside z for the food lanes (Tom's yes, 16 Nov 2026, from the 15 Nov suite review: Sudan's food
+    """Two rules beside z for the food lanes (16 Nov 2026, from the 15 Nov suite review: Sudan's food
     prices rose a median 50% in three months, the seventh straight monthly rise and the third-highest reading in five
     years, and z could not flag it because the baseline itself trends and has fat tails).
 

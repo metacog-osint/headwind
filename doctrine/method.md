@@ -55,7 +55,7 @@ past spike inflates a standard deviation enough to hide the next. An item is tie
 scale in the formula is never allowed below floor / 3.5, so a nearly constant history cannot
 produce a z in the hundreds.
 
-**Food lanes, two more rules beside z (`headwind-1.10`, 16 Nov 2026, Tom's yes, from the 15 Nov suite review).**
+**Food lanes, two more rules beside z (`headwind-1.10`, 16 Nov 2026, from the 15 Nov suite review).**
 Local food (WFP) and the FAO indices are also an anomaly when the latest reading is a rise above the 95th percentile
 of the same baseline (`rank`), or when the reading has risen six or more months in a row (`run`), in both cases with
 a move of at least the lane's floor (`stats.rank_run`). Why: Sudan's food prices rose a median 50% in three months to
@@ -145,7 +145,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   (an EU regime), "ONU" (a UN regime) or "Dispositif national de gel des avoirs" (a national freeze). An entry is
   national when any of its bases is national. Every one of the 1,107 legal bases on the 6 Nov file is one of the
   three; a basis that is none of them is shown on the list's status as an unknown program.
-- **Counted apart** (Tom, 16 Nov 2026). A change is reported as national freezes added, removed and changed, by type
+- **Counted apart** (16 Nov 2026). A change is reported as national freezes added, removed and changed, by type
   and by article, and scored by the observed-batch rule (France's file gives no designation date, so the batch is
   what Headwind saw added between two readings, against the earlier national additions it saw). Entries that
   restate EU and UN measures are one count line: added, removed and changed, never scored and placing no country,
@@ -185,7 +185,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - **Terms.** DFAT's copyright page (read 19 Nov 2026): everything on the site but the Coat of Arms is CC BY 4.0,
   attributed "Department of Foreign Affairs and Trade website – www.dfat.gov.au"; robots.txt allows the file.
   dfat.gov.au timed out from Headwind's machine on 15 Nov and on the morning of 19 Nov, then answered in about 8 s.
-- **UN restatements counted only** (Tom, 19 Nov 2026). The 1,067 entries under Security Council regimes ("1267",
+- **UN restatements counted only** (19 Nov 2026). The 1,067 entries under Security Council regimes ("1267",
   "1718", "1988" ...) restate the UN's lists, whose terms withhold redistribution; DFAT's licence covers only its own
   material. They are kept as [type, regime] and nothing else: counted, never named, not scored, placing no country,
   and their ships left out of the cross-list. As with France, the change is split: Australia's own designations are
@@ -220,7 +220,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - **Programs.** The list's 区分 is a number per program and type (40 in use; a program's people and organizations
   are often two numbers). Headwind maps each number to an English name for the page's heading (`JP_PROGRAMS`); a number not
   in the map shows as "category n" among the list's unknown programs and is counted only until it is read.
-- **UN restatements counted only** (Tom, 19 Nov 2026, as for Australia). The 1,002 entries under Security Council
+- **UN restatements counted only** (19 Nov 2026, as for Australia). The 1,002 entries under Security Council
   programs (1267/1988, Iraq, DR Congo, Sudan, 1718, Iran, Somalia, Libya, Central African Republic, Yemen, South
   Sudan, Haiti) are kept as [type, program]: counted, never named, not scored, placing no country. Category 3, Japan's
   resolution-1373 listing of people and organizations already on the UN's Al-Qaida list (each marked 重複, a
@@ -265,7 +265,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - **Which decisions, without judgment.** At a court that decides few cases (the US and UK Supreme Courts, about 50 to
   70 a year), every merits decision. Where the court itself selects (a press release, a decision type), the court's
   own selection. Where neither holds, only a fixed and published text rule, marked as a text match. Never a reading
-  of importance or of subject, with one stated exception (Tom, 19 Nov 2026): a court's own subject index may select
+  of importance or of subject, with one stated exception (19 Nov 2026): a court's own subject index may select
   the cases it files under restrictive measures (sanctions), because they bear on Headwind's lists; the item says
   that this is why it is listed.
 - **Not measured.** No anomaly test and no indicator: a court's pace says nothing measured about stress. Court items
@@ -279,7 +279,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   Not covered: orders lists (the Court publishes no feed of them), opinions relating to orders and in-chambers
   opinions (other pages, not read). On 16 Nov 2026: 75 opinions (56 signed, 19 per curiam).
 - **What an item says.** That the Court issued an opinion in a case on a date, by whom (or per curiam), with the
-  Court's own case title and docket number as the Court publishes them (Tom, 15 Nov 2026), the link to the opinion
+  Court's own case title and docket number as the Court publishes them (15 Nov 2026), the link to the opinion
   and to the docket. Headwind does not summarize, characterize or score a decision. An opinion is in the feed for 14
   days from its decision date; the page lists both terms.
 - **The decision date** comes from the docket: the entry that links the opinion, or, where the entry names it
@@ -305,7 +305,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   the last (a neutral citation, `[2026] UKSC 36`, is numbered by calendar year). One item per judgment: appeals
   decided together in one judgment (six cases under `[2025] UKSC 48`) are listed together. Not covered: permission to
   appeal decisions, the Judicial Committee of the Privy Council, hearings and their video.
-- **Source: the Court's own site** (supremecourt.uk; Tom chose it on 18 Nov 2026 over The National Archives' Find
+- **Source: the Court's own site** (supremecourt.uk; chosen on 18 Nov 2026 over The National Archives' Find
   Case Law, whose Open Justice Licence excludes computational analysis without a separate licence). The site has no
   feed, and its case list filters only through a Next.js server action (`updateCases`) whose id changes with every
   build of the site; fetched as a page, `/cases?cs=Judgment+given` ignores the filter and shows the newest 15 cases of
@@ -323,7 +323,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   reading on 18 Nov 2026 read the window's 108 case pages in one go (the whole lane took 1 min 35 s). No judgment
   text, issue, facts, parties' details or written arguments are read.
 - **What an item says.** That the Court handed down a judgment, with its neutral citation, on a date, in a case
-  or cases named by the Court's own case title and case id (Tom, 15 Nov 2026, for court items), and the links: the
+  or cases named by the Court's own case title and case id (15 Nov 2026, for court items), and the links: the
   Court's PDF and the case page. Headwind does not summarize, characterize or score a judgment. A judgment is in the
   feed for 14 days from its judgment date; the page lists the window. Titles are kept exactly as the Court publishes
   them, including a few where the Court's own text has the replacement character U+FFFD in place of an apostrophe
@@ -369,7 +369,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - **Which go in the feed (the strand's rule above).** The courts decide about 900 cases a year, so not every
   judgment: the Court of Justice's own selection, the judgments of its Grand Chamber and full Court (the formations
   it keeps for its weightiest cases). A judgment whose own subject words name restrictive measures (sanctions) is
-  also in the feed, under the rule's one stated exception (Tom, 19 Nov 2026; `cjeu.FEED_RESTRICTIVE_MEASURES`),
+  also in the feed, under the rule's one stated exception (19 Nov 2026; `cjeu.FEED_RESTRICTIVE_MEASURES`),
   from either court; the item says it is listed because the Court's own subject words name restrictive measures.
   On 19 Nov 2026 that was 18 judgments in the 60 days beside the 3 of the Grand Chamber. 14 days in the feed, 60 on
   the page.
@@ -436,7 +436,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   moved); the same names in another order are none. Before 27 Nov 2026 Headwind showed the first strong name, and two
   reorders were counted as renames: 1,167 entries on 20 Nov and 3,493 on 26 Nov 2026, every new name one the entry
   already had. Both changes stay in the record, tagged HW-IND-7 (more than half of the change renamed).
-- **Why these lists and not the UN's.** Tom, 15 Nov 2026: publish what the licences allow. OFAC's and trade.gov's
+- **Why these lists and not the UN's.** The suite rule (15 Nov 2026): publish what the licences allow. OFAC's and trade.gov's
   lists are US government works. Canada allows non-commercial reproduction. Australia's DFAT site is CC BY 4.0; Japan's MOF site is under PDL1.0, compatible with CC BY 4.0. France's register states no licence, so France's
   general rule for published public information applies (Code des relations entre le public et l'administration,
   articles L321-1 and L322-1: free reuse, unaltered, with the source and its date of last update; read 27 Nov 2026).
@@ -497,7 +497,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   investigation (same day) met no scheduled date in the register.
 
 ## HW-WP-1: list changes, HW-IND-1 and HW-IND-7 (register 1.4, 18 Nov 2026)
-Tom's yes to the reworded HW-WP-1 (18 Nov 2026). The hypotheses now say what can be seen, not why: HW-H-1A "OFAC
+HW-WP-1 reworded (18 Nov 2026). The hypotheses now say what can be seen, not why: HW-H-1A "OFAC
 designates ships or a procurement network in one action", HW-H-1B "BIS or USTR extend stays or suspensions before a
 scheduled date", HW-H-1C an artefact (publication lag or an identifier correction). HW-IND-1 lost its dual-use network
 half, which is a judgment Headwind cannot measure, and HW-H-1C gained an emerging indicator, HW-IND-7.
