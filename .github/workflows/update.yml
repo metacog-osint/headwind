@@ -159,6 +159,7 @@ jobs:
             if [ "$wait" != 0 ]; then echo "::warning::Cloudflare deploy failed; trying again in ${wait} s"; sleep "$wait"; fi
             if npx --yes wrangler@4.151.3 pages deploy site --project-name headwind --branch main \
                  --commit-hash "$GITHUB_SHA" --commit-message "update $GITHUB_SHA" --commit-dirty=true; then
+              echo "deployed=true" >> "$GITHUB_OUTPUT"    # only here: the skip above also ends the step green
               exit 0
             fi
           done
@@ -226,7 +227,8 @@ jobs:
       #            `state` replaces each run. Only once the feed check passed, so it is a state the next run may use
       #            (the restore step above reads it when the cache and the release have none).
       #   site     site/ as deployed: every published file, vessels.json (Wake) and events.json (Verdict) among them,
-      #            each replaced by the next deploy. Only when the deploy step succeeded.
+      #            each replaced by the next deploy. Only when wrangler deployed it (the deploy step's output
+      #            `deployed`): without the Cloudflare secrets the step skips the deploy and still succeeds.
       # These files are all public already, so nothing is redacted and the archived bytes match the public copy.
       # Each lane is tried even if another failed; any failure turns the run red after the live site is updated.
       - name: Private archive (history, run state and site, to tic-archive)
@@ -235,7 +237,7 @@ jobs:
           GH_TOKEN: ${{ secrets.TIC_ARCHIVE_TOKEN }}
           HISTORY: ${{ steps.history.outcome }}
           CHECKED: ${{ steps.check.outcome }}
-          DEPLOYED: ${{ steps.deploy.outcome }}
+          DEPLOYED: ${{ steps.deploy.outputs.deployed }}
         run: |
           if [ -z "$GH_TOKEN" ]; then
             echo "::error::secret TIC_ARCHIVE_TOKEN is not set, so history/, the run state and site/ did not reach the private archive"; exit 1
@@ -251,10 +253,10 @@ jobs:
           else
             echo "state: the feed check did not pass this run, so the state was not archived"
           fi
-          if [ "$DEPLOYED" = "success" ]; then
+          if [ "$DEPLOYED" = "true" ]; then
             python tools/tic_archive.py put --program headwind --lane site --src site || failed=1
           else
-            echo "site: not deployed this run, so not archived"
+            echo "site: not deployed this run (the deploy failed or was skipped), so not archived"
           fi
           if [ "$failed" != 0 ]; then
             echo "::error::a lane did not reach the private archive this run (see above)"; exit 1

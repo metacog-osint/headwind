@@ -1111,7 +1111,9 @@ FX_BROAD_ID = "headwind:fx:usd-broad"
 def _broad_item(b: dict, generated: str, valid_until: str, lane_accessed: str | None) -> dict:
     """The US dollar against all the currencies the ECB quotes, one item every run. It is the anomaly on a day when
     markets.FX_BROAD_MIN or more currencies are unusual the same way; those currencies' own items are then routine,
-    so one move of the dollar reaches COP once, not once per country."""
+    so one common move reaches COP once, not once per country. The item does not say whose move it is: the count
+    cannot tell a move of the dollar from one of the European currencies together (markets.EUROPEAN), so it says how
+    many of them are European, and says the count cannot tell when more than half are."""
     n, m, h = len(b["currencies"]), b["quoted"], markets.FX_HORIZON
     med = b["median_change_pct"]
     way = "stronger" if med > 0 else "weaker" if med < 0 else "unchanged"
@@ -1122,10 +1124,15 @@ def _broad_item(b: dict, generated: str, valid_until: str, lane_accessed: str | 
                f"against the US dollar over {h} business days and {b['flagged_stronger']} unusually stronger, each "
                f"against its own {markets.FX_WINDOW} earlier {h}-day changes; the median currency moved "
                f"{med:+.2f}% per US dollar (the dollar {way}). When {markets.FX_BROAD_MIN} or more are unusual the "
-               f"same way on one day, the move is the dollar's and is reported once, here; those currencies' own "
-               f"items stay routine.")
+               f"same way on one day, they are reported once, here, as one common move against the US dollar; those "
+               f"currencies' own items stay routine.")
     if b["broad"]:
-        summary += f" Moved with the dollar on {b['date']}: {', '.join(b['currencies'])}."
+        eu = b.get("european", 0)
+        summary += (f" Moved together on {b['date']}: {', '.join(b['currencies'])}; {eu} of the {n} are the euro or "
+                    f"currencies of other EU and EFTA countries and the UK.")
+        if 2 * eu > n:
+            summary += (" With most of them European, the count alone does not tell a move of the US dollar from "
+                        "one of the euro and the European currencies that move with it.")
     return _observation(
         FX_BROAD_ID, title, summary + " ECB reference rates, restated per US dollar.",
         anomaly=b["broad"], data_as_of=f"{b['date']}T00:00:00Z", generated=generated, valid_until=valid_until,
@@ -1134,7 +1141,7 @@ def _broad_item(b: dict, generated: str, valid_until: str, lane_accessed: str | 
                   "median_change_pct": med, "common_move": n},
         anchor="fx", source=SRC_ECB, indicator_id="HW-IND-4",
         baseline_ref=f"rolling: each currency against its own {markets.FX_WINDOW} prior {h}-day changes "
-                     f"(|z| >= {stats.Z_ANOMALY:g}, a move of at least {markets.FX_FLOOR:g}%); a move of the dollar "
+                     f"(|z| >= {stats.Z_ANOMALY:g}, a move of at least {markets.FX_FLOOR:g}%); one common move "
                      f"when {markets.FX_BROAD_MIN} or more are anomalies the same way",
         coverage=1.0, lane_accessed=lane_accessed, ascope=["events"])
 
@@ -1159,7 +1166,7 @@ def live_features(snapshot: dict) -> list[dict]:
             f"{f['per_usd']:g} {f['currency']} per US dollar on {f['date']}, against {f['prior_per_usd']:g} on "
             f"{f['prior_date']}. Measured against the currency's own {f['baseline_n']} earlier "
             f"{markets.FX_HORIZON}-day changes. ECB reference rate, restated per US dollar."
-            + (f" Part of a move of the US dollar itself: {len(broad['currencies'])} of {broad['quoted']} currencies "
+            + (f" Part of a common move against the US dollar: {len(broad['currencies'])} of {broad['quoted']} currencies "
                f"were unusual the same way on {f['date']}, reported once as {FX_BROAD_ID}." if f.get("common_move")
                else ""),
             anomaly=bool(f["anomaly"] and not f.get("common_move")), data_as_of=f"{f['date']}T00:00:00Z",

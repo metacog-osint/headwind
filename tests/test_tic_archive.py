@@ -200,6 +200,54 @@ class PutTests(Base):
             ta.Archive(self.store, "orbit", "raw/x")
 
 
+class LaneNameTests(Base):
+    """A lane whose name extends another's with a hyphen (raw and raw-daily) shares its tag prefix
+    (testprog-raw-). Each lane must still see only its own releases."""
+
+    def other(self, lane, files, now):
+        src = Path(self.td.name) / f"src-{lane}-{now:%H%M%S}"
+        for rel, data in files.items():
+            (src / rel).parent.mkdir(parents=True, exist_ok=True)
+            (src / rel).write_bytes(data)
+        return ta.Archive(self.store, "testprog", lane).put(src, now=now)
+
+    def test_restore_returns_this_lane_not_a_longer_lane_with_the_same_prefix(self):
+        self.write("f.txt", "raw lane")
+        self.put()
+        self.other("raw-daily", {"f.txt": b"raw-daily lane"}, T0 - timedelta(days=1))
+        self.assertEqual(sorted(p.name for p in self.store.root.iterdir()),
+                         ["testprog-raw-2026-11", "testprog-raw-daily-2026-11"])
+        self.assertEqual(self.restored(), {"f.txt": b"raw lane"})
+        doc = ta.Archive(self.store, "testprog", "raw-daily").restore(Path(self.td.name) / "daily")
+        self.assertEqual(doc["lane"], "raw-daily")
+
+    def test_put_compares_with_its_own_lane_only(self):
+        # The longer lane holds the same bytes first: this lane's put must still upload its own snapshot,
+        # not call it unchanged against the other lane's.
+        self.other("raw-daily", {"f.txt": b"same"}, T0 - timedelta(days=1))
+        self.write("f.txt", "same")
+        r = self.put()
+        self.assertEqual(r["status"], "uploaded")
+        self.assertEqual(r["doc"]["previous"], None)
+        self.assertEqual({f["release"] for f in r["doc"]["files"]}, {"testprog-raw-2026-11"})
+
+    def test_snapshot_by_name_and_list_stay_in_the_lane(self):
+        r = self.other("raw-daily", {"f.txt": b"daily"}, T0)
+        (index,) = [n for n in r["assets"] if n.endswith(".files.json")]
+        self.write("f.txt", "raw")
+        self.put(now=T0 + timedelta(hours=1))
+        with self.assertRaises(ta.ArchiveError):
+            self.restored(index)
+        self.assertEqual(ta.lane_tags(self.store, ta.lane_prefix("testprog", "raw")), ["testprog-raw-2026-11"])
+
+    def test_month_and_rollover_tags_are_the_lane_s(self):
+        for t in ("testprog-raw-2026-11", "testprog-raw-2026-11.2", "testprog-raw-2026-12", "testprog-raw-x-2026-11",
+                  "testprog-raw-2026-11-2026-11", "testprog-raw-2026-1"):
+            self.store.create(t)
+        self.assertEqual(ta.lane_tags(self.store, "testprog-raw-"),
+                         ["testprog-raw-2026-11", "testprog-raw-2026-11.2", "testprog-raw-2026-12"])
+
+
 class RedactTests(Base):
     def test_env_value_and_param_removed_from_plain_and_gz(self):
         os.environ["TA_TEST_APPNAME"] = "secret-app-name"

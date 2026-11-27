@@ -92,11 +92,15 @@ def parse_ecb_csv(text: str) -> dict[str, list[tuple[str, float]]]:
     return out
 
 
-# A day when this many currencies are unusual against the US dollar in the same direction is a move of the dollar
-# itself, not of each currency: on 17 Mar 2020 23 of today's 29 currencies were flagged weaker at once, and on
-# 14 Apr 2025 11 stronger. Back-test on the ECB's file, 2 Jan 2019 to 26 Nov 2026 (2,025 days): 11 days reach 10
-# in one direction, 7 reach 15, 38 reach 5.
+# A day when this many currencies are unusual against the US dollar in the same direction is one common move,
+# reported once, not a move of each currency: on 17 Mar 2020 23 of today's 29 currencies were flagged weaker at once,
+# and on 14 Apr 2025 11 stronger. Back-test on the ECB's file, 2 Jan 2019 to 26 Nov 2026 (2,025 days): 11 days reach
+# 10 in one direction, 7 reach 15, 38 reach 5. The count does not say whose move it is: 11 of the 29 are the euro and
+# the currencies of other EU and EFTA countries and the UK (EUROPEAN), which can move together against the dollar on
+# their own. On those 11 days 4 to 12 of the flagged currencies were from outside that group (fewest on 14 and
+# 15 Apr 2025: 7 of 11 European).
 FX_BROAD_MIN = 10
+EUROPEAN = frozenset({"EUR", "BGN", "CZK", "DKK", "HRK", "HUF", "PLN", "RON", "SEK", "CHF", "ISK", "NOK", "GBP"})
 
 
 def measure_fx(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
@@ -127,7 +131,8 @@ def measure_fx(series: dict[str, list[tuple[str, float]]]) -> list[dict]:
 def broad_move(fx: list[dict]) -> dict | None:
     """The US dollar against every currency quoted on the latest day: how many were unusual in each direction (each
     against its own history, `measure_fx`), the median currency's change per US dollar, and, on a dollar-wide day,
-    the currencies that moved with it (`common_move`). A positive median is a stronger dollar. None without rates."""
+    the currencies that moved together (`common_move`) and how many of those are EUROPEAN. A positive median is a
+    stronger dollar. None without rates."""
     latest = max((r["date"] for r in fx or []), default=None)
     rows = [r for r in fx or [] if r["date"] == latest]
     if not rows:
@@ -141,7 +146,8 @@ def broad_move(fx: list[dict]) -> dict | None:
         dollar = "stronger" if next(r for r in rows if r.get("common_move"))["direction"] == "weaker" else "weaker"
     return {"date": latest, "prior_date": min(r["prior_date"] for r in rows), "quoted": len(rows),
             "flagged_weaker": weaker, "flagged_stronger": stronger, "median_change_pct": round(median, 2),
-            "broad": bool(common), "dollar": dollar, "currencies": common}
+            "broad": bool(common), "dollar": dollar, "currencies": common,
+            "european": sum(1 for c in common if c in EUROPEAN)}
 
 
 def gem_url(iso3s) -> str:

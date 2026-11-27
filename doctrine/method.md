@@ -401,7 +401,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - These are the publishers' own dates. The table measures the publishers, not Headwind, and says nothing about a
   ship's conduct.
 
-## A move of the US dollar itself (26 Nov 2026)
+## A common move against the US dollar (26 Nov 2026; wording 27 Nov 2026)
 - Every currency is measured per US dollar, so a move of the dollar shows in all of them at once: on 17 Mar 2020,
   23 of the 29 currencies Headwind reads were unusually weaker the same day. On a day when 10 or more currencies are
   anomalies in the same direction, Headwind reports the move once, as `headwind:fx:usd-broad` (tier anomaly), and
@@ -411,6 +411,14 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - Back-test on the ECB's file, 2 Jan 2019 to 26 Nov 2026 (2,025 days): 11 days reach 10 currencies in one direction,
   7 reach 15. Measuring each currency net of the median move was tried and not used: it removed most of the broad
   days but raised the flags in ordinary times (897 to 1,057) and still flagged 15 currencies on 17 Mar 2020.
+- The count does not say whose move it is. 11 of the 29 currencies are the euro and the currencies of other EU and
+  EFTA countries and the UK, which can move together against the dollar on their own, so the item calls the day a
+  common move against the US dollar, not the dollar's, and names how many of the currencies are European. When more
+  than half are, it says the count alone cannot tell a move of the dollar from one of the euro and the currencies
+  that move with it. On the 11 back-test days 4 to 12 of the flagged currencies were from outside that group (fewest
+  on 14 and 15 Apr 2025, 7 of 11 European). Counting the European currencies once was tried and not used: it kept 6
+  of the 11 days and dropped the other 5, among them 12 Mar 2020 and 28 Apr 2022, when 8 of the flagged currencies
+  were from outside Europe.
 - HW-IND-4 is unchanged: a watched country's currency inside a dollar-wide move does not carry it.
 
 ## Names on list changes (`headwind-1.9`, 16 Nov 2026)

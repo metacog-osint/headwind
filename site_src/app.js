@@ -78,7 +78,7 @@
     var an = [], far = null;
     // Each unusual reading, and the one furthest from its own normal (largest |z|) for today's reading.
     function add(text, z) { an.push(text); if (typeof z === "number" && (!far || Math.abs(z) > Math.abs(far.z))) { far = { text: text, z: z }; } }
-    // A move of the dollar itself (10 or more currencies unusual the same way) is one line, not one per currency.
+    // One common move against the dollar (10 or more currencies unusual the same way) is one line, not one per currency.
     var common = fx.filter(function (f) { return f.common_move; });
     if (common.length) {
       add("US dollar: " + (common[0].direction === "weaker" ? "stronger" : "weaker") + " against " + common.length + " of " + fx.length +
