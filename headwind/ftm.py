@@ -18,7 +18,7 @@ What each entity carries is what the run state carries, and nothing more: the na
 countries of the entry's addresses and nationality (FtM `country`, the generic association; a country the model
 cannot place is left out and counted), and for vessels the IMO number, MMSI, flag and vessel type. Birth dates,
 identity documents, street addresses and reasons are not in the state and so not here. Ship listing dates are the
-publisher's own (`Sanction:listingDate`); `Interval:retrievedAt` is when Headwind last read the list. A screening
+publisher's own (`Sanction:listingDate`); `Interval:retrievedAt` is when Headwind last read the list, and the about file gives the date the publisher puts on its own file where it gives one (`source_generated`). A screening
 list's start and end dates, where the CSL gives them, are the Sanction's `startDate` and `endDate`; a listing whose
 end date is before the list's reading has ended, and its party carries no topic (FtM's `topics` mark what an
 entity is now; OpenSanctions sets them only while a sanction is in force), so it does not read as current.
@@ -72,6 +72,13 @@ CA_TERMS_URL = "https://www.canada.ca/en/transparency/terms.html"
 CC_BY_4 = "Creative Commons Attribution 4.0 International (CC BY 4.0)"
 CC_BY_4_URL = "https://creativecommons.org/licenses/by/4.0/"
 PDL1 = "Public Data License 1.0 (PDL1.0)"
+# France's register states no licence (its site and API pages, read 27 Nov 2026), so the general rule for public
+# information an administration publishes applies: Code des relations entre le public et l'administration, article
+# L321-1 (anyone may reuse it) on the conditions of article L322-1 (not altered, meaning not distorted, source and
+# date of last update given). Article L322-2: reuse of personal data stays within data-protection law.
+FR_REUSE = ("No licence stated by the publisher; reused as public information under France's Code des relations "
+            "entre le public et l'administration, articles L321-1 and L322-1")
+FR_REUSE_URL = "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033219044"
 
 # What Headwind changed on every exported list. Each list's own entry in LISTS adds what was changed on it.
 CHANGES_ALL = ("Modified by Headwind (The Intelligence Company): converted to FollowTheMoney entities, one listed "
@@ -119,6 +126,19 @@ LISTS = {
         "changes": "Individuals left out (the licence does not cover personal data): organizations and ships only. "
                    "The primary name as FCDO prints it; a ship the list names by its IMO number takes the name in "
                    "brackets, else its first alias; countries from addresses; ships' owners and operators dropped."},
+    "france-gels": {
+        "country": "fr", "title": "Registre national des gels (France's national asset-freeze register)",
+        "publisher": "Direction générale du Trésor (French Treasury)",
+        "source": [sanctions.FR_PAGE, sanctions.FR_JSON],
+        "licence": FR_REUSE, "licence_url": FR_REUSE_URL,
+        "statement": "Source: Direction générale du Trésor, Registre national des gels (" + sanctions.FR_PAGE
+                     + "), as last updated on the date given for this list (`source_generated`). A selection of "
+                     "its fields, converted by Headwind (The Intelligence Company); not the Treasury's own file.",
+        "changes": "Every entry, the register's restatements of EU and UN measures included. People's names "
+                   "joined as 'Nom, Prénom'; each legal basis shortened to its regime as printed (a national "
+                   "freeze as 'FR national' and its article); countries from nationality and addresses, which the register prints in French; ships "
+                   "with the name and IMO number the register gives (it gives no flag, type or MMSI; an owner "
+                   "printed before a ship's name is cut)."},
     "canada-sema": {
         "country": "ca", "authority_ids": False, "title": "Consolidated Canadian Autonomous Sanctions List",
         "publisher": "Global Affairs Canada", "source": [sanctions.CA_PAGE, sanctions.CA_XML],
@@ -171,10 +191,6 @@ SCREENING_TOPIC = {"EL": "export.control", "UVL": "export.control", "MEU": "expo
 LEFT_OUT = {
     "un-consolidated": "The UN Security Council's terms withhold redistribution of its list; Headwind counts it only, "
                        "so its state holds no names.",
-    "france-gels": "The register's site states no licence, and the French Treasury's legal notice for its own site "
-                   "(tresor.economie.gouv.fr, Mentions légales) treats making a product from its information for "
-                   "third parties, free or not, as reuse needing its authorization; its terms do not clearly cover "
-                   "a derived file, so the register is not exported.",
     "uk-sanctions individuals": "The Open Government Licence v3.0 does not cover personal data.",
 }
 
@@ -196,6 +212,27 @@ COUNTRY_ALIASES = {
     "democratic peoples republic of korea": "kp", "republic of belarus": "by", "slovak republic": "sk",
     "bahamas the": "bs", "man isle of": "im", "sao tome principe": "st", "st kitts nevis": "kn",
     "st vincent and grenadines": "vc", "st vincent and the grenadines": "vc", "st vincent": "vc", "u s a": "us",
+}
+
+# France's register prints countries in French. Its names, folded as `_fold` folds them (accents and case dropped),
+# to FtM codes: every value in the register read on 27 Nov 2026. Used for that list only ('CONGO' there is the
+# Republic of the Congo, beside 'RÉPUBLIQUE DÉMOCRATIQUE DU CONGO').
+FR_COUNTRIES = {
+    "russie": "ru", "bielorussie": "by", "syrie": "sy", "birmanie myanmar": "mm", "coree du nord": "kp", "irak": "iq",
+    "republique democratique du congo": "cd", "emirats arabes unis": "ae", "tunisie": "tn", "chine": "cn",
+    "soudan": "sd", "moldavie": "md", "libye": "ly", "royaume uni": "gb", "algerie": "dz", "indonesie": "id",
+    "turquie": "tr", "somalie": "so", "republique centrafricaine": "cf", "egypte": "eg", "etats unis": "us",
+    "arabie saoudite": "sa", "jordanie": "jo", "liban": "lb", "allemagne": "de", "ouganda": "ug", "maroc": "ma",
+    "territoires palestiniens": "ps", "soudan du sud": "ss", "italie": "it", "suisse": "ch", "koweit": "kw",
+    "malaisie": "my", "azerbaidjan": "az", "inde": "in", "belgique": "be", "mauritanie": "mr", "ouzbekistan": "uz",
+    "singapour": "sg", "armenie": "am", "georgie": "ge", "republique tcheque": "cz", "tanzanie": "tz",
+    "cambodge": "kh", "colombie": "co", "finlande": "fi", "kirghizistan": "kg", "lettonie": "lv", "roumanie": "ro",
+    "erythree": "er", "etat de palestine": "ps", "australie": "au", "bosnie herzegovine": "ba", "cameroun": "cm",
+    "maurice": "mu", "norvege": "no", "serbie": "rs", "tchad": "td", "trinidad et tobago": "tt", "ethiopie": "et",
+    "albanie": "al", "bahrein": "bh", "chypre": "cy", "comores": "km", "congo": "cg", "croatie": "hr",
+    "espagne": "es", "estonie": "ee", "guinee": "gn", "irlande": "ie", "lituanie": "lt", "pays bas": "nl",
+    "saint kitts et nevis": "kn", "slovenie": "si", "suede": "se", "tadjikistan": "tj", "iles caimanes": "ky",
+    "iles marshall": "mh", "iles vierges britanniques": "vg",
 }
 
 _DATE = re.compile(r"^\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2})?)?)?)?)?$")
@@ -230,6 +267,8 @@ class Countries:
             return v.lower()
         f = _fold(v)
         c = self.labels.get(f) or COUNTRY_ALIASES.get(f)
+        if c is None and list_id == "france-gels":
+            c = FR_COUNTRIES.get(f)
         if c is None:
             self.missed[(list_id, v)] += 1
         return c
@@ -372,7 +411,9 @@ def release_notes(about: dict) -> str:
         left = "; ".join(f"{why}: {n:,}" for why, n in a["left_out"].items())
         lines.append(f"- **{a['title']}**, {a['publisher']}. Source: {a['source'][0]}. Licence: "
                      f"[{a['licence']}]({a['licence_url']}). {a['statement']} Changed: as on every list, and: {own}"
-                     + (f" Entries left out: {left}." if left else ""))
+                     + (f" Entries left out: {left}." if left else "")
+                     + (f" The publisher's file is dated {item['source_generated']}."
+                        if item.get("source_generated") else ""))
     lines += ["", "Left out of the export: " + " ".join(f"{k}: {v}" for k, v in about["left_out"].items())]
     return "\n".join(lines) + "\n"
 
@@ -428,7 +469,8 @@ def entities(sanctions_state: dict, screening_state: dict, model: dict) -> tuple
             written[party["schema"]] += 1
         skipped.update({(list_id, why): n for why, n in left.items()})
         about_lists.append({"list": list_id, "name": meta["name"], "publisher": meta["publisher"], "url": meta["url"],
-                            "checked_at": st.get("checked_at"), "entries": len(index),
+                            "checked_at": st.get("checked_at"), "source_generated": st.get("source_generated"),
+                            "entries": len(index),
                             "exported": dict(sorted(written.items())), "terms": spec["statement"],
                             "attribution": attribution(list_id, left)})
     s_checked = screening_state.get("checked_at")

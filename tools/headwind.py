@@ -401,7 +401,7 @@ def _lane_sanctions(raw_dir, prev, getter):
         baseline_set = old.get("baseline_set_at") or now
         new_state[list_id] = {"checked_at": now, "baseline_set_at": baseline_set, "last_change_at": last_change,
                               "vessel_format": form, "name_format": names.NAME_FORMAT, "added_history": history,
-                              "index": index}
+                              "source_generated": source_generated, "index": index}
         if ca_names is not None:
             new_state[list_id]["names"] = ca_names
         if list_id == "ofac-sdn":
