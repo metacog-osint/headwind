@@ -79,7 +79,7 @@ class Export(unittest.TestCase):
     def test_party_and_sanction_per_named_entry(self):
         e = self.by_id["hw-ofac-sdn-15036"]
         self.assertEqual(e["schema"], "Vessel")
-        self.assertEqual(e["properties"], {"name": ["ARTAVIL"], "imoNumber": ["9187629"], "mmsi": ["572469210"],
+        self.assertEqual(e["properties"], {"name": ["ARTAVIL"], "imoNumber": ["IMO9187629"], "mmsi": ["572469210"],
                                            "flag": ["ir"], "type": ["Crude/Oil Products Tanker"],
                                            "topics": ["sanction"]})
         s = self.by_id["hw-ofac-sdn-15036-sanction"]["properties"]
@@ -142,6 +142,19 @@ class Export(unittest.TestCase):
         self.assertEqual(el["country"], ["us"])
         self.assertEqual(self.by_id["hw-csl-plc-9641-sanction"]["properties"]["program"], ["NS-PLC"])
 
+    def test_imo_numbers_in_ftm_form_and_checked(self):
+        self.assertEqual(ftm.imo_number("9187629"), "IMO9187629")
+        self.assertEqual(ftm.imo_number("IMO 9562233"), "IMO9562233")
+        self.assertIsNone(ftm.imo_number("9187628"))               # check digit fails both schemes
+        self.assertIsNone(ftm.imo_number("0000000"))
+        self.assertIsNone(ftm.imo_number(None))
+        s, c = _state()
+        s["uk-sanctions"]["index"]["DPR0075"][2]["imo"] = "9562234"
+        stream, about = ftm.entities(s, c, MODEL)
+        ship = next(e for e in stream if e["id"] == "hw-uk-sanctions-DPR0075")
+        self.assertNotIn("imoNumber", ship["properties"])
+        self.assertEqual(about["imo_numbers_not_valid"]["by_list"], {"uk-sanctions": 1})
+
     def test_ids_follow_ftm_rule_and_never_meet(self):
         for raw in ("Belarus|1, Part 1|1", "Belarus-1--Part-1-1", "a_b", "x.", "-y", "|"):
             self.assertRegex(ftm.entity_id("l", raw), ftm.ENTITY_ID)
@@ -200,6 +213,7 @@ class Validator(unittest.TestCase):
         self.broken(lambda s: s.append(copy.deepcopy(s[0])))                             # id twice
         self.broken(lambda s: s[0].update(id="hw_bad_id"))                               # FtM id rule
         self.broken(lambda s: s[0].update(extra=1))
+        self.broken(lambda s: next(e for e in s if e["schema"] == "Vessel")["properties"].update(imoNumber=["9187629"]))
 
 
 class Model(unittest.TestCase):

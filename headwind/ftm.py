@@ -155,6 +155,27 @@ class Countries:
         return sorted({c for c in (self.code(v, list_id) for v in values or []) if c})
 
 
+_IMO = re.compile(r"(?:IMO[\s:.#-]*)?(\d{5,7})", re.I)
+
+
+def imo_number(value: str | None) -> str | None:
+    """An IMO number in FtM's form ('9187629' -> 'IMO9187629'), or None when it fails both IMO check-digit schemes.
+
+    FtM's `imoNumber` has the identifier format `imo` (rigour.ids.imo, used by followthemoney 4.11.3): a value is
+    cleaned to `IMO` and seven digits (five or six are left-padded with zeros) when the ship or the company check
+    digit holds, and dropped otherwise. A number that fails is counted in the about file, not written."""
+    m = _IMO.fullmatch((value or "").strip())
+    if not m:
+        return None
+    v = m.group(1).zfill(7)
+    d = [int(x) for x in v]
+    if not any(d):
+        return None
+    ship = sum(x * (7 - i) for i, x in enumerate(d[:6])) % 10 == d[6]
+    company = (11 - sum(x * w for x, w in zip(d, (8, 6, 4, 2, 9, 7))) % 11) % 10 == d[6]
+    return f"IMO{v}" if ship or company else None
+
+
 def entity_id(list_id: str, entry_id: str) -> str:
     """'hw-<list>-<entry id>'; an entry id that FtM's id rule would not take as it is (characters outside
     [A-Za-z0-9.-], or a dot or hyphen at an end) is slugged and given a short hash of the original, so two ids
@@ -188,7 +209,7 @@ def _pair(list_id, entry_id, kind, name, countries, vessel, programs, sanction_p
     schema = SCHEMA.get(kind, "LegalEntity")
     props = _props(name=name, country=countries, topics=topic)
     if schema == "Vessel" and vessel:
-        props.update(_props(imoNumber=vessel.get("imo"), mmsi=vessel.get("mmsi"), flag=vessel.get("flag_code"),
+        props.update(_props(imoNumber=vessel.get("imo_ftm"), mmsi=vessel.get("mmsi"), flag=vessel.get("flag_code"),
                             type=vessel.get("vessel_type")))
     party = {"id": eid, "schema": schema, "properties": props}
     sanction = {"id": eid + "-sanction", "schema": "Sanction",
@@ -202,7 +223,7 @@ def entities(sanctions_state: dict, screening_state: dict, model: dict) -> tuple
     left out and why."""
     countries = Countries(model)
     out: list[dict] = []
-    about_lists, skipped = [], Counter()
+    about_lists, skipped, bad_imo = [], Counter(), Counter()
     for list_id, spec in LISTS.items():
         st = sanctions_state.get(list_id) or {}
         index = st.get("index") or {}
@@ -224,7 +245,10 @@ def entities(sanctions_state: dict, screening_state: dict, model: dict) -> tuple
             vessel = None
             cs = det.get("countries") or []
             if kind == "vessel":
-                vessel = {**det, "flag_code": countries.code(det.get("flag"), list_id)}
+                vessel = {**det, "flag_code": countries.code(det.get("flag"), list_id),
+                          "imo_ftm": imo_number(det.get("imo"))}
+                if det.get("imo") and not vessel["imo_ftm"]:
+                    bad_imo[list_id] += 1
             party, sanction = _pair(list_id, entry_id, kind, det["name"], countries.codes_for(cs, list_id), vessel,
                                     e[1], {**base, "listingDate": dates.get(entry_id) if kind == "vessel" else None},
                                     "sanction", spec.get("authority_ids", True))
@@ -265,6 +289,8 @@ def entities(sanctions_state: dict, screening_state: dict, model: dict) -> tuple
         "entities": len(out), "lists": about_lists,
         "left_out": LEFT_OUT,
         "not_written": [{"list": l, "why": why, "entries": n} for (l, why), n in sorted(skipped.items())],
+        "imo_numbers_not_valid": {"why": "fail both IMO check-digit schemes, so FtM would drop them; left out",
+                                  "by_list": dict(sorted(bad_imo.items()))},
         "countries_not_placed": [{"list": l, "value": v, "times": n}
                                  for (l, v), n in sorted(countries.missed.items(), key=lambda x: (-x[1], x[0]))],
     }
@@ -328,6 +354,8 @@ def validate(stream: list[dict], model: dict) -> None:
                     raise InvalidEntity(f"{eid}: {p} {v!r} is not an FtM country code")
                 if ptype == "topic" and v not in topics:
                     raise InvalidEntity(f"{eid}: {p} {v!r} is not an FtM topic")
+                if props[p].get("format") == "imo" and imo_number(v) != v:
+                    raise InvalidEntity(f"{eid}: {p} {v!r} is not an IMO number in FtM's form")
                 if ptype == "entity" and not ENTITY_ID.match(v):
                     raise InvalidEntity(f"{eid}: {p} {v!r} is not an FtM entity id")
                 if ptype == "date" and not _DATE.match(v):

@@ -47,7 +47,7 @@ def extract(model: dict, tag: str = TAG) -> dict:
         out["schemata"][name] = {
             "extends": list(s.get("extends") or []), "abstract": bool(s.get("abstract")),
             "required": list(s.get("required") or []),
-            "properties": {p: {k: v for k, v in d.items() if k in ("type", "maxLength", "range")}
+            "properties": {p: {k: v for k, v in d.items() if k in ("type", "maxLength", "range", "format")}
                            for p, d in sorted(s.get("properties", {}).items())}}
     types = model["types"]
     out["types"] = {
