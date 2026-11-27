@@ -8,8 +8,9 @@ name: update
 # its last good copy. Both need the run before: data/snapshot.json and the two list indexes in data/state/. They
 # are kept in the Actions cache and not on the site. Each run saves a new cache entry and the next run restores the
 # newest. GitHub drops an entry nobody has read for 7 days. A second copy goes to this repository's release `state`
-# as assets (14 Nov 2026): headwind-state.tar.gz, the newest, in release `state`; dated daily copies are kept for
-# good in release `state-YYYY-qN` (retention, 18 Nov 2026; none deleted). Release assets do not expire.
+# as an asset (14 Nov 2026): headwind-state.tar.gz, the newest, in release `state`. Dated daily copies and ship-table
+# versions went to release `state-YYYY-qN` from 18 Nov 2026 to the public window change; those stay, and every
+# run's state and site/ now go to the private archive instead. Release assets do not expire.
 # The repository is public (since 15 Nov 2026), so the release is public and the cache is to be treated as
 # public too: nothing goes into the state that may not be published. The indexes hold the publishers' own entry
 # ids, types and programs, taken from public lists, and since headwind-1.9 the names and address countries Headwind
@@ -35,6 +36,10 @@ name: update
 # history/log/YYYY/MM/DD.jsonl, and the items ended in the last 7 days to site/data/ended.geojson (deployed with the
 # site, read by COP). history/ is committed to main by the workflow's token, which starts no further run. It holds
 # only published feed items, never the run state. A failure there is a gap in the history, never a missed deploy.
+# Public window (the last step): the committed history/ keeps dated files from 1 Dec 2026 for 45 days
+# (headwind/archive.py, PUBLIC_DAYS); every file committed before then stays. An older file leaves the tree only on a
+# run whose history lane reached the private archive, and only with the bytes that run archived. git history and the
+# archive's history lane keep every removed file.
 on:
   push:
     branches: [main]
@@ -164,18 +169,15 @@ jobs:
           done
           echo "::error::Cloudflare Pages deploy failed three times"; exit 1
       # After the deploy, so a failed upload never holds the site back; it still fails the run, which mails the owner.
-      # Release `state` keeps only the newest tarball (the restore path above). Dated copies are kept for good in
-      # one release per quarter, `state-YYYY-qN` (about 92 assets a quarter against the 1,000 limit); a same-day
-      # run replaces that day's copy, and the changes between two runs are in history/deltas.
+      # Release `state` keeps only the newest tarball (the restore path above). The dated daily copies and ship-table
+      # versions that went to `state-YYYY-qN` stay there; new ones go only to the private archive (lanes state and
+      # site, the steps below), which keeps every run's version.
       - name: Second copy of the state in the release (public, like the repository)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tar -czf headwind-state.tar.gz data/snapshot.json data/state
           ls -l headwind-state.tar.gz
-          day="headwind-state-$(date -u +%Y-%m-%d).tar.gz"
-          cp headwind-state.tar.gz "$day"
-          q="state-$(date -u +%Y)-q$(( (10#$(date -u +%m) - 1) / 3 + 1 ))"
           title="Run state"
           notes="Headwind's run state: the last good snapshot and the list indexes (the publishers' own entry ids, types and programs, from public lists; names and address countries as Headwind publishes them, for every list but the UN Security Council's; short name hashes). Kept for the workflow to restore. Public with the repository, so nothing goes into it that may not be published."
           if ! gh release view state >/dev/null 2>&1; then
@@ -184,21 +186,6 @@ jobs:
             gh release edit state --title "$title" --notes "$notes" >/dev/null
           fi
           gh release upload state headwind-state.tar.gz --clobber
-          qnotes="Headwind's dated run states and ship-table versions for one quarter, kept for good (nothing is deleted). Public with the repository, so nothing goes into them that may not be published."
-          gh release view "$q" >/dev/null 2>&1 || gh release create "$q" --prerelease --latest=false --title "$q" --notes "$qnotes"
-          gh release upload "$q" "$day" --clobber
-          # Ship table (data/vessels.json): one dated asset per changed version, named with its content digest.
-          digest=$(python -m headwind.archive vessels-digest site/data/vessels.json)
-          last=$(gh release view "$q" --json assets --jq '.assets[].name' | grep -E '^headwind-vessels-' | sort | tail -n 1 || true)
-          case "$last" in
-            *"-$digest.json.gz") echo "vessels.json unchanged (digest $digest)";;
-            *) vname="headwind-vessels-$(date -u +%Y-%m-%dT%H%M)-$digest.json.gz"
-               gzip -9 -n -c site/data/vessels.json > "$vname"
-               gh release upload "$q" "$vname";;
-          esac
-          n=$(gh release view "$q" --json assets --jq '.assets | length')
-          echo "release $q holds $n assets (limit 1,000)"
-          if [ "$n" -ge 950 ]; then echo "::error::release $q has $n assets, near the 1,000 limit"; exit 1; fi
       # Private archive (19 Nov 2026, retention rule: no data lost). The raw source copies (sanctions lists, CSL,
       # prices, notices) were discarded with the runner; they go to the PRIVATE repo metacog-osint/tic-archive as
       # release assets (tools/tic_archive.py, release headwind-raw-YYYY-MM: a snapshot per run, only changed files
@@ -230,6 +217,7 @@ jobs:
       # These files are all public already, so nothing is redacted and the archived bytes match the public copy.
       # Each lane is tried even if another failed; any failure turns the run red after the live site is updated.
       - name: Private archive (history, run state and site, to tic-archive)
+        id: archive
         if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ secrets.TIC_ARCHIVE_TOKEN }}
@@ -242,7 +230,11 @@ jobs:
           fi
           failed=0
           if [ "$HISTORY" = "success" ]; then
-            python tools/tic_archive.py put --program headwind --lane history --src history || failed=1
+            if python tools/tic_archive.py put --program headwind --lane history --src history; then
+              echo "history_archived=true" >> "$GITHUB_OUTPUT"
+            else
+              failed=1
+            fi
           else
             echo "history: the History step did not run, so history/ was not archived"
           fi
@@ -259,3 +251,30 @@ jobs:
           if [ "$failed" != 0 ]; then
             echo "::error::a lane did not reach the private archive this run (see above)"; exit 1
           fi
+      # Public window for history/ (header): runs only when this run's history lane reached the archive. A file
+      # leaves main only if main's copy has the same bytes as the one archived here (git hash-object), so a file
+      # that changed after this run's snapshot stays until a later run archives it. Only history/ is staged.
+      - name: Public window for history/ (older files stay in the private archive)
+        if: ${{ !cancelled() && steps.archive.outputs.history_archived == 'true' }}
+        run: |
+          old=$(python -m headwind.archive outside-window --history history)
+          if [ -z "$old" ]; then echo "history/: nothing outside the public window"; exit 0; fi
+          stamp="history: public window $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do
+            git fetch -q --depth=1 origin main && git reset -q --mixed FETCH_HEAD || { sleep $((i * 15)); continue; }
+            n=0
+            while IFS= read -r rel; do
+              f="history/$rel"
+              main_blob=$(git rev-parse -q --verify "FETCH_HEAD:$f" 2>/dev/null) || continue    # not on main
+              if [ "$main_blob" = "$(git hash-object "$f")" ]; then
+                git rm -q --cached -- "$f" && n=$((n + 1))
+              else
+                echo "::warning::$f on main differs from the archived copy; kept for a later run"
+              fi
+            done <<< "$old"
+            git diff --cached --quiet -- history && { echo "history/: nothing to remove from main"; exit 0; }
+            git commit -q -m "$stamp" && git push -q origin HEAD:main && { echo "history/: $n file(s) left the public window"; exit 0; }
+            echo "::warning::public window push attempt $i failed"
+            sleep $((i * 15))
+          done
+          echo "::warning::public window not applied this run; the next run tries again"
