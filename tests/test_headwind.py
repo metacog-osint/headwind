@@ -5,6 +5,8 @@ names and remarks are blanked.
 """
 from __future__ import annotations
 
+import email.message
+import hashlib
 import importlib.util
 import io
 import json
@@ -28,7 +30,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
 from headwind import cjeu, pinksheet, scotus, uksc, unpress  # noqa: E402
-from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, releases,  # noqa: E402
+from headwind import (baseline, batches, controls, feed, food, health, inspection, markets, minerals, minerals_world, releases,  # noqa: E402
                       sanctions, screening, stats, tariffs, trade)
 from tic_doctrine import contract, registers  # noqa: E402
 
@@ -137,8 +139,12 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
     for needle, name in table:
         if needle in url:
             return (FIX / name).read_bytes()
+    if "sciencebase.gov/catalog/item/" + minerals_world.WORLD_ITEM_ID in url:
+        return (FIX / "usgs_world_item_synthetic.json").read_bytes()
     if "sciencebase.gov/catalog/item" in url:
         return (FIX / "usgs_item.json").read_bytes()
+    if "sciencebase.gov/catalog/file/get/" + minerals_world.WORLD_ITEM_ID in url:
+        return (FIX / "usgs_world_synthetic.csv").read_bytes()
     if "sciencebase.gov/catalog/file" in url:
         files = minerals.find_files(text("usgs_item.json"))["files"]
         name = {f["url"]: k for k, f in files.items()}[url]
@@ -449,13 +455,209 @@ class TestMineralsWatch(unittest.TestCase):
         self.assertEqual((w["newer_editions"], w["newer_lists"]), ([], []))
         self.assertEqual(len(w["errors"]), 1)
         self.assertEqual(minerals.watch_notes(result["minerals"])[0][:41], "could not check for a newer USGS edition:")
-        self.assertEqual(len(recs), 4)                                          # item, two CSVs, the FR search
+        self.assertEqual(len(recs), 6)                            # item, two CSVs, the FR search, world item and CSV
 
     def test_end_to_end_has_no_warning(self):
         with tempfile.TemporaryDirectory() as tmp:
             snap = headwind_cli.collect(Path(tmp), getter=fake_getter)
         self.assertEqual(snap["minerals"]["watch"]["errors"], [])
         self.assertNotIn("warnings", snap["health"]["usgs-mcs"])
+
+
+class TestMineralsWorld(unittest.TestCase):
+    """World production and reserves (minerals_world.py). usgs_world_synthetic.csv is made up, in the column layout the
+    ScienceBase item's metadata lists (read 25 Nov 2026); no real ScienceBase file was
+    recorded. The first live run shows the real Section and Statistics wording in statistics_seen."""
+
+    def parsed(self):
+        return minerals_world.parse_world(text("usgs_world_synthetic.csv"))
+
+    def test_series_and_shares(self):
+        world = minerals_world.build_world(self.parsed(), {"China": "CN", "Australia": "AU"}.get)
+        prod = [x for x in world["series"] if x["kind"] == "production"]
+        self.assertEqual(len(prod), 22)
+        self.assertTrue(all(x["year"] == "2025" for x in prod))           # the latest year with figures
+        cob = next(x for x in prod if x["commodity"] == "Cobalt")
+        self.assertEqual(cob["total_basis"], "world total as USGS prints it")
+        self.assertAlmostEqual(sum(s["share"] for s in cob["shares"]), 1, delta=0.05)
+        self.assertGreaterEqual(cob["top"]["share"], cob["shares"][1]["share"])
+        self.assertTrue(0 < cob["hhi"] <= 10000)
+        self.assertNotIn("United States", [s["country"] for s in cob["shares"]])   # the salient-statistics row
+        res = [x for x in world["series"] if x["kind"] == "reserves"]
+        self.assertTrue(res and all(x["total_basis"].startswith("sum of") for x in res))   # world total is XX
+        self.assertTrue(any("Vietnam" in x["withheld"] for x in res))
+        self.assertIn("Mine production", world["statistics_seen"])
+
+    def test_value_codes(self):
+        v = minerals_world.value
+        self.assertEqual(v("1,234"), (1234.0, None))
+        self.assertEqual(v("12e"), (12.0, "E"))
+        self.assertEqual(v("W"), (None, "W"))
+        self.assertEqual(v("—"), (0.0, None))
+
+    def test_concentration_edges(self):
+        c = minerals_world.concentration
+        self.assertIsNone(c([("China", 10.0, None)], lambda n: None))     # one country is no distribution
+        one = c([("China", 90.0, None), ("Brazil", 10.0, None), ("World total (rounded)", 100.0, None)],
+                {"China": "CN"}.get)
+        self.assertEqual((one["top"]["cc"], one["china_share"], one["hhi"]), ("CN", 0.9, 8200))
+
+    def test_eu_list(self):
+        r = minerals_world.eu_list_record()
+        self.assertEqual((len(r["strategic"]), len(r["critical"])), (17, 34))
+        self.assertTrue(set(r["strategic"]) - {"rare earth elements for magnets"} <= set(r["critical"]))
+        m = minerals_world.eu_mark
+        self.assertEqual(m("COBALT")["list"], "strategic")
+        self.assertEqual(m("Fluorspar")["list"], "critical")
+        self.assertEqual(m("Rare earths")["list"], "strategic")
+        self.assertIsNone(m("Zinc"))
+
+    def test_world_failure_is_a_warning_not_a_lane_failure(self):
+        def getter(url, timeout=60):   # an item record without the table: a layout change, which no stored copy covers
+            if minerals_world.WORLD_ITEM_ID in url:
+                return b'{"files": []}'
+            return fake_getter(url, timeout)
+        with tempfile.TemporaryDirectory() as tmp:
+            result, _ = headwind_cli._lane_minerals(Path(tmp) / "raw", {}, getter)
+        self.assertEqual(result["minerals"]["world"]["status"], "failed")
+        self.assertTrue(result["minerals"]["reliance"])
+        self.assertIn("world production and reserves table was not read", minerals.watch_notes(result["minerals"])[-1])
+
+
+class TestMineralsWorldRealFile(unittest.TestCase):
+    """usgs_commodities_excerpt.csv: the header and the gallium and cobalt world rows of MCS2026_Commodities_Data.csv,
+    byte for byte as USGS publishes it (Windows-1252, CRLF)."""
+
+    def built(self):
+        body = (FIX / "usgs_commodities_excerpt.csv").read_bytes()
+        self.assertRaises(UnicodeDecodeError, body.decode, "utf-8")
+        parsed = minerals_world.parse_world(minerals_world.decode(body))
+        return minerals_world.build_world(parsed, {"China": "CN", "Congo (Kinshasa)": "CD"}.get)
+
+    def test_world_total_row_joins_its_series(self):
+        series = {(x["commodity"], x["statistic"]): x for x in self.built()["series"]}
+        self.assertEqual(set(series), {("Gallium", "Production (Primary production)"),
+                                       ("Cobalt", "Production (Mine production)"), ("Cobalt", "Reserves (Reserves)")})
+        reserves = series[("Cobalt", "Reserves (Reserves)")]
+        self.assertEqual(reserves["total"], 12_000_000)
+        self.assertEqual(reserves["total_basis"], "world total as USGS prints it")
+
+    def test_rounded_total_below_the_sum(self):
+        gallium = next(x for x in self.built()["series"] if x["commodity"] == "Gallium")
+        self.assertEqual(gallium["year"], "2025")
+        self.assertEqual(gallium["total"], 909_000)
+        self.assertIn("rounded world total of 900,000", gallium["total_basis"])
+        self.assertEqual(gallium["top"]["country"], "China")
+        self.assertAlmostEqual(gallium["china_share"], 0.9901)
+        self.assertLessEqual(gallium["top3_share"], 1)
+
+
+class TestMineralsWorldStoredCopy(unittest.TestCase):
+    """The world table falls back to a stored copy when ScienceBase refuses, and only to one that matches the MD5
+    in its stored item record. The table here is the synthetic fixture, with its own MD5 written into the record."""
+
+    @staticmethod
+    def refusing(url, timeout=60):
+        if "sciencebase.gov" in url:
+            raise urllib.error.HTTPError(url, 403, "Forbidden", {}, None)
+        return fake_getter(url, timeout)
+
+    def stored(self, d: Path, md5: str | None = None) -> None:
+        body = (FIX / "usgs_world_synthetic.csv").read_bytes()
+        item = json.loads((FIX / "usgs_world_item_synthetic.json").read_text(encoding="utf-8"))
+        f = minerals_world.find_world_file(json.dumps(item))
+        for rec in item["files"]:
+            if rec.get("name") == f["name"]:
+                rec["checksum"] = {"type": "MD5", "value": md5 or hashlib.md5(body).hexdigest()}
+        (d / minerals_world.WORLD_ITEM_FILE).write_text(json.dumps(item), encoding="utf-8")
+        (d / f["name"]).write_bytes(body)
+
+    def world(self, stored_dir, getter=None):
+        with tempfile.TemporaryDirectory() as tmp:
+            return headwind_cli._minerals_world(Path(tmp) / "raw", getter or self.refusing, [], lambda n: None,
+                                                stored_dir=stored_dir)
+
+    def test_refused_read_uses_the_stored_copy(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.stored(Path(d))
+            stored = self.world(d)
+        live = self.world(None, fake_getter)
+        self.assertEqual((stored["status"], stored["read_from"]["copy"]), ("ok", "stored"))
+        self.assertIn("403", stored["read_from"]["reason"])
+        self.assertEqual(stored["series"], live["series"])
+        self.assertNotIn("read_from", live)
+        self.assertIn("stored copy", minerals.watch_notes({"world": stored})[-1])
+
+    def test_the_stored_copy_is_usgs_file(self):
+        f, body = minerals_world.stored_world()            # checks the MD5 the stored record lists
+        self.assertEqual((f["name"], f["md5"]), (minerals_world.WORLD_FILE, "36185ff3742087e1dd90c52fe634fe12"))
+        w = self.world(None)                               # ScienceBase refusing; the real stored copy is read
+        self.assertEqual((w["status"], w["read_from"]["copy"]), ("ok", "stored"))
+        self.assertGreaterEqual(len(w["series"]), minerals_world.MIN_SERIES)
+
+    def test_no_stored_copy_is_reported(self):
+        with tempfile.TemporaryDirectory() as d:
+            w = self.world(d)
+        self.assertEqual(w["status"], "failed")
+        self.assertIn("no stored copy", w["error"])
+
+    def test_a_stored_copy_with_the_wrong_checksum_is_not_read(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.stored(Path(d), md5="0" * 32)
+            w = self.world(d)
+        self.assertEqual(w["status"], "failed")
+        self.assertIn("checksum", w["error"])
+
+
+class TestMineralsStoredCopy(unittest.TestCase):
+    """When ScienceBase refuses the reading, the lane reads the stored copy of the same release, which must match
+    the USGS checksums and give the same figures as the live read."""
+
+    @staticmethod
+    def refusing(url, timeout=60):
+        if "sciencebase.gov" in url:
+            hdrs = email.message.Message()
+            hdrs["server"] = "cloudflare"
+            hdrs["cf-mitigated"] = "challenge"
+            raise urllib.error.HTTPError(url, 403, "Forbidden", hdrs, None)
+        return fake_getter(url, timeout)
+
+    def test_stored_copy_matches_the_release(self):
+        found, texts = minerals.stored_release()
+        self.assertEqual(found["published"], "2026-02-06")
+        self.assertEqual(texts["reliance"], (FIX / "usgs_net_import_reliance.csv").read_bytes().decode("utf-8-sig"))
+        self.assertEqual(texts["sources"], (FIX / "usgs_major_import_sources.csv").read_bytes().decode("utf-8-sig"))
+
+    def test_a_changed_stored_file_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            for f in minerals.STORED_DIR.iterdir():
+                (d / f.name).write_bytes(f.read_bytes())
+            name = minerals.find_files((d / "item.json").read_bytes())["files"]["reliance"]["name"]
+            (d / name).write_bytes((d / name).read_bytes() + b"\n")
+            with self.assertRaises(ValueError):
+                minerals.stored_release(d)
+
+    def test_refused_reading_uses_the_stored_copy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            live, _ = headwind_cli._lane_minerals(Path(tmp) / "raw", {}, fake_getter)
+            stored, recs = headwind_cli._lane_minerals(Path(tmp) / "raw", {}, self.refusing)
+        live, stored = live["minerals"], stored["minerals"]
+        self.assertNotIn("read_from", live)
+        self.assertEqual(stored["read_from"]["copy"], "stored")
+        self.assertIn("403", stored["read_from"]["reason"])
+        self.assertIn("cf-mitigated=challenge", stored["read_from"]["reason"])
+        for key in ("reliance", "import_sources", "published", "edition", "by_source"):
+            self.assertEqual(stored[key], live[key])
+        self.assertEqual(len(stored["watch"]["errors"]), 1)                     # the edition search was refused too
+        self.assertEqual(len(recs), 1)                                          # only the Federal Register search
+
+    def test_end_to_end_lane_ok_with_a_warning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            snap = headwind_cli.collect(Path(tmp), getter=self.refusing, only=["minerals"])
+        self.assertEqual(snap["lanes"]["minerals"]["status"], "ok")
+        h = snap["health"]["usgs-mcs"]
+        self.assertTrue(h["warnings"][0].startswith("ScienceBase did not answer"))
 
 
 class TestVesselCrosslist(unittest.TestCase):
@@ -2011,6 +2213,13 @@ class TestEndToEnd(unittest.TestCase):
             for name in ("data/feed.geojson", "data/events.json", "data/baseline.json", "data/question_drafts.json",
                          "data/minerals.json", "index.html"):
                 self.assertIn(name, files)
+            # The entity export's sources, list by list, written into the page from ftm's table.
+            self.assertNotIn(headwind_cli.FTM_SOURCES, files["index.html"])
+            self.assertIn("Sources, licences and changes, list by list", files["index.html"])
+            self.assertEqual(files["index.html"].count('href="https://creativecommons.org/licenses/by/4.0/">'
+                                                       'Creative Commons'), 1)
+            scr = json.loads((tmp / "data" / "state" / "screening_index.json").read_text(encoding="utf-8"))
+            self.assertTrue(all("entry_dates" in l for l in scr["lists"].values()))
             self.assertEqual(headwind_cli.check_all(tmp), [])
             # The kit's history log ends an item only when its lane (the item's first source id) is in the health
             # record; an item whose lane is missing would never end.
@@ -2091,10 +2300,14 @@ class TestEndToEnd(unittest.TestCase):
             def down(url, timeout=60):
                 raise OSError("down")
             snap = headwind_cli.collect(tmp, getter=down)
-            self.assertTrue(all(v["status"] == "failed" and not v["from_previous"] for v in snap["lanes"].values()))
+            # The minerals lane reads its stored copy of the USGS release; every other lane is empty.
+            others = {k: v for k, v in snap["lanes"].items() if k != "minerals"}
+            self.assertTrue(all(v["status"] == "failed" and not v["from_previous"] for v in others.values()))
+            self.assertEqual(snap["lanes"]["minerals"]["status"], "ok")
+            self.assertEqual(snap["minerals"]["read_from"]["copy"], "stored")
             self.assertEqual((snap["fx"], snap["energy"], snap["fao"], snap["local_food"]), ([], [], [], []))
             self.assertEqual((snap["sanctions"], snap["sanctions_lists"], snap["controls"]), ([], [], []))
-            self.assertEqual((snap["screening"], snap["screening_lists"], snap["minerals"]), ([], [], {}))
+            self.assertEqual((snap["screening"], snap["screening_lists"]), ([], []))
             self.assertEqual(feed.build_feed(snap)["features"], [])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
@@ -2296,6 +2509,42 @@ class TestNames(unittest.TestCase):
         items = {f["properties"]["id"]: f["properties"] for f in feed.live_features({**snap, "fx": few})}
         self.assertEqual((items["headwind:fx:W00"]["tier"], items["headwind:fx:usd-broad"]["tier"]),
                          ("anomaly", "routine"))
+
+    def test_a_european_bloc_move_is_not_called_the_dollar_s(self):
+        # The euro and ten European currencies weaker together, the rest flat: the count reaches FX_BROAD_MIN, but
+        # nothing in it says the dollar moved rather than the euro with the currencies tied to it.
+        def series(jump):
+            days = [f"2025-{1 + i // 28:02d}-{1 + i % 28:02d}" for i in range(300)]
+            vals = [1.0 + 0.002 * ((i * 7) % 5 - 2) for i in range(300)]
+            vals[-5:] = [v * (1 + jump) for v in vals[-5:]]
+            return list(zip(days, vals))
+        europe = ["EUR", "CZK", "DKK", "GBP", "HUF", "PLN", "RON", "SEK", "CHF", "ISK", "NOK"]
+        rest = ["JPY", "TRY", "AUD", "BRL", "CAD", "CNY", "HKD", "IDR", "ILS", "INR", "KRW", "MXN", "MYR", "NZD",
+                "PHP", "SGD", "THB", "ZAR"]
+        self.assertEqual(set(europe) - markets.EUROPEAN, set())
+        self.assertEqual(set(rest) & markets.EUROPEAN, set())
+        fx = markets.measure_fx({**{c: series(0.0) for c in rest}, **{c: series(0.06) for c in europe}})
+        b = markets.broad_move(fx)
+        self.assertEqual((b["broad"], len(b["currencies"]), b["european"], b["quoted"]), (True, 11, 11, 29))
+        snap = {"generated_at": "2025-11-27T06:00:00Z", "fx": fx, "lanes": {}}
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features(snap)}
+        broad = items["headwind:fx:usd-broad"]
+        for text in (broad["summary"], broad["baseline_ref"], items["headwind:fx:GBP"]["summary"]):
+            self.assertNotIn("the dollar's", text)
+            self.assertNotIn("dollar itself", text)
+            self.assertNotIn("move of the dollar", text)
+        self.assertIn("11 of the 11 are the euro or currencies of other EU and EFTA countries and the UK",
+                      broad["summary"])
+        self.assertIn("the count alone does not tell a move of the US dollar from one of the euro", broad["summary"])
+        self.assertIn("Part of a common move against the US dollar", items["headwind:fx:GBP"]["summary"])
+        # The rule itself is unchanged: one item, the members routine.
+        self.assertEqual((broad["tier"], items["headwind:fx:GBP"]["tier"]), ("anomaly", "routine"))
+        # With most of the set from outside Europe, the item names the European count and adds no caveat.
+        mixed = markets.measure_fx({**{c: series(0.06) for c in rest[:8] + europe[:3]},
+                                    **{c: series(0.0) for c in rest[8:] + europe[3:]}})
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features({**snap, "fx": mixed})}
+        self.assertIn("3 of the 11 are the euro", items["headwind:fx:usd-broad"]["summary"])
+        self.assertNotIn("count alone", items["headwind:fx:usd-broad"]["summary"])
 
     def test_an_eu_reorder_of_names_is_no_change(self):
         # The EU file printed each entry's strong aliases in another order on 20 Nov 2026 (1,167 entries)

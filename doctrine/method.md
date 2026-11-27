@@ -401,7 +401,7 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - These are the publishers' own dates. The table measures the publishers, not Headwind, and says nothing about a
   ship's conduct.
 
-## A move of the US dollar itself (26 Nov 2026)
+## A common move against the US dollar (26 Nov 2026; wording 27 Nov 2026)
 - Every currency is measured per US dollar, so a move of the dollar shows in all of them at once: on 17 Mar 2020,
   23 of the 29 currencies Headwind reads were unusually weaker the same day. On a day when 10 or more currencies are
   anomalies in the same direction, Headwind reports the move once, as `headwind:fx:usd-broad` (tier anomaly), and
@@ -411,6 +411,14 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
 - Back-test on the ECB's file, 2 Jan 2019 to 26 Nov 2026 (2,025 days): 11 days reach 10 currencies in one direction,
   7 reach 15. Measuring each currency net of the median move was tried and not used: it removed most of the broad
   days but raised the flags in ordinary times (897 to 1,057) and still flagged 15 currencies on 17 Mar 2020.
+- The count does not say whose move it is. 11 of the 29 currencies are the euro and the currencies of other EU and
+  EFTA countries and the UK, which can move together against the dollar on their own, so the item calls the day a
+  common move against the US dollar, not the dollar's, and names how many of the currencies are European. When more
+  than half are, it says the count alone cannot tell a move of the dollar from one of the euro and the currencies
+  that move with it. On the 11 back-test days 4 to 12 of the flagged currencies were from outside that group (fewest
+  on 14 and 15 Apr 2025, 7 of 11 European). Counting the European currencies once was tried and not used: it kept 6
+  of the 11 days and dropped the other 5, among them 12 Mar 2020 and 28 Apr 2022, when 8 of the flagged currencies
+  were from outside Europe.
 - HW-IND-4 is unchanged: a watched country's currency inside a dollar-wide move does not carry it.
 
 ## Names on list changes (`headwind-1.9`, 16 Nov 2026)
@@ -574,6 +582,22 @@ Summaries data release as printed, including bounds such as ">75" where USGS wit
 figure. They are annual and are not feed items. Headwind adds one count: the number of commodities
 for which each country is named first among the major import sources. It is a count of USGS's own
 ordering and says nothing about substitutes, stockpiles or domestic capacity.
+
+**World supply (25 Nov 2026, draft).** From the same data release's chapter table
+(MCS2026_Commodities_Data.csv, CC0), the world production and reserves rows by country. For each commodity and
+statistic, in the latest year USGS gives: the largest producer and its share of the world total, the top three
+countries' share, China's share and a Herfindahl-Hirschman index (HHI, the sum of squared percentage shares of the
+countries USGS names; 10,000 is one country). Shares are over the world total USGS prints, or over the named
+countries plus "other countries" where it prints none (reserves often have no world total). Withheld figures (W)
+are left out, so a share can be overstated where a large producer is withheld. Rows are picked by the words
+"production" and "reserves" in USGS's Statistics column, not by fixed strings, and every Section and Statistics
+value seen is kept in `data/minerals.json` (`world.statistics_seen`) so a change of wording shows. A failed read of
+this table is a warning on the usgs-mcs health entry; the import-reliance tables still pass. Context only: no feed
+item and no anomaly test. Concentration is a fact about supply, not a forecast of a disruption.
+
+**EU lists.** Each commodity also carries its entry, if any, in the EU Critical Raw Materials Act (Regulation (EU)
+2024/1252): Annex I's 17 strategic raw materials or Annex II's 34 critical ones (CC BY 4.0, European Commission). The
+annexes are copied into `headwind/minerals_world.py` and are reviewed by 24 May 2027.
 
 ## US mineral imports by country (15 Nov 2026)
 For 24 HS codes standing for minerals on the 2025 List of Critical Minerals, the Census Bureau's monthly general

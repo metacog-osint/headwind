@@ -347,6 +347,10 @@ def build(snap: dict, prev_health: dict | None, today: date) -> dict:
                    f"{cr.get('selected') or 0} selected for the feed",
             error=err("cjeu"), warnings=(notes.get("eurlex-cellar") or []) + late or None)
     watch = minerals.watch_notes(snap.get("minerals") or {})
+    stored = ((snap.get("minerals") or {}).get("read_from") or {})
+    if stored.get("copy") == "stored":
+        watch = [f"ScienceBase did not answer ({stored.get('reason')}); the figures are read from Headwind's stored "
+                 f"copy of the same USGS release, checked against the checksums USGS lists"] + watch
     if watch:
         out["usgs-mcs"]["warnings"] = list(out["usgs-mcs"].get("warnings") or []) + watch
 

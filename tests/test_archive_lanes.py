@@ -178,7 +178,10 @@ class TestWorkflowLanes(unittest.TestCase):
         text = step("Private archive (history")
         self.assertIn("HISTORY: ${{ steps.history.outcome }}", text)
         self.assertIn("CHECKED: ${{ steps.check.outcome }}", text)
-        self.assertIn("DEPLOYED: ${{ steps.deploy.outcome }}", text)
+        # The deploy step's outcome is success also when it skipped the deploy (no Cloudflare secrets), so the
+        # site lane reads the step's own output, which only a real deploy writes (TestDeployOutput).
+        self.assertIn("DEPLOYED: ${{ steps.deploy.outputs.deployed }}", text)
+        self.assertNotIn("steps.deploy.outcome", text)
         self.assertIn("id: history", step("History"))
         self.assertIn("id: check", STEPS["Feed check"])
         self.assertIn("id: deploy", STEPS["Deploy site/ to Cloudflare Pages"])
@@ -187,7 +190,7 @@ class TestWorkflowLanes(unittest.TestCase):
                                r'--program headwind --lane history ')
         self.assertRegex(flat, r'if \[ "\$CHECKED" = "success" \]; then\s+python tools/tic_archive\.py put '
                                r'--program headwind --lane state ')
-        self.assertRegex(flat, r'if \[ "\$DEPLOYED" = "success" \]; then\s+python tools/tic_archive\.py put '
+        self.assertRegex(flat, r'if \[ "\$DEPLOYED" = "true" \]; then\s+python tools/tic_archive\.py put '
                                r'--program headwind --lane site ')
 
     def test_what_the_workflow_keeps_for_a_while_or_replaces_is_inside_the_archived_folders(self):
@@ -204,6 +207,53 @@ class TestWorkflowLanes(unittest.TestCase):
             self.assertTrue(p.startswith("data/") and not p.startswith("data/raw"), p)
         self.assertIn("git add history\n", step("History"))
         self.assertIn("pages deploy site --project-name", step("Deploy site/"))
+
+
+def run_script(text: str) -> str:
+    """A step's `run: |` block as the shell gets it."""
+    block = text.split("run: |\n", 1)[1]
+    return "".join(line[10:] if line.startswith(" " * 10) else line.lstrip(" ")
+                   for line in block.splitlines(keepends=True))
+
+
+@unittest.skipUnless(shutil.which("bash"), "needs bash")
+class TestDeployOutput(unittest.TestCase):
+    """The deploy step's own shell, with npx and sleep replaced: `deployed=true` reaches $GITHUB_OUTPUT only when
+    wrangler deployed, so a run without the Cloudflare secrets never archives a site that was not published."""
+
+    def run_deploy(self, token: str, account: str, npx_exit: int) -> tuple[int, str, int]:
+        """(exit code, what the step wrote to $GITHUB_OUTPUT, how many times npx ran)."""
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            calls = td / "npx-calls"
+            script = td / "deploy.sh"
+            script.write_text(run_script(STEPS["Deploy site/ to Cloudflare Pages"]), encoding="utf-8", newline="\n")
+            out = td / "github-output"
+            out.write_text("", encoding="utf-8")
+            env = {**os.environ, "CLOUDFLARE_API_TOKEN": token, "CLOUDFLARE_ACCOUNT_ID": account,
+                   "GITHUB_SHA": "0" * 40, "GITHUB_OUTPUT": out.as_posix()}
+            # Shell functions stand in for npx (counted, its exit code chosen here) and sleep (no wait).
+            cmd = (f'npx() {{ echo x >> "{calls.as_posix()}"; return {npx_exit}; }}; sleep() {{ :; }}; '
+                   f'. "{script.as_posix()}"')
+            r = subprocess.run(["bash", "-c", cmd], env=env, capture_output=True, text=True, cwd=td)
+            n = len(calls.read_text().splitlines()) if calls.exists() else 0
+            return r.returncode, out.read_text(encoding="utf-8"), n
+
+    def test_no_secrets_skips_and_writes_no_output(self):
+        for token, account in (("", ""), ("t", ""), ("", "a")):
+            code, out, npx = self.run_deploy(token, account, 0)
+            self.assertEqual((code, npx), (0, 0))
+            self.assertNotIn("deployed=true", out)
+
+    def test_a_real_deploy_writes_the_output(self):
+        code, out, npx = self.run_deploy("t", "a", 0)
+        self.assertEqual((code, npx), (0, 1))
+        self.assertEqual(out.strip(), "deployed=true")
+
+    def test_three_failed_deploys_write_no_output(self):
+        code, out, npx = self.run_deploy("t", "a", 1)
+        self.assertEqual((code, npx), (1, 3))
+        self.assertNotIn("deployed=true", out)
 
 
 class TestEveryRunFileIsArchived(unittest.TestCase):

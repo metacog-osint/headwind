@@ -19,7 +19,20 @@ Headwind reports measurements. It states no probability and gives no investment 
 8. **US Federal Register**: rules and proposed rules from BIS and OFAC, with the future dates they name.
 9. **trade.gov** Consolidated Screening List (every list but the SDN list): changes between readings, as counts.
 10. **US Geological Survey** Mineral Commodity Summaries: net import reliance and import sources by commodity,
-    marked against the Final 2025 List of Critical Minerals.
+    marked against the Final 2025 List of Critical Minerals and the EU Critical Raw Materials Act's lists; and world
+    production and reserves by country, with each commodity's largest producer, top-three share, China's share and
+    HHI (draft, 25 Nov 2026).
+
+## Release files
+
+- Release `entities`: `headwind-entities.ftm.gz`, the named entries of the sanctions and screening lists as
+  [FollowTheMoney](https://followthemoney.tech/docs/) entities (one JSON entity per line), and
+  `headwind-entities.about.json`, which credits each list (publisher, title, source, licence and its link, the
+  attribution its terms ask for, what Headwind changed and what is left out); the release notes give the same
+  credits. A screening-list entry whose end date has passed carries its `endDate` and no topic. Replaced every run.
+- Release `state`: the run state the workflow restores; `state-YYYY-qN`: dated copies.
+- Every release carries `SHA256SUMS` and `headwind-manifest.json` with the SHA-256 of each of its files. To check
+  a copy: `sha256sum -c SHA256SUMS --ignore-missing`, or `python -m headwind.manifest verify headwind-manifest.json`.
 
 ## Commands
 

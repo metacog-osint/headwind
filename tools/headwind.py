@@ -5,7 +5,9 @@
     python tools/headwind.py check       # validate the registers and lint the feed
 
 collect never falls back to made-up data. A lane that fails keeps its last good copy (marked
-from_previous) or stays empty, and the snapshot's "lanes" block says which.
+from_previous) or stays empty, and the snapshot's "lanes" block says which. The one exception is the minerals
+lane: when ScienceBase does not answer, it reads the stored copy of the same USGS release (headwind/stored/),
+checked against the USGS checksums, and marks it read_from.
 """
 from __future__ import annotations
 
@@ -23,8 +25,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      cjeu, markets, minerals, names, pinksheet, releases, sanctions, scotus, screening, tariffs,
+from headwind import (baseline, batches, commodities, controls, feed, fetch, food, ftm, health,  # noqa: E402,F401
+                      inspection, cjeu, markets, minerals, minerals_world, names, pinksheet, releases, sanctions, scotus,
+                      screening, tariffs,
                       trade, uksc, unpress)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
@@ -672,22 +675,71 @@ def _lane_inspection(raw_dir, prev, getter):
 
 def _lane_minerals(raw_dir, prev, getter):
     """USGS Mineral Commodity Summaries: net import reliance and import sources. Annual; context, not feed items."""
-    item, rec0 = fetch.fetch("usgs-mcs-item", minerals.ITEM_URL.format(item=minerals.ITEM_ID), raw_dir, "json",
-                             getter=getter)
-    found = minerals.find_files(item)
-    bodies, recs = {}, [rec0]
-    for key, f in found["files"].items():
-        body, rec = fetch.fetch(f"usgs-mcs-{key}", f["url"], raw_dir, "csv", getter=getter)
-        minerals.check_md5(body, f["md5"], f["name"])
-        bodies[key] = body.decode("utf-8-sig")
-        recs.append(rec)
+    read_from = None
+    try:
+        item, rec0 = fetch.fetch("usgs-mcs-item", minerals.ITEM_URL.format(item=minerals.ITEM_ID), raw_dir, "json",
+                                 getter=getter)
+        found = minerals.find_files(item)
+        bodies, recs = {}, [rec0]
+        for key, f in found["files"].items():
+            body, rec = fetch.fetch(f"usgs-mcs-{key}", f["url"], raw_dir, "csv", getter=getter)
+            minerals.check_md5(body, f["md5"], f["name"])
+            bodies[key] = body.decode("utf-8-sig")
+            recs.append(rec)
+    except OSError as exc:   # urllib errors, timeouts and refusals (a checksum or layout change still fails)
+        # ScienceBase did not answer. The release is annual and the stored copy is the same files (checked
+        # against the USGS checksums), so the figures stay current; the site and the health entry say which copy.
+        found, bodies = minerals.stored_release()
+        recs = []
+        read_from = {"copy": "stored", "reason": minerals.refusal(exc), "at": fetch.now_utc()}
     by_name = {c["name"]: c["cc"] for c in json.loads(
         (ROOT / "doctrine" / "kit" / "geo" / "countries.json").read_text(encoding="utf-8"))["countries"]}
     cc_of = lambda name: minerals.NAME_CC.get(name) or by_name.get(name)  # noqa: E731
     doc = minerals.build(found, minerals.parse_reliance(bodies["reliance"]), minerals.parse_sources(bodies["sources"]),
                          cc_of)
+    if read_from:
+        doc["read_from"] = read_from
     doc["watch"] = _minerals_watch(raw_dir, getter, recs)
+    doc["eu_list"] = minerals_world.eu_list_record()
+    for r in doc["reliance"] + doc["import_sources"]:
+        r["eu"] = minerals_world.eu_mark(r["commodity"])
+    doc["world"] = _minerals_world(raw_dir, getter, recs, cc_of)
     return {"minerals": doc}, recs
+
+
+def _minerals_world(raw_dir, getter, recs, cc_of, stored_dir=None) -> dict:
+    """World production and reserves by country (USGS chapter tables, same data release). A failed read is noted on
+    the record and on the usgs-mcs health entry; the import-reliance tables above still pass. When ScienceBase does
+    not answer, the stored copy is read if there is one (minerals_world.STORED_DIR), and the record says so."""
+    cc = lambda name: minerals_world.NAME_CC.get(name) or cc_of(name)  # noqa: E731
+    read_from = None
+    try:
+        try:
+            item, rec = fetch.fetch("usgs-mcs-world-item",
+                                    minerals.ITEM_URL.format(item=minerals_world.WORLD_ITEM_ID), raw_dir, "json",
+                                    getter=getter)
+            recs.append(rec)
+            f = minerals_world.find_world_file(item)
+            body, rec = fetch.fetch("usgs-mcs-world", f["url"], raw_dir, "csv", getter=getter)
+            recs.append(rec)
+            minerals.check_md5(body, f["md5"], f["name"])
+        except OSError as exc:   # urllib errors, timeouts and refusals; a checksum or layout change still fails
+            reason = f"{type(exc).__name__}: {exc}"[:200]
+            try:
+                f, body = minerals_world.stored_world(stored_dir)
+            except FileNotFoundError as missing:
+                raise OSError(f"ScienceBase did not answer ({reason}); {missing}") from exc
+            read_from = {"copy": "stored", "reason": reason, "at": fetch.now_utc()}
+        world = minerals_world.build_world(minerals_world.parse_world(minerals_world.decode(body)), cc)
+        if len(world["series"]) < minerals_world.MIN_SERIES:
+            raise ValueError(f"only {len(world['series'])} production or reserves series read; see statistics_seen")
+        out = {"status": "ok", "file": f["name"], "title": f["title"], "published": f["published"],
+               "item_url": minerals.SB_ITEM_PAGE.format(item=minerals_world.WORLD_ITEM_ID), **world}
+        if read_from:
+            out["read_from"] = read_from
+        return out
+    except Exception as exc:  # noqa: BLE001 - the world table is an addition; its failure is reported, not fatal
+        return {"status": "failed", "error": f"{type(exc).__name__}: {exc}"[:300], "series": []}
 
 
 def _minerals_watch(raw_dir, getter, recs) -> dict:
@@ -783,6 +835,7 @@ def collect(root: Path = ROOT, getter=None, only: list[str] | None = None) -> di
 # What a run needs from the run before: the working snapshot (last good copies, FAO vintages, the WFP cache
 # markers) and the two list indexes. A scheduled run has no disk of its own, so the build publishes these under
 # site/data/state/ and the next run reads them back with `restore`.
+FTM_SOURCES = "<!-- ftm-sources -->"   # site_src/index.html: where build writes the entity export's sources
 STATE_FILES = {"snapshot.json": "data/state/snapshot.json",
                "state/sanctions_index.json": "data/state/sanctions_index.json",
                "state/screening_index.json": "data/state/screening_index.json"}
@@ -908,6 +961,9 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
         for p in sorted(src_dir.rglob("*")):
             if p.is_file():
                 files[p.relative_to(src_dir).as_posix()] = p.read_text(encoding="utf-8")
+    # The entity export's sources, licences and changes, list by list, from the table the export credits them from.
+    if "index.html" in files:
+        files["index.html"] = files["index.html"].replace(FTM_SOURCES, ftm.sources_html(snap.get("screening_lists")))
 
     out_dir = root / "site"
     out_dir.mkdir(parents=True, exist_ok=True)

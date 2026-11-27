@@ -78,7 +78,7 @@
     var an = [], far = null;
     // Each unusual reading, and the one furthest from its own normal (largest |z|) for today's reading.
     function add(text, z) { an.push(text); if (typeof z === "number" && (!far || Math.abs(z) > Math.abs(far.z))) { far = { text: text, z: z }; } }
-    // A move of the dollar itself (10 or more currencies unusual the same way) is one line, not one per currency.
+    // One common move against the dollar (10 or more currencies unusual the same way) is one line, not one per currency.
     var common = fx.filter(function (f) { return f.common_move; });
     if (common.length) {
       add("US dollar: " + (common[0].direction === "weaker" ? "stronger" : "weaker") + " against " + common.length + " of " + fx.length +
@@ -373,7 +373,8 @@
     if ((mn.import_sources || []).length) {
       document.getElementById("minerals-note").innerHTML = esc("Net import reliance in " + mn.reliance_year + " is imports less exports, adjusted for stock changes, as a share of US consumption. Import shares are for " + mn.sources_period + ". Annual figures, copied as published in the ") +
         '<a href="' + esc(mn.url) + '" rel="noopener">' + esc("USGS Mineral Commodity Summaries " + String(mn.edition || "").replace("MCS", "") + " data release") + "</a>" + esc(mn.published ? " of " + day(mn.published + "T12:00:00Z") + "." : ".") +
-        esc(" The table lists the " + mn.import_sources.length + " commodities in the Summaries' import-sources figure; the ") + '<a href="data/minerals.json">data file</a>' + esc(" also has net import reliance for " + (mn.reliance || []).length + " commodities.");
+        esc(" The table lists the " + mn.import_sources.length + " commodities in the Summaries' import-sources figure; the ") + '<a href="data/minerals.json">data file</a>' + esc(" also has net import reliance for " + (mn.reliance || []).length + " commodities." +
+          (mn.read_from && mn.read_from.copy === "stored" ? " ScienceBase did not answer the last reading, so these figures come from Headwind's stored copy of the same release, which matches the checksums USGS lists." : ""));
       table("minerals-table", ["Commodity", "Net import reliance", "Import sources and their share"], mn.import_sources.map(function (m) {
         return [esc(m.commodity), esc(m.reliance_text ? m.reliance_text + "%" : "not given"),
           esc((m.shares || []).map(function (x) { return x.source + " " + x.pct + "%"; }).join(", ") || "not given")];
@@ -390,6 +391,23 @@
       }
       var firsts = (mn.by_source || []).filter(function (b) { return b.named_first > 1; }).slice(0, 8).map(function (b) { return b.source + " " + b.named_first; });
       document.getElementById("minerals-first").textContent = firsts.length ? "Named first among major import sources, out of the " + mn.with_sources + " commodities with sources given: " + firsts.join(", ") + "." : "";
+      var wd = mn.world || {}, eu = mn.eu_list;
+      var euNote = eu ? " EU marks the commodity's entry in the " + eu.title + " (" + eu.citation + "): strategic (" + eu.strategic_count + " materials) or critical (" + eu.critical_count + ")." : "";
+      if (wd.status === "ok" && (wd.series || []).length) {
+        var prod = wd.series.filter(function (x) { return x.kind === "production"; });
+        document.getElementById("world-note").innerHTML = esc("World production by country, latest year USGS gives, from the ") +
+          '<a href="' + esc(wd.item_url) + '" rel="noopener">' + esc(wd.title || "Mineral Commodity Summaries") + "</a>" +
+          esc(" (" + wd.file + ", CC0). " + wd.note + euNote + (wd.read_from && wd.read_from.copy === "stored" ? " ScienceBase did not answer the last reading, so this table comes from Headwind's stored copy of the same file, which matches the checksum USGS lists." : "") + " Reserves are in the ") + '<a href="data/minerals.json">data file</a>' + esc(".");
+        table("world-table", ["Commodity", "Statistic", "Year", "Largest producer", "Top 3", "China", "HHI", "EU"], prod.map(function (x) {
+          return [esc(x.commodity), esc(x.statistic + (x.unit ? ", " + x.unit : "")), esc(x.year),
+            esc(x.top.country + " " + Math.round(x.top.share * 100) + "%"), esc(Math.round(x.top3_share * 100) + "%"),
+            esc(x.china_share === null || x.china_share === undefined ? "not named" : Math.round(x.china_share * 100) + "%"),
+            esc(Number(x.hhi).toLocaleString()), esc(x.eu ? x.eu.list : "")];
+        }));
+      } else {
+        document.getElementById("world-note").textContent = wd.status === "failed" ? "The world production table was not read on the last run: " + (wd.error || "") : "Not read yet.";
+        table("world-table", [], []);
+      }
     } else {
       table("minerals-table", [], []);
     }

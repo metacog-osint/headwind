@@ -17,6 +17,7 @@ import io
 import json
 import re
 from collections import Counter
+from pathlib import Path
 
 # The 2026 edition (data for 2025, published 6 Feb 2026). A new edition is a new ScienceBase item,
 # so this id has to be changed by hand each year, when USGS publishes the next Summaries.
@@ -119,6 +120,13 @@ def watch_notes(m: dict) -> list[str]:
     notes += [f'the Federal Register has published "{n["title"]}" ({n["published"]}, document {n["document"]}); '
               f"Headwind still carries the {CRITICAL_LIST['title']}" for n in w.get("newer_lists") or []]
     notes += [f"could not check for {e}" for e in w.get("errors") or []]
+    world = (m or {}).get("world") or {}
+    if world.get("status") == "failed":
+        notes.append(f"the world production and reserves table was not read: {world.get('error')}")
+    elif (world.get("read_from") or {}).get("copy") == "stored":
+        notes.append(f"the world production and reserves table is read from the stored copy of the same USGS "
+                     f"release, checked against the USGS checksum; ScienceBase did not answer "
+                     f"({world['read_from'].get('reason')})")
     return notes
 
 
@@ -169,6 +177,35 @@ def find_files(item_body: bytes | str) -> dict:
     if missing:
         raise ValueError(f"USGS data release: no file found for {sorted(missing)}")
     return out
+
+
+# A copy of the same two tables, kept in the repository (headwind/stored/<edition>/, see its README). The lane reads
+# ScienceBase first and this copy only when ScienceBase does not answer; it stands for EDITION and nothing else.
+STORED_DIR = Path(__file__).resolve().parent / "stored" / EDITION.lower().replace("mcs", "usgs_mcs")
+
+
+def stored_release(stored_dir: Path | None = None) -> tuple[dict, dict]:
+    """The stored copy as (found, {key: text}), each file checked against the MD5 USGS lists for it."""
+    d = Path(stored_dir or STORED_DIR)
+    found = find_files((d / "item.json").read_bytes())
+    texts = {}
+    for key, f in found["files"].items():
+        body = (d / f["name"]).read_bytes()
+        check_md5(body, f["md5"], f["name"])
+        texts[key] = body.decode("utf-8-sig")
+    return found, texts
+
+
+def refusal(exc: Exception) -> str:
+    """A short account of why ScienceBase did not answer, with the reply headers that tell a firewall
+    challenge (cf-mitigated) from an ordinary refusal."""
+    text = f"{type(exc).__name__}: {exc}"
+    headers = getattr(exc, "headers", None)
+    if headers is not None:
+        seen = [f"{h}={headers.get(h)}" for h in ("server", "cf-mitigated") if headers.get(h)]
+        if seen:
+            text += f" ({', '.join(seen)})"
+    return text[:200]
 
 
 def check_md5(body: bytes, expected: str | None, name: str) -> None:
