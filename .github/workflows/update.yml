@@ -211,13 +211,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          python -m headwind.ftm --state data/state --out headwind-entities.ftm.gz --about headwind-entities.about.json
+          # The release notes are written by the exporter from the same table as about.json: every list's publisher,
+          # title, source, licence and its link, attribution statement and what was changed.
+          python -m headwind.ftm --state data/state --out headwind-entities.ftm.gz --about headwind-entities.about.json --notes "$RUNNER_TEMP/entities-notes.md"
           title="Entities (FollowTheMoney)"
-          notes="The people, organizations, vessels and aircraft on the sanctions and screening lists Headwind reads, as FollowTheMoney entities (https://followthemoney.tech/docs/), one JSON entity per line: each listed party and a Sanction linking it to its list. As of each list's last reading; replaced every run. Not an official list: check the publisher's own list before acting on an entry. Lists, counts, what is left out and each source's terms: headwind-entities.about.json. Sources: US Treasury (OFAC); US International Trade Administration (Consolidated Screening List); European Commission (Financial Sanctions Files); UK Sanctions List, FCDO (contains public sector information licensed under the Open Government Licence v3.0; organizations and ships only); Global Affairs Canada (Consolidated Canadian Autonomous Sanctions List, reproduced in part for non-commercial purposes); Australian Sanctions Consolidated List (CC BY 4.0; Department of Foreign Affairs and Trade website - www.dfat.gov.au); Ministry of Finance Japan (出典：財務省ウェブサイト、PDL1.0を加工して作成; edited by Headwind). Checksums: SHA256SUMS."
           if ! gh release view entities >/dev/null 2>&1; then
-            gh release create entities --prerelease --latest=false --title "$title" --notes "$notes"
+            gh release create entities --prerelease --latest=false --title "$title" --notes-file "$RUNNER_TEMP/entities-notes.md"
           else
-            gh release edit entities --title "$title" --notes "$notes" >/dev/null
+            gh release edit entities --title "$title" --notes-file "$RUNNER_TEMP/entities-notes.md" >/dev/null
           fi
           gh release upload entities headwind-entities.ftm.gz headwind-entities.about.json --clobber
           for tag in $(gh release list --limit 200 --json tagName --jq '.[].tagName'); do

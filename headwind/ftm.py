@@ -18,7 +18,14 @@ What each entity carries is what the run state carries, and nothing more: the na
 countries of the entry's addresses and nationality (FtM `country`, the generic association; a country the model
 cannot place is left out and counted), and for vessels the IMO number, MMSI, flag and vessel type. Birth dates,
 identity documents, street addresses and reasons are not in the state and so not here. Ship listing dates are the
-publisher's own (`Sanction:listingDate`); `Interval:retrievedAt` is when Headwind last read the list.
+publisher's own (`Sanction:listingDate`); `Interval:retrievedAt` is when Headwind last read the list. A screening
+list's start and end dates, where the CSL gives them, are the Sanction's `startDate` and `endDate`; a listing whose
+end date is before the list's reading has ended, and its party carries no topic (FtM's `topics` mark what an
+entity is now; OpenSanctions sets them only while a sanction is in force), so it does not read as current.
+
+Credit: LISTS and SCREENING are the one table of each list's publisher, title, source, licence and its link, the
+attribution statement its terms ask for and what Headwind changed; about.json (`attribution` per list), the
+release notes (release_notes) and the site's Sources text (sources_html) are all written from it.
 
 Lists: each one's terms were read before it was exported; `LISTS` gives the terms each is reused under and
 `LEFT_OUT` the lists and parts left out and why. Entries with no name in the state (the UN Security Council's list,
@@ -32,6 +39,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import hashlib
+import html
 import io
 import json
 import re
@@ -40,7 +48,7 @@ import unicodedata
 from collections import Counter
 from pathlib import Path
 
-from . import sanctions
+from . import sanctions, screening
 
 MODEL_PATH = Path(__file__).with_name("ftm_model.json")
 DOCS = "https://followthemoney.tech/docs/"
@@ -52,37 +60,111 @@ RELEASE_URL = "https://github.com/metacog-osint/headwind/releases/tag/" + RELEAS
 SCHEMA = {"individual": "Person", "entity": "Organization", "vessel": "Vessel", "aircraft": "Airplane",
           "not stated": "LegalEntity"}
 
-# The sanctions lists exported: the sanctioning jurisdiction (Sanction:country) and the terms each is reused under,
-# with the attribution or statement those terms ask for. `types` limits a list to some entry types. Every listing
-# carries Headwind's key for the entry as `Interval:recordId`, and the publisher's own entry id as
-# `Sanction:authorityId` where the key is that id (`authority_ids`): Canada's list gives none, so its key is the
-# regime, schedule and item number (sanctions.canada_key).
+# Licences the exported lists are reused under, and where each is published.
+US_WORK = "US government work, not subject to copyright in the US (17 U.S.C. 105)"
+US_WORK_URL = "https://www.law.cornell.edu/uscode/text/17/105"
+EU_REUSE = "Commission Decision 2011/833/EU on the reuse of Commission documents"
+EU_REUSE_URL = "http://data.europa.eu/eli/dec/2011/833/oj"
+OGL3 = "Open Government Licence v3.0"
+OGL3_URL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+CA_TERMS = "Government of Canada terms and conditions: reproduction for non-commercial purposes"
+CA_TERMS_URL = "https://www.canada.ca/en/transparency/terms.html"
+CC_BY_4 = "Creative Commons Attribution 4.0 International (CC BY 4.0)"
+CC_BY_4_URL = "https://creativecommons.org/licenses/by/4.0/"
+PDL1 = "Public Data License 1.0 (PDL1.0)"
+
+# What Headwind changed on every exported list. Each list's own entry in LISTS adds what was changed on it.
+CHANGES_ALL = ("Modified by Headwind (The Intelligence Company): converted to FollowTheMoney entities, one listed "
+               "party and one Sanction per entry. Kept: the entry's id, one name, its type, its programs and, where "
+               "the list gives them, the countries of its addresses and nationality, merged into one property "
+               "(`country`) as FtM country codes (a country name FtM cannot place is left out and counted); for "
+               "ships the IMO number, MMSI, flag and type the list gives. Dropped: aliases, birth dates and places, "
+               "identity documents, street addresses, reasons, remarks and every other field.")
+
+# The sanctions lists exported, and how each is credited: one table, from which about.json, the release notes and
+# the site's Sources text are written (`attribution`). Per list: the sanctioning jurisdiction (Sanction:country);
+# `title`, `publisher`, `source` (the publisher's page, then the files read), `licence` and `licence_url`; the
+# attribution statement the terms ask for (`statement`); and what Headwind changed on that list (`changes`, after
+# CHANGES_ALL). `types` limits a list to some entry types. Every listing carries Headwind's key for the entry as
+# `Interval:recordId`, and the publisher's own entry id as `Sanction:authorityId` where the key is that id
+# (`authority_ids`): Canada's list gives none, so its key is the regime, schedule and item number
+# (sanctions.canada_key).
 LISTS = {
-    "ofac-sdn": {"country": "us", "terms": "US government work, not subject to copyright in the US (17 U.S.C. 105)."},
-    "eu-fsf": {"country": "eu", "terms": "Reused under Commission Decision 2011/833/EU on the reuse of Commission "
-                                         "documents (the licence the EU open data portal gives the Financial Sanctions "
-                                         "Files). Source: European Commission, Financial Sanctions Files."},
-    "uk-sanctions": {"country": "gb", "types": ("entity", "vessel", "aircraft"),
-                     "terms": "Contains public sector information licensed under the Open Government Licence v3.0. "
-                              "The licence does not cover personal data, so individuals are not exported."},
-    "canada-sema": {"country": "ca", "authority_ids": False,
-                    "terms": "Reproduced in part, for non-commercial purposes, under the Government of Canada's terms "
-                             "(canada.ca/en/transparency/terms.html): Consolidated Canadian Autonomous Sanctions "
-                             "List, Global Affairs Canada. This reproduction is a copy of part of the version "
-                             "available at " + sanctions.CA_PAGE + "."},
-    "australia-dfat": {"country": "au",
-                       "terms": "Australian Sanctions Consolidated List, CC BY 4.0. Source: Department of Foreign "
-                                "Affairs and Trade website - www.dfat.gov.au"},
-    "japan-mof": {"country": "jp",
-                  "terms": "出典：財務省ウェブサイト（" + sanctions.JP_PAGE + "）、PDL1.0（" + sanctions.PDL_URL
-                           + "）を加工して作成. Edited by Headwind (The Intelligence Company): entry numbers, types, "
-                           "programs, English names and countries, with Headwind's own English program names."},
+    "ofac-sdn": {
+        "country": "us", "title": "Specially Designated Nationals and Blocked Persons List (SDN list)",
+        "publisher": "US Department of the Treasury, Office of Foreign Assets Control (OFAC)",
+        "source": [sanctions.LISTS["ofac-sdn"]["url"], sanctions.OFAC_SDN_CSV, sanctions.OFAC_ADD_CSV,
+                   sanctions.OFAC_ADVANCED_ZIP],
+        "licence": US_WORK, "licence_url": US_WORK_URL,
+        "statement": "Source: US Department of the Treasury, Office of Foreign Assets Control (OFAC), SDN list.",
+        "changes": "Names as sdn.csv prints them; countries from OFAC's address file (add.csv); ships' listing dates "
+                   "from the SDN advanced XML (sdn_advanced.zip)."},
+    "eu-fsf": {
+        "country": "eu",
+        "title": "Consolidated list of persons, groups and entities subject to EU financial sanctions",
+        "publisher": "European Commission, Directorate-General for Financial Stability, Financial Services and "
+                     "Capital Markets Union (Financial Sanctions Files)",
+        "source": [sanctions.EU_PAGE, sanctions.EU_XML],
+        "licence": EU_REUSE + " (the licence the EU open data portal gives the Financial Sanctions Files)",
+        "licence_url": EU_REUSE_URL,
+        "statement": "Source: European Commission, Financial Sanctions Files.",
+        "changes": "One name per entry: the alias the file marks strong with the lowest alias id (else the lowest of "
+                   "its aliases); countries from its citizenships and addresses."},
+    "uk-sanctions": {
+        "country": "gb", "types": ("entity", "vessel", "aircraft"), "title": "UK Sanctions List",
+        "publisher": "UK Foreign, Commonwealth and Development Office (FCDO)",
+        "source": [sanctions.UK_PAGE, sanctions.UK_XML],
+        "licence": OGL3, "licence_url": OGL3_URL,
+        "statement": "Contains public sector information licensed under the Open Government Licence v3.0.",
+        "changes": "Individuals left out (the licence does not cover personal data): organizations and ships only. "
+                   "The primary name as FCDO prints it; a ship the list names by its IMO number takes the name in "
+                   "brackets, else its first alias; countries from addresses; ships' owners and operators dropped."},
+    "canada-sema": {
+        "country": "ca", "authority_ids": False, "title": "Consolidated Canadian Autonomous Sanctions List",
+        "publisher": "Global Affairs Canada", "source": [sanctions.CA_PAGE, sanctions.CA_XML],
+        "licence": CA_TERMS, "licence_url": CA_TERMS_URL,
+        "statement": "Reproduced in part, for non-commercial purposes: Consolidated Canadian Autonomous Sanctions "
+                     "List, Global Affairs Canada. This reproduction is a copy of part of the version available at "
+                     + sanctions.CA_PAGE + ".",
+        "changes": "Reproduced in part. People's names joined as 'Last, Given'; the regime named from the record's "
+                   "country field; the list prints no address or nationality, so no countries; the list gives no "
+                   "entry id, so the record id is Headwind's key (regime, schedule and item number); records with no "
+                   "name left out."},
+    "australia-dfat": {
+        "country": "au", "title": "Australian Sanctions Consolidated List",
+        "publisher": "Australian Department of Foreign Affairs and Trade (Australian Sanctions Office)",
+        "source": [sanctions.AU_PAGE, sanctions.AU_XLSX],
+        "licence": CC_BY_4, "licence_url": CC_BY_4_URL,
+        "statement": "Department of Foreign Affairs and Trade website – www.dfat.gov.au. Licensed under CC BY 4.0 "
+                     "(" + CC_BY_4_URL + "); modified by Headwind as stated.",
+        "changes": "Australia's own designations only: entries under a UN Security Council regime, which restate "
+                   "the UN's lists, are left out. The primary name only (aliases and original scripts dropped); "
+                   "countries from citizenship and from the country an address ends with; for ships the name and "
+                   "IMO number."},
+    "japan-mof": {
+        "country": "jp", "title": "経済制裁措置及び対象者リスト (Japan's asset-freeze list)",
+        "publisher": "Ministry of Finance Japan (財務省)", "source": [sanctions.JP_PAGE],
+        "licence": PDL1, "licence_url": sanctions.PDL_URL,
+        "statement": "出典：財務省ウェブサイト（" + sanctions.JP_PAGE + "）、PDL1.0（" + sanctions.PDL_URL
+                     + "）を加工して作成. Edited by Headwind (The Intelligence Company); not the Ministry's own data.",
+        "changes": "Edited: Japan's own programs only (UN Security Council restatements left out); entry numbers, "
+                   "types, programs with Headwind's own English program names, the English name as printed (NFKC) "
+                   "and countries; the ship file gives IMO numbers and no names, so its ships are left out."},
 }
 # The trade.gov Consolidated Screening List (every list but the SDN list, which comes from OFAC above): US government
-# works. FtM topics by list: the Commerce lists are export controls, the State Department's ITAR debarments are
-# debarments, and the State and Treasury sanctions lists are sanctions. A list not named here carries no topic.
-SCREENING_TERMS = ("US government work, not subject to copyright in the US (17 U.S.C. 105), from the US "
-                   "International Trade Administration's Consolidated Screening List.")
+# works, credited per list from this template (screening_attribution). FtM topics by list: the Commerce lists are
+# export controls, the State Department's ITAR debarments are debarments, and the State and Treasury sanctions lists
+# are sanctions. A list not named here carries no topic.
+SCREENING = {
+    "publisher": "US International Trade Administration (Consolidated Screening List)",
+    "source": [screening.CSL_PAGE, screening.CSL_URL], "licence": US_WORK, "licence_url": US_WORK_URL,
+    "statement": "Source: US International Trade Administration, Consolidated Screening List. The CSL asks users to "
+                 "check the official publication of restricted parties in the Federal Register.",
+    "changes": "The name, type (an entry the CSL gives no type is a LegalEntity), programs and address countries as "
+               "the CSL gives them; the listing's start and end dates as the CSL gives them (`startDate`, `endDate`). "
+               "An entry whose end date is before the list's reading carries no topic, so it does "
+               "not read as a current listing."}
+SCREENING_TERMS = SCREENING["statement"]
 SCREENING_TOPIC = {"EL": "export.control", "UVL": "export.control", "MEU": "export.control", "DPL": "export.control",
                    "DTC": "debarment", "ISN": "sanction", "ACN": "sanction", "FSE": "sanction", "SSI": "sanction",
                    "PLC": "sanction", "CAP": "sanction", "CMIC": "sanction", "NS-MBS": "sanction"}
@@ -219,6 +301,95 @@ def _pair(list_id, entry_id, kind, name, countries, vessel, programs, sanction_p
     return party, sanction
 
 
+ENDED_NOTE = ("Entries whose list gives an end date before Headwind's reading of that list (the Denied Persons List "
+              "gives one for most of its orders, and keeps an order in the file after it ends). Each is exported "
+              "with its Sanction's endDate (and startDate) and with no topic on the listed party, so it does not read "
+              "as a current listing; it is not left out.")
+
+
+def _day(value) -> str | None:
+    d = str(value or "").strip()[:10]
+    return d if re.fullmatch(r"\d{4}-\d{2}-\d{2}", d) else None
+
+
+def has_ended(end: str | None, checked_at: str | None) -> bool:
+    """Whether an end date (YYYY-MM-DD) is before the day a list was read: such a listing is no longer in force."""
+    day = _day(checked_at)
+    return bool(end and day and end < day)
+
+
+def attribution(list_id: str, left_out: Counter | dict | None = None) -> dict:
+    """The credit for one exported sanctions list, from LISTS: what the release, about.json and the site print."""
+    spec = LISTS[list_id]
+    return {"list": list_id, "title": spec["title"], "publisher": spec["publisher"], "source": list(spec["source"]),
+            "licence": spec["licence"], "licence_url": spec["licence_url"], "statement": spec["statement"],
+            "changes": f"{CHANGES_ALL} {spec['changes']}", "left_out": dict(sorted((left_out or {}).items()))}
+
+
+def screening_attribution(abbr: str, lst: dict, left_out: Counter | dict | None = None) -> dict:
+    """The credit for one list of the Consolidated Screening List, from SCREENING and the list's own name and
+    publisher as the CSL gives them."""
+    own = lst.get("url")
+    source = list(SCREENING["source"]) + ([own] if own and own not in SCREENING["source"] else [])
+    return {"list": "csl-" + abbr.lower(), "title": f"{lst.get('name')} ({abbr})",
+            "publisher": f"{lst.get('publisher')}, in the {SCREENING['publisher']}", "source": source,
+            "licence": SCREENING["licence"], "licence_url": SCREENING["licence_url"],
+            "statement": SCREENING["statement"], "changes": f"{CHANGES_ALL} {SCREENING['changes']}",
+            "left_out": dict(sorted((left_out or {}).items()))}
+
+
+def all_attributions(screening_lists) -> list[dict]:
+    """One credit per exported list: the sanctions lists of LISTS, then each screening list (`screening_lists`:
+    {abbr: list} as the state keeps them, or the page's statuses, [{id, name, publisher, url}])."""
+    if isinstance(screening_lists, dict):
+        items = sorted(screening_lists.items())
+    else:
+        items = sorted(((s["id"], s) for s in screening_lists or []), key=lambda x: x[0])
+    return [attribution(l) for l in LISTS] + [screening_attribution(a, lst) for a, lst in items]
+
+
+NOTES_INTRO = ("The people, organizations, vessels and aircraft on the sanctions and screening lists Headwind reads, as "
+               "FollowTheMoney entities (" + DOCS + "), one JSON entity per line: each listed party and a Sanction "
+               "linking it to its list. As of each list's last reading; replaced every run. Not an official list: "
+               "check the publisher's own list before acting on an entry. Lists, counts, what is left out and each "
+               "source's terms: headwind-entities.about.json. Checksums: SHA256SUMS.")
+
+
+def release_notes(about: dict) -> str:
+    """The `entities` release's notes, from about.json: what the file is, then every exported list's credit
+    (publisher, title, source, licence and its link, attribution statement, what was changed, entries left out)."""
+    lines = [NOTES_INTRO, ""]
+    ended = about.get("ended") or {}
+    if ended.get("entries"):
+        by = ", ".join(f"{k} {v:,}" for k, v in sorted(ended["by_list"].items()))
+        n = ended["entries"]
+        lines += [f"Ended listings: {n:,} {'entry' if n == 1 else 'entries'} ({by}). {ended['why']}", ""]
+    lines += ["## Sources, licences and changes", "",
+              f"Changed on every list: {about['changes']}", ""]
+    for item in about["lists"]:
+        a = item["attribution"]
+        own = a["changes"][len(about["changes"]):].strip()
+        left = "; ".join(f"{why}: {n:,}" for why, n in a["left_out"].items())
+        lines.append(f"- **{a['title']}**, {a['publisher']}. Source: {a['source'][0]}. Licence: "
+                     f"[{a['licence']}]({a['licence_url']}). {a['statement']} Changed: as on every list, and: {own}"
+                     + (f" Entries left out: {left}." if left else ""))
+    lines += ["", "Left out of the export: " + " ".join(f"{k}: {v}" for k, v in about["left_out"].items())]
+    return "\n".join(lines) + "\n"
+
+
+def sources_html(screening_lists) -> str:
+    """The site's list of the export's sources (site_src/index.html, `<!-- ftm-sources -->`), from the same table."""
+    rows = []
+    for a in all_attributions(screening_lists):
+        own = a["changes"][len(CHANGES_ALL):].strip()
+        rows.append(f'<li><b>{html.escape(a["title"])}</b>, {html.escape(a["publisher"])}. '
+                    f'<a href="{html.escape(a["source"][0])}">Source</a>. Licence: '
+                    f'<a href="{html.escape(a["licence_url"])}">{html.escape(a["licence"])}</a>. '
+                    f'{html.escape(a["statement"])} Changed: {html.escape(own)}</li>')
+    return ('<details class="small"><summary>Sources, licences and changes, list by list</summary>'
+            f'<p>Changed on every list: {html.escape(CHANGES_ALL)}</p><ul>' + "".join(rows) + "</ul></details>")
+
+
 def entities(sanctions_state: dict, screening_state: dict, model: dict) -> tuple[list[dict], dict]:
     """(entities, about): the FtM entities of every exported list, in list then entry order, and what was written,
     left out and why."""
@@ -232,16 +403,16 @@ def entities(sanctions_state: dict, screening_state: dict, model: dict) -> tuple
         dates = st.get("vessel_dates") or {}
         base = {"authority": meta["publisher"], "country": spec["country"], "sourceUrl": meta["url"],
                 "publisher": meta["name"], "retrievedAt": _ftm_time(st.get("checked_at"))}
-        written = Counter()
+        written, left = Counter(), Counter()
         for entry_id in sorted(index):
             e = index[entry_id]
             kind = e[0]
             det = e[2] if len(e) > 2 and isinstance(e[2], dict) else {}
             if kind not in spec.get("types", (kind,)):
-                skipped[(list_id, "type not exported")] += 1
+                left["type not exported"] += 1
                 continue
             if not det.get("name"):
-                skipped[(list_id, "no name in the state")] += 1
+                left["no name in the state"] += 1
                 continue
             vessel = None
             cs = det.get("countries") or []
@@ -255,9 +426,11 @@ def entities(sanctions_state: dict, screening_state: dict, model: dict) -> tuple
                                     "sanction", spec.get("authority_ids", True))
             out += [party, sanction]
             written[party["schema"]] += 1
+        skipped.update({(list_id, why): n for why, n in left.items()})
         about_lists.append({"list": list_id, "name": meta["name"], "publisher": meta["publisher"], "url": meta["url"],
                             "checked_at": st.get("checked_at"), "entries": len(index),
-                            "exported": dict(sorted(written.items())), "terms": spec["terms"]})
+                            "exported": dict(sorted(written.items())), "terms": spec["statement"],
+                            "attribution": attribution(list_id, left)})
     s_checked = screening_state.get("checked_at")
     for abbr in sorted(screening_state.get("lists") or {}):
         lst = screening_state["lists"][abbr]
@@ -265,20 +438,31 @@ def entities(sanctions_state: dict, screening_state: dict, model: dict) -> tuple
         list_id = "csl-" + abbr.lower()
         base = {"authority": lst.get("publisher"), "country": "us", "sourceUrl": lst.get("url"),
                 "publisher": f"{lst.get('name')} (Consolidated Screening List)", "retrievedAt": _ftm_time(s_checked)}
-        written = Counter()
+        entry_dates = lst.get("entry_dates") or {}
+        written, left, dated, ended = Counter(), Counter(), Counter(), 0
         for entry_id in sorted(index):
             e = index[entry_id]
             if len(e) < 5 or not e[4]:
-                skipped[(list_id, "no name in the state")] += 1
+                left["no name in the state"] += 1
                 continue
+            start, end = (list(entry_dates.get(entry_id) or []) + [None, None])[:2]
+            start, end = _day(start), _day(end)
+            gone = has_ended(end, s_checked)
             party, sanction = _pair(list_id, entry_id, e[0], e[4], countries.codes_for(e[2], list_id), None,
-                                    list(e[1]) or [lst.get("name")], base, SCREENING_TOPIC.get(abbr), False)
+                                    list(e[1]) or [lst.get("name")], {**base, "startDate": start, "endDate": end},
+                                    None if gone else SCREENING_TOPIC.get(abbr), False)
             out += [party, sanction]
             written[party["schema"]] += 1
+            dated["start"] += bool(start)
+            dated["end"] += bool(end)
+            ended += gone
+        skipped.update({(list_id, why): n for why, n in left.items()})
         about_lists.append({"list": list_id, "name": lst.get("name"), "publisher": lst.get("publisher"),
                             "url": lst.get("url"), "checked_at": s_checked, "entries": len(index),
                             "exported": dict(sorted(written.items())), "terms": SCREENING_TERMS,
-                            "topic": SCREENING_TOPIC.get(abbr)})
+                            "topic": SCREENING_TOPIC.get(abbr),
+                            "with_start_date": dated["start"], "with_end_date": dated["end"], "ended": ended,
+                            "attribution": screening_attribution(abbr, lst, left)})
     about = {
         "format": "FollowTheMoney entity stream (one JSON entity per line), gzip",
         "followthemoney": {"docs": DOCS, "model_version": model.get("version"), "model": model.get("source")},
@@ -288,6 +472,9 @@ def entities(sanctions_state: dict, screening_state: dict, model: dict) -> tuple
                  "countries of addresses and nationality; vessels with IMO number, MMSI, flag and type. Not an "
                  "official list: check the publisher's own list before acting on an entry."),
         "entities": len(out), "lists": about_lists,
+        "changes": CHANGES_ALL,
+        "ended": {"why": ENDED_NOTE, "entries": sum(x.get("ended", 0) for x in about_lists),
+                  "by_list": {x["list"]: x["ended"] for x in about_lists if x.get("ended")}},
         "left_out": LEFT_OUT,
         "not_written": [{"list": l, "why": why, "entries": n} for (l, why), n in sorted(skipped.items())],
         "imo_numbers_not_valid": {"why": "fail both IMO check-digit schemes, so FtM would drop them; left out",
@@ -390,6 +577,7 @@ def main(argv=None) -> int:
     ap.add_argument("--state", default="data/state", help="folder holding sanctions_index.json and screening_index.json")
     ap.add_argument("--out", default=OUT_NAME)
     ap.add_argument("--about", default=ABOUT_NAME)
+    ap.add_argument("--notes", help="also write the release notes (Markdown) to this file")
     args = ap.parse_args(argv)
     state = Path(args.state)
     s = json.loads((state / "sanctions_index.json").read_text(encoding="utf-8"))
@@ -399,9 +587,13 @@ def main(argv=None) -> int:
     validate(stream, model)
     write(stream, Path(args.out))
     Path(args.about).write_text(json.dumps(about, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    if args.notes:
+        Path(args.notes).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.notes).write_text(release_notes(about), encoding="utf-8", newline="\n")
     kinds = Counter(e["schema"] for e in stream)
     print(f"{args.out}: {len(stream)} entities ({', '.join(f'{k} {v}' for k, v in sorted(kinds.items()))}); "
           f"{sum(x['entries'] for x in about['not_written'])} entries not written; "
+          f"{about['ended']['entries']} ended listings marked ended; "
           f"{sum(x['times'] for x in about['countries_not_placed'])} country values not placed")
     return 0
 

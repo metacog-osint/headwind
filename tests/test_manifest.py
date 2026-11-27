@@ -180,6 +180,12 @@ class WorkflowStepRun(unittest.TestCase):
             r = run()
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
             self.assertTrue((store / "entities" / ftm.OUT_NAME).is_file())
+            # The release notes are the exporter's, with every list's credit.
+            made = [x for x in (store / "calls.log").read_text().splitlines() if x.startswith("gh release create entities")]
+            self.assertTrue(made and "--notes-file " in made[0], made)
+            notes = Path(made[0].split("--notes-file ", 1)[1].split()[0]).read_text(encoding="utf-8")
+            self.assertIn(ftm.CC_BY_4_URL, notes)
+            self.assertIn(ftm.OGL3_URL, notes)
             for tag in ("state", "entities"):
                 m = json.loads((store / tag / manifest.JSON_NAME).read_text(encoding="utf-8"))
                 self.assertEqual(manifest.verify(m, store / tag), [])
