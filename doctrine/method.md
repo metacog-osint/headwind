@@ -30,7 +30,7 @@ It reports measurements and records. It states no probability and gives no inves
 | Local food prices | WFP prices by market, from the Humanitarian Data Exchange | Monthly, one to three months late | Median 3-month change across a country's price series, against its own 60 prior medians |
 | Country baseline | World Bank World Development Indicators | Annual | No anomaly test; context only, in `data/baseline.json` |
 | Calendar | Federal Reserve, ECB and FAO schedule pages | As published | Dates for Verdict's calendar, in `data/events.json` |
-| Sanctions lists | OFAC SDN list (`sdn.csv`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML); since 19 Nov 2026 Australia's Consolidated List (xlsx) and Japan's asset-freeze list (CSV, with its ship file) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
+| Sanctions lists | OFAC SDN list (`sdn.csv`; entry dates from `sdn_advanced.zip`); UN Security Council consolidated list (XML); the EU's Financial Sanctions Files (XML); the UK Sanctions List (XML); since 16 Nov 2026 France's Registre national des gels (JSON) and Canada's Consolidated Canadian Autonomous Sanctions List (XML); since 19 Nov 2026 Australia's Consolidated List (xlsx) and Japan's asset-freeze list (CSV, with its ship file) | As the publishers update them | Entries added and removed since Headwind's last reading, by type and program; a change is scored by its designation batches (below) |
 | US Supreme Court (since 16 Nov 2026) | The Court's slip opinion feeds (this term and the last) and its dockets (JSON) | As the Court publishes | Every signed and per curiam opinion, with the Court's case title, docket number and decision date; the tariff-authority dockets tracked; no anomaly test |
 | UK Supreme Court (since 18 Nov 2026) | The Court's own site: sitemap, latest-judgments page, case pages | As the Court publishes | Every judgment this year and last, with the Court's case title, case id and neutral citation; no anomaly test |
 | Court of Justice of the EU (since 19 Nov 2026) | The Publications Office's SPARQL endpoint (the metadata behind EUR-Lex) | Same day | Every judgment of the Court of Justice and the General Court in the last 60 days; in the feed, the Grand Chamber's and full Court's and those on restrictive measures; no anomaly test |
@@ -385,12 +385,17 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   individuals, 61 organizations, 16 none.
 
 ## Who listed a ship first (26 Nov 2026)
-- Ships on two or more of the lists that date their ship entries, matched by IMO number: the UK Sanctions List
+- Ships on two or more of the lists that date their ship entries, matched by IMO number: OFAC's SDN list (since 27
+  Nov 2026: the "Created" date, `SanctionsEntry/EntryEvent` type 1, in the SDN advanced XML, `sdn_advanced.zip`,
+  matched to the entry id of `sdn.csv`; the earliest where an entry has one event per legal basis), the UK Sanctions List
   (DateDesignated), Canada's consolidated list (DateOfListing) and Japan's ship list (its notice date). A list's
   date for a ship is the earliest of its entries for that number. For each two lists: how many ships both list, how
   many each listed first (with the median and largest number of days the other followed) and how many on the same
   day. Every ship's dates are in `data/lead-time.json`.
-- OFAC's, France's and Australia's files give no designation date, so their ships are not placed in time; a ship
+- "Created" is when OFAC's entry was created. For a ship removed and listed again under a new entry, it is the later
+  listing. The date serves this table only; OFAC's batch rule still uses Headwind's own readings. If the advanced XML
+  cannot be read, the dates of the reading before are kept.
+- France's and Australia's files give no designation date, so their ships are not placed in time; a ship
   also on one of them says so (`also_on_undated`). A list whose ship measure began later can only follow: Japan's
   ship list starts with one notice of 2 Oct 2026, and Canada's ship entries run from 21 Feb 2025.
 - These are the publishers' own dates. The table measures the publishers, not Headwind, and says nothing about a

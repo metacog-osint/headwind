@@ -278,9 +278,13 @@ def list_changes(snap: dict) -> dict:
             + [slim(d, "screening") for d in snap.get("screening") or []]}
 
 
+_OFAC_DATES: dict = {}   # {entry id: date} from the last read of OFAC's advanced XML
+
+
 def _read_list(list_id, raw_dir, getter):
     """Fetch and parse one sanctions list: (index, the publisher's generation date, fetch record, designation dates).
-    OFAC's file has no designation dates (None)."""
+    OFAC's dates are returned as None: they come from a second file, are kept in _OFAC_DATES and serve only the
+    cross-list lead table, not the batch rule."""
     dates: dict = {}
     if list_id == "ofac-sdn":
         body, rec = fetch.fetch("ofac-sdn", sanctions.OFAC_SDN_CSV, raw_dir, "csv", timeout=180, getter=getter)
@@ -292,6 +296,14 @@ def _read_list(list_id, raw_dir, getter):
             addresses = sanctions.parse_add_csv(abody.decode("utf-8", errors="replace"))
         except Exception as exc:  # noqa: BLE001 - the list itself was read
             print(f"  sanctions: ofac-sdn: address file not read ({exc}); no countries this run", file=sys.stderr)
+        _OFAC_DATES.clear()
+        try:
+            zbody, _ = fetch.fetch("ofac-sdn-advanced", sanctions.OFAC_ADVANCED_ZIP, raw_dir, "zip", timeout=180,
+                                   getter=getter)
+            _OFAC_DATES.update(sanctions.parse_sdn_advanced_dates(zbody))
+        except Exception as exc:  # noqa: BLE001 - the list itself was read
+            print(f"  sanctions: ofac-sdn: entry dates not read ({exc}); ship dates kept from the reading before",
+                  file=sys.stderr)
         return sanctions.parse_sdn_csv(body.decode("utf-8", errors="replace"), addresses), None, rec, None
     if list_id == "un-consolidated":
         body, rec = fetch.fetch("un-sc-consolidated", sanctions.UN_XML, raw_dir, "xml", timeout=120, getter=getter)
@@ -389,10 +401,15 @@ def _lane_sanctions(raw_dir, prev, getter):
                               "index": index}
         if ca_names is not None:
             new_state[list_id]["names"] = ca_names
-        if dates and list_id in sanctions.DATED_VESSEL_LISTS:
+        if list_id == "ofac-sdn":
+            # Without a fresh dates file, the dates read before stand: an entry's creation date does not change.
+            dates_for_ships = _OFAC_DATES or old.get("vessel_dates") or {}
+        else:
+            dates_for_ships = dates
+        if dates_for_ships and list_id in sanctions.DATED_VESSEL_LISTS:
             # Each ship's listing date as the publisher gives it (cross_list_lead); kept so a list that fails a
             # later run still has its dates.
-            new_state[list_id]["vessel_dates"] = {i: d for i, d in sorted(dates.items())
+            new_state[list_id]["vessel_dates"] = {i: d for i, d in sorted(dates_for_ships.items())
                                                   if d and i in index and index[i][0] == "vessel"}
         lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated, last_change))
     if not recs:
@@ -867,11 +884,13 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
             "vessels": snap.get("vessel_table") or []}),
         "data/lead-time.json": dump({
             "generated_at": snap["generated_at"],
-            "note": ("Which publisher listed a ship first: ships, by IMO number, on two or more of the UK Sanctions List, "
-                     "Canada's consolidated list and Japan's ship list, with each list's own designation date (the "
-                     "earliest of its entries for that number). OFAC's, France's and Australia's files give no date, "
-                     "so their ships are not placed in time (also_on_undated). These are the publishers' dates: they "
-                     "measure the publishers, not Headwind, and say nothing about the ship."),
+            "note": ("Which publisher listed a ship first: ships, by IMO number, on two or more of the OFAC SDN list, the "
+                     "UK Sanctions List, "
+                     "Canada's consolidated list and Japan's ship list, with each list's own date (the earliest of its "
+                     "entries for that number). OFAC's is the date its entry was created, from the SDN advanced XML. "
+                     "France's and Australia's files give no date, so their ships are not placed in time "
+                     "(also_on_undated). These are the publishers' dates: they measure the publishers, not Headwind, "
+                     "and say nothing about the ship."),
             "sources": {l: {"name": sanctions.LISTS[l]["name"], "url": sanctions.LISTS[l]["url"]}
                         for l in sanctions.DATED_VESSEL_LISTS},
             **(snap.get("vessel_lead") or {})}),

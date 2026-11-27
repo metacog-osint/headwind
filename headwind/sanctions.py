@@ -32,6 +32,8 @@ from . import batches, pinksheet, screening
 from . import names as nm
 
 OFAC_SDN_CSV = "https://www.treasury.gov/ofac/downloads/sdn.csv"
+# The SDN list in OFAC's advanced XML (about 6 MB zipped, 129 MB unzipped): read only for each entry's date.
+OFAC_ADVANCED_ZIP = "https://www.treasury.gov/ofac/downloads/sanctions/1.0/sdn_advanced.zip"
 OFAC_ADD_CSV = "https://www.treasury.gov/ofac/downloads/add.csv"     # addresses: only the country is kept
 UN_XML = "https://scsanctions.un.org/resources/xml/en/consolidated.xml"
 OFAC_RECENT = "https://ofac.treasury.gov/recent-actions"
@@ -421,6 +423,34 @@ def parse_sdn_csv(text: str, addresses: dict | None = None) -> dict[str, list]:
         entry.append(_vessel(row) if kind == "vessel" else nm.details(_blank(row[1]), (addresses or {}).get(uid)))
         index[uid] = entry
     return index
+
+
+def parse_sdn_advanced_dates(body: bytes) -> dict[str, str]:
+    """{entry id: "YYYY-MM-DD"} from sdn_advanced.zip: the "Created" date (EntryEvent type 1) of each
+    SanctionsEntry, whose ProfileID is the entry id in sdn.csv. An entry has one event per legal basis; the earliest
+    date counts. Raises when the file holds none, so a changed layout is not read as a list without dates."""
+    dates: dict[str, str] = {}
+    with zipfile.ZipFile(io.BytesIO(body)) as z:
+        member = next(n for n in z.namelist() if n.lower().endswith(".xml"))
+        with z.open(member) as fh:
+            for _, el in ET.iterparse(fh):
+                tag = el.tag.rsplit("}", 1)[-1]
+                if tag == "SanctionsEntry":
+                    for event in el.findall("{*}EntryEvent"):
+                        if event.get("EntryEventTypeID") != "1":
+                            continue
+                        try:
+                            day = datetime(*(int(event.findtext("{*}Date/{*}" + k) or "")
+                                             for k in ("Year", "Month", "Day"))).strftime("%Y-%m-%d")
+                        except ValueError:
+                            continue
+                        uid = el.get("ProfileID") or ""
+                        dates[uid] = min(day, dates.get(uid, day))
+                if tag in ("SanctionsEntry", "DistinctParty", "IDRegDocument", "Location", "ProfileRelationship"):
+                    el.clear()      # the file is large; keep only the dates
+    if not dates:
+        raise ValueError("no entry dates in the advanced XML")
+    return dates
 
 
 def _blank(s: str) -> str | None:
@@ -1098,10 +1128,10 @@ def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict,
     return summary, table
 
 
-# The lists whose files give each ship's own listing date: the UK's DateDesignated, Canada's DateOfListing and the
-# notice date in Japan's ship file. OFAC's, France's and Australia's files give none, so their ships cannot be
-# placed in time here.
-DATED_VESSEL_LISTS = ("uk-sanctions", "canada-sema", "japan-mof")
+# The lists whose files give each ship's own listing date: the "Created" date of the entry in OFAC's advanced XML,
+# the UK's DateDesignated, Canada's DateOfListing and the notice date in Japan's ship file. France's and Australia's
+# files give none, so their ships cannot be placed in time here.
+DATED_VESSEL_LISTS = ("ofac-sdn", "uk-sanctions", "canada-sema", "japan-mof")
 
 
 def cross_list_lead(table: list[dict], vessel_dates: dict[str, dict], checked_at: str) -> dict:
@@ -1131,7 +1161,7 @@ def cross_list_lead(table: list[dict], vessel_dates: dict[str, dict], checked_at
                       "listed": listed, "first": [l for l in listed if listed[l] == first_day],
                       "days_after_first": {l: (date.fromisoformat(d) - date.fromisoformat(first_day)).days
                                            for l, d in listed.items()},
-                      "also_on_undated": sorted(l for l in r["on"] if l not in DATED_VESSEL_LISTS)})
+                      "also_on_undated": sorted(l for l in r["on"] if l not in listed)})
         for x, a in enumerate(DATED_VESSEL_LISTS):
             for b in DATED_VESSEL_LISTS[x + 1:]:
                 if a in listed and b in listed:

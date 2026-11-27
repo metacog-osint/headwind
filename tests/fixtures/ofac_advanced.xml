@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Sanctions xmlns="https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/ADVANCED_XML">
+<SanctionsEntries>
+<SanctionsEntry ID="15042" ProfileID="15042" ListID="1550">
+      <EntryEvent ID="15042" EntryEventTypeID="1" LegalBasisID="1823">
+        <Comment />
+        <Date CalendarTypeID="1">
+          <Year>2012</Year>
+          <Month>7</Month>
+          <Day>12</Day>
+        </Date>
+      </EntryEvent>
+      <SanctionsMeasure ID="93" SanctionsTypeID="1705">
+        <DatePeriod CalendarTypeID="1" YearFixed="true" MonthFixed="true" DayFixed="true" />
+      </SanctionsMeasure>
+      <SanctionsMeasure ID="140043" SanctionsTypeID="1">
+        <Comment>IRAN</Comment>
+        <DatePeriod CalendarTypeID="1" YearFixed="true" MonthFixed="true" DayFixed="true" />
+      </SanctionsMeasure>
+    </SanctionsEntry>
+<SanctionsEntry ID="23730" ProfileID="23730" ListID="1550">
+      <EntryEvent ID="23730" EntryEventTypeID="1" LegalBasisID="91745">
+        <Comment />
+        <Date CalendarTypeID="1">
+          <Year>2018</Year>
+          <Month>2</Month>
+          <Day>23</Day>
+        </Date>
+      </EntryEvent>
+      <SanctionsMeasure ID="15827" SanctionsTypeID="1705">
+        <DatePeriod CalendarTypeID="1" YearFixed="true" MonthFixed="true" DayFixed="true" />
+      </SanctionsMeasure>
+      <SanctionsMeasure ID="149966" SanctionsTypeID="1">
+        <Comment>DPRK4</Comment>
+        <DatePeriod CalendarTypeID="1" YearFixed="true" MonthFixed="true" DayFixed="true" />
+      </SanctionsMeasure>
+    </SanctionsEntry>
+<SanctionsEntry ID="25289" ProfileID="25289" ListID="1550">
+      <EntryEvent ID="25289" EntryEventTypeID="1" LegalBasisID="1811">
+        <Comment />
+        <Date CalendarTypeID="1">
+          <Year>2018</Year>
+          <Month>11</Month>
+          <Day>5</Day>
+        </Date>
+      </EntryEvent>
+      <EntryEvent ID="1025289" EntryEventTypeID="1" LegalBasisID="1823">
+        <Comment />
+        <Date CalendarTypeID="1">
+          <Year>2018</Year>
+          <Month>11</Month>
+          <Day>5</Day>
+        </Date>
+      </EntryEvent>
+      <SanctionsMeasure ID="17407" SanctionsTypeID="1705">
+        <DatePeriod CalendarTypeID="1" YearFixed="true" MonthFixed="true" DayFixed="true" />
+      </SanctionsMeasure>
+      <SanctionsMeasure ID="151725" SanctionsTypeID="1">
+        <Comment>IRAN</Comment>
+        <DatePeriod CalendarTypeID="1" YearFixed="true" MonthFixed="true" DayFixed="true" />
+      </SanctionsMeasure>
+      <SanctionsMeasure ID="154542" SanctionsTypeID="1">
+        <Comment>NPWMD</Comment>
+        <DatePeriod CalendarTypeID="1" YearFixed="true" MonthFixed="true" DayFixed="true" />
+      </SanctionsMeasure>
+      <SanctionsMeasure ID="156374" SanctionsTypeID="1">
+        <Comment>IFSR</Comment>
+        <DatePeriod CalendarTypeID="1" YearFixed="true" MonthFixed="true" DayFixed="true" />
+      </SanctionsMeasure>
+    </SanctionsEntry>
+</SanctionsEntries>
+</Sanctions>

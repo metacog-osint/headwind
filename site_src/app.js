@@ -184,23 +184,23 @@
       " Canadian and " + Number((vc.without_imo || {})["australia-dfat"] || 0) +
       " Australian entries give no IMO number (Australia's ships under UN regimes are counted only, not matched)." + ((vc.from_earlier_run || []).length ? " From an earlier reading: " + vc.from_earlier_run.join(", ") + "." : "")) +
       ' <a href="data/vessels.json">Every ship, with each list\'s entry ids, name and flag</a>.</p>' : "";
-    // Which publisher listed a ship first, by the lists' own designation dates (UK, Canada, Japan).
+    // Which publisher listed a ship first, by the lists' own dates (OFAC, UK, Canada, Japan).
     var vl = s.vessel_lead || {};
-    var short = { "uk-sanctions": "the UK", "canada-sema": "Canada", "japan-mof": "Japan" };
-    var cap = { "uk-sanctions": "UK", "canada-sema": "Canada", "japan-mof": "Japan" };
+    var short = { "ofac-sdn": "OFAC", "uk-sanctions": "the UK", "canada-sema": "Canada", "japan-mof": "Japan" };
+    var cap = { "ofac-sdn": "OFAC", "uk-sanctions": "UK", "canada-sema": "Canada", "japan-mof": "Japan" };
     function firstText(p, l) {
       var f = (p.first || {})[l] || {};
       return short[l] + " first for " + Number(f.ships || 0).toLocaleString() + (f.ships ? " (median " + f.median_days + " days, at most " + Number(f.max_days).toLocaleString() + ")" : "");
     }
     document.getElementById("vessel-lead").innerHTML = (vl.pairs || []).length ? '<p class="small muted">' + esc(
-      "Who listed a ship first, by each list's own designation date: " + Number(vl.ships_on_two_or_more_dated || 0).toLocaleString() +
-      " ships are on two or more of the UK, Canadian and Japanese lists. " + vl.pairs.map(function (p) {
+      "Who listed a ship first, by each list's own date: " + Number(vl.ships_on_two_or_more_dated || 0).toLocaleString() +
+      " ships are on two or more of the OFAC, UK, Canadian and Japanese lists. " + vl.pairs.map(function (p) {
         return cap[p.lists[0]] + " and " + cap[p.lists[1]] + ", " + Number(p.ships).toLocaleString() + " ships: " +
           firstText(p, p.lists[0]) + ", " + firstText(p, p.lists[1]) + ", same day " + Number(p.same_day).toLocaleString();
       }).join("; ") + ". Each list's ship dates run " + Object.keys(vl.date_range || {}).map(function (l) {
         var r = vl.date_range[l];
         return "for " + short[l] + (r[0] === r[1] ? " only on " + r[0] : " from " + r[0] + " to " + r[1]);
-      }).join(", ") + ", so a list whose ship measure began later can only follow. OFAC's, France's and Australia's files give no designation date. These are the publishers' dates: they measure the publishers, not Headwind, and say nothing about the ship.") +
+      }).join(", ") + ", so a list whose ship measure began later can only follow. OFAC's date is the day its entry was created. France's and Australia's files give no date. These are the publishers' dates: they measure the publishers, not Headwind, and say nothing about the ship.") +
       ' <a href="data/lead-time.json">Every ship, with each list\'s date</a>.</p>' : "";
     // ideas#264: a bare two-letter country code (some lists print RU, UA) reads as the country's name; names pass through.
     var REGION = (function () { try { return new Intl.DisplayNames(["en"], { type: "region" }); } catch (e) { return null; } })();
