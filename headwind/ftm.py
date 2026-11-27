@@ -89,9 +89,10 @@ SCREENING_TOPIC = {"EL": "export.control", "UVL": "export.control", "MEU": "expo
 LEFT_OUT = {
     "un-consolidated": "The UN Security Council's terms withhold redistribution of its list; Headwind counts it only, "
                        "so its state holds no names.",
-    "france-gels": "The French Treasury's own reuse notice (tresor.economie.gouv.fr, Mentions légales) treats making a "
-                   "product from its information available to third parties, free or not, as reuse needing its "
-                   "authorization, so the register is not exported.",
+    "france-gels": "The register's site states no licence, and the French Treasury's legal notice for its own site "
+                   "(tresor.economie.gouv.fr, Mentions légales) treats making a product from its information for "
+                   "third parties, free or not, as reuse needing its authorization; its terms do not clearly cover "
+                   "a derived file, so the register is not exported.",
     "uk-sanctions individuals": "The Open Government Licence v3.0 does not cover personal data.",
 }
 
