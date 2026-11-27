@@ -47,7 +47,9 @@ EU_PAGE = ("https://data.europa.eu/data/datasets/"
 UK_XML = "https://sanctionslist.fcdo.gov.uk/docs/UK-Sanctions-List.xml"
 UK_PAGE = "https://www.gov.uk/government/publications/the-uk-sanctions-list"
 # France's Registre national des gels (Direction générale du Trésor): the JSON its public API gives, about 15 MB.
-# A HEAD request answers 405; GET works. Licence Ouverte 2.0 (the data.gouv.fr record, read 15 Nov 2026).
+# A HEAD request answers 405; GET works. The register's site states no licence (read 27 Nov 2026);
+# the data.gouv.fr record that says Licence Ouverte 2.0 belongs to a third party. Reused as public information under
+# the Code des relations entre le public et l'administration, articles L321-1 and L322-1.
 FR_JSON = "https://gels-avoirs.dgtresor.gouv.fr/ApiPublic/api/v1/publication/derniere-publication-fichier-json"
 FR_PAGE = "https://gels-avoirs.dgtresor.gouv.fr/"
 # Canada's Consolidated Canadian Autonomous Sanctions List (Global Affairs Canada), XML, about 2.9 MB. Canada.ca's
