@@ -40,8 +40,12 @@ def _state():
             "DPR0075": ["vessel", ["Democratic People's Republic of Korea"],
                         {"name": "Petrel 8", "imo": "9562233", "mmsi": None, "flag": "Comoros",
                          "vessel_type": "Bulk Carrier"}]}},
-        "france-gels": {"checked_at": CHECKED, "index": {
-            "4240": ["individual", ["UE Ukraine"], {"name": "SHILKIN, Grigory Vladimirovich", "countries": []}]}},
+        "france-gels": {"checked_at": CHECKED, "source_generated": "2026-11-26T17:02:11", "index": {
+            "4240": ["individual", ["UE Ukraine"], {"name": "SHILKIN, Grigory Vladimirovich", "countries": []}],
+            "2205": ["vessel", ["ONU Corée du Nord"], {"name": "AN SAN 1", "imo": "7303803", "mmsi": None,
+                                                      "flag": None, "vessel_type": None}],
+            "9001": ["entity", ["FR national, art L. 562-2"], {"name": "EXAMPLE ASSOCIATION",
+                                                               "countries": ["FRANCE", "RUSSIE", "ÉMIRATS ARABES UNIS", "CONGO"]}]}},
         "canada-sema": {"checked_at": CHECKED, "index": {
             "Belarus|1, Part 1|1": ["individual", ["Belarus"], {"name": "Atabekov, Khazalbek", "countries": []}],
             "Russia|1.1|1": ["vessel", ["Russia"], {"name": "Balitiyskiy III", "imo": "7612448", "mmsi": None,
@@ -108,7 +112,7 @@ class Export(unittest.TestCase):
 
     def test_lists_left_out_by_their_terms(self):
         ids = set(self.by_id)
-        self.assertFalse([i for i in ids if i.startswith(("hw-un-", "hw-france-"))])
+        self.assertFalse([i for i in ids if i.startswith("hw-un-")])
         self.assertNotIn("hw-uk-sanctions-RUS0001", ids)          # OGL v3.0 does not cover personal data
         self.assertIn("hw-uk-sanctions-AFG0001", ids)
         self.assertIn("hw-uk-sanctions-DPR0075", ids)
@@ -119,12 +123,30 @@ class Export(unittest.TestCase):
         self.assertEqual(why[("australia-dfat", "no name in the state")], 1)
         self.assertEqual(why[("japan-mof", "no name in the state")], 1)
         self.assertEqual(why[("csl-el", "no name in the state")], 1)
-        self.assertEqual(set(self.about["left_out"]), {"un-consolidated", "france-gels", "uk-sanctions individuals"})
+        self.assertEqual(set(self.about["left_out"]), {"un-consolidated", "uk-sanctions individuals"})
+
+    def test_france_register_exported_with_source_and_its_date(self):
+        p = self.by_id["hw-france-gels-4240"]
+        self.assertEqual((p["schema"], p["properties"]["name"]), ("Person", ["SHILKIN, Grigory Vladimirovich"]))
+        s = self.by_id["hw-france-gels-4240-sanction"]["properties"]
+        self.assertEqual((s["country"], s["authorityId"], s["program"]), (["fr"], ["4240"], ["UE Ukraine"]))
+        self.assertEqual(self.by_id["hw-france-gels-9001"]["properties"]["country"], ["ae", "cg", "fr", "ru"])
+        self.assertEqual(set(ftm.FR_COUNTRIES.values()) - set(MODEL["types"]["country"]["values"]), set())
+        self.assertIsNone(ftm.Countries(MODEL).code("RUSSIE", "eu-fsf"))        # French names: that list only
+        self.assertEqual(self.by_id["hw-france-gels-2205"]["schema"], "Vessel")
+        item = next(x for x in self.about["lists"] if x["list"] == "france-gels")
+        self.assertEqual(item["exported"], {"Organization": 1, "Person": 1, "Vessel": 1})
+        self.assertEqual(item["source_generated"], "2026-11-26T17:02:11")      # CRPA L322-1: date of last update
+        a = item["attribution"]
+        self.assertIn("Direction générale du Trésor, Registre national des gels", a["statement"])
+        self.assertIn("L321-1 and L322-1", a["licence"])
+        self.assertTrue(a["licence_url"].startswith("https://www.legifrance.gouv.fr/"))
+        self.assertIn("The publisher's file is dated 2026-11-26T17:02:11.", ftm.release_notes(self.about))
 
     def test_every_list_is_exported_or_left_out_with_a_reason(self):
         for list_id in sanctions.LISTS:
             self.assertTrue(list_id in ftm.LISTS or list_id in ftm.LEFT_OUT, list_id)
-        self.assertFalse(set(ftm.LISTS) & {"un-consolidated", "france-gels"})
+        self.assertFalse(set(ftm.LISTS) & {"un-consolidated"})
         self.assertTrue(set(ftm.LISTS) <= set(sanctions.NAMED_LISTS))
         for spec in ftm.LISTS.values():
             self.assertTrue(spec["statement"])
