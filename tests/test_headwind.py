@@ -2297,6 +2297,42 @@ class TestNames(unittest.TestCase):
         self.assertEqual((items["headwind:fx:W00"]["tier"], items["headwind:fx:usd-broad"]["tier"]),
                          ("anomaly", "routine"))
 
+    def test_a_european_bloc_move_is_not_called_the_dollar_s(self):
+        # The euro and ten European currencies weaker together, the rest flat: the count reaches FX_BROAD_MIN, but
+        # nothing in it says the dollar moved rather than the euro with the currencies tied to it.
+        def series(jump):
+            days = [f"2025-{1 + i // 28:02d}-{1 + i % 28:02d}" for i in range(300)]
+            vals = [1.0 + 0.002 * ((i * 7) % 5 - 2) for i in range(300)]
+            vals[-5:] = [v * (1 + jump) for v in vals[-5:]]
+            return list(zip(days, vals))
+        europe = ["EUR", "CZK", "DKK", "GBP", "HUF", "PLN", "RON", "SEK", "CHF", "ISK", "NOK"]
+        rest = ["JPY", "TRY", "AUD", "BRL", "CAD", "CNY", "HKD", "IDR", "ILS", "INR", "KRW", "MXN", "MYR", "NZD",
+                "PHP", "SGD", "THB", "ZAR"]
+        self.assertEqual(set(europe) - markets.EUROPEAN, set())
+        self.assertEqual(set(rest) & markets.EUROPEAN, set())
+        fx = markets.measure_fx({**{c: series(0.0) for c in rest}, **{c: series(0.06) for c in europe}})
+        b = markets.broad_move(fx)
+        self.assertEqual((b["broad"], len(b["currencies"]), b["european"], b["quoted"]), (True, 11, 11, 29))
+        snap = {"generated_at": "2025-11-27T06:00:00Z", "fx": fx, "lanes": {}}
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features(snap)}
+        broad = items["headwind:fx:usd-broad"]
+        for text in (broad["summary"], broad["baseline_ref"], items["headwind:fx:GBP"]["summary"]):
+            self.assertNotIn("the dollar's", text)
+            self.assertNotIn("dollar itself", text)
+            self.assertNotIn("move of the dollar", text)
+        self.assertIn("11 of the 11 are the euro or currencies of other EU and EFTA countries and the UK",
+                      broad["summary"])
+        self.assertIn("the count alone does not tell a move of the US dollar from one of the euro", broad["summary"])
+        self.assertIn("Part of a common move against the US dollar", items["headwind:fx:GBP"]["summary"])
+        # The rule itself is unchanged: one item, the members routine.
+        self.assertEqual((broad["tier"], items["headwind:fx:GBP"]["tier"]), ("anomaly", "routine"))
+        # With most of the set from outside Europe, the item names the European count and adds no caveat.
+        mixed = markets.measure_fx({**{c: series(0.06) for c in rest[:8] + europe[:3]},
+                                    **{c: series(0.0) for c in rest[8:] + europe[3:]}})
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features({**snap, "fx": mixed})}
+        self.assertIn("3 of the 11 are the euro", items["headwind:fx:usd-broad"]["summary"])
+        self.assertNotIn("count alone", items["headwind:fx:usd-broad"]["summary"])
+
     def test_an_eu_reorder_of_names_is_no_change(self):
         # The EU file printed each entry's strong aliases in another order on 20 Nov 2026 (1,167 entries)
         # and 26 Nov (3,493), and taking the first strong alias reported each as renamed.
