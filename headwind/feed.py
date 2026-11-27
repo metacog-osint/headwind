@@ -80,7 +80,8 @@ SRC_FRANCE = {
     "publisher": "French Treasury (Direction générale du Trésor)",
     "title": "Registre national des gels (France's national asset-freeze register)",
     "url": "https://gels-avoirs.dgtresor.gouv.fr/",
-    "licence": "Licence Ouverte / Open Licence 2.0",
+    "licence": "No licence stated; public information reused under France's Code des relations entre le public et "
+               "l'administration (articles L321-1 and L322-1)",
     "grade": "A1",
     "independence_group": "fr-dgtresor-gels",
     "source_type": "official or market data",
@@ -1411,7 +1412,9 @@ def build_feed(snapshot: dict) -> dict:
                     "Federal Register and its public inspection US public domain; USITC tariff schedule releases and White House presidential actions US government works; UN Security Council list, no "
                     "licence stated; EU financial "
                     "sanctions list, European Commission reuse notice; UK Sanctions List, Open Government Licence v3.0; "
-                    "France's Registre national des gels, Licence Ouverte 2.0; Canada's consolidated autonomous "
+                    "France's Registre national des gels, no licence stated, reused as public information under France's "
+                    "Code des relations entre le public et l'administration (articles L321-1 and L322-1); "
+                    "Canada's consolidated autonomous "
                     "sanctions list, non-commercial reproduction (Canada.ca terms); Australian Sanctions Consolidated "
                     "List, CC BY 4.0 (Department of Foreign Affairs and Trade website – www.dfat.gov.au); Japan's "
                     "asset-freeze list, PDL1.0 (出典：財務省ウェブサイト, edited by Headwind); UN press "

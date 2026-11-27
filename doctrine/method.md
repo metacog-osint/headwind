@@ -437,7 +437,10 @@ list gives them, because the IMO number is how a vessel is matched elsewhere.
   reorders were counted as renames: 1,167 entries on 20 Nov and 3,493 on 26 Nov 2026, every new name one the entry
   already had. Both changes stay in the record, tagged HW-IND-7 (more than half of the change renamed).
 - **Why these lists and not the UN's.** Tom, 15 Nov 2026: publish what the licences allow. OFAC's and trade.gov's
-  lists are US government works. Canada allows non-commercial reproduction. Australia's DFAT site is CC BY 4.0; Japan's MOF site is under PDL1.0, compatible with CC BY 4.0. France's Licence Ouverte 2.0 and the EU's
+  lists are US government works. Canada allows non-commercial reproduction. Australia's DFAT site is CC BY 4.0; Japan's MOF site is under PDL1.0, compatible with CC BY 4.0. France's register states no licence, so France's
+  general rule for published public information applies (Code des relations entre le public et l'administration,
+  articles L321-1 and L322-1: free reuse, unaltered, with the source and its date of last update; read 27 Nov 2026).
+  That rule (article L322-2) and the EU's
   reuse decision (2011/833/EU) allow reuse of personal data within data-protection law; the UK's Open Government
   Licence v3.0 does not cover personal data, which leaves the question to data-protection law too (all read 16 Nov
   2026). Headwind carries the least that identifies an entry, shows a removal as a removal, and takes down on request

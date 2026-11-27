@@ -42,7 +42,7 @@
       "id": "dgtresor-gels",
       "name": "French Treasury (Direction générale du Trésor): Registre national des gels (JSON, the register's public API)",
       "url": "https://gels-avoirs.dgtresor.gouv.fr/",
-      "licence": "Licence Ouverte / Open Licence 2.0 (data.gouv.fr record 'Registre national des gels', licence lov2, read 15 Nov 2026)",
+      "licence": "No licence stated by the publisher (register site and its API pages read 27 Nov 2026). Public information reused under France's Code des relations entre le public et l'administration, articles L321-1 and L322-1: not altered, meaning not distorted, source and date of last update given. The data.gouv.fr record 'Registre national des gels' (licence lov2) is a third party's, not the Treasury's",
       "use": "ingest",
       "grade": "A1",
       "independence_group": "fr-dgtresor-gels"
