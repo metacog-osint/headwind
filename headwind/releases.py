@@ -73,7 +73,7 @@ def build_events(today: date, fomc: list[str], ecb: list[str], fao: list[str], f
 
 
 def question_drafts(fao_measures: list[dict], next_release: str | None) -> list[dict]:
-    """Draft Verdict questions with a naive baseline. Drafts only: Tom sets the number and registers."""
+    """Draft Verdict questions with a naive baseline. Drafts only: the number is set and the question registered by hand."""
     out = []
     for m in fao_measures:
         if m["id"] not in ("ffpi", "cereals") or not next_release:

@@ -15,7 +15,7 @@ its judgment page changes) for the Court's case title, case id, judgment date, n
 latest-judgments page is read every run as a cross-check: a case it names that the sitemap does not yet list is read
 too.
 
-Names (Tom, 15 Nov 2026, for court items): the Court's own case title, case id and neutral citation as the Court
+Names (15 Nov 2026, for court items): the Court's own case title, case id and neutral citation as the Court
 publishes them, with `us_person_data` from the title (`party_kind`). Nothing is summarized or judged, and no judgment
 text is read or kept: an item says the Court gave judgment in a case on a date, with the link.
 """

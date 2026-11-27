@@ -11,7 +11,7 @@ filing made within WINDOW_DAYS before a scheduled date. A scheduled date is one 
 register in controls.scheduled(), matched on RIN, docket number or, for USTR, the investigation its title names)
 or one the filing itself says was scheduled ("The suspension was set to end November 9, 2026.").
 
-OFAC's and BIS's notices (sanctions actions, denial orders) carry their titles since `headwind-1.9` (Tom, 15 Nov
+OFAC's and BIS's notices (sanctions actions, denial orders) carry their titles since `headwind-1.9` (15 Nov
 2026: publish what the licences allow; Federal Register documents may be reproduced without restriction). A BIS
 order names its party in the title, so such a filing carries us_person_data `individuals` (`person_label`).
 Filings kept from before as counted only (no title) age out within 30 days.

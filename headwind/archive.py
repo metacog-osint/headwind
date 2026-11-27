@@ -24,7 +24,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-# Privacy switch. Tom, 19 Nov 2026: removed individuals are retained in full (government lists, publicly
+# Privacy switch (19 Nov 2026): removed individuals are retained in full (government lists, publicly
 # released). False: an individual removed from a list is archived as a count plus
 # the list id only, as the published history log already does. True: the full record (name, type, programs, address
 # countries, listing date) is archived too. Entries of unstated type count as individuals, as in

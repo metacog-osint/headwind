@@ -7,7 +7,7 @@ Consolidated List (DFAT, xlsx), and Japan's asset-freeze list (Ministry of Finan
 list to an index of entry id -> [type, groups, details], compares it with the index kept from the run before, and
 reports the difference by type and by sanctions program, naming what changed.
 
-Names (`headwind-1.9`, Tom, 15-16 Nov 2026: publish what the licences allow): people and organizations on every
+Names (`headwind-1.9`, 15-16 Nov 2026: publish what the licences allow): people and organizations on every
 list but the UN's carry their name as the publisher prints it and the countries of their addresses and
 nationality (`names.py`); vessels carry name, IMO number, MMSI, flag and type, as since 13 Nov 2026. Owners, birth
 dates, identity documents, street addresses and reasons are never carried. The UN list stays [type, list type]:
@@ -94,9 +94,9 @@ LISTS = {
 
 # EU programme codes, as the Financial Sanctions Files give them, that name a country. Read against the
 # live file on 14 Nov 2026 (34 codes). "UKR" is the EU's regime on undermining Ukraine's territorial
-# integrity; it is placed on Russia only (Tom, 14 Nov 2026): of its 2,962 entries, 1,609 give a Russian address
+# integrity; it is placed on Russia only (14 Nov 2026): of its 2,962 entries, 1,609 give a Russian address
 # or citizenship and 86 a Ukrainian one, so placing it on Ukraine too would mark Ukraine on nearly every EU
-# change. "SDNZ" is placed on Sudan (Tom, 14 Nov 2026): its 25 entries carry Sudanese addresses (8) and UAE
+# change. "SDNZ" is placed on Sudan (14 Nov 2026): its 25 entries carry Sudanese addresses (8) and UAE
 # ones (3) and cite EU acts on Sudan such as 2024/384; "SDN" (9 entries) is the older Sudan regime. Left
 # unplaced on purpose: TAQA and EUAQ (ISIL and Al-Qaida), TERR (terrorism), HAM (Hamas and Palestinian
 # Islamic Jihad), HR (global human rights), CHEM (chemical weapons), CYB (cyber attacks) and UNLI (UN
@@ -126,8 +126,8 @@ UK_UNPLACED = {"Isil (Da'esh) and Al-Qaeda (United Nations Sanctions)", "Global 
 
 # Canada's regimes, by the English half of the list's Country field (canada_regime()), read against the live list
 # on 16 Nov 2026 (19 regimes). "Ukraine" is Canada's Special Economic Measures (Ukraine) Regulations; it is placed on
-# Russia only, as Tom placed the EU's UKR on 14 Nov 2026 (kept
-# on his yes to item 3, 16 Nov 2026). Left unplaced on purpose:
+# Russia only, as the EU's UKR is placed (14 Nov 2026; kept
+# 16 Nov 2026). Left unplaced on purpose:
 # JVCFOR (corrupt foreign officials), Hamas Terrorist Attacks, Extremist Settler Violence (conduct regimes).
 CA_REGIME_COUNTRY = {
     "Russia": "RU", "Ukraine": "RU", "Iran": "IR", "Belarus": "BY", "Syria": "SY", "Myanmar (Burma)": "MM",
@@ -139,7 +139,7 @@ CA_UNPLACED = {"Justice for Victims of Corrupt Foreign Officials Regulations (JV
 
 # Australia's regimes, by the list's Committees field, read against the live list on 19 Nov 2026 (29 regimes: 14
 # autonomous, 15 under Security Council resolutions). "Autonomous (Ukraine)" (Russia and Ukraine instruments) is
-# placed on Russia only, as Tom placed the EU's UKR and Canada's Ukraine regulations; "Autonomous (Vessels)" holds
+# placed on Russia only, as are the EU's UKR and Canada's Ukraine regulations; "Autonomous (Vessels)" holds
 # the ships designated under the Sanctioned Vessels – Russia designations. Left unplaced on purpose: FFRY (the former
 # Federal Republic of Yugoslavia, as OFAC's BALKANS), the three thematic regimes (human rights, cyber, corruption)
 # and 1373 (Australia's own terrorism listings). The UN regimes restate the Security Council's lists: counted only,
@@ -155,7 +155,7 @@ AU_UNPLACED = {"Autonomous (FFRY)", "Autonomous (Thematic - Human Rights)", "Aut
 # Japan's programs, by the list's 区分 (category) number, read against the list page and the file of 20 Nov 2026
 # (40 categories in use; a program's people and organizations are often two numbers). Labels are Headwind's English for
 # the page's headings. True marks a program under a Security Council resolution that restates a UN list: counted
-# only, never named, placing no country (Tom, 19 Nov 2026, as for Australia). Category 3 is Japan's resolution-1373
+# only, never named, placing no country (19 Nov 2026, as for Australia). Category 3 is Japan's resolution-1373
 # listing of people and organizations already on the UN's Al-Qaida list (each entry is marked 重複, duplicate, of a
 # category-2 entry), so it restates the UN list too. Not restatements, because the UN keeps no list under them:
 # 4 (Japan's own resolution-1373 listings) and 13 (Japan's 2006 listings under resolution 1695 on North Korea).
@@ -179,8 +179,8 @@ JP_PROGRAMS = {
 }
 JP_VESSELS = "Designated vessels (services ban)"
 JP_UN = {label for label, un in JP_PROGRAMS.values() if un}
-# Japan's own programs that name a country. "Ukraine (Crimea and eastern Ukraine)" is placed on Russia only, as Tom
-# placed the EU's UKR and Canada's Ukraine regulations; "Russia (third countries)" (shipping companies and banks
+# Japan's own programs that name a country. "Ukraine (Crimea and eastern Ukraine)" is placed on Russia only, as are
+# the EU's UKR and Canada's Ukraine regulations; "Russia (third countries)" (shipping companies and banks
 # outside Russia and Belarus) and the vessel ban (MOF's ship file sits under the Russia measures on the page, and all
 # 35 ships of 2 Oct 2026 are on OFAC's and Canada's Russia lists) are Russia's. Left unplaced on purpose: FRY (as
 # Australia's FFRY), 1373 (terrorism) and the settlers program (conduct, as Canada's Extremist Settler Violence).
@@ -213,7 +213,7 @@ PROGRAM_COUNTRY = {
     "UHRPA": "CN",
     "PAARSSR": "SY",         # EO 13894 as amended: accountability for Assad and regional stabilization
     # OFAC's Ukraine/Russia program. EO 13661 and 13662 name Russian officials and sectors; EO 13660
-    # (undermining Ukraine) and EO 13685 (Crimea) are about both countries (Tom, 13 Nov 2026).
+    # (undermining Ukraine) and EO 13685 (Crimea) are about both countries (13 Nov 2026).
     "UKRAINE-EO13660": ("RU", "UA"), "UKRAINE-EO13685": ("RU", "UA"),
     # UN list types
     "Iran": "IR", "Iraq": "IQ", "DRC": "CD", "Libya": "LY", "Somalia": "SO", "Sudan": "SD", "Haiti": "HT",
@@ -224,7 +224,7 @@ PROGRAM_COUNTRY = {
 def countries_for(groups, list_id: str | None = None) -> list[str]:
     if list_id == "france-gels":
         # France's national freezes are conduct measures (the Code monétaire et financier's articles L. 562-2 and
-        # following), and its EU and UN entries restate measures Headwind reads on those lists (Tom, 15 Nov 2026:
+        # following), and its EU and UN entries restate measures Headwind reads on those lists (15 Nov 2026:
         # no countries from restatements). So a change on the French register places no country.
         return []
     out = set()
@@ -725,7 +725,7 @@ def _au_generated(zf) -> str | None:
 def parse_au_xlsx(body: bytes) -> tuple[str | None, dict[str, list]]:
     """Australia's Consolidated List: one row per name, keyed on Reference ('2' for the primary name, '2a', '2b' for
     its aliases and original scripts). An entry is its primary-name row: [type, [regime]] with the regime as the
-    Committees field prints it. Entries under a Security Council regime restate the UN's lists (Tom, 19 Nov 2026:
+    Committees field prints it. Entries under a Security Council regime restate the UN's lists (19 Nov 2026:
     counted only, never named), so they carry no third member. Australia's own entries carry, for a person or
     organization, the name as printed and its countries (au_countries); for a ship, its name and IMO number (the list
     gives no flag, type or MMSI). Birth dates, places of birth, street addresses, 'Additional Information' and the
@@ -998,8 +998,8 @@ SPLIT_KEYS = ("added", "removed", "changed", "added_by_type", "added_by_program"
 
 
 # Lists that restate other lists Headwind reads, beside measures of their own: the test for an entry of the
-# publisher's own. France: national freezes (Tom, 15 Nov 2026); Australia and Japan: every program but the Security
-# Council's (Tom, 19 Nov 2026).
+# publisher's own. France: national freezes (15 Nov 2026); Australia and Japan: every program but the Security
+# Council's (19 Nov 2026).
 OWN_ENTRY = {"france-gels": lambda e: is_fr_national(e), "australia-dfat": lambda e: is_au_own(e),
              "japan-mof": lambda e: is_jp_own(e)}
 

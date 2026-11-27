@@ -23,7 +23,7 @@ Court), 3 of the Grand Chamber, 14 naming restrictive measures, 8 not yet in Eng
 What goes in the feed (the legal events strand's rule, doctrine/method.md: at a court that decides many cases, the
 court's own selection, never a reading of importance or of subject): a Court of Justice judgment given by the Grand
 Chamber or the full Court, the formations the Court keeps for its weightiest cases; and, under the rule's one stated
-exception (Tom, 19 Nov 2026), a judgment of either court whose own subject words name restrictive measures
+exception (19 Nov 2026), a judgment of either court whose own subject words name restrictive measures
 (sanctions). Every judgment is on the page.
 """
 from __future__ import annotations
@@ -42,7 +42,7 @@ EURLEX_DOC = "https://eur-lex.europa.eu/legal-content/{lang}/TXT/?uri=CELEX:{cel
 DAYS = 60               # judgments kept and shown, from the judgment date
 FEED_DAYS = 14          # judgments in the feed
 # Restrictive-measures judgments in the feed as well: a selection by the Court's own subject words, the stated
-# exception to the strand's rule (Tom, 19 Nov 2026).
+# exception to the strand's rule (19 Nov 2026).
 FEED_RESTRICTIVE_MEASURES = True
 
 _CDM = "http://publications.europa.eu/ontology/cdm#"

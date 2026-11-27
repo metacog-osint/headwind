@@ -1,4 +1,4 @@
-"""Names on list changes (`headwind-1.9`, Tom, 15-16 Nov 2026: publish what the licences allow).
+"""Names on list changes (`headwind-1.9`, 15-16 Nov 2026: publish what the licences allow).
 
 Every list but the UN Security Council's is named: people, organizations and ships, with the few fields Headwind
 carries for them (name as the publisher prints it, type, programs, and the countries of the entry's addresses and

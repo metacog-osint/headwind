@@ -1555,7 +1555,7 @@ class TestFeed(unittest.TestCase):
         self.assertEqual(eur["properties"]["precision_class"], "none")
 
     def test_series_ids_carry_no_date(self):
-        # Tom, 18 Nov 2026: one id per series, so a new reading is the same item changed (the history log, with
+        # 18 Nov 2026: one id per series, so a new reading is the same item changed (the history log, with
         # --reading-key data_as_of, logs it as changed), never the reading before ended.
         ids = {f["properties"]["id"] for f in feed.build_feed(self.snapshot())["features"]}
         self.assertTrue({"headwind:fx:TRY", "headwind:fx:EUR", "headwind:energy:brent", "headwind:food:cereals",
@@ -1708,7 +1708,7 @@ class TestListParsers(unittest.TestCase):
         self.assertTrue(all(re.fullmatch(r"[0-9a-f]{12}", v[2]["aliases"]) for v in idx.values()))
         self.assertTrue(all(v[2]["name"] for v in idx.values()))
         self.assertEqual(sanctions.countries_for(["UKR", "TAQA", "IRN"], "eu-fsf"), ["IR", "RU"])
-        self.assertEqual(sanctions.countries_for(["SDNZ"], "eu-fsf"), ["SD"])   # Tom, 14 Nov 2026
+        self.assertEqual(sanctions.countries_for(["SDNZ"], "eu-fsf"), ["SD"])   # 14 Nov 2026
         self.assertEqual(sanctions.countries_for(["SDN"], "eu-fsf"), ["SD"])   # the EU's Sudan code, not OFAC's list
         self.assertEqual(sanctions.unknown_programs("eu-fsf", idx), [])
         self.assertEqual(sanctions.unknown_programs("eu-fsf", {"1": ["entity", ["NEWX"]]}), ["NEWX"])
@@ -2314,7 +2314,7 @@ class TestEndToEnd(unittest.TestCase):
 
 
 class TestListIndicators(unittest.TestCase):
-    """Register 1.4 (Tom's yes, 18 Nov 2026): HW-IND-1 on OFAC changes, HW-IND-7 on changes made mostly of renames."""
+    """Register 1.4 (18 Nov 2026): HW-IND-1 on OFAC changes, HW-IND-7 on changes made mostly of renames."""
 
     def ship(self, n):
         return ["vessel", ["RUSSIA-EO14024"], {"name": f"SHIP {n}", "imo": f"900000{n}", "mmsi": None, "flag": None,
@@ -2381,7 +2381,7 @@ class TestListIndicators(unittest.TestCase):
 
 
 class TestNames(unittest.TestCase):
-    """headwind-1.9: names on list changes (Tom, 15-16 Nov 2026: publish what the licences allow). Fixtures cut from
+    """headwind-1.9: names on list changes (15-16 Nov 2026: publish what the licences allow). Fixtures cut from
     OFAC's sdn.csv and add.csv of 12 Nov 2026 and trade.gov's file of 15 Nov 2026, as published (street addresses
     and remarks dropped from the trade.gov cut)."""
 

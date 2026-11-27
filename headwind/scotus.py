@@ -4,7 +4,7 @@ Sources (supremecourt.gov, keyless): the slip opinion RSS feed for a term (`slip
 term that began in October 2026) and each case's docket as JSON (`/RSS/Cases/JSON/<docket>.json`). Opinions and
 dockets are US government works (17 USC 105, stated from memory; the Court's site policies give no reuse statement).
 
-Names (Tom, 15 Nov 2026): an item carries the Court's own case title and docket number as the Court publishes them,
+Names (15 Nov 2026): an item carries the Court's own case title and docket number as the Court publishes them,
 and `us_person_data` says when a party may be a US person (`party_kind`). Nothing is summarized or judged: an item
 says the Court issued an opinion in a case on a date, by whom, with the link.
 
