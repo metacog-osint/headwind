@@ -5,6 +5,7 @@ names and remarks are blanked.
 """
 from __future__ import annotations
 
+import email.message
 import hashlib
 import importlib.util
 import io
@@ -119,6 +120,8 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         return f.read_bytes()
     if "api.worldbank.org" in url and "source=15" in url:
         return (FIX / "worldbank_gem.json").read_bytes()
+    if "sdn_advanced.zip" in url:
+        return zipped("ofac_advanced.xml")
     table = [("petroleum/pri/spt", "eia_petroleum.json"), ("natural-gas/pri/fut", "eia_natural_gas.json"),
              ("foodpricesindex", "fao_page.html"),
              ("food_price_indices_data.csv", "fao.csv"), ("package_search", "hdx.json"),
@@ -147,6 +150,13 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         name = {f["url"]: k for k, f in files.items()}[url]
         return (FIX / {"reliance": "usgs_net_import_reliance.csv", "sources": "usgs_major_import_sources.csv"}[name]).read_bytes()
     raise OSError(f"no fixture for {url}")
+
+
+def zipped(name: str) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("SDN_ADVANCED.XML", (FIX / name).read_bytes())
+    return buf.getvalue()
 
 
 def lint(fc: dict) -> list[str]:
@@ -597,6 +607,57 @@ class TestMineralsWorldStoredCopy(unittest.TestCase):
             w = self.world(d)
         self.assertEqual(w["status"], "failed")
         self.assertIn("checksum", w["error"])
+
+
+class TestMineralsStoredCopy(unittest.TestCase):
+    """When ScienceBase refuses the reading, the lane reads the stored copy of the same release, which must match
+    the USGS checksums and give the same figures as the live read."""
+
+    @staticmethod
+    def refusing(url, timeout=60):
+        if "sciencebase.gov" in url:
+            hdrs = email.message.Message()
+            hdrs["server"] = "cloudflare"
+            hdrs["cf-mitigated"] = "challenge"
+            raise urllib.error.HTTPError(url, 403, "Forbidden", hdrs, None)
+        return fake_getter(url, timeout)
+
+    def test_stored_copy_matches_the_release(self):
+        found, texts = minerals.stored_release()
+        self.assertEqual(found["published"], "2026-02-06")
+        self.assertEqual(texts["reliance"], (FIX / "usgs_net_import_reliance.csv").read_bytes().decode("utf-8-sig"))
+        self.assertEqual(texts["sources"], (FIX / "usgs_major_import_sources.csv").read_bytes().decode("utf-8-sig"))
+
+    def test_a_changed_stored_file_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            for f in minerals.STORED_DIR.iterdir():
+                (d / f.name).write_bytes(f.read_bytes())
+            name = minerals.find_files((d / "item.json").read_bytes())["files"]["reliance"]["name"]
+            (d / name).write_bytes((d / name).read_bytes() + b"\n")
+            with self.assertRaises(ValueError):
+                minerals.stored_release(d)
+
+    def test_refused_reading_uses_the_stored_copy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            live, _ = headwind_cli._lane_minerals(Path(tmp) / "raw", {}, fake_getter)
+            stored, recs = headwind_cli._lane_minerals(Path(tmp) / "raw", {}, self.refusing)
+        live, stored = live["minerals"], stored["minerals"]
+        self.assertNotIn("read_from", live)
+        self.assertEqual(stored["read_from"]["copy"], "stored")
+        self.assertIn("403", stored["read_from"]["reason"])
+        self.assertIn("cf-mitigated=challenge", stored["read_from"]["reason"])
+        for key in ("reliance", "import_sources", "published", "edition", "by_source"):
+            self.assertEqual(stored[key], live[key])
+        self.assertEqual(len(stored["watch"]["errors"]), 1)                     # the edition search was refused too
+        self.assertEqual(len(recs), 1)                                          # only the Federal Register search
+
+    def test_end_to_end_lane_ok_with_a_warning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            snap = headwind_cli.collect(Path(tmp), getter=self.refusing, only=["minerals"])
+        self.assertEqual(snap["lanes"]["minerals"]["status"], "ok")
+        h = snap["health"]["usgs-mcs"]
+        self.assertTrue(h["warnings"][0].startswith("ScienceBase did not answer"))
 
 
 class TestVesselCrosslist(unittest.TestCase):
@@ -1478,7 +1539,8 @@ class TestFeed(unittest.TestCase):
         self.assertEqual(lint(fc), [])
         ids = [f["properties"]["id"] for f in fc["features"]]
         self.assertNotIn("headwind:localfood:VE", ids)      # stale data is not published as current
-        self.assertEqual(len(ids), 5)
+        self.assertIn("headwind:fx:usd-broad", ids)         # the dollar against all currencies, every run
+        self.assertEqual(len(ids), 6)
         for f in fc["features"]:
             p = f["properties"]
             self.assertEqual(p["kind"], "observation")
@@ -1641,7 +1703,9 @@ class TestListParsers(unittest.TestCase):
         self.assertEqual(generated[:10], "2026-10-23")
         self.assertEqual(len(idx), 9)
         self.assertEqual({v[0] for v in idx.values()}, {"individual", "entity"})
-        self.assertTrue(all(len(v) == 3 and sorted(v[2]) == ["countries", "name"] for v in idx.values() if v[0] != "vessel"))
+        self.assertTrue(all(len(v) == 3 and sorted(v[2]) == ["aliases", "countries", "name"]
+                            for v in idx.values() if v[0] != "vessel"))
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{12}", v[2]["aliases"]) for v in idx.values()))
         self.assertTrue(all(v[2]["name"] for v in idx.values()))
         self.assertEqual(sanctions.countries_for(["UKR", "TAQA", "IRN"], "eu-fsf"), ["IR", "RU"])
         self.assertEqual(sanctions.countries_for(["SDNZ"], "eu-fsf"), ["SD"])   # Tom, 14 Nov 2026
@@ -2149,6 +2213,13 @@ class TestEndToEnd(unittest.TestCase):
             for name in ("data/feed.geojson", "data/events.json", "data/baseline.json", "data/question_drafts.json",
                          "data/minerals.json", "index.html"):
                 self.assertIn(name, files)
+            # The entity export's sources, list by list, written into the page from ftm's table.
+            self.assertNotIn(headwind_cli.FTM_SOURCES, files["index.html"])
+            self.assertIn("Sources, licences and changes, list by list", files["index.html"])
+            self.assertEqual(files["index.html"].count('href="https://creativecommons.org/licenses/by/4.0/">'
+                                                       'Creative Commons'), 1)
+            scr = json.loads((tmp / "data" / "state" / "screening_index.json").read_text(encoding="utf-8"))
+            self.assertTrue(all("entry_dates" in l for l in scr["lists"].values()))
             self.assertEqual(headwind_cli.check_all(tmp), [])
             # The kit's history log ends an item only when its lane (the item's first source id) is in the health
             # record; an item whose lane is missing would never end.
@@ -2187,6 +2258,17 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual(len(kept["eu-fsf"]["index"]), 9)       # the EU baseline survives the failed read
             self.assertIn("United States", kept["ofac-sdn"]["index"]["8129"][2]["countries"])   # add.csv read too
 
+            # OFAC's ship dates come from the advanced XML and survive a run that cannot read it.
+            def undated(url, timeout=60):
+                if "sdn_advanced.zip" in url:
+                    raise OSError("no dates file")
+                return eu_down(url, timeout)
+            before = kept["ofac-sdn"].get("vessel_dates")
+            self.assertEqual(before.get("15042"), "2012-07-12")
+            headwind_cli.collect(tmp, getter=undated)
+            again_kept = json.loads((tmp / "data" / "state" / "sanctions_index.json").read_text(encoding="utf-8"))
+            self.assertEqual(again_kept["ofac-sdn"].get("vessel_dates"), before)
+
             # A list that changes between runs is reported once, as counts.
             def changed(url, timeout=60):
                 body = fake_getter(url, timeout)
@@ -2218,10 +2300,14 @@ class TestEndToEnd(unittest.TestCase):
             def down(url, timeout=60):
                 raise OSError("down")
             snap = headwind_cli.collect(tmp, getter=down)
-            self.assertTrue(all(v["status"] == "failed" and not v["from_previous"] for v in snap["lanes"].values()))
+            # The minerals lane reads its stored copy of the USGS release; every other lane is empty.
+            others = {k: v for k, v in snap["lanes"].items() if k != "minerals"}
+            self.assertTrue(all(v["status"] == "failed" and not v["from_previous"] for v in others.values()))
+            self.assertEqual(snap["lanes"]["minerals"]["status"], "ok")
+            self.assertEqual(snap["minerals"]["read_from"]["copy"], "stored")
             self.assertEqual((snap["fx"], snap["energy"], snap["fao"], snap["local_food"]), ([], [], [], []))
             self.assertEqual((snap["sanctions"], snap["sanctions_lists"], snap["controls"]), ([], [], []))
-            self.assertEqual((snap["screening"], snap["screening_lists"], snap["minerals"]), ([], [], {}))
+            self.assertEqual((snap["screening"], snap["screening_lists"]), ([], []))
             self.assertEqual(feed.build_feed(snap)["features"], [])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
@@ -2353,6 +2439,167 @@ class TestNames(unittest.TestCase):
         old = {"1": ["entity", ["X"]], "2": ["individual", ["X"]]}
         d = sanctions.delta("eu-fsf", old, {"1": new["1"]}, "2026-11-16T18:00:00Z", None)
         self.assertEqual((d["removed"], d["named_removed"], d["unnamed_removed"], d["changed"]), (1, [], 1, 0))
+
+    def test_ofac_entry_dates(self):
+        dates = sanctions.parse_sdn_advanced_dates(zipped("ofac_advanced.xml"))
+        # 25289 has two legal bases with the same date.
+        self.assertEqual(dates, {"15042": "2012-07-12", "23730": "2018-02-23", "25289": "2018-11-05"})
+        with self.assertRaises(ValueError):
+            buf = io.BytesIO()
+            with zipfile.ZipFile(buf, "w") as z:
+                z.writestr("SDN_ADVANCED.XML", "<Sanctions><SanctionsEntries/></Sanctions>")
+            sanctions.parse_sdn_advanced_dates(buf.getvalue())
+
+    def test_who_listed_a_ship_first(self):
+        table = [{"imo": "1000001", "on": {"uk-sanctions": {"ids": ["RUS1", "RUS9"], "name": "A"},
+                                           "canada-sema": {"ids": ["c1"], "name": "A"},
+                                           "ofac-sdn": {"ids": ["1"], "name": "A"}}},
+                 {"imo": "1000002", "on": {"uk-sanctions": {"ids": ["RUS2"], "name": "B"},
+                                           "japan-mof": {"ids": ["ship-1"], "name": None}}},
+                 {"imo": "1000003", "on": {"uk-sanctions": {"ids": ["RUS3"], "name": "C"},
+                                           "canada-sema": {"ids": ["c3"], "name": "C"}}},
+                 {"imo": "1000004", "on": {"uk-sanctions": {"ids": ["RUS4"], "name": "D"},
+                                           "ofac-sdn": {"ids": ["4"], "name": "D"}}}]
+        dates = {"uk-sanctions": {"RUS1": "2025-03-01", "RUS9": "2025-01-01", "RUS2": "2025-05-10", "RUS3": "2025-02-01",
+                                  "RUS4": "2025-01-01"},
+                 "canada-sema": {"c1": "2025-02-15", "c3": "2025-02-01"}, "japan-mof": {"ship-1": "2025-05-01"}}
+        lead = sanctions.cross_list_lead(table, dates, "2026-11-27T00:00:00Z")
+        self.assertEqual(lead["ships_on_two_or_more_dated"], 3)     # a ship on one dated list only is left out
+        ships = {s["imo"]: s for s in lead["ships"]}
+        self.assertEqual(ships["1000001"]["listed"]["uk-sanctions"], "2025-01-01")    # the earliest of its entries
+        self.assertEqual((ships["1000001"]["first"], ships["1000001"]["days_after_first"]["canada-sema"]),
+                         (["uk-sanctions"], 45))
+        self.assertEqual(ships["1000001"]["also_on_undated"], ["ofac-sdn"])    # carries it, no date given for it
+        self.assertEqual(ships["1000002"]["first"], ["japan-mof"])
+        pairs = {tuple(p["lists"]): p for p in lead["pairs"]}
+        uk_ca = pairs[("uk-sanctions", "canada-sema")]
+        self.assertEqual((uk_ca["ships"], uk_ca["same_day"], uk_ca["first"]["uk-sanctions"]["ships"],
+                          uk_ca["first"]["uk-sanctions"]["median_days"], uk_ca["first"]["canada-sema"]["ships"]),
+                         (2, 1, 1, 45, 0))
+        self.assertEqual(pairs[("uk-sanctions", "japan-mof")]["first"]["japan-mof"]["max_days"], 9)
+        self.assertEqual(lead["lists_undated"], ["france-gels", "australia-dfat"])
+        dates["ofac-sdn"] = {"1": "2024-12-02"}
+        dated = sanctions.cross_list_lead(table, dates, "2026-11-27T00:00:00Z")
+        ships = {s["imo"]: s for s in dated["ships"]}
+        self.assertEqual((ships["1000001"]["first"], ships["1000001"]["days_after_first"]["uk-sanctions"],
+                          ships["1000001"]["also_on_undated"]), (["ofac-sdn"], 30, []))
+        self.assertEqual(lead["date_range"]["uk-sanctions"], ["2025-01-01", "2025-05-10"])
+
+    def test_a_move_of_the_dollar_is_one_item(self):
+        def series(jump):
+            days = [f"2025-{1 + i // 28:02d}-{1 + i % 28:02d}" for i in range(300)]
+            vals = [1.0 + 0.002 * ((i * 7) % 5 - 2) for i in range(300)]
+            vals[-5:] = [v * (1 + jump) for v in vals[-5:]]
+            return list(zip(days, vals))
+        base = {f"C{i:02d}": series(0.0) for i in range(17)}
+        wide = markets.measure_fx({**base, **{f"W{i:02d}": series(0.06) for i in range(12)}})
+        self.assertEqual(sum(1 for r in wide if r.get("common_move")), 12)
+        b = markets.broad_move(wide)
+        self.assertEqual((b["broad"], b["dollar"], b["flagged_weaker"], b["quoted"]), (True, "stronger", 12, 29))
+        snap = {"generated_at": "2025-11-27T06:00:00Z", "fx": wide, "lanes": {}}
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features(snap)}
+        self.assertEqual(items["headwind:fx:usd-broad"]["tier"], "anomaly")
+        self.assertIn("12 of 29", items["headwind:fx:usd-broad"]["title"])
+        self.assertEqual(items["headwind:fx:W00"]["tier"], "routine")
+        self.assertTrue(items["headwind:fx:W00"]["measures"]["common_move"])
+        self.assertIn("headwind:fx:usd-broad", items["headwind:fx:W00"]["summary"])
+        # Three currencies moving is theirs: each keeps its anomaly, and the dollar's item is routine.
+        few = markets.measure_fx({**base, **{f"W{i:02d}": series(0.06) for i in range(3)}})
+        self.assertFalse(any(r.get("common_move") for r in few))
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features({**snap, "fx": few})}
+        self.assertEqual((items["headwind:fx:W00"]["tier"], items["headwind:fx:usd-broad"]["tier"]),
+                         ("anomaly", "routine"))
+
+    def test_a_european_bloc_move_is_not_called_the_dollar_s(self):
+        # The euro and ten European currencies weaker together, the rest flat: the count reaches FX_BROAD_MIN, but
+        # nothing in it says the dollar moved rather than the euro with the currencies tied to it.
+        def series(jump):
+            days = [f"2025-{1 + i // 28:02d}-{1 + i % 28:02d}" for i in range(300)]
+            vals = [1.0 + 0.002 * ((i * 7) % 5 - 2) for i in range(300)]
+            vals[-5:] = [v * (1 + jump) for v in vals[-5:]]
+            return list(zip(days, vals))
+        europe = ["EUR", "CZK", "DKK", "GBP", "HUF", "PLN", "RON", "SEK", "CHF", "ISK", "NOK"]
+        rest = ["JPY", "TRY", "AUD", "BRL", "CAD", "CNY", "HKD", "IDR", "ILS", "INR", "KRW", "MXN", "MYR", "NZD",
+                "PHP", "SGD", "THB", "ZAR"]
+        self.assertEqual(set(europe) - markets.EUROPEAN, set())
+        self.assertEqual(set(rest) & markets.EUROPEAN, set())
+        fx = markets.measure_fx({**{c: series(0.0) for c in rest}, **{c: series(0.06) for c in europe}})
+        b = markets.broad_move(fx)
+        self.assertEqual((b["broad"], len(b["currencies"]), b["european"], b["quoted"]), (True, 11, 11, 29))
+        snap = {"generated_at": "2025-11-27T06:00:00Z", "fx": fx, "lanes": {}}
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features(snap)}
+        broad = items["headwind:fx:usd-broad"]
+        for text in (broad["summary"], broad["baseline_ref"], items["headwind:fx:GBP"]["summary"]):
+            self.assertNotIn("the dollar's", text)
+            self.assertNotIn("dollar itself", text)
+            self.assertNotIn("move of the dollar", text)
+        self.assertIn("11 of the 11 are the euro or currencies of other EU and EFTA countries and the UK",
+                      broad["summary"])
+        self.assertIn("the count alone does not tell a move of the US dollar from one of the euro", broad["summary"])
+        self.assertIn("Part of a common move against the US dollar", items["headwind:fx:GBP"]["summary"])
+        # The rule itself is unchanged: one item, the members routine.
+        self.assertEqual((broad["tier"], items["headwind:fx:GBP"]["tier"]), ("anomaly", "routine"))
+        # With most of the set from outside Europe, the item names the European count and adds no caveat.
+        mixed = markets.measure_fx({**{c: series(0.06) for c in rest[:8] + europe[:3]},
+                                    **{c: series(0.0) for c in rest[8:] + europe[3:]}})
+        items = {f["properties"]["id"]: f["properties"] for f in feed.live_features({**snap, "fx": mixed})}
+        self.assertIn("3 of the 11 are the euro", items["headwind:fx:usd-broad"]["summary"])
+        self.assertNotIn("count alone", items["headwind:fx:usd-broad"]["summary"])
+
+    def test_an_eu_reorder_of_names_is_no_change(self):
+        # The EU file printed each entry's strong aliases in another order on 20 Nov 2026 (1,167 entries)
+        # and 26 Nov (3,493), and taking the first strong alias reported each as renamed.
+        body = (FIX / "eu_fsf.xml").read_bytes()
+        _, idx = sanctions.parse_eu_xml(body)
+        root = ET.fromstring(body)
+        ns = sanctions.EU_NS
+        many = [e for e in root.findall("e:sanctionEntity", ns)
+                if sum(1 for a in e.findall("e:nameAlias", ns) if a.get("strong") == "true") > 1]
+        self.assertTrue(many)                       # the fixture has an entry with several strong aliases
+        for e in many:                              # print every entry's aliases the other way round
+            aliases = e.findall("e:nameAlias", ns)
+            for a in aliases:
+                e.remove(a)
+            for a in reversed(aliases):
+                e.append(a)
+        _, flipped = sanctions.parse_eu_xml(ET.tostring(root))
+        self.assertEqual(flipped, idx)              # the same name and digest, whatever the order
+        self.assertIsNone(sanctions.delta("eu-fsf", idx, flipped, "2026-11-20T21:50:00Z", None))
+        # A name added to an entry is a change, with the name shown kept; an edited name likewise.
+        lid = many[0].get("logicalId")
+        grown = ET.fromstring(ET.tostring(root))
+        e = next(x for x in grown.findall("e:sanctionEntity", ns) if x.get("logicalId") == lid)
+        extra = ET.SubElement(e, f"{{{ns['e']}}}nameAlias", {"wholeName": "A NEW ALIAS", "strong": "true",
+                                                             "logicalId": "999999999"})
+        _, idx2 = sanctions.parse_eu_xml(ET.tostring(grown))
+        d = sanctions.delta("eu-fsf", idx, idx2, "2026-11-21T21:50:00Z", None)
+        rec = d["named_changed"][0]
+        self.assertEqual((d["changed"], d["renamed"], rec["list_id"], rec["aliases_changed"]), (1, 0, lid, True))
+        self.assertNotIn("name_before", rec)
+        self.assertIn("its other names changed", feed._names_text(d))
+        # The name shown edited: a rename, as before.
+        extra.set("logicalId", "1")
+        _, idx3 = sanctions.parse_eu_xml(ET.tostring(grown))
+        d = sanctions.delta("eu-fsf", idx, idx3, "2026-11-21T21:50:00Z", None)
+        rec = d["named_changed"][0]
+        self.assertEqual((d["renamed"], rec["name"], rec["name_before"]), (1, "A NEW ALIAS", idx[lid][2]["name"]))
+        # A name taken away is a change too.
+        e.remove(extra)
+        first = e.findall("e:nameAlias", ns)[0]
+        e.remove(first)
+        _, idx4 = sanctions.parse_eu_xml(ET.tostring(grown))
+        self.assertEqual(sanctions.delta("eu-fsf", idx, idx4, "2026-11-21T21:50:00Z", None)["changed"], 1)
+        # The first reading after the digest was added (the older index has none) compares no names.
+        older = {k: [v[0], v[1], {"name": "AN OLDER PICK", "countries": v[2]["countries"]}] for k, v in idx.items()}
+        self.assertIsNone(sanctions.delta("eu-fsf", older, idx, "2026-11-27T03:50:00Z", None))
+        # A real change of programs still counts on that reading.
+        moved = {k: [v[0], v[1] + ["NEWP"], v[2]] if k == lid else v for k, v in idx.items()}
+        self.assertEqual(sanctions.delta("eu-fsf", older, moved, "2026-11-27T03:50:00Z", None)["changed"], 1)
+
+    def test_the_name_set_digest(self):
+        self.assertEqual(sanctions.nm.name_set_digest(["B", "A", " A "]), sanctions.nm.name_set_digest(["A", "B"]))
+        self.assertNotEqual(sanctions.nm.name_set_digest(["A", "B"]), sanctions.nm.name_set_digest(["A", "B", "C"]))
+        self.assertIsNone(sanctions.nm.name_set_digest(["", None]))
 
     def test_the_un_list_is_never_named(self):
         _, idx = sanctions.parse_un_xml((FIX / "un_consolidated.xml").read_bytes())

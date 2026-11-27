@@ -4,7 +4,7 @@
   "sources": [
     {
       "id": "ofac-sdn",
-      "name": "US Department of the Treasury, OFAC: Specially Designated Nationals and Blocked Persons List (sdn.csv)",
+      "name": "US Department of the Treasury, OFAC: Specially Designated Nationals and Blocked Persons List (sdn.csv, entry dates from sdn_advanced.zip)",
       "url": "https://ofac.treasury.gov/recent-actions",
       "licence": "US public domain",
       "use": "ingest",

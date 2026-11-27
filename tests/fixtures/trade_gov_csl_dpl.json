@@ -1,0 +1,85 @@
+{
+ "total": 3,
+ "offset": 0,
+ "search_performed_at": "2026-11-27T07:15:00.019222+00:00",
+ "sources_used": [
+  {
+   "last_imported": "2026-11-27T07:15:00.019222+00:00",
+   "source_last_updated": "2026-04-28T12:39:28+00:00",
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "import_rate": "Hourly"
+  }
+ ],
+ "results": [
+  {
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "name": "SEMICONDUCTOR SYSTEMS INTL., INC. (SSI)",
+   "addresses": [
+    {
+     "address": "BAGSVAERD HOVEDGADE 99 1 2880 BAGSVAERD",
+     "city": "COPENHAGEN",
+     "state": "",
+     "postal_code": "",
+     "country": "DK"
+    }
+   ],
+   "federal_register_notice": "",
+   "start_date": "1992-03-20",
+   "end_date": "2000-10-04",
+   "standard_order": "Y",
+   "remarks": "",
+   "source_list_url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl",
+   "source_information_url": "https://www.bis.gov/licensing/guidance-on-end-user-and-end-use-controls-and-us-person-controls",
+   "id": "2815dd9334befab373278b903a412b353b292cc8d09cf8d06af746db"
+  },
+  {
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "name": "PHOTOMASKING SERVICES LTD.",
+   "addresses": [
+    {
+     "address": "52 HIGH STREET, HENLEY-IN-ARDEN",
+     "city": "WARWICKSHIRE",
+     "state": "",
+     "postal_code": "",
+     "country": "GB"
+    },
+    {
+     "address": "TURRIFF INDUSTRIAL ESTATE, UNIT 5 BUDBROOKE ROAD",
+     "city": "WARWICKSHIRE",
+     "state": "",
+     "postal_code": "",
+     "country": "GB"
+    }
+   ],
+   "federal_register_notice": "49 F.R. 49666 12/21/84",
+   "start_date": "1984-12-14",
+   "end_date": null,
+   "standard_order": "Y",
+   "remarks": "ADDRESS CORRECTION",
+   "source_list_url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl",
+   "source_information_url": "https://www.bis.gov/licensing/guidance-on-end-user-and-end-use-controls-and-us-person-controls",
+   "id": "2a3f1ab0ea11c63a96bf46133e98e1464f46880717a20affef268393"
+  },
+  {
+   "source": "Denied Persons List (DPL) - Bureau of Industry and Security",
+   "name": "THANE-COAT, INC",
+   "addresses": [
+    {
+     "address": "12725 ROYAL DRIVE",
+     "city": "STAFFORD",
+     "state": "TX",
+     "postal_code": "77477",
+     "country": "US"
+    }
+   ],
+   "federal_register_notice": "67 F.R. 7351 2/19/02 66 F.R. 48998 9/25/01 62 F.R. 26471 5/14/97 62 F.R. 34688 6/27/97 62 F.R. 60063 11/6/97 63 F.R. 25817 5/11/98 63 F.R. 58707 11/2/98 64 F.R. 23049 4/29/99",
+   "start_date": "2002-01-24",
+   "end_date": "2027-01-24",
+   "standard_order": "Y",
+   "remarks": "STANDARD ORDER",
+   "source_list_url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl",
+   "source_information_url": "https://www.bis.gov/licensing/guidance-on-end-user-and-end-use-controls-and-us-person-controls",
+   "id": "e8e62a20de26fe327462978a684d3d1c7868333511985d62d61c2539"
+  }
+ ]
+}

@@ -16,7 +16,17 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with: { python-version: "3.12" }
+      # Tests only: Headwind itself runs on the standard library. With the followthemoney package present,
+      # tests/test_ftm.py also checks the entity export against the library (its model, Schema.validate and an
+      # uncleaned get_proxy); without it that class is skipped. libicu-dev is what its PyICU dependency builds on.
+      - name: FollowTheMoney, for the entity export's check against the library itself
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libicu-dev
+          python -m pip install -q followthemoney==4.11.3
       - name: Tests
         run: python -m unittest discover -s tests
-      - name: Registers and feed check
-        run: python tools/headwind.py check
+      # A checkout has no built site/, so there is no feed to lint here; update.yml checks the feed after it
+      # builds it.
+      - name: Registers check
+        run: python tools/headwind.py check --registers-only

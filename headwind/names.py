@@ -11,6 +11,7 @@ so nothing goes into it that may not be published.
 """
 from __future__ import annotations
 
+import hashlib
 import re
 import unicodedata
 
@@ -45,6 +46,13 @@ def countries(values) -> list[str]:
 
 def details(name: str | None, cs=()) -> dict:
     return {"name": clean(name), "countries": countries(cs)}
+
+
+def name_set_digest(values) -> str | None:
+    """The first 12 hex digits of the SHA-256 of an entry's distinct names, sorted: the same for the same names in
+    any order, different when one is added, removed or edited. None for an entry with no name."""
+    names = sorted({c for c in (clean(v) for v in values or []) if c})
+    return hashlib.sha256("\n".join(names).encode("utf-8")).hexdigest()[:12] if names else None
 
 
 def entry(index: dict, i: str, dates: dict | None = None) -> dict | None:

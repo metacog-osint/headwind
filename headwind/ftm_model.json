@@ -1,0 +1,1448 @@
+{
+ "source": "https://github.com/opensanctions/followthemoney/blob/v4.11.3/js/src/defaultModel.json",
+ "version": "4.11.3",
+ "licence": "Extract of the FollowTheMoney data model (js/src/defaultModel.json), MIT License. Copyright (c) 2017-2024 Journalism Development Network, Inc.; Copyright (c) 2025 OpenSanctions Datenbanken GmbH.",
+ "schemata": {
+  "Airplane": {
+   "extends": [
+    "Vehicle"
+   ],
+   "abstract": false,
+   "required": [],
+   "properties": {
+    "icaoCode": {
+     "maxLength": 16,
+     "type": "identifier"
+    },
+    "manufacturer": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "serialNumber": {
+     "maxLength": 64,
+     "type": "identifier"
+    }
+   }
+  },
+  "Asset": {
+   "extends": [
+    "Thing",
+    "Value"
+   ],
+   "abstract": false,
+   "required": [],
+   "properties": {
+    "ownershipAsset": {
+     "maxLength": 200,
+     "range": "Ownership",
+     "type": "entity"
+    }
+   }
+  },
+  "Interval": {
+   "extends": [],
+   "abstract": true,
+   "required": [],
+   "properties": {
+    "alephUrl": {
+     "maxLength": 4096,
+     "type": "url"
+    },
+    "date": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "description": {
+     "maxLength": 65000,
+     "type": "text"
+    },
+    "endDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "indexText": {
+     "maxLength": 65000,
+     "type": "text"
+    },
+    "modifiedAt": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "namesMentioned": {
+     "maxLength": 384,
+     "type": "name"
+    },
+    "proof": {
+     "maxLength": 200,
+     "range": "Document",
+     "type": "entity"
+    },
+    "publisher": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "publisherUrl": {
+     "maxLength": 4096,
+     "type": "url"
+    },
+    "recordId": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "retrievedAt": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "sourceUrl": {
+     "maxLength": 4096,
+     "type": "url"
+    },
+    "startDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "summary": {
+     "maxLength": 65000,
+     "type": "text"
+    }
+   }
+  },
+  "LegalEntity": {
+   "extends": [
+    "Thing"
+   ],
+   "abstract": false,
+   "required": [
+    "name"
+   ],
+   "properties": {
+    "abbreviation": {
+     "maxLength": 384,
+     "type": "name"
+    },
+    "agencyClient": {
+     "maxLength": 200,
+     "range": "Representation",
+     "type": "entity"
+    },
+    "agentRepresentation": {
+     "maxLength": 200,
+     "range": "Representation",
+     "type": "entity"
+    },
+    "brightQueryId": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "brightQueryOrgId": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "bvdId": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "callForTenders": {
+     "maxLength": 200,
+     "range": "CallForTenders",
+     "type": "entity"
+    },
+    "callsMade": {
+     "maxLength": 200,
+     "range": "Call",
+     "type": "entity"
+    },
+    "callsReceived": {
+     "maxLength": 200,
+     "range": "Call",
+     "type": "entity"
+    },
+    "cikCode": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "classification": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "contractAuthority": {
+     "maxLength": 200,
+     "range": "Contract",
+     "type": "entity"
+    },
+    "contractAwardSupplier": {
+     "maxLength": 200,
+     "range": "ContractAward",
+     "type": "entity"
+    },
+    "controlledEntities": {
+     "maxLength": 200,
+     "range": "Control",
+     "type": "entity"
+    },
+    "controllingEntities": {
+     "maxLength": 200,
+     "range": "Control",
+     "type": "entity"
+    },
+    "cryptoWallets": {
+     "maxLength": 200,
+     "range": "CryptoWallet",
+     "type": "entity"
+    },
+    "debtCreditor": {
+     "maxLength": 200,
+     "range": "Debt",
+     "type": "entity"
+    },
+    "debtDebtor": {
+     "maxLength": 200,
+     "range": "Debt",
+     "type": "entity"
+    },
+    "delegatedCallForTenders": {
+     "maxLength": 200,
+     "range": "CallForTenders",
+     "type": "entity"
+    },
+    "directorshipDirector": {
+     "maxLength": 200,
+     "range": "Directorship",
+     "type": "entity"
+    },
+    "dissolutionDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "dunsCode": {
+     "maxLength": 16,
+     "type": "identifier"
+    },
+    "economicActivityDeclarant": {
+     "maxLength": 200,
+     "range": "EconomicActivity",
+     "type": "entity"
+    },
+    "economicActivityHolder": {
+     "maxLength": 200,
+     "range": "EconomicActivity",
+     "type": "entity"
+    },
+    "economicActivityReceiver": {
+     "maxLength": 200,
+     "range": "EconomicActivity",
+     "type": "entity"
+    },
+    "economicActivitySender": {
+     "maxLength": 200,
+     "range": "EconomicActivity",
+     "type": "entity"
+    },
+    "email": {
+     "maxLength": 250,
+     "type": "email"
+    },
+    "emailsReceived": {
+     "maxLength": 200,
+     "range": "Email",
+     "type": "entity"
+    },
+    "emailsSent": {
+     "maxLength": 200,
+     "range": "Email",
+     "type": "entity"
+    },
+    "eventsInvolved": {
+     "maxLength": 200,
+     "range": "Event",
+     "type": "entity"
+    },
+    "eventsOrganized": {
+     "maxLength": 200,
+     "range": "Event",
+     "type": "entity"
+    },
+    "icijId": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "idNumber": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "identification": {
+     "maxLength": 200,
+     "range": "Identification",
+     "type": "entity"
+    },
+    "incorporationDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "innCode": {
+     "format": "inn",
+     "maxLength": 32,
+     "type": "identifier"
+    },
+    "jurisdiction": {
+     "maxLength": 16,
+     "type": "country"
+    },
+    "legalForm": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "leiCode": {
+     "format": "lei",
+     "maxLength": 32,
+     "type": "identifier"
+    },
+    "licenseNumber": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "mainCountry": {
+     "maxLength": 16,
+     "type": "country"
+    },
+    "membershipMember": {
+     "maxLength": 200,
+     "range": "Membership",
+     "type": "entity"
+    },
+    "mentionedBy": {
+     "maxLength": 200,
+     "range": "Mention",
+     "type": "entity"
+    },
+    "messagesReceived": {
+     "maxLength": 200,
+     "range": "Message",
+     "type": "entity"
+    },
+    "messagesSent": {
+     "maxLength": 200,
+     "range": "Message",
+     "type": "entity"
+    },
+    "npiCode": {
+     "format": "npi",
+     "maxLength": 16,
+     "type": "identifier"
+    },
+    "ogrnCode": {
+     "format": "ogrn",
+     "maxLength": 32,
+     "type": "identifier"
+    },
+    "okpoCode": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "okvedCode": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "opencorporatesUrl": {
+     "maxLength": 4096,
+     "type": "url"
+    },
+    "operatedVehicles": {
+     "maxLength": 200,
+     "range": "Vehicle",
+     "type": "entity"
+    },
+    "ownedVehicles": {
+     "maxLength": 200,
+     "range": "Vehicle",
+     "type": "entity"
+    },
+    "ownershipOwner": {
+     "maxLength": 200,
+     "range": "Ownership",
+     "type": "entity"
+    },
+    "parent": {
+     "maxLength": 200,
+     "range": "LegalEntity",
+     "type": "entity"
+    },
+    "paymentBeneficiary": {
+     "maxLength": 200,
+     "range": "Payment",
+     "type": "entity"
+    },
+    "paymentPayer": {
+     "maxLength": 200,
+     "range": "Payment",
+     "type": "entity"
+    },
+    "phone": {
+     "maxLength": 32,
+     "type": "phone"
+    },
+    "predecessors": {
+     "maxLength": 200,
+     "range": "Succession",
+     "type": "entity"
+    },
+    "projectParticipation": {
+     "maxLength": 200,
+     "range": "ProjectParticipant",
+     "type": "entity"
+    },
+    "registrationNumber": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "sayariId": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "sector": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "securities": {
+     "maxLength": 200,
+     "range": "Security",
+     "type": "entity"
+    },
+    "status": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "subsidiaries": {
+     "maxLength": 200,
+     "range": "LegalEntity",
+     "type": "entity"
+    },
+    "successors": {
+     "maxLength": 200,
+     "range": "Succession",
+     "type": "entity"
+    },
+    "swiftBic": {
+     "format": "bic",
+     "maxLength": 16,
+     "type": "identifier"
+    },
+    "taxNumber": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "taxRolls": {
+     "maxLength": 200,
+     "range": "TaxRoll",
+     "type": "entity"
+    },
+    "taxStatus": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "uniqueEntityId": {
+     "format": "uei",
+     "maxLength": 32,
+     "type": "identifier"
+    },
+    "uscCode": {
+     "format": "uscc",
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "userAccounts": {
+     "maxLength": 200,
+     "range": "UserAccount",
+     "type": "entity"
+    },
+    "vatCode": {
+     "maxLength": 32,
+     "type": "identifier"
+    },
+    "website": {
+     "maxLength": 4096,
+     "type": "url"
+    }
+   }
+  },
+  "Organization": {
+   "extends": [
+    "LegalEntity"
+   ],
+   "abstract": false,
+   "required": [
+    "name"
+   ],
+   "properties": {
+    "bankAccounts": {
+     "maxLength": 200,
+     "range": "BankAccount",
+     "type": "entity"
+    },
+    "cageCode": {
+     "maxLength": 16,
+     "type": "identifier"
+    },
+    "directorshipOrganization": {
+     "maxLength": 200,
+     "range": "Directorship",
+     "type": "entity"
+    },
+    "employees": {
+     "maxLength": 200,
+     "range": "Employment",
+     "type": "entity"
+    },
+    "giiNumber": {
+     "maxLength": 20,
+     "type": "identifier"
+    },
+    "imoNumber": {
+     "format": "imo",
+     "maxLength": 16,
+     "type": "identifier"
+    },
+    "irsCode": {
+     "format": "ein",
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "membershipOrganization": {
+     "maxLength": 200,
+     "range": "Membership",
+     "type": "entity"
+    },
+    "permId": {
+     "maxLength": 16,
+     "type": "identifier"
+    },
+    "positions": {
+     "maxLength": 200,
+     "range": "Position",
+     "type": "entity"
+    }
+   }
+  },
+  "Person": {
+   "extends": [
+    "LegalEntity"
+   ],
+   "abstract": false,
+   "required": [
+    "name"
+   ],
+   "properties": {
+    "appearance": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "associates": {
+     "maxLength": 200,
+     "range": "Associate",
+     "type": "entity"
+    },
+    "associations": {
+     "maxLength": 200,
+     "range": "Associate",
+     "type": "entity"
+    },
+    "biography": {
+     "maxLength": 65000,
+     "type": "text"
+    },
+    "birthCountry": {
+     "maxLength": 16,
+     "type": "country"
+    },
+    "birthDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "birthPlace": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "citizenship": {
+     "maxLength": 16,
+     "type": "country"
+    },
+    "deathDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "education": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "employers": {
+     "maxLength": 200,
+     "range": "Employment",
+     "type": "entity"
+    },
+    "ethnicity": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "eyeColor": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "familyPerson": {
+     "maxLength": 200,
+     "range": "Family",
+     "type": "entity"
+    },
+    "familyRelative": {
+     "maxLength": 200,
+     "range": "Family",
+     "type": "entity"
+    },
+    "fatherName": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "firstName": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "gender": {
+     "maxLength": 16,
+     "type": "gender"
+    },
+    "hairColor": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "height": {
+     "maxLength": 250,
+     "type": "number"
+    },
+    "images": {
+     "maxLength": 200,
+     "range": "Image",
+     "type": "entity"
+    },
+    "lastName": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "middleName": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "motherName": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "nameSuffix": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "nationality": {
+     "maxLength": 16,
+     "type": "country"
+    },
+    "passportNumber": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "political": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "position": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "positionOccupancies": {
+     "maxLength": 200,
+     "range": "Occupancy",
+     "type": "entity"
+    },
+    "profession": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "religion": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "secondName": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "socialSecurityNumber": {
+     "format": "ssn",
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "spokenLanguage": {
+     "maxLength": 16,
+     "type": "language"
+    },
+    "title": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "weight": {
+     "maxLength": 250,
+     "type": "number"
+    }
+   }
+  },
+  "Sanction": {
+   "extends": [
+    "Interval"
+   ],
+   "abstract": false,
+   "required": [
+    "entity"
+   ],
+   "properties": {
+    "authority": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "authorityId": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "country": {
+     "maxLength": 16,
+     "type": "country"
+    },
+    "duration": {
+     "maxLength": 250,
+     "type": "number"
+    },
+    "entity": {
+     "maxLength": 200,
+     "range": "Thing",
+     "type": "entity"
+    },
+    "listingDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "program": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "programId": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "programUrl": {
+     "maxLength": 4096,
+     "type": "url"
+    },
+    "provisions": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "reason": {
+     "maxLength": 65000,
+     "type": "text"
+    },
+    "status": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "unscId": {
+     "maxLength": 16,
+     "type": "identifier"
+    }
+   }
+  },
+  "Thing": {
+   "extends": [],
+   "abstract": true,
+   "required": [
+    "name"
+   ],
+   "properties": {
+    "address": {
+     "maxLength": 250,
+     "type": "address"
+    },
+    "addressEntity": {
+     "maxLength": 200,
+     "range": "Address",
+     "type": "entity"
+    },
+    "alephUrl": {
+     "maxLength": 4096,
+     "type": "url"
+    },
+    "alias": {
+     "maxLength": 384,
+     "type": "name"
+    },
+    "candidateSimilars": {
+     "maxLength": 200,
+     "range": "Similar",
+     "type": "entity"
+    },
+    "country": {
+     "maxLength": 16,
+     "type": "country"
+    },
+    "courtCase": {
+     "maxLength": 200,
+     "range": "CourtCaseParty",
+     "type": "entity"
+    },
+    "createdAt": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "description": {
+     "maxLength": 65000,
+     "type": "text"
+    },
+    "documentedBy": {
+     "maxLength": 200,
+     "range": "Documentation",
+     "type": "entity"
+    },
+    "indexText": {
+     "maxLength": 65000,
+     "type": "text"
+    },
+    "keywords": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "matchSimilars": {
+     "maxLength": 200,
+     "range": "Similar",
+     "type": "entity"
+    },
+    "modifiedAt": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "name": {
+     "maxLength": 384,
+     "type": "name"
+    },
+    "noteEntities": {
+     "maxLength": 200,
+     "range": "Note",
+     "type": "entity"
+    },
+    "notes": {
+     "maxLength": 65000,
+     "type": "text"
+    },
+    "previousName": {
+     "maxLength": 384,
+     "type": "name"
+    },
+    "program": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "programId": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "proof": {
+     "maxLength": 200,
+     "range": "Document",
+     "type": "entity"
+    },
+    "publisher": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "publisherUrl": {
+     "maxLength": 4096,
+     "type": "url"
+    },
+    "retrievedAt": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "riskSource": {
+     "maxLength": 200,
+     "range": "Thing",
+     "type": "entity"
+    },
+    "risks": {
+     "maxLength": 200,
+     "range": "Risk",
+     "type": "entity"
+    },
+    "sanctions": {
+     "maxLength": 200,
+     "range": "Sanction",
+     "type": "entity"
+    },
+    "sourceUrl": {
+     "maxLength": 4096,
+     "type": "url"
+    },
+    "summary": {
+     "maxLength": 65000,
+     "type": "text"
+    },
+    "topics": {
+     "maxLength": 64,
+     "type": "topic"
+    },
+    "unknownLinkFrom": {
+     "maxLength": 200,
+     "range": "UnknownLink",
+     "type": "entity"
+    },
+    "unknownLinkTo": {
+     "maxLength": 200,
+     "range": "UnknownLink",
+     "type": "entity"
+    },
+    "weakAlias": {
+     "maxLength": 384,
+     "type": "name"
+    },
+    "wikidataId": {
+     "format": "wikidata",
+     "maxLength": 32,
+     "type": "identifier"
+    },
+    "wikipediaUrl": {
+     "maxLength": 4096,
+     "type": "url"
+    }
+   }
+  },
+  "Value": {
+   "extends": [],
+   "abstract": true,
+   "required": [],
+   "properties": {
+    "amount": {
+     "maxLength": 250,
+     "type": "number"
+    },
+    "amountEur": {
+     "maxLength": 250,
+     "type": "number"
+    },
+    "amountUsd": {
+     "maxLength": 250,
+     "type": "number"
+    },
+    "currency": {
+     "maxLength": 1024,
+     "type": "string"
+    }
+   }
+  },
+  "Vehicle": {
+   "extends": [
+    "Asset"
+   ],
+   "abstract": false,
+   "required": [],
+   "properties": {
+    "buildDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "declaredCustoms": {
+     "maxLength": 200,
+     "range": "EconomicActivity",
+     "type": "entity"
+    },
+    "deregistrationDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "model": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "operator": {
+     "maxLength": 200,
+     "range": "LegalEntity",
+     "type": "entity"
+    },
+    "owner": {
+     "maxLength": 200,
+     "range": "LegalEntity",
+     "type": "entity"
+    },
+    "registrationDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "registrationNumber": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "tripsInvolved": {
+     "maxLength": 200,
+     "range": "Trip",
+     "type": "entity"
+    },
+    "type": {
+     "maxLength": 1024,
+     "type": "string"
+    }
+   }
+  },
+  "Vessel": {
+   "extends": [
+    "Vehicle"
+   ],
+   "abstract": false,
+   "required": [
+    "name"
+   ],
+   "properties": {
+    "callSign": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "crsNumber": {
+     "maxLength": 64,
+     "type": "identifier"
+    },
+    "deadweightTonnage": {
+     "maxLength": 250,
+     "type": "number"
+    },
+    "flag": {
+     "maxLength": 16,
+     "type": "country"
+    },
+    "grossRegisteredTonnage": {
+     "maxLength": 250,
+     "type": "number"
+    },
+    "imoNumber": {
+     "format": "imo",
+     "maxLength": 16,
+     "type": "identifier"
+    },
+    "mmsi": {
+     "maxLength": 16,
+     "type": "identifier"
+    },
+    "nameChangeDate": {
+     "maxLength": 32,
+     "type": "date"
+    },
+    "navigationArea": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "pastFlags": {
+     "maxLength": 16,
+     "type": "country"
+    },
+    "pastTypes": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "registrationPort": {
+     "maxLength": 1024,
+     "type": "string"
+    },
+    "tonnage": {
+     "maxLength": 250,
+     "type": "number"
+    }
+   }
+  }
+ },
+ "types": {
+  "country": {
+   "values": {
+    "ac": "Ascension Island",
+    "ad": "Andorra",
+    "ae": "United Arab Emirates",
+    "af": "Afghanistan",
+    "ag": "Antigua and Barbuda",
+    "ai": "Anguilla",
+    "al": "Albania",
+    "am": "Armenia",
+    "ao": "Angola",
+    "aq": "Antarctica",
+    "ar": "Argentina",
+    "as": "American Samoa",
+    "at": "Austria",
+    "au": "Australia",
+    "aw": "Aruba",
+    "ax": "Åland Islands",
+    "az": "Azerbaijan",
+    "az-nk": "Artsakh",
+    "ba": "Bosnia and Herzegovina",
+    "bb": "Barbados",
+    "bd": "Bangladesh",
+    "be": "Belgium",
+    "bf": "Burkina Faso",
+    "bg": "Bulgaria",
+    "bh": "Bahrain",
+    "bi": "Burundi",
+    "bj": "Benin",
+    "bl": "Saint Barthélemy",
+    "bm": "Bermuda",
+    "bn": "Brunei",
+    "bo": "Bolivia",
+    "bq": "Bonaire, Sint Eustatius and Saba",
+    "br": "Brazil",
+    "bs": "Bahamas",
+    "bt": "Bhutan",
+    "bv": "Bouvet Island",
+    "bw": "Botswana",
+    "by": "Belarus",
+    "bz": "Belize",
+    "ca": "Canada",
+    "cc": "Cocos (Keeling) Islands",
+    "cd": "DR Congo",
+    "cf": "Central African Republic",
+    "cg": "Congo-Brazzaville",
+    "ch": "Switzerland",
+    "ci": "Côte d'Ivoire",
+    "ck": "Cook Islands",
+    "cl": "Chile",
+    "cm": "Cameroon",
+    "cn": "China",
+    "cn-xz": "Tibet",
+    "co": "Colombia",
+    "cp": "Clipperton Island",
+    "cq": "Sark",
+    "cr": "Costa Rica",
+    "cshh": "Czechoslovakia",
+    "csxx": "Serbia and Montenegro",
+    "cu": "Cuba",
+    "cv": "Cape Verde",
+    "cw": "Curaçao",
+    "cx": "Christmas Island",
+    "cy": "Cyprus",
+    "cy-trnc": "Northern Cyprus",
+    "cz": "Czechia",
+    "dd": "East Germany",
+    "de": "Germany",
+    "dg": "Diego Garcia",
+    "dj": "Djibouti",
+    "dk": "Denmark",
+    "dm": "Dominica",
+    "do": "Dominican Republic",
+    "dz": "Algeria",
+    "ec": "Ecuador",
+    "ee": "Estonia",
+    "eg": "Egypt",
+    "eh": "Western Sahara",
+    "er": "Eritrea",
+    "es": "Spain",
+    "et": "Ethiopia",
+    "eu": "European Union",
+    "fi": "Finland",
+    "fj": "Fiji",
+    "fk": "Falkland Islands",
+    "fm": "Micronesia",
+    "fo": "Faroe Islands",
+    "fr": "France",
+    "ga": "Gabon",
+    "gb": "United Kingdom",
+    "gb-nir": "Northern Ireland",
+    "gb-sct": "Scotland",
+    "gb-wls": "Wales",
+    "gd": "Grenada",
+    "ge": "Georgia",
+    "ge-ab": "Abkhazia (Occupied Georgia)",
+    "gf": "French Guiana",
+    "gg": "Guernsey",
+    "gh": "Ghana",
+    "gi": "Gibraltar",
+    "gl": "Greenland",
+    "gm": "Gambia",
+    "gn": "Guinea",
+    "gp": "Guadeloupe",
+    "gq": "Equatorial Guinea",
+    "gr": "Greece",
+    "gs": "South Georgia and the South Sandwich Islands",
+    "gt": "Guatemala",
+    "gu": "Guam",
+    "gw": "Guinea-Bissau",
+    "gy": "Guyana",
+    "hk": "Hong Kong SAR",
+    "hm": "Heard and McDonald Islands",
+    "hn": "Honduras",
+    "hr": "Croatia",
+    "ht": "Haiti",
+    "hu": "Hungary",
+    "ic": "Canary Islands",
+    "id": "Indonesia",
+    "ie": "Ireland",
+    "il": "Israel",
+    "im": "Isle of Man",
+    "in": "India",
+    "io": "British Indian Ocean Territory",
+    "ip": "Cyberspace",
+    "iq": "Iraq",
+    "iq-kr": "Kurdistan",
+    "ir": "Iran",
+    "is": "Iceland",
+    "it": "Italy",
+    "je": "Jersey",
+    "jm": "Jamaica",
+    "jo": "Jordan",
+    "jp": "Japan",
+    "ke": "Kenya",
+    "kg": "Kyrgyzstan",
+    "kh": "Cambodia",
+    "ki": "Kiribati",
+    "km": "Comoros",
+    "kn": "Saint Kitts and Nevis",
+    "kp": "North Korea",
+    "kr": "South Korea",
+    "kw": "Kuwait",
+    "ky": "Cayman Islands",
+    "kz": "Kazakhstan",
+    "la": "Laos",
+    "lb": "Lebanon",
+    "lc": "Saint Lucia",
+    "li": "Liechtenstein",
+    "lk": "Sri Lanka",
+    "lr": "Liberia",
+    "ls": "Lesotho",
+    "lt": "Lithuania",
+    "lu": "Luxembourg",
+    "lv": "Latvia",
+    "ly": "Libya",
+    "ma": "Morocco",
+    "mc": "Monaco",
+    "md": "Moldova",
+    "md-pmr": "Transnistria",
+    "me": "Montenegro",
+    "mf": "Saint Martin",
+    "mg": "Madagascar",
+    "mh": "Marshall Islands",
+    "mk": "North Macedonia",
+    "ml": "Mali",
+    "mm": "Myanmar",
+    "mn": "Mongolia",
+    "mo": "Macao SAR",
+    "mp": "Northern Mariana Islands",
+    "mq": "Martinique",
+    "mr": "Mauritania",
+    "ms": "Montserrat",
+    "mt": "Malta",
+    "mu": "Mauritius",
+    "mv": "Maldives",
+    "mw": "Malawi",
+    "mx": "Mexico",
+    "my": "Malaysia",
+    "mz": "Mozambique",
+    "na": "Namibia",
+    "nc": "New Caledonia",
+    "ne": "Niger",
+    "nf": "Norfolk Island",
+    "ng": "Nigeria",
+    "ni": "Nicaragua",
+    "nl": "Netherlands",
+    "no": "Norway",
+    "np": "Nepal",
+    "nr": "Naoero",
+    "nu": "Niue",
+    "nz": "New Zealand",
+    "om": "Oman",
+    "pa": "Panama",
+    "pe": "Peru",
+    "pf": "French Polynesia",
+    "pg": "Papua New Guinea",
+    "ph": "Philippines",
+    "pk": "Pakistan",
+    "pk-km": "Kashmir",
+    "pl": "Poland",
+    "pm": "Saint Pierre and Miquelon",
+    "pn": "Pitcairn",
+    "pr": "Puerto Rico",
+    "ps": "Palestine",
+    "pt": "Portugal",
+    "pw": "Palau",
+    "py": "Paraguay",
+    "qa": "Qatar",
+    "re": "Réunion",
+    "ro": "Romania",
+    "rs": "Serbia",
+    "ru": "Russia",
+    "rw": "Rwanda",
+    "sa": "Saudi Arabia",
+    "sb": "Solomon Islands",
+    "sc": "Seychelles",
+    "sd": "Sudan",
+    "se": "Sweden",
+    "sg": "Singapore",
+    "sh": "Saint Helena, Ascension and Tristan da Cunha",
+    "si": "Slovenia",
+    "sj": "Svalbard and Jan Mayen",
+    "sk": "Slovakia",
+    "sl": "Sierra Leone",
+    "sm": "San Marino",
+    "sn": "Senegal",
+    "so": "Somalia",
+    "so-som": "Somaliland",
+    "sr": "Suriname",
+    "ss": "South Sudan",
+    "st": "São Tomé and Príncipe",
+    "suhh": "Soviet Union",
+    "sv": "El Salvador",
+    "sx": "Sint Maarten",
+    "sy": "Syria",
+    "sz": "Eswatini",
+    "ta": "Tristan da Cunha",
+    "tc": "Turks and Caicos Islands",
+    "td": "Chad",
+    "tf": "French Southern Territories",
+    "tg": "Togo",
+    "th": "Thailand",
+    "tj": "Tajikistan",
+    "tk": "Tokelau",
+    "tl": "Timor-Leste",
+    "tm": "Turkmenistan",
+    "tn": "Tunisia",
+    "to": "Tonga",
+    "tr": "Türkiye",
+    "tt": "Trinidad and Tobago",
+    "tv": "Tuvalu",
+    "tw": "Taiwan",
+    "tz": "Tanzania",
+    "ua": "Ukraine",
+    "ua-cri": "Crimea (Occupied Ukraine)",
+    "ua-dpr": "Donetsk (Occupied Ukraine)",
+    "ua-lpr": "Luhansk (Occupied Ukraine)",
+    "ug": "Uganda",
+    "um": "U.S. Outlying Islands",
+    "un": "United Nations",
+    "us": "United States",
+    "uy": "Uruguay",
+    "uz": "Uzbekistan",
+    "va": "Holy See",
+    "vc": "Saint Vincent and the Grenadines",
+    "ve": "Venezuela",
+    "vg": "British Virgin Islands",
+    "vi": "U.S. Virgin Islands",
+    "vn": "Vietnam",
+    "vu": "Vanuatu",
+    "wf": "Wallis and Futuna",
+    "ws": "Samoa",
+    "x-so": "South Ossetia (Occupied Georgia)",
+    "xk": "Kosovo",
+    "ye": "Yemen",
+    "yt": "Mayotte",
+    "yucs": "Yugoslavia",
+    "za": "South Africa",
+    "zm": "Zambia",
+    "zr": "Zaire",
+    "zw": "Zimbabwe",
+    "zz": "Global"
+   }
+  },
+  "topic": {
+   "values": {
+    "asset.frozen": "Frozen asset",
+    "corp.clone": "Clone of real entity",
+    "corp.disqual": "Disqualified",
+    "corp.offshore": "Offshore",
+    "corp.public": "Public listed company",
+    "corp.shell": "Shell company",
+    "crime": "Crime",
+    "crime.boss": "Criminal leadership",
+    "crime.cyber": "Cybercrime",
+    "crime.env": "Environmental violations",
+    "crime.fin": "Financial crime",
+    "crime.fraud": "Fraud",
+    "crime.terror": "Terrorism",
+    "crime.theft": "Theft",
+    "crime.traffick": "Trafficking",
+    "crime.traffick.drug": "Drug trafficking",
+    "crime.traffick.human": "Human trafficking",
+    "crime.war": "War crimes",
+    "debarment": "Debarred",
+    "export.control": "Export controlled",
+    "export.control.linked": "Export control-linked",
+    "export.risk": "Trade risk",
+    "fin": "Financial services",
+    "fin.adivsor": "Financial advisor",
+    "fin.bank": "Bank",
+    "fin.fund": "Fund",
+    "forced.labor": "Forced labor",
+    "geo.risk": "High-risk area",
+    "gov": "Government",
+    "gov.admin": "Civil service",
+    "gov.executive": "Executive branch of government",
+    "gov.financial": "Central banking and financial integrity",
+    "gov.head": "Head of government or state",
+    "gov.igo": "Intergovernmental organization",
+    "gov.judicial": "Judicial branch of government",
+    "gov.legislative": "Legislative branch of government",
+    "gov.muni": "Municipal government",
+    "gov.national": "National government",
+    "gov.religion": "Religious leadership",
+    "gov.security": "Security services",
+    "gov.soe": "State-owned enterprise",
+    "gov.state": "State government",
+    "invest.ban": "Investment ban",
+    "invest.risk": "Investment risk",
+    "mare.detained": "Maritime detention",
+    "mare.shadow": "Shadow fleet",
+    "mare.sts": "Ship-to-ship transfer",
+    "mil": "Military",
+    "poi": "Person of interest",
+    "pol.party": "Political party",
+    "pol.union": "Union",
+    "reg.action": "Regulator action",
+    "reg.warn": "Regulator warning",
+    "rel": "Religion",
+    "role.acct": "Accountant",
+    "role.act": "Activist",
+    "role.civil": "Civil servant",
+    "role.diplo": "Diplomat",
+    "role.journo": "Journalist",
+    "role.judge": "Judge",
+    "role.lawyer": "Lawyer",
+    "role.lobby": "Lobbyist",
+    "role.oligarch": "Oligarch",
+    "role.pep": "PEP",
+    "role.pep.frmr": "Former PEP",
+    "role.pep.intl": "International PEP",
+    "role.pep.natl": "National PEP",
+    "role.pol": "Politician",
+    "role.rca": "Close Associate",
+    "role.spy": "Spy",
+    "sanction": "Sanctioned",
+    "sanction.control": "Sanction ownership or control",
+    "sanction.counter": "Counter-sanctioned",
+    "sanction.linked": "Sanction-linked",
+    "wanted": "Wanted"
+   }
+  },
+  "maxLength": {
+   "address": 250,
+   "checksum": 40,
+   "country": 16,
+   "date": 32,
+   "email": 250,
+   "entity": 200,
+   "gender": 16,
+   "html": 65000,
+   "identifier": 64,
+   "ip": 64,
+   "json": 250,
+   "language": 16,
+   "mimetype": 250,
+   "name": 384,
+   "number": 250,
+   "phone": 64,
+   "string": 1024,
+   "text": 65000,
+   "topic": 64,
+   "url": 4096
+  }
+ }
+}

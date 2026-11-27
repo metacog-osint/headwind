@@ -23,6 +23,17 @@ Headwind reports measurements. It states no probability and gives no investment 
     production and reserves by country, with each commodity's largest producer, top-three share, China's share and
     HHI (draft, 25 Nov 2026).
 
+## Release files
+
+- Release `entities`: `headwind-entities.ftm.gz`, the named entries of the sanctions and screening lists as
+  [FollowTheMoney](https://followthemoney.tech/docs/) entities (one JSON entity per line), and
+  `headwind-entities.about.json`, which credits each list (publisher, title, source, licence and its link, the
+  attribution its terms ask for, what Headwind changed and what is left out); the release notes give the same
+  credits. A screening-list entry whose end date has passed carries its `endDate` and no topic. Replaced every run.
+- Release `state`: the run state the workflow restores; `state-YYYY-qN`: dated copies.
+- Every release carries `SHA256SUMS` and `headwind-manifest.json` with the SHA-256 of each of its files. To check
+  a copy: `sha256sum -c SHA256SUMS --ignore-missing`, or `python -m headwind.manifest verify headwind-manifest.json`.
+
 ## Commands
 
 ```bash

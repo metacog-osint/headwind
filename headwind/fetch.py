@@ -2,11 +2,11 @@
 
 Collection order (suite rule): fetch, hash, store the raw copy, record the times, then derive.
 Raw copies go under data/raw/<source>/<sha12>.<ext> (git-ignored), and every fetch adds one line
-to data/raw/index.jsonl, so a later reader can tell which bytes a number came from.
+to data/raw/index.jsonl, so a later reader can tell which bytes a number came from
+(rawstore.read_fetched gives back the reply of any line, as fetched).
 """
 from __future__ import annotations
 
-import gzip
 import hashlib
 import json
 import os
@@ -15,6 +15,8 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+
+from headwind import rawstore
 
 UA = os.environ.get("HEADWIND_UA", "Mozilla/5.0 (compatible; research-collector/1.0)")
 
@@ -52,16 +54,26 @@ def fetch(source_id: str, url: str, raw_dir: Path | None, ext: str, timeout: int
           gz: bool = False) -> tuple[bytes, dict]:
     """Return (bytes, record). The record carries the URL, SHA-256, size and fetch time.
 
-    gz stores the raw copy gzipped (for large files); the hash and size are of the bytes as fetched."""
+    gz stores the raw copy gzipped (for large files, with no time in the gzip header); the hash and size are of
+    the bytes as fetched. For a source whose replies carry values that change on every request (rawstore.RULES),
+    the raw copy is the reply with those values taken out, named <sha12 of the stored bytes>.stable.<ext>, and the
+    index line adds `stored` (its path under raw_dir) and `rebuild` (the values, to rebuild the reply exactly)."""
     body = (getter or get)(url, timeout)
     sha = hashlib.sha256(body).hexdigest()
     rec = {"source_id": source_id, "url": url, "sha256": sha, "bytes": len(body), "fetched_at": now_utc()}
     if raw_dir is not None:
         dest = Path(raw_dir) / source_id
         dest.mkdir(parents=True, exist_ok=True)
-        f = dest / (f"{sha[:12]}.{ext}" + (".gz" if gz else ""))
+        stored, recipe = rawstore.split(source_id, ext, body)
+        if recipe is None:
+            name = f"{sha[:12]}.{ext}"
+        else:
+            name = f"{hashlib.sha256(stored).hexdigest()[:12]}.stable.{ext}"
+            rec["stored"] = f"{source_id}/{name}" + (".gz" if gz else "")
+            rec["rebuild"] = recipe
+        f = dest / (name + (".gz" if gz else ""))
         if not f.exists():
-            f.write_bytes(gzip.compress(body, 6) if gz else body)
+            f.write_bytes(rawstore.gzip_bytes(stored) if gz else stored)
         with (Path(raw_dir) / "index.jsonl").open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(rec) + "\n")
     return body, rec

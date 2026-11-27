@@ -11,3 +11,6 @@ private/
 data/raw/
 data/snapshot.json
 data/state/
+
+# built by tools/headwind.py build on every run and deployed directly; never committed
+site/

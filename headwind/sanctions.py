@@ -32,6 +32,8 @@ from . import batches, pinksheet, screening
 from . import names as nm
 
 OFAC_SDN_CSV = "https://www.treasury.gov/ofac/downloads/sdn.csv"
+# The SDN list in OFAC's advanced XML (about 6 MB zipped, 129 MB unzipped): read only for each entry's date.
+OFAC_ADVANCED_ZIP = "https://www.treasury.gov/ofac/downloads/sanctions/1.0/sdn_advanced.zip"
 OFAC_ADD_CSV = "https://www.treasury.gov/ofac/downloads/add.csv"     # addresses: only the country is kept
 UN_XML = "https://scsanctions.un.org/resources/xml/en/consolidated.xml"
 OFAC_RECENT = "https://ofac.treasury.gov/recent-actions"
@@ -282,13 +284,28 @@ def parse_eu_xml(body: bytes, dates: dict | None = None) -> tuple[str | None, di
     return root.get("generationDate"), index
 
 
+def _alias_order(a) -> tuple:
+    lid = (a.get("logicalId") or "").strip()
+    return (0, int(lid)) if lid.isdigit() else (1, 0)
+
+
 def _eu_details(e) -> dict:
-    """The name the EU marks strong (else the first given) and the country codes of the entry's citizenships and
-    addresses. Birth dates, functions, identity documents and remarks are not carried."""
+    """One name for the entry, the digest of all its names, and the country codes of its citizenships and
+    addresses. Birth dates, functions, identity documents and remarks are not carried.
+
+    The name is the alias the EU marks strong with the lowest alias id (else the lowest of all its aliases). Most
+    entries carry several strong aliases, and the file prints them in an order that moves between generations: on
+    20 Nov 2026 taking the first strong alias made 1,167 entries look renamed, and on 26 Nov 3,493, each new name an
+    alias the entry already had. The alias ids stay with their names across files, so this choice does not move.
+    `aliases` is a digest of the entry's distinct names, whatever their order: a name added, removed or edited
+    changes it, a reorder does not (`edits`)."""
     aliases = [a for a in e.findall("e:nameAlias", EU_NS) if nm.clean(a.get("wholeName"))]
-    pick = next((a for a in aliases if a.get("strong") == "true"), aliases[0] if aliases else None)
+    strong = [a for a in aliases if a.get("strong") == "true"]
+    pick = min(strong or aliases, key=_alias_order) if aliases else None
     cs = [x.get("countryIso2Code") for tag in ("e:citizenship", "e:address") for x in e.findall(tag, EU_NS)]
-    return nm.details(pick.get("wholeName") if pick is not None else None, [c for c in cs if c and c != "00"])
+    out = nm.details(pick.get("wholeName") if pick is not None else None, [c for c in cs if c and c != "00"])
+    out["aliases"] = nm.name_set_digest(a.get("wholeName") for a in aliases)
+    return out
 
 
 def _iso_day(text: str | None) -> str | None:
@@ -406,6 +423,34 @@ def parse_sdn_csv(text: str, addresses: dict | None = None) -> dict[str, list]:
         entry.append(_vessel(row) if kind == "vessel" else nm.details(_blank(row[1]), (addresses or {}).get(uid)))
         index[uid] = entry
     return index
+
+
+def parse_sdn_advanced_dates(body: bytes) -> dict[str, str]:
+    """{entry id: "YYYY-MM-DD"} from sdn_advanced.zip: the "Created" date (EntryEvent type 1) of each
+    SanctionsEntry, whose ProfileID is the entry id in sdn.csv. An entry has one event per legal basis; the earliest
+    date counts. Raises when the file holds none, so a changed layout is not read as a list without dates."""
+    dates: dict[str, str] = {}
+    with zipfile.ZipFile(io.BytesIO(body)) as z:
+        member = next(n for n in z.namelist() if n.lower().endswith(".xml"))
+        with z.open(member) as fh:
+            for _, el in ET.iterparse(fh):
+                tag = el.tag.rsplit("}", 1)[-1]
+                if tag == "SanctionsEntry":
+                    for event in el.findall("{*}EntryEvent"):
+                        if event.get("EntryEventTypeID") != "1":
+                            continue
+                        try:
+                            day = datetime(*(int(event.findtext("{*}Date/{*}" + k) or "")
+                                             for k in ("Year", "Month", "Day"))).strftime("%Y-%m-%d")
+                        except ValueError:
+                            continue
+                        uid = el.get("ProfileID") or ""
+                        dates[uid] = min(day, dates.get(uid, day))
+                if tag in ("SanctionsEntry", "DistinctParty", "IDRegDocument", "Location", "ProfileRelationship"):
+                    el.clear()      # the file is large; keep only the dates
+    if not dates:
+        raise ValueError("no entry dates in the advanced XML")
+    return dates
 
 
 def _blank(s: str) -> str | None:
@@ -899,13 +944,25 @@ def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True,
     organization that changed (`named_changed`, with the programs it gained and lost and, when renamed, its name
     before), and each vessel, before and after for each field that moved. `pairs` are (old id, new id) for one entry
     under a new id, compared as one. An index written before vessel details or names were kept, or kept in an older
-    form (`compare_vessels`, `compare_names` False), gives no such comparison."""
+    form (`compare_vessels`, `compare_names` False), gives no such comparison.
+
+    An entry that keeps the digest of all its names (the EU's, `aliases`) is compared on that digest: a name added,
+    removed or edited is a change (`aliases_changed`, with `name_before` when the name shown moved too), and the
+    same names in another order are none. Where only one reading keeps the digest (the first reading after it was
+    added), the entry is not compared by name."""
     changed, gained, lost, retyped, vessels, named_changed = [], Counter(), Counter(), Counter(), [], []
     for old_id, new_id in [(i, i) for i in sorted(set(index) & set(prev_index))] + list(pairs):
         old, new = prev_index[old_id], index[new_id]
         before, after = nm.entry(prev_index, old_id), nm.entry(index, new_id)
-        renamed = bool(compare_names and before and after and before["name"] != after["name"])
-        if old[0] != new[0] or sorted(old[1]) != sorted(new[1]) or renamed:
+        renamed = realiased = False
+        if compare_names and before and after:
+            d_old, d_new = old[2].get("aliases"), new[2].get("aliases")
+            if d_old and d_new:
+                realiased = d_old != d_new
+                renamed = realiased and before["name"] != after["name"]
+            elif not d_old and not d_new:
+                renamed = before["name"] != after["name"]
+        if old[0] != new[0] or sorted(old[1]) != sorted(new[1]) or renamed or realiased:
             changed.append(new_id)
             gained.update(set(new[1]) - set(old[1]))
             lost.update(set(old[1]) - set(new[1]))
@@ -915,6 +972,8 @@ def edits(prev_index: dict, index: dict, pairs=(), compare_vessels: bool = True,
                 rec = {**after, "gained": sorted(set(new[1]) - set(old[1])), "lost": sorted(set(old[1]) - set(new[1]))}
                 if renamed:
                     rec["name_before"] = before["name"]
+                if realiased:
+                    rec["aliases_changed"] = True
                 if old[0] != new[0]:
                     rec["type_before"] = old[0]
                 named_changed.append(rec)
@@ -1067,6 +1126,61 @@ def vessel_crosslist(indexes: dict[str, dict], stale: tuple = ()) -> tuple[dict,
         for rec in r["on"].values():
             rec["ids"].sort()
     return summary, table
+
+
+# The lists whose files give each ship's own listing date: the "Created" date of the entry in OFAC's advanced XML,
+# the UK's DateDesignated, Canada's DateOfListing and the notice date in Japan's ship file. France's and Australia's
+# files give none, so their ships cannot be placed in time here.
+DATED_VESSEL_LISTS = ("ofac-sdn", "uk-sanctions", "canada-sema", "japan-mof")
+
+
+def cross_list_lead(table: list[dict], vessel_dates: dict[str, dict], checked_at: str) -> dict:
+    """Which publisher listed a ship first, for ships (by IMO number, `vessel_crosslist`) on two or more of the lists
+    that date their entries. A list's date for a ship is the earliest date of its entries for that IMO number. These
+    are the publishers' own dates: the table measures the publishers, not Headwind, and says nothing about the ship.
+
+    `pairs` gives, for each two lists, how many ships both list, how many each listed first and how many on the same
+    day, with the median and largest number of days the later list followed. `ships` gives each ship's dates.
+    `date_range` is each list's earliest and latest ship date: a list whose ship measure began later (Japan's ship
+    list starts with one notice of 2 Oct 2026) can only follow."""
+    import statistics
+    from datetime import date
+
+    ships, pairs = [], {}
+    for r in table:
+        listed = {}
+        for l in DATED_VESSEL_LISTS:
+            on = r["on"].get(l)
+            days = [d for d in (vessel_dates.get(l, {}).get(i) for i in (on or {}).get("ids") or []) if d]
+            if days:
+                listed[l] = min(days)
+        if len(listed) < 2:
+            continue
+        first_day = min(listed.values())
+        ships.append({"imo": r["imo"], "names": {l: r["on"][l].get("name") for l in listed},
+                      "listed": listed, "first": [l for l in listed if listed[l] == first_day],
+                      "days_after_first": {l: (date.fromisoformat(d) - date.fromisoformat(first_day)).days
+                                           for l, d in listed.items()},
+                      "also_on_undated": sorted(l for l in r["on"] if l not in listed)})
+        for x, a in enumerate(DATED_VESSEL_LISTS):
+            for b in DATED_VESSEL_LISTS[x + 1:]:
+                if a in listed and b in listed:
+                    gap = (date.fromisoformat(listed[b]) - date.fromisoformat(listed[a])).days
+                    pairs.setdefault((a, b), []).append(gap)
+
+    def later(gaps):
+        return {"ships": len(gaps), "median_days": statistics.median(gaps) if gaps else None,
+                "max_days": max(gaps) if gaps else None}
+    out_pairs = []
+    for (a, b), gaps in pairs.items():
+        out_pairs.append({"lists": [a, b], "ships": len(gaps), "same_day": sum(1 for g in gaps if g == 0),
+                          "first": {a: later([g for g in gaps if g > 0]), b: later([-g for g in gaps if g < 0])}})
+    return {"checked_at": checked_at, "lists_dated": list(DATED_VESSEL_LISTS),
+            "lists_undated": [l for l in VESSEL_LISTS if l not in DATED_VESSEL_LISTS],
+            "date_range": {l: [min(v.values()), max(v.values())] for l in DATED_VESSEL_LISTS
+                           if (v := {i: d for i, d in (vessel_dates.get(l) or {}).items() if d})},
+            "ships_on_two_or_more_dated": len(ships), "pairs": out_pairs,
+            "ships": sorted(ships, key=lambda s: (min(s["listed"].values()), s["imo"]))}
 
 
 def mark_also_on(d: dict, table: list[dict]) -> dict:

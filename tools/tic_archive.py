@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """tic_archive.py: copy licence-restricted raw data into TIC's private archive, metacog-osint/tic-archive.
 
-Rule (Tom, 18 Nov 2026): no TIC program loses data. Live views may filter; storage keeps everything. Data whose
+Rule: no TIC program loses data. Live views may filter; storage keeps everything. Data whose
 licence bars public redistribution (Space-Track, WHO, ReliefWeb, private watch configuration, ...) cannot go into
 the public program repos, so it goes here. Same file in every program repo (tools/tic_archive.py); the reference
 copy and its tests live in tic-archive itself.
@@ -171,6 +171,13 @@ def lane_prefix(program: str, lane: str) -> str:
     return f"{program}-{lane}-"
 
 
+def lane_tags(store, prefix: str) -> list[str]:
+    """The lane's own releases: <prefix>YYYY-MM or <prefix>YYYY-MM.N. The store's prefix match alone also returns
+    the releases of a lane whose name extends this one with a hyphen (lane `state` would see `state-daily`'s)."""
+    rx = re.compile(re.escape(prefix) + r"\d{4}-\d{2}(?:\.\d+)?")
+    return [t for t in store.tags(prefix) if rx.fullmatch(t)]
+
+
 def tag_month(tag: str, prefix: str) -> str:
     return tag[len(prefix):len(prefix) + 7]
 
@@ -324,7 +331,7 @@ class Archive:
 
     # The previous snapshot is the newest files.json in the lane, in any month.
     def latest(self, workdir: Path) -> dict | None:
-        tags = sorted(self.store.tags(self.prefix), key=lambda t: tag_sort_key(t, self.prefix), reverse=True)
+        tags = sorted(lane_tags(self.store, self.prefix), key=lambda t: tag_sort_key(t, self.prefix), reverse=True)
         for tag in tags:
             names = sorted(n for n in self.store.assets(tag) if n.endswith(".files.json"))
             if names:
@@ -457,7 +464,7 @@ class Archive:
         with tempfile.TemporaryDirectory(prefix="tic-archive-") as td:
             work = Path(td)
             if snapshot:
-                tag = next((t for t in self.store.tags(self.prefix) if snapshot in self.store.assets(t)), None)
+                tag = next((t for t in lane_tags(self.store, self.prefix) if snapshot in self.store.assets(t)), None)
                 if tag is None:
                     raise ArchiveError(f"snapshot {snapshot} not found")
                 doc = json.loads(self.store.download(tag, snapshot, work).read_text(encoding="utf-8"))
@@ -518,7 +525,7 @@ def main(argv=None) -> int:
         elif a.cmd == "restore":
             arch.restore(Path(a.dest), a.snapshot)
         else:
-            for t in sorted(arch.store.tags(arch.prefix), key=lambda t: tag_sort_key(t, arch.prefix)):
+            for t in sorted(lane_tags(arch.store, arch.prefix), key=lambda t: tag_sort_key(t, arch.prefix)):
                 assets = arch.store.assets(t)
                 n_snap = sum(1 for n in assets if n.endswith(".files.json"))
                 print(f"{t}\t{len(assets)} assets\t{n_snap} snapshots\t{sum(assets.values()):,} bytes")

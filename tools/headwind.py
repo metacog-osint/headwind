@@ -5,7 +5,9 @@
     python tools/headwind.py check       # validate the registers and lint the feed
 
 collect never falls back to made-up data. A lane that fails keeps its last good copy (marked
-from_previous) or stays empty, and the snapshot's "lanes" block says which.
+from_previous) or stays empty, and the snapshot's "lanes" block says which. The one exception is the minerals
+lane: when ScienceBase does not answer, it reads the stored copy of the same USGS release (headwind/stored/),
+checked against the USGS checksums, and marks it read_from.
 """
 from __future__ import annotations
 
@@ -23,8 +25,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      cjeu, markets, minerals, minerals_world, names, pinksheet, releases, sanctions, scotus, screening, tariffs,
+from headwind import (baseline, batches, commodities, controls, feed, fetch, food, ftm, health,  # noqa: E402,F401
+                      inspection, cjeu, markets, minerals, minerals_world, names, pinksheet, releases, sanctions, scotus,
+                      screening, tariffs,
                       trade, uksc, unpress)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
@@ -37,7 +40,7 @@ LANE_FIELDS = {
     "wfp": ["local_food", "local_food_missing", "market_fx"],
     "baseline": ["baseline"],
     "calendar": ["fomc_dates", "ecb_dates"],
-    "sanctions": ["sanctions", "sanctions_lists", "vessel_crosslist", "vessel_table"],
+    "sanctions": ["sanctions", "sanctions_lists", "vessel_crosslist", "vessel_table", "vessel_lead"],
     "screening": ["screening", "screening_lists"],
     "controls": ["controls", "scheduled_dates", "tariff_pace"],
     "inspection": ["inspection", "inspection_issues"],
@@ -52,7 +55,7 @@ LANE_FIELDS = {
 EMPTY = {"fx": [], "fx_official": [], "fx_official_missing": [], "fx_official_updated": None, "market_fx": [],
          "energy": [], "fao": [], "fao_release_dates": [], "pinksheet": [], "pinksheet_updated": None,
          "local_food": [], "local_food_missing": [],
-         "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "screening": [],
+         "baseline": {}, "fomc_dates": [], "ecb_dates": [], "sanctions": [], "sanctions_lists": [], "vessel_crosslist": {}, "vessel_table": [], "vessel_lead": {}, "screening": [],
          "screening_lists": [], "controls": [], "scheduled_dates": [], "inspection": [], "inspection_issues": [],
          "minerals": {}, "mineral_trade": {}, "tariff_pace": {}, "hts_releases": {}, "hts_pace": {},
          "signed_actions": [], "signed_error": None, "un_committee_releases": [], "un_press": {},
@@ -278,9 +281,13 @@ def list_changes(snap: dict) -> dict:
             + [slim(d, "screening") for d in snap.get("screening") or []]}
 
 
+_OFAC_DATES: dict = {}   # {entry id: date} from the last read of OFAC's advanced XML
+
+
 def _read_list(list_id, raw_dir, getter):
     """Fetch and parse one sanctions list: (index, the publisher's generation date, fetch record, designation dates).
-    OFAC's file has no designation dates (None)."""
+    OFAC's dates are returned as None: they come from a second file, are kept in _OFAC_DATES and serve only the
+    cross-list lead table, not the batch rule."""
     dates: dict = {}
     if list_id == "ofac-sdn":
         body, rec = fetch.fetch("ofac-sdn", sanctions.OFAC_SDN_CSV, raw_dir, "csv", timeout=180, getter=getter)
@@ -292,6 +299,14 @@ def _read_list(list_id, raw_dir, getter):
             addresses = sanctions.parse_add_csv(abody.decode("utf-8", errors="replace"))
         except Exception as exc:  # noqa: BLE001 - the list itself was read
             print(f"  sanctions: ofac-sdn: address file not read ({exc}); no countries this run", file=sys.stderr)
+        _OFAC_DATES.clear()
+        try:
+            zbody, _ = fetch.fetch("ofac-sdn-advanced", sanctions.OFAC_ADVANCED_ZIP, raw_dir, "zip", timeout=180,
+                                   getter=getter)
+            _OFAC_DATES.update(sanctions.parse_sdn_advanced_dates(zbody))
+        except Exception as exc:  # noqa: BLE001 - the list itself was read
+            print(f"  sanctions: ofac-sdn: entry dates not read ({exc}); ship dates kept from the reading before",
+                  file=sys.stderr)
         return sanctions.parse_sdn_csv(body.decode("utf-8", errors="replace"), addresses), None, rec, None
     if list_id == "un-consolidated":
         body, rec = fetch.fetch("un-sc-consolidated", sanctions.UN_XML, raw_dir, "xml", timeout=120, getter=getter)
@@ -389,6 +404,16 @@ def _lane_sanctions(raw_dir, prev, getter):
                               "index": index}
         if ca_names is not None:
             new_state[list_id]["names"] = ca_names
+        if list_id == "ofac-sdn":
+            # Without a fresh dates file, the dates read before stand: an entry's creation date does not change.
+            dates_for_ships = _OFAC_DATES or old.get("vessel_dates") or {}
+        else:
+            dates_for_ships = dates
+        if dates_for_ships and list_id in sanctions.DATED_VESSEL_LISTS:
+            # Each ship's listing date as the publisher gives it (cross_list_lead); kept so a list that fails a
+            # later run still has its dates.
+            new_state[list_id]["vessel_dates"] = {i: d for i, d in sorted(dates_for_ships.items())
+                                                  if d and i in index and index[i][0] == "vessel"}
         lists.append(sanctions.status(list_id, index, now, baseline_set, source_generated, last_change))
     if not recs:
         raise RuntimeError("no sanctions list could be read: " + "; ".join(errors))
@@ -400,10 +425,11 @@ def _lane_sanctions(raw_dir, prev, getter):
     cross, table = sanctions.vessel_crosslist({k: v.get("index") or {} for k, v in new_state.items()},
                                               stale=tuple(l for l in failed if l in new_state))
     cross["checked_at"] = now
+    lead = sanctions.cross_list_lead(table, {k: v.get("vessel_dates") or {} for k, v in new_state.items()}, now)
     for d in deltas:
         sanctions.mark_also_on(d, table)
     return {"sanctions": sanctions.roll(prev.get("sanctions") or [], deltas, now), "sanctions_lists": lists,
-            "vessel_crosslist": cross, "vessel_table": table}, recs
+            "vessel_crosslist": cross, "vessel_table": table, "vessel_lead": lead}, recs
 
 
 def _lane_screening(raw_dir, prev, getter):
@@ -649,20 +675,30 @@ def _lane_inspection(raw_dir, prev, getter):
 
 def _lane_minerals(raw_dir, prev, getter):
     """USGS Mineral Commodity Summaries: net import reliance and import sources. Annual; context, not feed items."""
-    item, rec0 = fetch.fetch("usgs-mcs-item", minerals.ITEM_URL.format(item=minerals.ITEM_ID), raw_dir, "json",
-                             getter=getter)
-    found = minerals.find_files(item)
-    bodies, recs = {}, [rec0]
-    for key, f in found["files"].items():
-        body, rec = fetch.fetch(f"usgs-mcs-{key}", f["url"], raw_dir, "csv", getter=getter)
-        minerals.check_md5(body, f["md5"], f["name"])
-        bodies[key] = body.decode("utf-8-sig")
-        recs.append(rec)
+    read_from = None
+    try:
+        item, rec0 = fetch.fetch("usgs-mcs-item", minerals.ITEM_URL.format(item=minerals.ITEM_ID), raw_dir, "json",
+                                 getter=getter)
+        found = minerals.find_files(item)
+        bodies, recs = {}, [rec0]
+        for key, f in found["files"].items():
+            body, rec = fetch.fetch(f"usgs-mcs-{key}", f["url"], raw_dir, "csv", getter=getter)
+            minerals.check_md5(body, f["md5"], f["name"])
+            bodies[key] = body.decode("utf-8-sig")
+            recs.append(rec)
+    except OSError as exc:   # urllib errors, timeouts and refusals (a checksum or layout change still fails)
+        # ScienceBase did not answer. The release is annual and the stored copy is the same files (checked
+        # against the USGS checksums), so the figures stay current; the site and the health entry say which copy.
+        found, bodies = minerals.stored_release()
+        recs = []
+        read_from = {"copy": "stored", "reason": minerals.refusal(exc), "at": fetch.now_utc()}
     by_name = {c["name"]: c["cc"] for c in json.loads(
         (ROOT / "doctrine" / "kit" / "geo" / "countries.json").read_text(encoding="utf-8"))["countries"]}
     cc_of = lambda name: minerals.NAME_CC.get(name) or by_name.get(name)  # noqa: E731
     doc = minerals.build(found, minerals.parse_reliance(bodies["reliance"]), minerals.parse_sources(bodies["sources"]),
                          cc_of)
+    if read_from:
+        doc["read_from"] = read_from
     doc["watch"] = _minerals_watch(raw_dir, getter, recs)
     doc["eu_list"] = minerals_world.eu_list_record()
     for r in doc["reliance"] + doc["import_sources"]:
@@ -799,6 +835,7 @@ def collect(root: Path = ROOT, getter=None, only: list[str] | None = None) -> di
 # What a run needs from the run before: the working snapshot (last good copies, FAO vintages, the WFP cache
 # markers) and the two list indexes. A scheduled run has no disk of its own, so the build publishes these under
 # site/data/state/ and the next run reads them back with `restore`.
+FTM_SOURCES = "<!-- ftm-sources -->"   # site_src/index.html: where build writes the entity export's sources
 STATE_FILES = {"snapshot.json": "data/state/snapshot.json",
                "state/sanctions_index.json": "data/state/sanctions_index.json",
                "state/screening_index.json": "data/state/screening_index.json"}
@@ -859,7 +896,7 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                                      "energy", "fao", "pinksheet", "pinksheet_updated",
                                      "local_food", "local_food_missing", "sanctions", "sanctions_lists", "screening",
                                      "screening_lists", "controls", "inspection", "inspection_issues", "minerals",
-                                     "question_drafts", "vessel_crosslist", "mineral_trade", "tariff_pace",
+                                     "question_drafts", "vessel_crosslist", "vessel_lead", "mineral_trade", "tariff_pace",
                                      "hts_releases", "hts_pace", "signed_actions", "signed_error",
                                      "un_committee_releases", "un_press", "scotus_opinions", "scotus_tracked",
                                      "scotus_errors", "uksc_judgments", "uksc_errors", "uksc_sitemap",
@@ -898,6 +935,18 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
                         for l in sanctions.VESSEL_LISTS},
             "summary": snap.get("vessel_crosslist") or {},
             "vessels": snap.get("vessel_table") or []}),
+        "data/lead-time.json": dump({
+            "generated_at": snap["generated_at"],
+            "note": ("Which publisher listed a ship first: ships, by IMO number, on two or more of the OFAC SDN list, the "
+                     "UK Sanctions List, "
+                     "Canada's consolidated list and Japan's ship list, with each list's own date (the earliest of its "
+                     "entries for that number). OFAC's is the date its entry was created, from the SDN advanced XML. "
+                     "France's and Australia's files give no date, so their ships are not placed in time "
+                     "(also_on_undated). These are the publishers' dates: they measure the publishers, not Headwind, "
+                     "and say nothing about the ship."),
+            "sources": {l: {"name": sanctions.LISTS[l]["name"], "url": sanctions.LISTS[l]["url"]}
+                        for l in sanctions.DATED_VESSEL_LISTS},
+            **(snap.get("vessel_lead") or {})}),
         "data/list-changes.json": dump(list_changes(snap)),
         "data/question_drafts.json": dump({"note": "Drafts only. Nothing here is registered in Verdict.",
                                            "drafts": snap.get("question_drafts") or []}),
@@ -912,6 +961,9 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
         for p in sorted(src_dir.rglob("*")):
             if p.is_file():
                 files[p.relative_to(src_dir).as_posix()] = p.read_text(encoding="utf-8")
+    # The entity export's sources, licences and changes, list by list, from the table the export credits them from.
+    if "index.html" in files:
+        files["index.html"] = files["index.html"].replace(FTM_SOURCES, ftm.sources_html(snap.get("screening_lists")))
 
     out_dir = root / "site"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -922,8 +974,10 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
     return files
 
 
-def check_all(root: Path = ROOT) -> list[str]:
+def check_all(root: Path = ROOT, registers_only: bool = False) -> list[str]:
     errs = registers.check(root / "doctrine")
+    if registers_only:
+        return errs
     regs = registers.ids(root / "doctrine")
     feed_path = root / "site" / "data" / "feed.geojson"
     if not feed_path.exists():
@@ -947,7 +1001,9 @@ def main(argv=None) -> int:
                    help="also write data/state/ into site/, for a scheduled run to restore from")
     r = sub.add_parser("restore")
     r.add_argument("--from", dest="base_url", required=True, help="the published site to read the last state from")
-    sub.add_parser("check")
+    k = sub.add_parser("check")
+    k.add_argument("--registers-only", action="store_true",
+                   help="check the registers only (a checkout with no built site/)")
     args = ap.parse_args(argv)
 
     if args.cmd == "collect":
@@ -991,7 +1047,7 @@ def main(argv=None) -> int:
             return 1
         return 0
     if args.cmd == "check":
-        errs = check_all(ROOT)
+        errs = check_all(ROOT, registers_only=args.registers_only)
         for e in errs:
             print("  -", e)
         print(f"Headwind check: {'PASS' if not errs else f'FAIL ({len(errs)} problems)'}")

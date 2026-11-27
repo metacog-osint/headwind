@@ -14,10 +14,16 @@ name: update
 # public too: nothing goes into the state that may not be published. The indexes hold the publishers' own entry
 # ids, types and programs, taken from public lists, and since headwind-1.9 the names and address countries Headwind
 # publishes (every list but the UN's), and short name hashes; never UN list text. A
-# run restores the cache first and the release asset when the cache has nothing. With neither the run fails, so a
+# run restores the cache first, the release asset when the cache has nothing, and the newest copy in the private
+# archive (lane `state`, see the last step) when neither has it. With none of the three the run fails, so a
 # lost state is an alarm and not a silent first reading; start a deliberate first reading by hand with
 # first_reading ticked. State is saved after the feed check and before the deploy, so a failed deploy does not
 # lose a change.
+#
+# Private archive (the last two steps): every run's raw replies, history/, run state and deployed site/ also go to
+# the PRIVATE repo metacog-osint/tic-archive (tools/tic_archive.py), where nothing is replaced or deleted. The run
+# state and site/ are otherwise kept only for a while (the cache) or replaced by the next run (the release `state`,
+# the deploy), and the archive keeps every version.
 #
 # Secrets: EIA_API_KEY (energy lane; without it that lane fails and the rest run), CENSUS_API_KEY (the trade lane,
 # US mineral imports by country; the same), CLOUDFLARE_PAGES_TOKEN
@@ -66,20 +72,29 @@ jobs:
             data/state
           key: headwind-state-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: headwind-state-
-      - name: No cache entry, so the state from the release
+      # Then the private archive: its lane `state` holds the run state of every run whose feed check passed. The
+      # restore goes to a temporary folder first and is copied into data/ only when it finished, so a broken
+      # download never leaves half a state behind.
+      - name: No cache entry, so the state from the release (or the private archive)
         if: steps.state.outputs.cache-matched-key == ''
         env:
           GH_TOKEN: ${{ github.token }}
+          ARCHIVE_TOKEN: ${{ secrets.TIC_ARCHIVE_TOKEN }}
           FIRST_READING: ${{ inputs.first_reading }}
         run: |
           if gh release download state --pattern headwind-state.tar.gz --dir "$RUNNER_TEMP" 2>/dev/null; then
             tar -xzf "$RUNNER_TEMP/headwind-state.tar.gz"
             echo "::warning::No state in the Actions cache; restored the copy kept in the release 'state'."
             ls -l data/snapshot.json data/state
+          elif [ -n "$ARCHIVE_TOKEN" ] && GH_TOKEN="$ARCHIVE_TOKEN" python tools/tic_archive.py restore \
+                 --program headwind --lane state --dest "$RUNNER_TEMP/archive-state"; then
+            mkdir -p data && cp -R "$RUNNER_TEMP/archive-state/." data/
+            echo "::warning::No state in the Actions cache or the release 'state'; restored the newest copy kept in the private archive."
+            ls -l data/snapshot.json data/state
           elif [ "$FIRST_READING" = "true" ]; then
             echo "::warning::No state anywhere and first_reading was chosen: this run sets new list baselines."
           else
-            echo "::error::No state in the Actions cache or the release 'state'. Stopping so the list baselines are not started over. If the state is known lost, run the workflow by hand with first_reading ticked."
+            echo "::error::No state in the Actions cache, the release 'state' or the private archive. Stopping so the list baselines are not started over. If the state is known lost, run the workflow by hand with first_reading ticked."
             exit 1
           fi
       - name: Live collection (a failed lane keeps its last good copy and says so on the page)
@@ -90,6 +105,7 @@ jobs:
       - name: Build site/
         run: python tools/headwind.py build
       - name: Feed check
+        id: check
         run: python tools/headwind.py check
       # The run's checkout can be older than main: a run queued behind another starts from the commit that
       # triggered it, without the history commit the run before made. So history/ is taken from main's tip first,
@@ -98,6 +114,7 @@ jobs:
       # --reading-key data_as_of (kit 0.5.13, 18 Nov 2026): series ids carry no date, so a new reading is a
       # changed line in the log, not the reading before ended.
       - name: History (history/, and site/data/ended.geojson)
+        id: history
         run: |
           git fetch -q --depth=1 origin main && git checkout -q FETCH_HEAD -- history 2>/dev/null \
             || echo "::warning::could not take history/ from main's tip; using this checkout's"
@@ -128,6 +145,7 @@ jobs:
             data/state
           key: headwind-state-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Deploy site/ to Cloudflare Pages
+        id: deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -135,8 +153,17 @@ jobs:
           if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
             echo "Cloudflare secrets not set; skipping deploy"; exit 0
           fi
-          npx --yes wrangler@4.151.3 pages deploy site --project-name headwind --branch main \
-            --commit-hash "$GITHUB_SHA" --commit-message "update $GITHUB_SHA" --commit-dirty=true
+          # Cloudflare's API fails now and then with nothing wrong here ("An unknown error occurred ... [code: 8000000]"),
+          # which failed the run and mailed an alert. Try three times, 20 s and 60 s apart.
+          for wait in 0 20 60; do
+            if [ "$wait" != 0 ]; then echo "::warning::Cloudflare deploy failed; trying again in ${wait} s"; sleep "$wait"; fi
+            if npx --yes wrangler@4.151.3 pages deploy site --project-name headwind --branch main \
+                 --commit-hash "$GITHUB_SHA" --commit-message "update $GITHUB_SHA" --commit-dirty=true; then
+              echo "deployed=true" >> "$GITHUB_OUTPUT"    # only here: the skip above also ends the step green
+              exit 0
+            fi
+          done
+          echo "::error::Cloudflare Pages deploy failed three times"; exit 1
       # After the deploy, so a failed upload never holds the site back; it still fails the run, which mails the owner.
       # Release `state` keeps only the newest tarball (the restore path above). Dated copies are kept for good in
       # one release per quarter, `state-YYYY-qN` (about 92 assets a quarter against the 1,000 limit); a same-day
@@ -173,6 +200,37 @@ jobs:
           n=$(gh release view "$q" --json assets --jq '.assets | length')
           echo "release $q holds $n assets (limit 1,000)"
           if [ "$n" -ge 950 ]; then echo "::error::release $q has $n assets, near the 1,000 limit"; exit 1; fi
+      # Entities and checksums, after the state upload so the manifests cover this run's files. The named entries of
+      # the run state as a FollowTheMoney entity stream (headwind/ftm.py; checked against FtM's model before it is
+      # written) go to release `entities`, replaced each run like `state`; every version of the state they are made
+      # from is kept in the private archive (lane state). Then every release gets SHA256SUMS and
+      # headwind-manifest.json (headwind/manifest.py): a file uploaded in this run is hashed here and must match
+      # GitHub's digest of the upload, the others are taken from GitHub's digest, and a manifest is uploaded only
+      # when it changed. Nothing is deleted.
+      - name: Entities (FollowTheMoney) and release checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The release notes are written by the exporter from the same table as about.json: every list's publisher,
+          # title, source, licence and its link, attribution statement and what was changed.
+          python -m headwind.ftm --state data/state --out headwind-entities.ftm.gz --about headwind-entities.about.json --notes "$RUNNER_TEMP/entities-notes.md"
+          title="Entities (FollowTheMoney)"
+          if ! gh release view entities >/dev/null 2>&1; then
+            gh release create entities --prerelease --latest=false --title "$title" --notes-file "$RUNNER_TEMP/entities-notes.md"
+          else
+            gh release edit entities --title "$title" --notes-file "$RUNNER_TEMP/entities-notes.md" >/dev/null
+          fi
+          gh release upload entities headwind-entities.ftm.gz headwind-entities.about.json --clobber
+          for tag in $(gh release list --limit 200 --json tagName --jq '.[].tagName'); do
+            out="$RUNNER_TEMP/manifest/$tag"
+            res=$(python -m headwind.manifest release "$tag" --repo "$GITHUB_REPOSITORY" --out-dir "$out" --local-dir .) || { echo "::error::release $tag: checksums not written (see above)"; exit 1; }
+            if [ "$res" = "changed" ]; then
+              gh release upload "$tag" "$out/SHA256SUMS" "$out/headwind-manifest.json" --clobber
+              echo "$tag: SHA256SUMS and headwind-manifest.json updated"
+            else
+              echo "$tag: checksums unchanged"
+            fi
+          done
       # Private archive (19 Nov 2026, retention rule: no data lost). The raw source copies (sanctions lists, CSL,
       # prices, notices) were discarded with the runner; they go to the PRIVATE repo metacog-osint/tic-archive as
       # release assets (tools/tic_archive.py, release headwind-raw-YYYY-MM: a snapshot per run, only changed files
@@ -191,3 +249,46 @@ jobs:
           fi
           python tools/tic_archive.py put --program headwind --lane raw --src data/raw \
             --redact-env-if-set EIA_API_KEY --redact-env-if-set CENSUS_API_KEY
+      # What this public repository keeps only for a while or replaces, to the same private archive, one lane each
+      # (release headwind-<lane>-YYYY-MM; a snapshot per run, only changed files uploaded, nothing replaced):
+      #   history  history/ as the History step left it: the history log, list changes in full, the fetch index,
+      #            the kit's state.json. Committed to main too. Only when that step ran, so a run that stopped
+      #            earlier never archives an older checkout's history/ as the newest snapshot.
+      #   state    data/ without data/raw: the run state, which the Actions cache keeps for 7 days and the release
+      #            `state` replaces each run. Only once the feed check passed, so it is a state the next run may use
+      #            (the restore step above reads it when the cache and the release have none).
+      #   site     site/ as deployed: every published file, vessels.json (Wake) and events.json (Verdict) among them,
+      #            each replaced by the next deploy. Only when wrangler deployed it (the deploy step's output
+      #            `deployed`): without the Cloudflare secrets the step skips the deploy and still succeeds.
+      # These files are all public already, so nothing is redacted and the archived bytes match the public copy.
+      # Each lane is tried even if another failed; any failure turns the run red after the live site is updated.
+      - name: Private archive (history, run state and site, to tic-archive)
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ secrets.TIC_ARCHIVE_TOKEN }}
+          HISTORY: ${{ steps.history.outcome }}
+          CHECKED: ${{ steps.check.outcome }}
+          DEPLOYED: ${{ steps.deploy.outputs.deployed }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::secret TIC_ARCHIVE_TOKEN is not set, so history/, the run state and site/ did not reach the private archive"; exit 1
+          fi
+          failed=0
+          if [ "$HISTORY" = "success" ]; then
+            python tools/tic_archive.py put --program headwind --lane history --src history || failed=1
+          else
+            echo "history: the History step did not run, so history/ was not archived"
+          fi
+          if [ "$CHECKED" = "success" ]; then
+            python tools/tic_archive.py put --program headwind --lane state --src data --exclude 'raw/*' || failed=1
+          else
+            echo "state: the feed check did not pass this run, so the state was not archived"
+          fi
+          if [ "$DEPLOYED" = "true" ]; then
+            python tools/tic_archive.py put --program headwind --lane site --src site || failed=1
+          else
+            echo "site: not deployed this run (the deploy failed or was skipped), so not archived"
+          fi
+          if [ "$failed" != 0 ]; then
+            echo "::error::a lane did not reach the private archive this run (see above)"; exit 1
+          fi
