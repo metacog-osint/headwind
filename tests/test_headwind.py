@@ -118,6 +118,8 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         return f.read_bytes()
     if "api.worldbank.org" in url and "source=15" in url:
         return (FIX / "worldbank_gem.json").read_bytes()
+    if "sdn_advanced.zip" in url:
+        return zipped("ofac_advanced.xml")
     table = [("petroleum/pri/spt", "eia_petroleum.json"), ("natural-gas/pri/fut", "eia_natural_gas.json"),
              ("foodpricesindex", "fao_page.html"),
              ("food_price_indices_data.csv", "fao.csv"), ("package_search", "hdx.json"),
@@ -142,6 +144,13 @@ def fake_getter(url: str, timeout: int = 60) -> bytes:
         name = {f["url"]: k for k, f in files.items()}[url]
         return (FIX / {"reliance": "usgs_net_import_reliance.csv", "sources": "usgs_major_import_sources.csv"}[name]).read_bytes()
     raise OSError(f"no fixture for {url}")
+
+
+def zipped(name: str) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("SDN_ADVANCED.XML", (FIX / name).read_bytes())
+    return buf.getvalue()
 
 
 def lint(fc: dict) -> list[str]:
@@ -2040,6 +2049,17 @@ class TestEndToEnd(unittest.TestCase):
             self.assertEqual(len(kept["eu-fsf"]["index"]), 9)       # the EU baseline survives the failed read
             self.assertIn("United States", kept["ofac-sdn"]["index"]["8129"][2]["countries"])   # add.csv read too
 
+            # OFAC's ship dates come from the advanced XML and survive a run that cannot read it.
+            def undated(url, timeout=60):
+                if "sdn_advanced.zip" in url:
+                    raise OSError("no dates file")
+                return eu_down(url, timeout)
+            before = kept["ofac-sdn"].get("vessel_dates")
+            self.assertEqual(before.get("15042"), "2012-07-12")
+            headwind_cli.collect(tmp, getter=undated)
+            again_kept = json.loads((tmp / "data" / "state" / "sanctions_index.json").read_text(encoding="utf-8"))
+            self.assertEqual(again_kept["ofac-sdn"].get("vessel_dates"), before)
+
             # A list that changes between runs is reported once, as counts.
             def changed(url, timeout=60):
                 body = fake_getter(url, timeout)
@@ -2207,6 +2227,16 @@ class TestNames(unittest.TestCase):
         d = sanctions.delta("eu-fsf", old, {"1": new["1"]}, "2026-11-16T18:00:00Z", None)
         self.assertEqual((d["removed"], d["named_removed"], d["unnamed_removed"], d["changed"]), (1, [], 1, 0))
 
+    def test_ofac_entry_dates(self):
+        dates = sanctions.parse_sdn_advanced_dates(zipped("ofac_advanced.xml"))
+        # 25289 has two legal bases with the same date.
+        self.assertEqual(dates, {"15042": "2012-07-12", "23730": "2018-02-23", "25289": "2018-11-05"})
+        with self.assertRaises(ValueError):
+            buf = io.BytesIO()
+            with zipfile.ZipFile(buf, "w") as z:
+                z.writestr("SDN_ADVANCED.XML", "<Sanctions><SanctionsEntries/></Sanctions>")
+            sanctions.parse_sdn_advanced_dates(buf.getvalue())
+
     def test_who_listed_a_ship_first(self):
         table = [{"imo": "1000001", "on": {"uk-sanctions": {"ids": ["RUS1", "RUS9"], "name": "A"},
                                            "canada-sema": {"ids": ["c1"], "name": "A"},
@@ -2226,7 +2256,7 @@ class TestNames(unittest.TestCase):
         self.assertEqual(ships["1000001"]["listed"]["uk-sanctions"], "2025-01-01")    # the earliest of its entries
         self.assertEqual((ships["1000001"]["first"], ships["1000001"]["days_after_first"]["canada-sema"]),
                          (["uk-sanctions"], 45))
-        self.assertEqual(ships["1000001"]["also_on_undated"], ["ofac-sdn"])
+        self.assertEqual(ships["1000001"]["also_on_undated"], ["ofac-sdn"])    # carries it, no date given for it
         self.assertEqual(ships["1000002"]["first"], ["japan-mof"])
         pairs = {tuple(p["lists"]): p for p in lead["pairs"]}
         uk_ca = pairs[("uk-sanctions", "canada-sema")]
@@ -2234,7 +2264,12 @@ class TestNames(unittest.TestCase):
                           uk_ca["first"]["uk-sanctions"]["median_days"], uk_ca["first"]["canada-sema"]["ships"]),
                          (2, 1, 1, 45, 0))
         self.assertEqual(pairs[("uk-sanctions", "japan-mof")]["first"]["japan-mof"]["max_days"], 9)
-        self.assertEqual(lead["lists_undated"], ["ofac-sdn", "france-gels", "australia-dfat"])
+        self.assertEqual(lead["lists_undated"], ["france-gels", "australia-dfat"])
+        dates["ofac-sdn"] = {"1": "2024-12-02"}
+        dated = sanctions.cross_list_lead(table, dates, "2026-11-27T00:00:00Z")
+        ships = {s["imo"]: s for s in dated["ships"]}
+        self.assertEqual((ships["1000001"]["first"], ships["1000001"]["days_after_first"]["uk-sanctions"],
+                          ships["1000001"]["also_on_undated"]), (["ofac-sdn"], 30, []))
         self.assertEqual(lead["date_range"]["uk-sanctions"], ["2025-01-01", "2025-05-10"])
 
     def test_a_move_of_the_dollar_is_one_item(self):
