@@ -21,7 +21,7 @@ import gzip
 import hashlib
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # Privacy switch. Tom, 19 Nov 2026: removed individuals are retained in full (government lists, publicly
@@ -126,9 +126,59 @@ def vessels_digest(path: Path) -> str:
     return hashlib.sha256(json.dumps(doc, sort_keys=True, separators=(",", ":")).encode()).hexdigest()[:12]
 
 
+# Public window. history/ keeps every file in the private archive's history lane (tools/tic_archive.py, a snapshot
+# per run). The committed copy keeps a rolling window: a dated file leaves the tree once its last day is more than
+# PUBLIC_DAYS old, and only files dated on or after PUBLIC_WINDOW_FROM, so everything committed before that date stays
+# in the tree. git history keeps every removed file too.
+# 45 days, not less: the kit's ended.geojson reads the last 8 days of the log, and append_deltas skips ids already in
+# history/deltas while the snapshot still offers changes up to 30 days old, so a month's deltas file must stay in the
+# tree for more than 30 days after the month ends, or a change listed late in the month would be written again.
+PUBLIC_DAYS = 45
+PUBLIC_WINDOW_FROM = "2026-12-01"
+
+
+def file_days(rel: str) -> tuple[str, str] | None:
+    """(first day, last day), YYYY-MM-DD, that a history/ file covers; None for an undated file (state.json)."""
+    parts = rel.replace("\\", "/").split("/")
+    stem = parts[-1].split(".")[0]
+    try:
+        if parts[0] == "log" and len(parts) == 4:
+            day = datetime(int(parts[1]), int(parts[2]), int(stem)).strftime("%Y-%m-%d")
+            return day, day
+        if parts[0] in ("deltas", "fetch-index") and len(parts) == 2:
+            y, m = (int(x) for x in stem.split("-"))
+            last = datetime(y + (m == 12), m % 12 + 1, 1) - timedelta(days=1)
+            return f"{y:04d}-{m:02d}-01", last.strftime("%Y-%m-%d")
+    except ValueError:
+        return None
+    return None
+
+
+def outside_window(history_dir: Path, now: datetime | None = None, days: int = PUBLIC_DAYS,
+                   window_from: str = PUBLIC_WINDOW_FROM) -> list[str]:
+    """history/ files (relative, '/'-separated) that leave the committed tree: first day on or after `window_from`,
+    last day more than `days` days before `now`. Undated files never leave."""
+    now = now or datetime.now(timezone.utc)
+    cutoff = (now - timedelta(days=days)).strftime("%Y-%m-%d")
+    root = Path(history_dir)
+    out = []
+    for p in sorted(root.rglob("*")):
+        if not p.is_file():
+            continue
+        rel = p.relative_to(root).as_posix()
+        span = file_days(rel)
+        if span and span[0] >= window_from and span[1] < cutoff:
+            out.append(rel)
+    return out
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Headwind retention archives")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    w = sub.add_parser("outside-window", help="list history/ files older than the public window, one per line")
+    w.add_argument("--history", default="history")
+    w.add_argument("--days", type=int, default=PUBLIC_DAYS)
+    w.add_argument("--now", help="ISO time to measure from (tests); default the current time")
     a = sub.add_parser("append", help="archive deltas and fetch-index rows into history/")
     a.add_argument("--snapshot", default="data/snapshot.json")
     a.add_argument("--raw-index", default="data/raw/index.jsonl")
@@ -136,6 +186,11 @@ def main(argv=None) -> int:
     v = sub.add_parser("vessels-digest", help="print the digest of data/vessels.json")
     v.add_argument("path")
     args = ap.parse_args(argv)
+    if args.cmd == "outside-window":
+        now = datetime.fromisoformat(args.now.replace("Z", "+00:00")) if args.now else None
+        out = "".join(rel + "\n" for rel in outside_window(Path(args.history), now=now, days=args.days))
+        sys.stdout.buffer.write(out.encode("utf-8"))      # "\n" on every system: the workflow reads it in bash
+        return 0
     if args.cmd == "vessels-digest":
         print(vessels_digest(Path(args.path)))
         return 0

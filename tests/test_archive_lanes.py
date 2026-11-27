@@ -172,7 +172,7 @@ class TestWorkflowLanes(unittest.TestCase):
         self.assertNotIn("|| true", text)
         self.assertIn('[ -z "$GH_TOKEN" ]', text)
         self.assertEqual(text.count("exit 1"), 2)            # token missing; any lane failed
-        self.assertEqual(text.count("|| failed=1"), 3)       # each lane tried even if another failed
+        self.assertEqual(text.count("failed=1"), 3)          # each lane tried even if another failed
 
     def test_each_lane_only_after_the_step_that_writes_it(self):
         text = step("Private archive (history")
@@ -186,7 +186,7 @@ class TestWorkflowLanes(unittest.TestCase):
         self.assertIn("id: check", STEPS["Feed check"])
         self.assertIn("id: deploy", STEPS["Deploy site/ to Cloudflare Pages"])
         flat = text.replace("\\\n", " ")
-        self.assertRegex(flat, r'if \[ "\$HISTORY" = "success" \]; then\s+python tools/tic_archive\.py put '
+        self.assertRegex(flat, r'if \[ "\$HISTORY" = "success" \]; then\s+(?:if )?python tools/tic_archive\.py put '
                                r'--program headwind --lane history ')
         self.assertRegex(flat, r'if \[ "\$CHECKED" = "success" \]; then\s+python tools/tic_archive\.py put '
                                r'--program headwind --lane state ')
