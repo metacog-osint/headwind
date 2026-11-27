@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from headwind import ftm, sanctions  # noqa: E402
+from headwind import ftm, sanctions, screening  # noqa: E402
 
 MODEL = ftm.load_model()
 CHECKED = "2026-11-27T05:45:11Z"
@@ -64,7 +64,11 @@ def _state():
                     "9641": ["individual", ["NS-PLC"], ["PS"], "351726a4b135", "Jamileh Abdullah AL-SHANTI"]}},
         "DTC": {"name": "ITAR Debarred", "publisher": "US State Department",
                 "url": "https://www.trade.gov/consolidated-screening-list", "index": {
-                    "1d0250ee": ["not stated", [], [], "133af806e4f8", "A & C International Trade, Inc."]}}}}
+                    "1d0250ee": ["not stated", [], [], "133af806e4f8", "A & C International Trade, Inc."]}},
+        "DPL": {"name": "Denied Persons List", "publisher": "US Bureau of Industry and Security",
+                "url": "https://www.bis.gov/licensing/end-user-guidance/denied-persons-list-dpl", "index": {
+                    "2815dd93": ["not stated", [], ["DK"], "5d1f0e0c9c1a", "SEMICONDUCTOR SYSTEMS INTL., INC. (SSI)"]},
+                "entry_dates": {"2815dd93": ["1992-03-20", "2000-10-04"]}}}}
     return s, c
 
 
@@ -123,7 +127,7 @@ class Export(unittest.TestCase):
         self.assertFalse(set(ftm.LISTS) & {"un-consolidated", "france-gels"})
         self.assertTrue(set(ftm.LISTS) <= set(sanctions.NAMED_LISTS))
         for spec in ftm.LISTS.values():
-            self.assertTrue(spec["terms"])
+            self.assertTrue(spec["statement"])
 
     def test_canada_key_is_a_record_id_not_an_authority_id(self):
         eid = ftm.entity_id("canada-sema", "Belarus|1, Part 1|1")
@@ -186,6 +190,146 @@ class Export(unittest.TestCase):
             a = json.loads(about.read_text(encoding="utf-8"))
             self.assertEqual(a["followthemoney"]["model_version"], "4.11.3")
             self.assertEqual(a["entities"], len(self.stream))
+
+
+CREDIT_FIELDS = ("publisher", "title", "source", "licence", "licence_url", "statement", "changes")
+
+
+class Attribution(unittest.TestCase):
+    """Every exported list is credited, from one table, in about.json, the release notes and the site."""
+
+    def setUp(self):
+        self.stream, self.about = ftm.entities(*_state(), MODEL)
+
+    def test_every_exported_list_has_a_licence_link_and_a_statement_of_changes(self):
+        self.assertEqual(len(self.about["lists"]), len(ftm.LISTS) + 4)       # six lists and four CSL lists
+        for item in self.about["lists"]:
+            a = item["attribution"]
+            self.assertEqual(a["list"], item["list"])
+            for field in CREDIT_FIELDS:
+                self.assertTrue(a.get(field), f"{item['list']}: no {field}")
+            self.assertRegex(a["licence_url"], r"^https?://", item["list"])
+            self.assertTrue(all(s.startswith(("https://", "http://")) for s in a["source"]), item["list"])
+            self.assertTrue(a["changes"].startswith("Modified by Headwind"), item["list"])
+            self.assertGreater(len(a["changes"]), len(ftm.CHANGES_ALL) + 20, item["list"])  # and its own changes
+            self.assertEqual(item["terms"], a["statement"])
+
+    def test_the_table_covers_every_list(self):
+        for list_id, spec in ftm.LISTS.items():
+            for field in CREDIT_FIELDS:
+                self.assertTrue(spec.get(field), f"{list_id}: no {field}")
+        for field in ("publisher", "source", "licence", "licence_url", "statement", "changes"):
+            self.assertTrue(ftm.SCREENING.get(field), field)
+
+    def test_cc_by_and_ogl_ask_for_their_licence_link_and_cc_by_for_the_changes(self):
+        au = ftm.attribution("australia-dfat")
+        self.assertEqual(au["licence_url"], "https://creativecommons.org/licenses/by/4.0/")
+        self.assertIn("Department of Foreign Affairs and Trade website – www.dfat.gov.au", au["statement"])
+        self.assertIn(ftm.CC_BY_4_URL, au["statement"])
+        self.assertIn("modified", au["statement"])
+        self.assertIn("left out", au["changes"])
+        uk = ftm.attribution("uk-sanctions")
+        self.assertEqual(uk["licence_url"], "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/")
+        self.assertIn("Contains public sector information licensed under the Open Government Licence v3.0",
+                      uk["statement"])
+        self.assertIn("加工して作成", ftm.attribution("japan-mof")["statement"])
+
+    def test_left_out_counts_per_list(self):
+        by = {x["list"]: x["attribution"]["left_out"] for x in self.about["lists"]}
+        self.assertEqual(by["uk-sanctions"], {"type not exported": 1})
+        self.assertEqual(by["australia-dfat"], {"no name in the state": 1})
+        self.assertEqual(by["ofac-sdn"], {})
+
+    def test_release_notes_carry_every_credit(self):
+        notes = ftm.release_notes(self.about)
+        for item in self.about["lists"]:
+            a = item["attribution"]
+            self.assertIn(f"[{a['licence']}]({a['licence_url']})", notes)
+            self.assertIn(a["title"], notes)
+            self.assertIn(a["statement"], notes)
+            self.assertIn(a["changes"][len(ftm.CHANGES_ALL):].strip(), notes)
+        self.assertIn(ftm.CHANGES_ALL, notes)
+        self.assertIn("SHA256SUMS", notes)
+
+    def test_site_sources_from_the_same_table(self):
+        _, c = _state()
+        page = ftm.sources_html(c["lists"])
+        statuses = [{"id": k, **v} for k, v in c["lists"].items()]
+        self.assertEqual(page, ftm.sources_html(statuses))
+        for a in ftm.all_attributions(c["lists"]):
+            self.assertIn(f'href="{a["licence_url"]}"', page)
+        self.assertEqual(page.count("<li>"), len(ftm.LISTS) + 4)
+
+    def test_main_writes_notes(self):
+        s, c = _state()
+        with tempfile.TemporaryDirectory() as d:
+            st = Path(d) / "state"
+            st.mkdir()
+            (st / "sanctions_index.json").write_text(json.dumps(s), encoding="utf-8")
+            (st / "screening_index.json").write_text(json.dumps(c), encoding="utf-8")
+            notes = Path(d) / "notes.md"
+            ftm.main(["--state", str(st), "--out", str(Path(d) / "x.ftm.gz"), "--about", str(Path(d) / "a.json"),
+                      "--notes", str(notes)])
+            self.assertIn(ftm.CC_BY_4_URL, notes.read_text(encoding="utf-8"))
+
+
+class EndedListings(unittest.TestCase):
+    """Denied Persons List orders whose end date has passed stay in the CSL file; the export marks them ended.
+    Fixture: three real DPL entries from the CSL of 27 Nov 2026 (ended 2000, ends 2027, no end date)."""
+    ENDED, LATER, OPEN = ("2815dd9334befab373278b903a412b353b292cc8d09cf8d06af746db",
+                          "e8e62a20de26fe327462978a684d3d1c7868333511985d62d61c2539",
+                          "2a3f1ab0ea11c63a96bf46133e98e1464f46880717a20affef268393")
+
+    def setUp(self):
+        body = (Path(__file__).resolve().parent / "fixtures" / "trade_gov_csl_dpl.json").read_bytes()
+        self.lists = screening.parse(body)
+        screening.MIN_ENTRIES, self._min = 0, screening.MIN_ENTRIES
+        _, _, self.state = screening.compare(self.lists, {}, "2026-11-27T07:40:00Z")
+
+    def tearDown(self):
+        screening.MIN_ENTRIES = self._min
+
+    def test_the_state_keeps_start_and_end_dates_beside_the_index(self):
+        dpl = self.state["lists"]["DPL"]
+        self.assertEqual(dpl["entry_dates"][self.ENDED], ["1992-03-20", "2000-10-04"])
+        self.assertEqual(dpl["entry_dates"][self.LATER], ["2002-01-24", "2027-01-24"])
+        self.assertEqual(dpl["entry_dates"][self.OPEN], ["1984-12-14", None])
+        self.assertEqual(len(dpl["index"][self.ENDED]), 5)                   # the index keeps its form
+
+    def test_an_older_state_without_dates_compares_as_before(self):
+        old = copy.deepcopy(self.state)
+        for lst in old["lists"].values():
+            lst.pop("entry_dates")
+        deltas, _, new = screening.compare(screening.parse(
+            (Path(__file__).resolve().parent / "fixtures" / "trade_gov_csl_dpl.json").read_bytes()), old,
+            "2026-11-27T13:40:00Z")
+        self.assertEqual(deltas, [])
+        self.assertIn(self.ENDED, new["lists"]["DPL"]["entry_dates"])
+
+    def test_ended_orders_carry_their_end_date_and_no_topic(self):
+        stream, about = ftm.entities({}, self.state, MODEL)
+        ftm.validate(stream, MODEL)
+        by_id = {e["id"]: e for e in stream}
+        ended = by_id[f"hw-csl-dpl-{self.ENDED}"]["properties"]
+        self.assertNotIn("topics", ended)
+        s = by_id[f"hw-csl-dpl-{self.ENDED}-sanction"]["properties"]
+        self.assertEqual((s["startDate"], s["endDate"]), (["1992-03-20"], ["2000-10-04"]))
+        self.assertEqual(by_id[f"hw-csl-dpl-{self.LATER}"]["properties"]["topics"], ["export.control"])
+        self.assertEqual(by_id[f"hw-csl-dpl-{self.LATER}-sanction"]["properties"]["endDate"], ["2027-01-24"])
+        self.assertEqual(by_id[f"hw-csl-dpl-{self.OPEN}"]["properties"]["topics"], ["export.control"])
+        self.assertNotIn("endDate", by_id[f"hw-csl-dpl-{self.OPEN}-sanction"]["properties"])
+        self.assertEqual(len(stream), 6)                                     # none left out
+        dpl = next(x for x in about["lists"] if x["list"] == "csl-dpl")
+        self.assertEqual((dpl["ended"], dpl["with_end_date"], dpl["with_start_date"]), (1, 2, 3))
+        self.assertEqual(about["ended"]["entries"], 1)
+        self.assertEqual(about["ended"]["by_list"], {"csl-dpl": 1})
+        self.assertIn("Ended listings: 1 entry (csl-dpl 1)", ftm.release_notes(about))
+
+    def test_has_ended_is_before_the_reading_day(self):
+        self.assertTrue(ftm.has_ended("2026-11-26", "2026-11-27T07:40:00Z"))
+        self.assertFalse(ftm.has_ended("2026-11-27", "2026-11-27T07:40:00Z"))   # in force on its last day
+        self.assertFalse(ftm.has_ended(None, "2026-11-27T07:40:00Z"))
+        self.assertFalse(ftm.has_ended("2026-11-26", None))
 
 
 class Validator(unittest.TestCase):

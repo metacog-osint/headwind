@@ -9,7 +9,10 @@ Same measure as sanctions.py: each run reduces every list to an index of entry i
 programs, countries, name hash, name], compares it with the index kept from the run before, and
 reports the difference by address country and program, naming the entries added, removed and changed
 (`headwind-1.9`; US government works). Countries are the address countries the list itself gives for an
-entry; street addresses, alternative names and remarks are not carried.
+entry; street addresses, alternative names and remarks are not carried. Each entry's start and end dates, as the
+file gives them, are kept beside the index (`entry_dates`, id -> [start, end]): the Denied Persons List gives an end
+date for most of its orders, and an order whose end date has passed stays in the file. The comparison does not read
+them, so a state kept before them compares as before; the entity export (ftm.py) writes them.
 
 What a delta means: the change between two of Headwind's own readings. The date on it is when
 Headwind saw the change, not the date of the listing.
@@ -72,7 +75,8 @@ def parse(body: bytes | str) -> dict[str, dict]:
         abbr, name, pub = split_source(s.get("source"))
         if abbr not in SKIP:
             lists[abbr] = {"name": name, "publisher": pub, "url": CSL_PAGE,
-                           "source_last_updated": s.get("source_last_updated"), "index": {}, "dates": {}}
+                           "source_last_updated": s.get("source_last_updated"), "index": {}, "dates": {},
+                           "end_dates": {}}
     for e in results:
         abbr, name, pub = split_source(e.get("source"))
         if abbr in SKIP:
@@ -81,15 +85,31 @@ def parse(body: bytes | str) -> dict[str, dict]:
         if not entry_id:
             raise ValueError(f"screening list: an entry on {abbr} has no id")
         lst = lists.setdefault(abbr, {"name": name, "publisher": pub, "url": CSL_PAGE,
-                                      "source_last_updated": None, "index": {}, "dates": {}})
+                                      "source_last_updated": None, "index": {}, "dates": {}, "end_dates": {}})
         if e.get("source_list_url") and lst["url"] == CSL_PAGE:
             lst["url"] = e["source_list_url"]
         lst["index"][entry_id] = [(e.get("type") or "not stated").lower(), sorted(e.get("programs") or []),
                                   _countries(e), name_key(e.get("name")), names.clean(e.get("name"))]
-        # The listing date, for the batch measure only (never kept in the state).
-        sd = str(e.get("start_date") or "").strip()[:10]
-        lst["dates"][entry_id] = sd if re.fullmatch(r"\d{4}-\d{2}-\d{2}", sd) else None
+        # The listing date (the batch measure, and the state's entry_dates) and the end date (entry_dates).
+        lst["dates"][entry_id] = _day(e.get("start_date"))
+        lst["end_dates"][entry_id] = _day(e.get("end_date"))
     return lists
+
+
+def _day(value) -> str | None:
+    d = str(value or "").strip()[:10]
+    return d if re.fullmatch(r"\d{4}-\d{2}-\d{2}", d) else None
+
+
+def entry_dates(lst: dict) -> dict[str, list]:
+    """{entry id: [start date, end date]} for the entries of a parsed list that the file gives either date for."""
+    starts, ends = lst.get("dates") or {}, lst.get("end_dates") or {}
+    out = {}
+    for i in sorted(lst.get("index") or {}):
+        pair = [starts.get(i), ends.get(i)]
+        if any(pair):
+            out[i] = pair
+    return out
 
 
 def check_size(lists: dict[str, dict], prev_lists: dict[str, dict] | None) -> None:
@@ -232,5 +252,6 @@ def compare(lists: dict[str, dict], state: dict, now: str) -> tuple[list[dict], 
                  "lists": {s["id"]: {"name": s["name"], "publisher": s["publisher"], "url": s["url"],
                                      "baseline_set_at": s["baseline_set_at"],
                                      "added_history": history.get(s["id"]) or [],
-                                     "index": ({**lists, **gone})[s["id"]]["index"]} for s in statuses}}
+                                     "index": ({**lists, **gone})[s["id"]]["index"],
+                                     "entry_dates": entry_dates(({**lists, **gone})[s["id"]])} for s in statuses}}
     return deltas, sorted(statuses, key=lambda s: -s["total"]), new_state

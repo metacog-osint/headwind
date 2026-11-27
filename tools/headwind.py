@@ -23,8 +23,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "doctrine" / "kit" / "python"))
 
-from headwind import (baseline, batches, commodities, controls, feed, fetch, food, health, inspection,  # noqa: E402,F401
-                      cjeu, markets, minerals, names, pinksheet, releases, sanctions, scotus, screening, tariffs,
+from headwind import (baseline, batches, commodities, controls, feed, fetch, food, ftm, health,  # noqa: E402,F401
+                      inspection, cjeu, markets, minerals, names, pinksheet, releases, sanctions, scotus, screening, tariffs,
                       trade, uksc, unpress)
 from tic_doctrine import contract, geo, registers  # noqa: E402
 
@@ -783,6 +783,7 @@ def collect(root: Path = ROOT, getter=None, only: list[str] | None = None) -> di
 # What a run needs from the run before: the working snapshot (last good copies, FAO vintages, the WFP cache
 # markers) and the two list indexes. A scheduled run has no disk of its own, so the build publishes these under
 # site/data/state/ and the next run reads them back with `restore`.
+FTM_SOURCES = "<!-- ftm-sources -->"   # site_src/index.html: where build writes the entity export's sources
 STATE_FILES = {"snapshot.json": "data/state/snapshot.json",
                "state/sanctions_index.json": "data/state/sanctions_index.json",
                "state/screening_index.json": "data/state/screening_index.json"}
@@ -908,6 +909,9 @@ def build_site(root: Path = ROOT, snapshot: dict | None = None, publish_state: b
         for p in sorted(src_dir.rglob("*")):
             if p.is_file():
                 files[p.relative_to(src_dir).as_posix()] = p.read_text(encoding="utf-8")
+    # The entity export's sources, licences and changes, list by list, from the table the export credits them from.
+    if "index.html" in files:
+        files["index.html"] = files["index.html"].replace(FTM_SOURCES, ftm.sources_html(snap.get("screening_lists")))
 
     out_dir = root / "site"
     out_dir.mkdir(parents=True, exist_ok=True)

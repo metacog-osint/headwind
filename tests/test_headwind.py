@@ -2011,6 +2011,13 @@ class TestEndToEnd(unittest.TestCase):
             for name in ("data/feed.geojson", "data/events.json", "data/baseline.json", "data/question_drafts.json",
                          "data/minerals.json", "index.html"):
                 self.assertIn(name, files)
+            # The entity export's sources, list by list, written into the page from ftm's table.
+            self.assertNotIn(headwind_cli.FTM_SOURCES, files["index.html"])
+            self.assertIn("Sources, licences and changes, list by list", files["index.html"])
+            self.assertEqual(files["index.html"].count('href="https://creativecommons.org/licenses/by/4.0/">'
+                                                       'Creative Commons'), 1)
+            scr = json.loads((tmp / "data" / "state" / "screening_index.json").read_text(encoding="utf-8"))
+            self.assertTrue(all("entry_dates" in l for l in scr["lists"].values()))
             self.assertEqual(headwind_cli.check_all(tmp), [])
             # The kit's history log ends an item only when its lane (the item's first source id) is in the health
             # record; an item whose lane is missing would never end.
