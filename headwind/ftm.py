@@ -588,6 +588,7 @@ def main(argv=None) -> int:
     write(stream, Path(args.out))
     Path(args.about).write_text(json.dumps(about, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     if args.notes:
+        Path(args.notes).parent.mkdir(parents=True, exist_ok=True)
         Path(args.notes).write_text(release_notes(about), encoding="utf-8", newline="\n")
     kinds = Counter(e["schema"] for e in stream)
     print(f"{args.out}: {len(stream)} entities ({', '.join(f'{k} {v}' for k, v in sorted(kinds.items()))}); "
